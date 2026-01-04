@@ -1,4 +1,5 @@
 import React from 'react';
+import PayoutManagement from './PayoutManagement';
 import {
   Users,
   CreditCard,
@@ -17,7 +18,8 @@ import {
   Plus,
   Search,
   Shield,
-  Trash2
+  Trash2,
+  FileText
 } from 'lucide-react';
 
 export default function AdminDashboard(props) {
@@ -200,9 +202,21 @@ export default function AdminDashboard(props) {
                   <DollarSign size={20} />
                   Ambassador Payouts
                 </button>
+
+                <button
+                  onClick={() => setActiveTab('payoutsManagement')}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                    activeTab === 'payoutsManagement'
+                      ? 'bg-purple-100 text-purple-700 font-semibold'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <FileText size={20} />
+                  Payout Management
+                </button>
               </>
             )}
-
+            
             {(currentAdmin?.role === 'super' || canViewFeature('countries')) && (
               <button
                 onClick={() => setActiveTab('countries')}
@@ -930,6 +944,14 @@ export default function AdminDashboard(props) {
                 </div>
               )}
             </div>
+          )}
+          {/* PAYOUT MANAGEMENT TAB - NEW */}
+          {activeTab === 'payoutsManagement' && (
+            <PayoutManagement 
+              currentAdmin={currentAdmin}
+              ambassadors={ambassadors}
+              canViewFeature={canViewFeature}
+            />
           )}
       {/* Bank Details Modal */}
       {showBankModal && (

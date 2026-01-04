@@ -12,6 +12,8 @@ import AnalyzeName from './pages/AnalyzeName';
 import FamilyPackage from './pages/FamilyPackage';
 import Pricing from './pages/Pricing';
 import Settings from './pages/Settings';
+import AmbassadorLogin from './pages/AmbassadorLogin';
+import AmbassadorRegistration from './pages/AmbassadorRegistration';
 import AmbassadorDashboard from './pages/AmbassadorDashboard';
 import AdminPanel from './pages/AdminPanel';
 
@@ -53,7 +55,9 @@ function App() {
         <Route path="/analyze" element={<ProtectedRoute><AnalyzeName /></ProtectedRoute>} />
         <Route path="/family" element={<ProtectedRoute><FamilyPackage /></ProtectedRoute>} />
         
-        <Route path="/ambassador" element={<AmbassadorDashboard />} />
+        <Route path="/ambassador" element={<AmbassadorLogin />} />
+        <Route path="/ambassador/register" element={<AmbassadorRegistration />} />
+        <Route path="/ambassador/dashboard" element={<AmbassadorDashboard />} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/admin" element={<AdminPanel />} />
       </Routes>

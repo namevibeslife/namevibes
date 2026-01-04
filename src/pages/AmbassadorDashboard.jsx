@@ -1,248 +1,425 @@
-import React, { useState } from 'react';
-import { TrendingUp, Users, DollarSign, Copy, Share2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { 
+  collection, 
+  query, 
+  where, 
+  getDocs,
+  doc,
+  getDoc 
+} from 'firebase/firestore';
+import { db } from '../firebase';
+import { 
+  Users, 
+  DollarSign, 
+  Calendar,
+  TrendingUp,
+  LogOut,
+  UserCheck,
+  Globe,
+  MapPin
+} from 'lucide-react';
 
 export default function AmbassadorDashboard() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const [ambassador, setAmbassador] = useState(null);
+  const [analytics, setAnalytics] = useState({
+    totalReferrals: 0,
+    totalRevenue: 0,
+    byCountry: {},
+    byState: {},
+    byMonth: {},
+    byGender: { Male: 0, Female: 0, Other: 0 },
+    byPackage: { individual: 0, family: 0 },
+    renewalAlerts: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState({
+    year: new Date().getFullYear(),
+    month: 'all'
+  });
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    // Mock login - in production, this would call Firebase Auth
-    if (email && password) {
-      setIsLoggedIn(true);
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  useEffect(() => {
+    loadAmbassadorData();
+  }, []);
+
+  useEffect(() => {
+    if (ambassador) {
+      loadAnalytics();
+    }
+  }, [ambassador, filter]);
+
+  const loadAmbassadorData = async () => {
+    try {
+      // Check session storage instead of Firebase Auth
+      const ambassadorId = sessionStorage.getItem('ambassadorId');
+      const ambassadorEmail = sessionStorage.getItem('ambassadorEmail');
+
+      if (!ambassadorId || !ambassadorEmail) {
+        navigate('/ambassador');
+        return;
+      }
+
+      // Get ambassador from Firestore
+      const ambassadorDoc = await getDoc(doc(db, 'ambassadors', ambassadorId));
+      
+      if (!ambassadorDoc.exists()) {
+        alert('Ambassador account not found');
+        sessionStorage.clear();
+        navigate('/ambassador');
+        return;
+      }
+
+      const ambassadorData = { id: ambassadorDoc.id, ...ambassadorDoc.data() };
+
+      if (!ambassadorData.isApproved || !ambassadorData.isActive) {
+        alert('Your ambassador account is not active yet. Please wait for admin approval.');
+        sessionStorage.clear();
+        navigate('/ambassador');
+        return;
+      }
+
+      setAmbassador(ambassadorData);
+    } catch (error) {
+      console.error('Error loading ambassador:', error);
+      alert('Error loading ambassador data');
     }
   };
 
-  const copyReferralCode = () => {
-    navigator.clipboard.writeText('NV2024XYZ');
-    alert('Referral code copied!');
+  const loadAnalytics = async () => {
+    if (!ambassador?.referralCode) return;
+
+    setLoading(true);
+    try {
+      // Get all users who used this referral code
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('referralUsed', '==', ambassador.referralCode));
+      const usersSnapshot = await getDocs(q);
+
+      const stats = {
+        totalReferrals: 0,
+        totalRevenue: 0,
+        byCountry: {},
+        byState: {},
+        byMonth: {},
+        byGender: { Male: 0, Female: 0, Other: 0 },
+        byPackage: { individual: 0, family: 0 },
+        renewalAlerts: []
+      };
+
+      const now = new Date();
+      const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+      usersSnapshot.docs.forEach(doc => {
+        const user = doc.data();
+
+        // Apply filters
+        const userDate = user.paidAt?.toDate();
+        if (filter.year !== 'all' && userDate?.getFullYear() !== parseInt(filter.year)) {
+          return;
+        }
+        if (filter.month !== 'all' && userDate?.getMonth() !== parseInt(filter.month)) {
+          return;
+        }
+
+        stats.totalReferrals++;
+        stats.totalRevenue += user.paidAmount || 0;
+
+        // By country
+        const country = user.countryName || 'Unknown';
+        stats.byCountry[country] = (stats.byCountry[country] || 0) + 1;
+
+        // By state
+        const state = user.stateName || 'Unknown';
+        stats.byState[state] = (stats.byState[state] || 0) + 1;
+
+        // By month
+        if (userDate) {
+          const monthYear = `${months[userDate.getMonth()]} ${userDate.getFullYear()}`;
+          stats.byMonth[monthYear] = (stats.byMonth[monthYear] || 0) + 1;
+        }
+
+        // By gender
+        const gender = user.gender || 'Other';
+        stats.byGender[gender] = (stats.byGender[gender] || 0) + 1;
+
+        // By package
+        if (user.planType) {
+          stats.byPackage[user.planType] = (stats.byPackage[user.planType] || 0) + 1;
+        }
+
+        // Renewal alerts (30 days before expiry)
+        if (user.planExpiry) {
+          const expiryDate = user.planExpiry.toDate();
+          if (expiryDate > now && expiryDate < thirtyDaysFromNow) {
+            stats.renewalAlerts.push({
+              name: user.firstName || 'User',
+              expiry: expiryDate,
+              daysLeft: Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24))
+            });
+          }
+        }
+      });
+
+      setAnalytics(stats);
+    } catch (error) {
+      console.error('Error loading analytics:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (!isLoggedIn) {
+  const handleLogout = async () => {
+    try {
+      sessionStorage.clear();
+      navigate('/ambassador');
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+  const calculateCommission = () => {
+    if (!ambassador) return 0;
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
-          <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Ambassador Login</h1>
-          
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                required
-              />
-            </div>
-            
-            <button
-              type="submit"
-              className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
-            >
-              Login
-            </button>
-          </form>
-          
-          <p className="mt-6 text-center text-sm text-gray-600">
-            Ambassadors receive login credentials after approval
-          </p>
-        </div>
+      (analytics.byPackage.individual || 0) * (ambassador.commissionRateIndividual || 0) +
+      (analytics.byPackage.family || 0) * (ambassador.commissionRateFamily || 0)
+    );
+  };
+
+  if (loading && !ambassador) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-xl text-gray-600">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-purple-600">Ambassador Panel</h1>
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="px-6 py-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <UserCheck className="w-8 h-8 text-purple-600" />
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">Ambassador Dashboard</h1>
+              <p className="text-xs text-gray-500">{ambassador?.fullName}</p>
+            </div>
+          </div>
           <button
-            onClick={() => setIsLoggedIn(false)}
-            className="text-gray-600 hover:text-gray-800"
+            onClick={handleLogout}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
           >
+            <LogOut size={18} />
             Logout
           </button>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Welcome */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4">
-            👋 Welcome, Ambassador!
-          </h2>
-          
-          {/* Referral Code */}
-          <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">Your Referral Code</h3>
-            <div className="flex items-center gap-4">
-              <div className="flex-1 bg-white rounded-lg p-4 font-mono text-3xl font-bold text-purple-600">
-                NV2024XYZ
-              </div>
-              <button
-                onClick={copyReferralCode}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+      <div className="max-w-7xl mx-auto p-6">
+        {/* Referral Code Card */}
+        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-lg p-8 mb-6 text-white">
+          <h2 className="text-2xl font-bold mb-2">Your Referral Code</h2>
+          <div className="text-5xl font-bold tracking-wider mb-4">
+            {ambassador?.referralCode || 'N/A'}
+          </div>
+          <p className="text-purple-100">Share this code with your network to earn commissions!</p>
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Filters</h3>
+          <div className="flex gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+              <select
+                value={filter.year}
+                onChange={(e) => setFilter({ ...filter, year: e.target.value })}
+                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
               >
-                <Copy size={20} />
-                Copy
-              </button>
-              <button className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition flex items-center gap-2">
-                <Share2 size={20} />
-                Share
-              </button>
+                <option value="all">All Years</option>
+                {[2024, 2025, 2026, 2027].map(year => (
+                  <option key={year} value={year}>{year}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Month</label>
+              <select
+                value={filter.month}
+                onChange={(e) => setFilter({ ...filter, month: e.target.value })}
+                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+              >
+                <option value="all">All Months</option>
+                {months.map((month, index) => (
+                  <option key={index} value={index}>{month}</option>
+                ))}
+              </select>
             </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <Users className="w-5 h-5 text-blue-600" />
+        <div className="grid md:grid-cols-4 gap-6 mb-6">
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Referrals</p>
+                <p className="text-3xl font-bold text-gray-800">{analytics.totalReferrals}</p>
               </div>
-              <h3 className="font-semibold text-gray-600">Total Referrals</h3>
+              <Users className="w-12 h-12 text-blue-500 opacity-20" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">47</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-green-600" />
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
+                <p className="text-3xl font-bold text-gray-800">₹{analytics.totalRevenue}</p>
               </div>
-              <h3 className="font-semibold text-gray-600">Total Earnings</h3>
+              <DollarSign className="w-12 h-12 text-green-500 opacity-20" />
             </div>
-            <p className="text-3xl font-bold text-green-600">₹4,285</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-yellow-600" />
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Your Commission</p>
+                <p className="text-3xl font-bold text-gray-800">₹{calculateCommission()}</p>
               </div>
-              <h3 className="font-semibold text-gray-600">Pending</h3>
+              <TrendingUp className="w-12 h-12 text-purple-500 opacity-20" />
             </div>
-            <p className="text-3xl font-bold text-yellow-600">₹1,250</p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                <DollarSign className="w-5 h-5 text-purple-600" />
+          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600 mb-1">Renewals Due</p>
+                <p className="text-3xl font-bold text-gray-800">{analytics.renewalAlerts.length}</p>
               </div>
-              <h3 className="font-semibold text-gray-600">Paid Out</h3>
-            </div>
-            <p className="text-3xl font-bold text-purple-600">₹3,035</p>
-          </div>
-        </div>
-
-        {/* Payout Settings */}
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Payout Settings</h3>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Payout Frequency
-              </label>
-              <select className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                <option>Weekly</option>
-                <option>Fortnightly</option>
-                <option>Monthly</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Next Payout Date
-              </label>
-              <div className="px-4 py-2 bg-gray-100 rounded-lg font-semibold text-gray-700">
-                January 10, 2025
-              </div>
+              <Calendar className="w-12 h-12 text-orange-500 opacity-20" />
             </div>
           </div>
         </div>
 
-        {/* Live Activity */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-6">
-            📊 Live Activity Feed
-          </h3>
-          
-          <div className="space-y-4">
-            <div className="border-2 border-green-200 bg-green-50 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="font-bold text-lg">🟢 Raj Kumar</h4>
-                  <p className="text-sm text-gray-600">Individual Plan</p>
-                </div>
-                <span className="text-xs text-gray-500">2 minutes ago</span>
+        {/* Analytics Grid */}
+        <div className="grid md:grid-cols-2 gap-6 mb-6">
+          {/* By Country */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Globe className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-bold text-gray-800">By Country</h3>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(analytics.byCountry).length > 0 ? (
+                Object.entries(analytics.byCountry).map(([country, count]) => (
+                  <div key={country} className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-700">{country}</span>
+                    <span className="font-bold text-purple-600">{count}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No data available</p>
+              )}
+            </div>
+          </div>
+
+          {/* By State */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="flex items-center gap-2 mb-4">
+              <MapPin className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-bold text-gray-800">By State</h3>
+            </div>
+            <div className="space-y-2">
+              {Object.entries(analytics.byState).length > 0 ? (
+                Object.entries(analytics.byState).map(([state, count]) => (
+                  <div key={state} className="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span className="text-gray-700">{state}</span>
+                    <span className="font-bold text-purple-600">{count}</span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-500 text-sm">No data available</p>
+              )}
+            </div>
+          </div>
+
+          {/* By Gender */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">By Gender</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700">Male</span>
+                <span className="font-bold text-blue-600">{analytics.byGender.Male}</span>
               </div>
-              <div className="grid grid-cols-2 gap-4 mt-3">
-                <div>
-                  <p className="text-sm text-gray-600">Payment Received</p>
-                  <p className="text-xl font-bold text-gray-800">₹89.10</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Your Commission</p>
-                  <p className="text-xl font-bold text-green-600">₹8.91</p>
-                </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700">Female</span>
+                <span className="font-bold text-pink-600">{analytics.byGender.Female}</span>
+              </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700">Other</span>
+                <span className="font-bold text-purple-600">{analytics.byGender.Other}</span>
               </div>
             </div>
+          </div>
 
-            <div className="border-2 border-green-200 bg-green-50 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="font-bold text-lg">🟢 Priya Sharma</h4>
-                  <p className="text-sm text-gray-600">Family Package</p>
-                </div>
-                <span className="text-xs text-gray-500">15 minutes ago</span>
+          {/* By Package */}
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">By Package</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700">Individual</span>
+                <span className="font-bold text-green-600">{analytics.byPackage.individual}</span>
               </div>
-              <div className="grid grid-cols-2 gap-4 mt-3">
-                <div>
-                  <p className="text-sm text-gray-600">Payment Received</p>
-                  <p className="text-xl font-bold text-gray-800">₹239.20</p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-600">Your Commission</p>
-                  <p className="text-xl font-bold text-green-600">₹47.84</p>
-                </div>
+              <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <span className="text-gray-700">Family</span>
+                <span className="font-bold text-orange-600">{analytics.byPackage.family}</span>
               </div>
-            </div>
-
-            <div className="border-2 border-yellow-200 bg-yellow-50 rounded-lg p-4">
-              <div className="flex justify-between items-start mb-2">
-                <div>
-                  <h4 className="font-bold text-lg">🔴 Amit Patel</h4>
-                  <p className="text-sm text-gray-600">Payment Pending</p>
-                </div>
-                <span className="text-xs text-gray-500">1 hour ago</span>
-              </div>
-              <p className="text-sm text-gray-600">Order created, awaiting payment confirmation...</p>
             </div>
           </div>
         </div>
 
-        {/* Disclaimer */}
-        <div className="mt-8 p-6 bg-blue-50 border-2 border-blue-200 rounded-xl">
-          <p className="text-sm text-blue-800">
-            ℹ️ <strong>Note:</strong> All commissions are calculated on payment received after tax deductions 
-            as per your country/state laws. Detailed breakdown available in Earnings Report section.
-          </p>
-        </div>
+        {/* Renewal Alerts */}
+        {analytics.renewalAlerts.length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Upcoming Renewals (Next 30 Days)</h3>
+            <div className="space-y-2">
+              {analytics.renewalAlerts.map((alert, index) => (
+                <div key={index} className="flex justify-between items-center p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                  <span className="font-medium text-gray-800">{alert.name}</span>
+                  <div className="text-right">
+                    <span className="text-sm text-gray-600">
+                      Expires: {alert.expiry.toLocaleDateString()}
+                    </span>
+                    <span className="ml-4 text-sm font-bold text-orange-600">
+                      {alert.daysLeft} days left
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Month-wise Breakdown */}
+        {Object.keys(analytics.byMonth).length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Month-wise Sign-ups</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              {Object.entries(analytics.byMonth).map(([month, count]) => (
+                <div key={month} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <p className="text-sm text-gray-600">{month}</p>
+                  <p className="text-2xl font-bold text-purple-600">{count}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
