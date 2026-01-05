@@ -88,3 +88,8 @@ export function parseNameToElements(name) {
   
   return elements;
 }
+/**
+ * Public API used by UI
+ * (important: keep this name stable)
+ */
+export const analyzeWord = parseNameToElements;

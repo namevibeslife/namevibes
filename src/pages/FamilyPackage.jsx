@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { parseNameToElements } from '../utils/elements';
-import { ArrowLeft, Download, Plus, X, LogOut, Share2, Instagram } from 'lucide-react';
+import { ArrowLeft, Download, Plus, X, LogOut, Share2, ExternalLink } from 'lucide-react';
 import jsPDF from 'jspdf';
 
 const RELATIONS = [
@@ -13,14 +13,22 @@ const RELATIONS = [
   'Pet Name', 'Other'
 ];
 
+const contextOptions = [
+  { id: 'health_stress', label: 'Family health-related stress' },
+  { id: 'emotional_imbalance', label: 'Emotional or relationship imbalance' },
+  { id: 'financial_pressure', label: 'Financial or career-related challenges' },
+  { id: 'general_curiosity', label: 'General curiosity / self-understanding' }
+];
+
 export default function FamilyPackage() {
   const navigate = useNavigate();
-  
   const [names, setNames] = useState([
     { id: 1, firstName: '', middleName: '', lastName: '', relation: 'Father' }
   ]);
   const [results, setResults] = useState(null);
   const [showingCount, setShowingCount] = useState(10);
+  const [harmonyStep, setHarmonyStep] = useState('results');
+  const [selectedContext, setSelectedContext] = useState([]);
 
   const handleLogout = async () => {
     try {
@@ -29,6 +37,14 @@ export default function FamilyPackage() {
     } catch (error) {
       console.error('Logout error:', error);
     }
+  };
+
+  const toggleContext = (contextId) => {
+    setSelectedContext(prev =>
+      prev.includes(contextId)
+        ? prev.filter(id => id !== contextId)
+        : [...prev, contextId]
+    );
   };
 
   const handleShare = () => {
@@ -79,6 +95,7 @@ export default function FamilyPackage() {
     });
 
     setResults(analyzed);
+    setHarmonyStep('results');
   };
 
   const findCommonElements = () => {
@@ -89,12 +106,23 @@ export default function FamilyPackage() {
     );
     
     const firstSet = new Set(allElementSymbols[0]);
-    const common = [...firstSet].filter(symbol =>
+    const commonSymbols = [...firstSet].filter(symbol =>
       allElementSymbols.every(symbols => symbols.includes(symbol))
     );
     
-    return results[0].elements.filter(e => common.includes(e.symbol))
-      .filter((e, i, arr) => arr.findIndex(x => x.symbol === e.symbol) === i);
+    // Get all unique elements that match the common symbols
+    const allElements = results.flatMap(r => r.elements);
+    const uniqueCommon = [];
+    const seenSymbols = new Set();
+    
+    for (const element of allElements) {
+      if (commonSymbols.includes(element.symbol) && !seenSymbols.has(element.symbol)) {
+        uniqueCommon.push(element);
+        seenSymbols.add(element.symbol);
+      }
+    }
+    
+    return uniqueCommon;
   };
 
   const downloadPDF = async () => {
@@ -113,7 +141,6 @@ export default function FamilyPackage() {
       yPos += 10;
     };
 
-    // Title
     pdf.setFontSize(24);
     pdf.setTextColor(147, 51, 234);
     pdf.setFont('helvetica', 'bold');
@@ -126,7 +153,6 @@ export default function FamilyPackage() {
     pdf.text('Family Chemistry Report', pageWidth / 2, yPos, { align: 'center' });
     yPos += 15;
 
-    // For each person
     for (let i = 0; i < results.length; i++) {
       const person = results[i];
       
@@ -134,7 +160,6 @@ export default function FamilyPackage() {
         addNewPage();
       }
 
-      // Relation + Name
       pdf.setFontSize(12);
       pdf.setTextColor(100);
       pdf.setFont('helvetica', 'bold');
@@ -148,7 +173,6 @@ export default function FamilyPackage() {
       pdf.text(person.fullName, margin, yPos);
       yPos += 12;
 
-      // Elements
       const boxSize = 28;
       const boxGap = 6;
       const elementsPerRow = 5;
@@ -177,19 +201,16 @@ export default function FamilyPackage() {
         pdf.setLineWidth(0.5);
         pdf.rect(xPos, rowYPos, boxSize, boxSize);
 
-        // Atomic number - LARGER
         pdf.setFontSize(9);
         pdf.setTextColor(0);
         pdf.setFont('helvetica', 'bold');
         pdf.text(element.number.toString(), xPos + 2, rowYPos + 4);
 
-        // Element symbol - LARGER
         pdf.setFontSize(20);
         pdf.setFont('helvetica', 'bold');
         const symbolWidth = pdf.getTextWidth(element.symbol);
         pdf.text(element.symbol, xPos + (boxSize - symbolWidth) / 2, rowYPos + boxSize / 2 + 4);
 
-        // Element name - LARGER
         pdf.setFontSize(8);
         pdf.setFont('helvetica', 'bold');
         const nameWidth = pdf.getTextWidth(element.name);
@@ -208,7 +229,6 @@ export default function FamilyPackage() {
       }
     }
 
-    // Common Elements
     if (results.length > 1) {
       const commonElements = findCommonElements();
       
@@ -292,15 +312,16 @@ export default function FamilyPackage() {
     const commonElements = results.length > 1 ? findCommonElements() : [];
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50" style={{
-        backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='molecules' x='0' y='0' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='40' cy='40' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='80' cy='60' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='60' cy='100' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='120' cy='80' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Cline x1='40' y1='40' x2='80' y2='60' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='80' y1='60' x2='60' y2='100' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='60' y1='100' x2='120' y2='80' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23molecules)'/%3E%3C/svg%3E")`
-      }}>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
         <header className="bg-white shadow-sm border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-4">
                 <button
-                  onClick={() => setResults(null)}
+                  onClick={() => {
+                    setResults(null);
+                    setHarmonyStep('results');
+                  }}
                   className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
                 >
                   <ArrowLeft size={20} />
@@ -320,7 +341,7 @@ export default function FamilyPackage() {
             </div>
           </div>
         </header>
-
+  
         <div className="container mx-auto max-w-6xl py-8 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
             <div className="mb-8">
@@ -350,7 +371,6 @@ export default function FamilyPackage() {
               </p>
             </div>
 
-            {/* Individual Results */}
             {displayedResults.map((person, idx) => (
               <div key={idx} className="mb-12 pb-8 border-b-2 border-gray-100 last:border-0">
                 {results.length > 1 && (
@@ -360,7 +380,6 @@ export default function FamilyPackage() {
                 )}
                 <h3 className="text-3xl font-bold text-gray-800 mb-6">{person.fullName}</h3>
 
-                {/* Element Boxes - LARGER */}
                 <div className="flex flex-wrap gap-6 justify-center p-6 bg-gray-50 rounded-xl mb-6">
                   {person.elements.map((el, i) => (
                     <div key={i} className="flex flex-col items-center">
@@ -368,21 +387,14 @@ export default function FamilyPackage() {
                         className="relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
                         style={{ backgroundColor: el.color }}
                       >
-                        <div className="text-base font-mono text-gray-800 font-bold">
-                          {el.number}
-                        </div>
-                        <div className="text-7xl font-bold text-gray-800 text-center leading-none">
-                          {el.symbol}
-                        </div>
-                        <div className="text-base text-gray-800 text-center font-bold">
-                          {el.name}
-                        </div>
+                        <div className="text-base font-mono text-gray-800 font-bold">{el.number}</div>
+                        <div className="text-7xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
+                        <div className="text-base text-gray-800 text-center font-bold">{el.name}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                {/* Element Table - SAME AS INDIVIDUAL */}
                 <div className="overflow-x-auto">
                   <h4 className="text-2xl font-bold text-gray-800 mb-4">Element Colors & Meanings</h4>
                   <table className="w-full border-collapse">
@@ -428,7 +440,6 @@ export default function FamilyPackage() {
               </button>
             )}
 
-            {/* The Harmony - Common Elements */}
             {results.length > 1 && commonElements.length > 0 && (
               <div className="mt-12 pt-8 border-t-2 border-purple-200">
                 <h3 className="text-3xl font-bold text-purple-600 mb-2 text-center">The Harmony</h3>
@@ -443,26 +454,70 @@ export default function FamilyPackage() {
                         className="relative border-4 border-purple-600 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
                         style={{ backgroundColor: el.color }}
                       >
-                        <div className="text-base font-mono text-gray-800 font-bold">
-                          {el.number}
-                        </div>
-                        <div className="text-7xl font-bold text-gray-800 text-center leading-none">
-                          {el.symbol}
-                        </div>
-                        <div className="text-base text-gray-800 text-center font-bold">
-                          {el.name}
-                        </div>
+                        <div className="text-base font-mono text-gray-800 font-bold">{el.number}</div>
+                        <div className="text-7xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
+                        <div className="text-base text-gray-800 text-center font-bold">{el.name}</div>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="bg-purple-100 rounded-lg p-6 border-2 border-purple-300">
-                  <p className="text-lg text-purple-900 text-center">
-                    <span className="font-bold">These {commonElements.length} elements</span> appear in all family members' names, 
-                    representing the shared vibrational energy and collective identity of your family unit.
+                {harmonyStep === 'results' && (
+                  <button
+                    onClick={() => setHarmonyStep('context')}
+                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition"
+                  >
+                    Know Your Harmony - Press to Know More
+                  </button>
+                )}
+
+                {harmonyStep === 'context' && (
+                  <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mt-6">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      Why are you exploring this? (Optional)
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      This helps us give you a more meaningful interpretation.
+                    </p>
+                    <div className="space-y-3 mb-6">
+                      {contextOptions.map(option => (
+                        <label key={option.id} className="flex items-center gap-3 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={selectedContext.includes(option.id)}
+                            onChange={() => toggleContext(option.id)}
+                            className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+                          />
+                          <span className="text-gray-700">{option.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setHarmonyStep('interpretation')}
+                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition"
+                    >
+                      Get Interpretation
+                    </button>
+                  </div>
+                )}
+
+                {harmonyStep === 'interpretation' && (
+                 <div className="mt-6 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-8 border-2 border-purple-300">
+                  <p className="text-xl text-purple-900 text-center font-semibold mb-4">
+                    Your harmony elements <span className="font-bold">{commonElements.map(e => e.name).join(', ')}</span> represent shared connection and energy across all names.
                   </p>
-                </div>
+                    <button
+                      onClick={() => {
+                        const prompt = `I discovered that these elements: ${commonElements.map(e => `${e.name} (${e.symbol})`).join(', ')} are the harmony elements in my family's names. Can you help me understand what this means and how these elements connect us?`;
+                        window.open(`https://claude.ai/new?q=${encodeURIComponent(prompt)}`, '_blank');
+                      }}
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition"
+                    >
+                      <ExternalLink size={20} />
+                      Deepen Your Understanding with AI (Free)
+                    </button>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -472,125 +527,123 @@ export default function FamilyPackage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50" style={{
-      backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='molecules' x='0' y='0' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='40' cy='40' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='80' cy='60' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='60' cy='100' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='120' cy='80' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Cline x1='40' y1='40' x2='80' y2='60' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='80' y1='60' x2='60' y2='100' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='60' y1='100' x2='120' y2='80' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23molecules)'/%3E%3C/svg%3E")`
-    }}>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
       <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-              >
-                <ArrowLeft size={20} />
-                Back
-              </button>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                NameVibes - Family Package
-              </h1>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="container mx-auto max-w-4xl py-8 px-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Family Package</h1>
-          <p className="text-gray-600 mb-8">
-            Analyze up to 50 names • Showing {Math.min(names.length, 10)} at once
-          </p>
-
-          <div className="space-y-6">
-            {names.map((nameData, index) => (
-              <div key={nameData.id} className="bg-gray-50 rounded-xl p-6 relative">
-                <div className="absolute top-4 right-4">
-                  {names.length > 1 && (
-                    <button
-                      onClick={() => removeName(nameData.id)}
-                      className="text-red-500 hover:text-red-700"
-                    >
-                      <X size={20} />
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      First Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={nameData.firstName}
-                      onChange={(e) => updateName(nameData.id, 'firstName', e.target.value)}
-                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Middle Name
-                    </label>
-                    <input
-                      type="text"
-                      value={nameData.middleName}
-                      onChange={(e) => updateName(nameData.id, 'middleName', e.target.value)}
-                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Last Name *
-                    </label>
-                    <input
-                      type="text"
-                      value={nameData.lastName}
-                      onChange={(e) => updateName(nameData.id, 'lastName', e.target.value)}
-                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Relation
-                    </label>
-                    <select
-                      value={nameData.relation}
-                      onChange={(e) => updateName(nameData.id, 'relation', e.target.value)}
-                      className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    >
-                      {RELATIONS.map(rel => (
-                        <option key={rel} value={rel}>{rel}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate('/dashboard')}
+                  className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
+                >
+                  <ArrowLeft size={20} />
+                  Back
+                </button>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                  NameVibes - Family Package
+                </h1>
               </div>
-            ))}
-
-            <button
-              onClick={addName}
-              disabled={names.length >= 50}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
-            >
-              <Plus size={20} />
-              Add Another Name ({names.length}/50)
-            </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
+            </div>
           </div>
+        </header>
+  
+        <div className="container mx-auto max-w-4xl py-8 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl p-8">
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">Family Package</h1>
+            <p className="text-gray-600 mb-8">
+              Analyze up to 50 names • Showing {Math.min(names.length, 10)} at once
+            </p>
 
-          <div className="mt-8">
-            <button
-              onClick={handleAnalyzeAll}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition"
-            >
-              Analyze All Names
-            </button>
+            <div className="space-y-6">
+              {names.map((nameData) => (
+                <div key={nameData.id} className="bg-gray-50 rounded-xl p-6 relative">
+                  <div className="absolute top-4 right-4">
+                    {names.length > 1 && (
+                      <button
+                        onClick={() => removeName(nameData.id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <X size={20} />
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid md:grid-cols-4 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        First Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={nameData.firstName}
+                        onChange={(e) => updateName(nameData.id, 'firstName', e.target.value)}
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Middle Name
+                      </label>
+                      <input
+                        type="text"
+                        value={nameData.middleName}
+                        onChange={(e) => updateName(nameData.id, 'middleName', e.target.value)}
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Last Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={nameData.lastName}
+                        onChange={(e) => updateName(nameData.id, 'lastName', e.target.value)}
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Relation
+                      </label>
+                      <select
+                        value={nameData.relation}
+                        onChange={(e) => updateName(nameData.id, 'relation', e.target.value)}
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                      >
+                        {RELATIONS.map(rel => (
+                          <option key={rel} value={rel}>{rel}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              <button
+                onClick={addName}
+                disabled={names.length >= 50}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+              >
+                <Plus size={20} />
+                Add Another Name ({names.length}/50)
+              </button>
+            </div>
+
+            <div className="mt-8">
+              <button
+                onClick={handleAnalyzeAll}
+                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition"
+              >
+                Analyze All Names
+              </button>
           </div>
         </div>
       </div>

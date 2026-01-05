@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
-import { Sparkles, Users, Calendar, LogOut, Settings } from 'lucide-react';
+import { Sparkles, Users, Calendar, LogOut, Settings, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [recentAnalyses, setRecentAnalyses] = useState([]);
 
   useEffect(() => {
     loadUserProfile();
+    loadRecentAnalyses();
   }, []);
 
   const loadUserProfile = async () => {
@@ -30,6 +32,26 @@ export default function Dashboard() {
       console.error('Error loading profile:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadRecentAnalyses = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      const analysesRef = collection(db, 'users', user.uid, 'analyses');
+      const q = query(analysesRef, orderBy('timestamp', 'desc'), limit(5));
+      const snapshot = await getDocs(q);
+      
+      const analyses = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      
+      setRecentAnalyses(analyses);
+    } catch (error) {
+      console.error('Error loading analyses:', error);
     }
   };
 
@@ -128,7 +150,7 @@ export default function Dashboard() {
             </button>
           )}
 
-          {/* Settings Button - Always visible */}
+          {/* Settings Button */}
           <button
             onClick={() => navigate('/settings')}
             className="bg-gradient-to-br from-gray-500 to-gray-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
@@ -139,12 +161,80 @@ export default function Dashboard() {
           </button>
         </div>
 
+        {/* Knowledge Base Cards */}
+        <div className="mb-8">
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">Knowledge Base</h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Zodiac Name Guide */}
+            <div
+              onClick={() => navigate('/zodiac-syllables')}
+              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
+            >
+              <div className="text-5xl mb-4 text-center">♈</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
+                Zodiac Name Guide
+              </h3>
+              <p className="text-gray-600 text-center mb-4">
+                Choose auspicious syllables for names based on zodiac signs
+              </p>
+              <div className="flex justify-center">
+                <span className="text-purple-600 font-semibold flex items-center gap-2">
+                  View Guide <ArrowRight size={18} />
+                </span>
+              </div>
+            </div>
+
+            {/* Numerology Calculator */}
+            <div
+              onClick={() => navigate('/numerology-calculator')}
+              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
+            >
+              <div className="text-5xl mb-4 text-center">🔢</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
+                Numerology Calculator
+              </h3>
+              <p className="text-gray-600 text-center mb-4">
+                Calculate life path, destiny, and soul numbers
+              </p>
+              <div className="flex justify-center">
+                <span className="text-purple-600 font-semibold flex items-center gap-2">
+                  Calculate Now <ArrowRight size={18} />
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Recent Analyses */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">Recent Analyses</h3>
-          <div className="text-center py-12 text-gray-500">
-            <p>No analyses yet. Start by analyzing a name!</p>
-          </div>
+          {recentAnalyses.length > 0 ? (
+            <div className="space-y-3">
+              {recentAnalyses.map((analysis) => (
+                <div
+                  key={analysis.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                >
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-800">
+                      {analysis.type === 'individual' 
+                        ? analysis.fullName 
+                        : `Family (${analysis.count} names)`
+                      }
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {analysis.timestamp?.toDate().toLocaleDateString()}
+                    </div>
+                  </div>
+                  <ArrowRight className="text-gray-400" size={20} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              <p>No analyses yet. Start by analyzing a name!</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

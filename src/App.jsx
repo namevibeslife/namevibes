@@ -9,6 +9,8 @@ import PaymentPage from './pages/PaymentPage';
 import ProfileComplete from './pages/ProfileComplete';
 import Dashboard from './pages/Dashboard';
 import AnalyzeName from './pages/AnalyzeName';
+import ZodiacSyllableTable from './pages/ZodiacSyllableTable';
+import NumerologyCalculator from './pages/NumerologyCalculator';
 import FamilyPackage from './pages/FamilyPackage';
 import Pricing from './pages/Pricing';
 import Settings from './pages/Settings';
@@ -51,9 +53,12 @@ function App() {
         <Route path="/pricing" element={<Pricing />} />
         <Route path="/payment" element={<ProtectedRoute><PaymentPage /></ProtectedRoute>} />
         
+        
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/analyze" element={<ProtectedRoute><AnalyzeName /></ProtectedRoute>} />
         <Route path="/family" element={<ProtectedRoute><FamilyPackage /></ProtectedRoute>} />
+        <Route path="/zodiac-syllables" element={<ProtectedRoute><ZodiacSyllableTable /></ProtectedRoute>} />
+        <Route path="/numerology-calculator" element={<ProtectedRoute><NumerologyCalculator /></ProtectedRoute>} />
         
         <Route path="/ambassador" element={<AmbassadorLogin />} />
         <Route path="/ambassador/register" element={<AmbassadorRegistration />} />

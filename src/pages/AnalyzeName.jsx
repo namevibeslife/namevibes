@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Sparkles, Share2, Instagram, LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements } from '../utils/elements';
 
 export default function AnalyzeName() {
@@ -19,7 +20,23 @@ export default function AnalyzeName() {
     }
   };
 
-  const handleAnalyze = () => {
+  const saveAnalysis = async (fullName, elements) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await addDoc(collection(db, 'users', user.uid, 'analyses'), {
+        fullName: fullName,
+        elementCount: elements.length,
+        type: 'individual',
+        timestamp: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+    }
+  };
+
+  const handleAnalyze = async () => {
     if (!name.trim()) return;
 
     const elements = parseNameToElements(name);
@@ -28,6 +45,9 @@ export default function AnalyzeName() {
       name,
       elements
     });
+
+    // Save analysis to Firebase
+    await saveAnalysis(name, elements);
   };
 
   const handleShare = (platform) => {
