@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, ChevronDown } from 'lucide-react';
+import UserNav from '../components/UserNav';
+import { ChevronDown } from 'lucide-react';
 
 export default function ZodiacSyllableTable() {
   const navigate = useNavigate();
@@ -329,37 +330,26 @@ export default function ZodiacSyllableTable() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-            >
-              <ArrowLeft size={20} />
-              Back
-            </button>
-            
-            {/* System Selector Dropdown */}
-            <div className="relative">
-              <select
-                value={system}
-                onChange={(e) => {
-                  setSystem(e.target.value);
-                  setSelectedSign(null);
-                }}
-                className="appearance-none bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 pr-10 rounded-lg font-semibold text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400"
-              >
-                <option value="western">Western Zodiac</option>
-                <option value="vedic">Vedic Astrology</option>
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white pointer-events-none" size={16} />
-            </div>
-          </div>
-        </div>
-      </header>
+      <UserNav />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* System Selector */}
+        <div className="flex justify-end mb-4">
+          <div className="relative">
+            <select
+              value={system}
+              onChange={(e) => {
+                setSystem(e.target.value);
+                setSelectedSign(null);
+              }}
+              className="appearance-none bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 pr-10 rounded-lg font-semibold text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400"
+            >
+              <option value="western">Western Zodiac</option>
+              <option value="vedic">Vedic Astrology</option>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white pointer-events-none" size={16} />
+          </div>
+        </div>
         {/* Title */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">

@@ -133,8 +133,11 @@ export default function PaymentPage() {
       await updateDoc(userRef, {
         planType,
         planActive: true,
+        paidAmount: amount,
+        paidAt: new Date(),
+        planExpiry: renewalDate,
         renewalDate: renewalDate,
-        referralCodeUsed: referralCode || null
+        referralCode: referralCode || null
       });
 
       await setDoc(doc(db, 'payments', `${user.uid}_${Date.now()}`), {

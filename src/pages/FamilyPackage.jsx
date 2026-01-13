@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { auth } from '../firebase';
+import UserNav from '../components/UserNav';
+import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements } from '../utils/elements';
-import { ArrowLeft, Download, Plus, X, LogOut, Share2, ExternalLink } from 'lucide-react';
+import { Download, Plus, X, Share2, ExternalLink } from 'lucide-react';
 import jsPDF from 'jspdf';
 
 const RELATIONS = [
@@ -29,15 +31,6 @@ export default function FamilyPackage() {
   const [showingCount, setShowingCount] = useState(10);
   const [harmonyStep, setHarmonyStep] = useState('results');
   const [selectedContext, setSelectedContext] = useState([]);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   const toggleContext = (contextId) => {
     setSelectedContext(prev =>
@@ -75,7 +68,24 @@ export default function FamilyPackage() {
     setNames(names.map(n => n.id === id ? { ...n, [field]: value } : n));
   };
 
-  const handleAnalyzeAll = () => {
+  const saveAnalysisToFirebase = async (analyzed) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await addDoc(collection(db, 'users', user.uid, 'analyses'), {
+        type: 'family',
+        count: analyzed.length,
+        members: analyzed.map(m => ({ fullName: m.fullName, relation: m.relation })),
+        elementData: analyzed.map(m => ({ fullName: m.fullName, elements: m.elements })),
+        timestamp: serverTimestamp()
+      });
+    } catch (error) {
+      console.error('Error saving analysis:', error);
+    }
+  };
+
+  const handleAnalyzeAll = async () => {
     const validNames = names.filter(n => n.firstName.trim() && n.lastName.trim());
     
     if (validNames.length === 0) {
@@ -95,6 +105,7 @@ export default function FamilyPackage() {
     });
 
     setResults(analyzed);
+    await saveAnalysisToFirebase(analyzed);
     setHarmonyStep('results');
   };
 
@@ -313,34 +324,7 @@ export default function FamilyPackage() {
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => {
-                    setResults(null);
-                    setHarmonyStep('results');
-                  }}
-                  className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-                >
-                  <ArrowLeft size={20} />
-                  Back
-                </button>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  NameVibes - Family Package
-                </h1>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
-            </div>
-          </div>
-        </header>
+        <UserNav />
   
         <div className="container mx-auto max-w-6xl py-8 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
@@ -528,31 +512,7 @@ export default function FamilyPackage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-                >
-                  <ArrowLeft size={20} />
-                  Back
-                </button>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  NameVibes - Family Package
-                </h1>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
-            </div>
-          </div>
-        </header>
+      <UserNav />
   
         <div className="container mx-auto max-w-4xl py-8 px-4">
           <div className="bg-white rounded-2xl shadow-2xl p-8">

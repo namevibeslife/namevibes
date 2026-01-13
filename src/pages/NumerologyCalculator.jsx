@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calculator } from 'lucide-react';
+import UserNav from '../components/UserNav';
+import { Calculator } from 'lucide-react';
 
 const RELATIONS = [
   'Self', 'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister',
@@ -233,20 +234,7 @@ export default function NumerologyCalculator() {
   if (results) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-        <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 py-3">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setResults(null)}
-                className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-              >
-                <ArrowLeft size={20} />
-                Back
-              </button>
-              <h1 className="text-lg font-bold text-gray-800">Numerology Results</h1>
-            </div>
-          </div>
-        </header>
+        <UserNav />
 
         <div className="max-w-4xl mx-auto px-4 py-6">
           {/* Header Card */}
@@ -360,20 +348,7 @@ export default function NumerologyCalculator() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-            >
-              <ArrowLeft size={20} />
-              Back
-            </button>
-            <h1 className="text-lg font-bold text-gray-800">Numerology Calculator</h1>
-          </div>
-        </div>
-      </header>
+      <UserNav />
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="bg-white rounded-xl shadow-lg p-6">

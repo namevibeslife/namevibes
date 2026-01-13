@@ -18,6 +18,8 @@ import AmbassadorLogin from './pages/AmbassadorLogin';
 import AmbassadorRegistration from './pages/AmbassadorRegistration';
 import AmbassadorDashboard from './pages/AmbassadorDashboard';
 import AdminPanel from './pages/AdminPanel';
+import AnalysisView from './pages/AnalysisView';
+import FamilyAnalysisView from './pages/FamilyAnalysisView';
 
 function ProtectedRoute({ children, requiresAuth = true }) {
   const { user, loading } = useAuthStore();
@@ -59,6 +61,10 @@ function App() {
         <Route path="/family" element={<ProtectedRoute><FamilyPackage /></ProtectedRoute>} />
         <Route path="/zodiac-syllables" element={<ProtectedRoute><ZodiacSyllableTable /></ProtectedRoute>} />
         <Route path="/numerology-calculator" element={<ProtectedRoute><NumerologyCalculator /></ProtectedRoute>} />
+        
+        {/* NEW ROUTES FOR VIEWING SAVED ANALYSES */}
+        <Route path="/analysis/:analysisId" element={<ProtectedRoute><AnalysisView /></ProtectedRoute>} />
+        <Route path="/family-analysis/:analysisId" element={<ProtectedRoute><FamilyAnalysisView /></ProtectedRoute>} />
         
         <Route path="/ambassador" element={<AmbassadorLogin />} />
         <Route path="/ambassador/register" element={<AmbassadorRegistration />} />

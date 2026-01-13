@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles, Share2, Instagram, LogOut } from 'lucide-react';
-import { signOut } from 'firebase/auth';
+import UserNav from '../components/UserNav';
+import { Sparkles, Share2, Instagram } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements } from '../utils/elements';
@@ -10,15 +10,6 @@ export default function AnalyzeName() {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [result, setResult] = useState(null);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   const saveAnalysis = async (fullName, elements) => {
     try {
@@ -46,7 +37,6 @@ export default function AnalyzeName() {
       elements
     });
 
-    // Save analysis to Firebase
     await saveAnalysis(name, elements);
   };
 
@@ -66,32 +56,7 @@ export default function AnalyzeName() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50" style={{
         backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='molecules' x='0' y='0' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='40' cy='40' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='80' cy='60' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='60' cy='100' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='120' cy='80' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Cline x1='40' y1='40' x2='80' y2='60' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='80' y1='60' x2='60' y2='100' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='60' y1='100' x2='120' y2='80' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23molecules)'/%3E%3C/svg%3E")`
       }}>
-        {/* Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => navigate('/dashboard')}
-                  className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-                >
-                  <ArrowLeft size={20} />
-                  Back
-                </button>
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                  NameVibes
-                </h1>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-              >
-                <LogOut size={18} />
-                Logout
-              </button>
-            </div>
-          </div>
-        </header>
+        <UserNav />
 
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
@@ -142,37 +107,11 @@ export default function AnalyzeName() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50" style={{
       backgroundImage: `url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='molecules' x='0' y='0' width='200' height='200' patternUnits='userSpaceOnUse'%3E%3Ccircle cx='40' cy='40' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='80' cy='60' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='60' cy='100' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Ccircle cx='120' cy='80' r='3' fill='%236b21a8' opacity='0.05'/%3E%3Cline x1='40' y1='40' x2='80' y2='60' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='80' y1='60' x2='60' y2='100' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3Cline x1='60' y1='100' x2='120' y2='80' stroke='%236b21a8' stroke-width='1' opacity='0.05'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23molecules)'/%3E%3C/svg%3E")`
     }}>
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setResult(null)}
-                className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-              >
-                <ArrowLeft size={20} />
-                Analyze Another
-              </button>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                NameVibes
-              </h1>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+      <UserNav />
 
       <div className="p-4">
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-2xl shadow-2xl p-8">
-            {/* Header with Name */}
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
                 Chemistry of "{result.name.toUpperCase()}"
@@ -194,13 +133,11 @@ export default function AnalyzeName() {
                 </button>
               </div>
               
-              {/* Tagline */}
               <p className="text-center text-lg text-gray-600 italic font-medium mb-8">
                 "Elements of the Universe Found in Your Name"
               </p>
             </div>
 
-            {/* Element Boxes - NO HEADING, LARGER TEXT */}
             <div className="mb-8">
               <div className="flex flex-wrap gap-6 justify-center p-6 bg-gray-50 rounded-xl">
                 {result.elements.map((el, idx) => (
@@ -223,7 +160,6 @@ export default function AnalyzeName() {
               </div>
             </div>
 
-            {/* Element Details Table */}
             <div className="overflow-x-auto">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Element Colors & Meanings</h2>
               <table className="w-full border-collapse">

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserNav from '../components/UserNav';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { signOut } from 'firebase/auth';
-import { Sparkles, Users, Calendar, LogOut, Settings, ArrowRight } from 'lucide-react';
+import { Sparkles, Users, Calendar, Settings, ArrowRight } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -55,12 +55,11 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
+  const handleViewAnalysis = (analysis) => {
+    if (analysis.type === 'individual') {
+      navigate(`/analysis/${analysis.id}`);
+    } else {
+      navigate(`/family-analysis/${analysis.id}`);
     }
   };
 
@@ -73,30 +72,14 @@ export default function Dashboard() {
         </div>
       </div>
     );
-  };
+  }
 
   const renewalDate = userProfile?.renewalDate?.toDate();
   const formattedRenewalDate = renewalDate ? renewalDate.toLocaleDateString() : 'N/A';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-              NameVibes
-            </h1>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+      <UserNav />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}
@@ -150,7 +133,6 @@ export default function Dashboard() {
             </button>
           )}
 
-          {/* Settings Button */}
           <button
             onClick={() => navigate('/settings')}
             className="bg-gradient-to-br from-gray-500 to-gray-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
@@ -165,7 +147,6 @@ export default function Dashboard() {
         <div className="mb-8">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">Knowledge Base</h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Zodiac Name Guide */}
             <div
               onClick={() => navigate('/zodiac-syllables')}
               className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
@@ -184,7 +165,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Numerology Calculator */}
             <div
               onClick={() => navigate('/numerology-calculator')}
               className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
@@ -211,11 +191,12 @@ export default function Dashboard() {
           {recentAnalyses.length > 0 ? (
             <div className="space-y-3">
               {recentAnalyses.map((analysis) => (
-                <div
+                <button
                   key={analysis.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
+                  onClick={() => handleViewAnalysis(analysis)}
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-purple-50 hover:border-purple-300 border-2 border-transparent transition cursor-pointer"
                 >
-                  <div className="flex-1">
+                  <div className="flex-1 text-left">
                     <div className="font-semibold text-gray-800">
                       {analysis.type === 'individual' 
                         ? analysis.fullName 
@@ -226,8 +207,8 @@ export default function Dashboard() {
                       {analysis.timestamp?.toDate().toLocaleDateString()}
                     </div>
                   </div>
-                  <ArrowRight className="text-gray-400" size={20} />
-                </div>
+                  <ArrowRight className="text-purple-600" size={20} />
+                </button>
               ))}
             </div>
           ) : (

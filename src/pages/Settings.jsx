@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import UserNav from '../components/UserNav';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
-import { ArrowLeft, LogOut, Trash2, AlertTriangle } from 'lucide-react';
+import { Trash2, AlertTriangle, LogOut } from 'lucide-react';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -15,11 +16,9 @@ export default function Settings() {
 
     setClearing(true);
     try {
-      // Clear all storage
       localStorage.clear();
       sessionStorage.clear();
       
-      // Clear IndexedDB
       if (window.indexedDB) {
         const databases = await window.indexedDB.databases();
         for (const db of databases) {
@@ -29,14 +28,12 @@ export default function Settings() {
         }
       }
       
-      // Clear cookies
       document.cookie.split(";").forEach((c) => {
         document.cookie = c
           .replace(/^ +/, "")
           .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
       });
       
-      // Clear cache storage
       if ('caches' in window) {
         const cacheNames = await caches.keys();
         for (const name of cacheNames) {
@@ -44,12 +41,10 @@ export default function Settings() {
         }
       }
       
-      // Sign out from Firebase
       await signOut(auth);
       
       alert('✅ Signed out from all devices successfully!');
       
-      // Redirect to home
       window.location.href = '/';
       
     } catch (error) {
@@ -71,47 +66,19 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="flex items-center gap-2 text-purple-600 hover:text-purple-700 font-medium"
-              >
-                <ArrowLeft size={20} />
-                Back
-              </button>
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Settings
-              </h1>
-            </div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+      <UserNav />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* Account Settings */}
         <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h2>
           
           <div className="space-y-4">
-            {/* User Info */}
             <div className="border-b border-gray-200 pb-4">
               <p className="text-sm text-gray-600 mb-1">Email</p>
               <p className="text-lg font-semibold text-gray-800">{auth.currentUser?.email}</p>
             </div>
 
-            {/* Sign Out Current Device */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Sign Out</h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -126,7 +93,6 @@ export default function Settings() {
               </button>
             </div>
 
-            {/* Sign Out All Devices */}
             <div className="border-b border-gray-200 pb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Sign Out All Devices
@@ -161,7 +127,6 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* App Info */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">About</h2>
           <div className="space-y-2 text-gray-600">

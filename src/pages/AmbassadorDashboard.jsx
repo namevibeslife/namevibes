@@ -31,7 +31,8 @@ export default function AmbassadorDashboard() {
     byMonth: {},
     byGender: { Male: 0, Female: 0, Other: 0 },
     byPackage: { individual: 0, family: 0 },
-    renewalAlerts: []
+    renewalAlerts: [],
+    userPayments: []
   });
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState({
@@ -98,7 +99,7 @@ export default function AmbassadorDashboard() {
     try {
       // Get all users who used this referral code
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('referralUsed', '==', ambassador.referralCode));
+      const q = query(usersRef, where('referralCode', '==', ambassador.referralCode));
       const usersSnapshot = await getDocs(q);
 
       const stats = {
@@ -109,7 +110,8 @@ export default function AmbassadorDashboard() {
         byMonth: {},
         byGender: { Male: 0, Female: 0, Other: 0 },
         byPackage: { individual: 0, family: 0 },
-        renewalAlerts: []
+        renewalAlerts: [],
+        userPayments: []
       };
 
       const now = new Date();
@@ -153,6 +155,14 @@ export default function AmbassadorDashboard() {
           stats.byPackage[user.planType] = (stats.byPackage[user.planType] || 0) + 1;
         }
 
+        // Store payment data for commission calculation
+        if (user.paidAmount && user.planType) {
+          stats.userPayments.push({
+            planType: user.planType,
+            paidAmount: user.paidAmount
+          });
+        }
+
         // Renewal alerts (30 days before expiry)
         if (user.planExpiry) {
           const expiryDate = user.planExpiry.toDate();
@@ -184,11 +194,19 @@ export default function AmbassadorDashboard() {
   };
 
   const calculateCommission = () => {
-    if (!ambassador) return 0;
-    return (
-      (analytics.byPackage.individual || 0) * (ambassador.commissionRateIndividual || 0) +
-      (analytics.byPackage.family || 0) * (ambassador.commissionRateFamily || 0)
-    );
+    if (!ambassador || !analytics.userPayments) return 0;
+    
+    let totalCommission = 0;
+    
+    analytics.userPayments.forEach(payment => {
+      if (payment.planType === 'individual') {
+        totalCommission += payment.paidAmount * 0.15; // 15% commission
+      } else if (payment.planType === 'family') {
+        totalCommission += payment.paidAmount * 0.25; // 25% commission
+      }
+    });
+    
+    return Math.round(totalCommission);
   };
 
   if (loading && !ambassador) {
