@@ -1,5 +1,6 @@
 import React from 'react';
-import PayoutManagement from './PayoutManagement';
+import PayoutManagement from '../components/PayoutManagement';
+import FilterPanel from '../components/FilterPanel';
 import {
   Users,
   CreditCard,
@@ -19,8 +20,11 @@ import {
   Search,
   Shield,
   Trash2,
-  FileText
+  FileText,
+  Share2
 } from 'lucide-react';
+import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { db } from '../firebase';
 
 export default function AdminDashboard(props) {
   const {
@@ -86,8 +90,176 @@ export default function AdminDashboard(props) {
     editingCountry,
     countryFormData,
     setCountryFormData,
-    handleSaveCountry
+    handleSaveCountry,
+    userFilters,
+    setUserFilters,
+    ambassadorFilters,
+    setAmbassadorFilters
   } = props;
+
+  // New state for Share with Accounts modals
+  const [showSharePayoutModal, setShowSharePayoutModal] = React.useState(false);
+  const [showShareRevenueModal, setShowShareRevenueModal] = React.useState(false);
+  const [selectedPayoutData, setSelectedPayoutData] = React.useState(null);
+  const [sharingLoading, setSharingLoading] = React.useState(false);
+
+  // Share Payout with Accounts
+  const handleSharePayoutWithAccounts = async (payout) => {
+    setSelectedPayoutData(payout);
+    setShowSharePayoutModal(true);
+  };
+
+  const confirmSharePayout = async () => {
+    if (!selectedPayoutData) return;
+
+    setSharingLoading(true);
+    try {
+      // Find ambassador details
+      const ambassador = ambassadors.find(a => a.referralCode === selectedPayoutData.referralCode);
+      
+      if (!ambassador) {
+        alert('Ambassador not found!');
+        return;
+      }
+
+      // Create payout request document
+      await addDoc(collection(db, 'payoutRequests'), {
+        type: 'ambassador_payout',
+        referralCode: selectedPayoutData.referralCode,
+        ambassadorName: ambassador.fullName,
+        ambassadorEmail: ambassador.email,
+        month: payoutFilter.month,
+        year: payoutFilter.year,
+        country: ambassador.countryName || 'Unknown',
+        state: ambassador.stateName || 'Unknown',
+        countryCode: ambassador.countryCode,
+        stateCode: ambassador.stateCode,
+        currency: 'INR', // You can make this dynamic based on country
+        currencySymbol: '₹',
+        salesCount: selectedPayoutData.count,
+        totalSales: selectedPayoutData.totalSales,
+        commissionAmount: selectedPayoutData.totalCommission,
+        bankAccountNumber: ambassador.accountNumber || '',
+        bankIFSC: ambassador.ifscCode || '',
+        bankName: ambassador.bankName || '',
+        accountHolderName: ambassador.bankAccountName || ambassador.fullName,
+        status: 'pending',
+        sharedBy: currentAdmin.email,
+        sharedAt: Timestamp.now(),
+        paidBy: null,
+        paidAt: null,
+        paymentNote: '',
+        paymentMethod: ''
+      });
+
+      alert('Payout request shared with Accounts team successfully!');
+      setShowSharePayoutModal(false);
+      setSelectedPayoutData(null);
+    } catch (error) {
+      console.error('Error sharing payout:', error);
+      alert('Error sharing payout: ' + error.message);
+    } finally {
+      setSharingLoading(false);
+    }
+  };
+
+  // Share Revenue Report with Accounts
+  const handleShareRevenueReport = () => {
+    setShowShareRevenueModal(true);
+  };
+
+  const confirmShareRevenueReport = async () => {
+    setSharingLoading(true);
+    try {
+      const filteredPayments = getFilteredPayments();
+      
+      if (filteredPayments.length === 0) {
+        alert('No payments found for selected filters');
+        return;
+      }
+
+      // Calculate totals
+      const totals = filteredPayments.reduce((acc, payment) => {
+        acc.totalPayments++;
+        acc.totalAmount += payment.amount || 0;
+        
+        if (payment.planType === 'individual') {
+          acc.individualCount++;
+          acc.individualAmount += payment.amount || 0;
+        } else if (payment.planType === 'family') {
+          acc.familyCount++;
+          acc.familyAmount += payment.amount || 0;
+        }
+        
+        if (payment.referralCode) {
+          acc.withReferralCount++;
+          acc.withReferralAmount += payment.amount || 0;
+        } else {
+          acc.withoutReferralCount++;
+          acc.withoutReferralAmount += payment.amount || 0;
+        }
+        
+        if (payment.gateway === 'razorpay') {
+          acc.razorpayCount++;
+          acc.razorpayAmount += payment.amount || 0;
+        } else if (payment.gateway === 'paypal') {
+          acc.paypalCount++;
+          acc.paypalAmount += payment.amount || 0;
+        }
+        
+        return acc;
+      }, {
+        totalPayments: 0,
+        totalAmount: 0,
+        individualCount: 0,
+        individualAmount: 0,
+        familyCount: 0,
+        familyAmount: 0,
+        withReferralCount: 0,
+        withReferralAmount: 0,
+        withoutReferralCount: 0,
+        withoutReferralAmount: 0,
+        razorpayCount: 0,
+        razorpayAmount: 0,
+        paypalCount: 0,
+        paypalAmount: 0
+      });
+
+      // Determine country and currency
+      const country = paymentFilter.country !== 'all' 
+        ? COUNTRIES[paymentFilter.country]?.name || 'Unknown'
+        : 'All Countries';
+      
+      const countryCode = paymentFilter.country !== 'all' ? paymentFilter.country : 'ALL';
+      
+      // Assume INR for India, USD for others (you can make this more sophisticated)
+      const currency = countryCode === 'IN' ? 'INR' : 'USD';
+      const currencySymbol = countryCode === 'IN' ? '₹' : '$';
+
+      // Create revenue report document
+      await addDoc(collection(db, 'revenueReports'), {
+        type: 'revenue_report',
+        country: country,
+        countryCode: countryCode,
+        currency: currency,
+        currencySymbol: currencySymbol,
+        month: paymentFilter.month,
+        year: paymentFilter.year,
+        reportPeriod: `${months[paymentFilter.month - 1]} ${paymentFilter.year}`,
+        ...totals,
+        sharedBy: currentAdmin.email,
+        sharedAt: Timestamp.now()
+      });
+
+      alert('Revenue report shared with Accounts team successfully!');
+      setShowShareRevenueModal(false);
+    } catch (error) {
+      console.error('Error sharing revenue report:', error);
+      alert('Error sharing revenue report: ' + error.message);
+    } finally {
+      setSharingLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -426,30 +598,15 @@ export default function AdminDashboard(props) {
                 </button>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-3 text-gray-400" size={20} />
-                    <input
-                      type="text"
-                      placeholder="Search by name or email..."
-                      value={userSearchTerm}
-                      onChange={(e) => setUserSearchTerm(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                    />
-                  </div>
-                  <select
-                    value={userFilter}
-                    onChange={(e) => setUserFilter(e.target.value)}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    <option value="all">All Plans</option>
-                    <option value="none">No Plan</option>
-                    <option value="individual">Individual</option>
-                    <option value="family">Family</option>
-                  </select>
-                </div>
-              </div>
+              <FilterPanel
+                filterType="users"
+                filters={userFilters}
+                onFilterChange={setUserFilters}
+                COUNTRIES={COUNTRIES}
+                getAvailableStates={getAvailableStates}
+                months={months}
+                years={years}
+              />
 
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
@@ -515,6 +672,16 @@ export default function AdminDashboard(props) {
                   Refresh
                 </button>
               </div>
+
+              <FilterPanel
+                filterType="ambassadors"
+                filters={ambassadorFilters}
+                onFilterChange={setAmbassadorFilters}
+                COUNTRIES={COUNTRIES}
+                getAvailableStates={getAvailableStates}
+                months={months}
+                years={years}
+              />
 
               {ambassadors.length === 0 ? (
                 <div className="bg-white rounded-xl shadow-lg p-12 text-center">
@@ -653,12 +820,23 @@ export default function AdminDashboard(props) {
             <div>
               <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Payment Tracking</h2>
-                <button
-                  onClick={loadPayments}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-                >
-                  Refresh
-                </button>
+                <div className="flex gap-2">
+                  {currentAdmin?.role === 'super' && (
+                    <button
+                      onClick={handleShareRevenueReport}
+                      className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                    >
+                      <Share2 size={18} />
+                      Share Revenue Report with Accounts
+                    </button>
+                  )}
+                  <button
+                    onClick={loadPayments}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  >
+                    Refresh
+                  </button>
+                </div>
               </div>
 
               {/* Enhanced Filters */}
@@ -727,14 +905,14 @@ export default function AdminDashboard(props) {
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Plan</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gateway</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Country</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">State</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Referral</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Plan</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Gateway</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Country</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">State</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Referral</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -787,7 +965,7 @@ export default function AdminDashboard(props) {
             </div>
           )}
 
-          {/* AMBASSADOR PAYOUTS TAB - NEW */}
+          {/* AMBASSADOR PAYOUTS TAB - WITH SHARE BUTTON */}
           {activeTab === 'payouts' && canViewFeature('payments') && (
             <div>
               <div className="flex justify-between items-center mb-6">
@@ -800,39 +978,27 @@ export default function AdminDashboard(props) {
                 </button>
               </div>
 
-              {/* Month/Year Filter */}
-              <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <select
-                    value={payoutFilter.month}
-                    onChange={(e) => setPayoutFilter({...payoutFilter, month: parseInt(e.target.value)})}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    {months.map((month, idx) => (
-                      <option key={idx} value={idx + 1}>{month}</option>
-                    ))}
-                  </select>
-
-                  <select
-                    value={payoutFilter.year}
-                    onChange={(e) => setPayoutFilter({...payoutFilter, year: parseInt(e.target.value)})}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                  >
-                    {years.map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+              <FilterPanel
+                filterType="payouts"
+                filters={payoutFilter}
+                onFilterChange={setPayoutFilter}
+                COUNTRIES={COUNTRIES}
+                getAvailableStates={getAvailableStates}
+                months={months}
+                years={years}
+              />
 
               <div className="bg-white rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Referral Code</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sales Count</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Sales</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Commission</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Referral Code</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Sales Count</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Total Sales</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Total Commission</th>
+                      {currentAdmin?.role === 'super' && (
+                        <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Action</th>
+                      )}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -850,6 +1016,17 @@ export default function AdminDashboard(props) {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
                           ₹{payout.totalCommission.toFixed(2)}
                         </td>
+                        {currentAdmin?.role === 'super' && (
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <button
+                              onClick={() => handleSharePayoutWithAccounts(payout)}
+                              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                            >
+                              <Share2 size={16} />
+                              Share with Accounts
+                            </button>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -927,6 +1104,18 @@ export default function AdminDashboard(props) {
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
+                          <span className="text-sm text-gray-600">Individual Discount</span>
+                          <span className="text-sm font-semibold text-green-600">
+                            {country.individualDiscount}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="text-sm text-gray-600">Family Discount</span>
+                          <span className="text-sm font-semibold text-green-600">
+                            {country.familyDiscount}%
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b">
                           <span className="text-sm text-gray-600">Individual Commission</span>
                           <span className="text-sm font-semibold text-purple-600">
                             {country.individualCommission}%
@@ -945,6 +1134,7 @@ export default function AdminDashboard(props) {
               )}
             </div>
           )}
+          
           {/* PAYOUT MANAGEMENT TAB - NEW */}
           {activeTab === 'payoutsManagement' && (
             <PayoutManagement 
@@ -953,6 +1143,110 @@ export default function AdminDashboard(props) {
               canViewFeature={canViewFeature}
             />
           )}
+
+      {/* Share Payout Modal */}
+      {showSharePayoutModal && selectedPayoutData && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">Share Payout with Accounts</h3>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Referral Code:</span>
+                <span className="font-mono font-bold text-purple-600">{selectedPayoutData.referralCode}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Period:</span>
+                <span className="font-semibold">{months[payoutFilter.month - 1]} {payoutFilter.year}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Sales Count:</span>
+                <span className="font-semibold">{selectedPayoutData.count}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Total Sales:</span>
+                <span className="font-semibold">₹{selectedPayoutData.totalSales.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Commission Amount:</span>
+                <span className="font-bold text-green-600 text-lg">₹{selectedPayoutData.totalCommission.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              This will create a payout request that the Accounts team can process and mark as paid.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowSharePayoutModal(false);
+                  setSelectedPayoutData(null);
+                }}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                disabled={sharingLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmSharePayout}
+                disabled={sharingLoading}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              >
+                {sharingLoading ? 'Sharing...' : 'Confirm & Share'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share Revenue Report Modal */}
+      {showShareRevenueModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h3 className="text-2xl font-bold text-gray-800 mb-4">Share Revenue Report with Accounts</h3>
+            
+            <div className="space-y-3 mb-6">
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Period:</span>
+                <span className="font-semibold">{months[paymentFilter.month - 1]} {paymentFilter.year}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Country:</span>
+                <span className="font-semibold">
+                  {paymentFilter.country === 'all' ? 'All Countries' : COUNTRIES[paymentFilter.country]?.name}
+                </span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Total Payments:</span>
+                <span className="font-semibold">{getFilteredPayments().length}</span>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-6">
+              This will create a revenue report that the Accounts team can use for tax filing and financial tracking.
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowShareRevenueModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+                disabled={sharingLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmShareRevenueReport}
+                disabled={sharingLoading}
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+              >
+                {sharingLoading ? 'Sharing...' : 'Confirm & Share'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Bank Details Modal */}
       {showBankModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -1154,6 +1448,33 @@ export default function AdminDashboard(props) {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Individual Discount (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={countryFormData.individualDiscount}
+                    onChange={(e) => setCountryFormData({...countryFormData, individualDiscount: e.target.value})}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
+                    placeholder="10"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Family Discount (%)
+                  </label>
+                  <input
+                    type="number"
+                    value={countryFormData.familyDiscount}
+                    onChange={(e) => setCountryFormData({...countryFormData, familyDiscount: e.target.value})}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
+                    placeholder="20"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Individual Commission (%)
                   </label>
                   <input
@@ -1275,7 +1596,7 @@ export default function AdminDashboard(props) {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">Features</label>
                     <div className="space-y-2">
-                      {['users', 'payments', 'ambassadors', 'countries'].map(feature => (
+                      {['users', 'payments', 'ambassadors', 'countries', 'Accounts'].map(feature => (
                         <label key={feature} className="flex items-center gap-2">
                           <input
                             type="checkbox"

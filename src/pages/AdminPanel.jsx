@@ -104,11 +104,31 @@ export default function AdminPanel() {
     year: new Date().getFullYear()
   });
 
-  // Ambassador Payouts
+  // Ambassador Payouts - UPDATED with country/state
   const [ambassadorPayouts, setAmbassadorPayouts] = useState([]);
   const [payoutFilter, setPayoutFilter] = useState({
+    country: 'all',
+    state: 'all',
     month: new Date().getMonth() + 1,
     year: new Date().getFullYear()
+  });
+
+  // User filters - NEW
+  const [userFilters, setUserFilters] = useState({
+    country: 'all',
+    state: 'all',
+    month: 'all',
+    year: 'all',
+    planType: 'all'
+  });
+
+  // Ambassador filters - NEW
+  const [ambassadorFilters, setAmbassadorFilters] = useState({
+    country: 'all',
+    state: 'all',
+    month: 'all',
+    year: 'all',
+    status: 'all'
   });
 
   // Country pricing
@@ -119,6 +139,8 @@ export default function AdminPanel() {
     countryCode: '',
     individualPrice: 0,
     familyPrice: 0,
+    individualDiscount: 10,
+    familyDiscount: 20,
     individualCommission: 15,
     familyCommission: 25,
     isActive: true
@@ -137,7 +159,17 @@ export default function AdminPanel() {
       if (activeTab === 'payouts') loadAmbassadorPayouts();
       if (activeTab === 'countries') loadCountrySettings();
     }
-  }, [isLoggedIn, currentAdmin, activeTab, paymentFilter.month, paymentFilter.year, payoutFilter.month, payoutFilter.year]);
+  }, [
+    isLoggedIn, 
+    currentAdmin, 
+    activeTab, 
+    paymentFilter.month, 
+    paymentFilter.year, 
+    payoutFilter.month, 
+    payoutFilter.year,
+    userFilters,
+    ambassadorFilters
+  ]);
 
   const checkAdminSession = async () => {
     const adminSession = sessionStorage.getItem('adminLoggedIn');
@@ -393,6 +425,7 @@ export default function AdminPanel() {
     }
   };
 
+  // UPDATED loadAmbassadors with filter logic
   const loadAmbassadors = async () => {
     if (!canViewFeature('ambassadors')) return;
     
@@ -405,6 +438,34 @@ export default function AdminPanel() {
       });
 
       ambassadorsList = filterByAdminAccess(ambassadorsList, 'ambassador');
+
+      // Apply ambassador filters
+      ambassadorsList = ambassadorsList.filter(ambassador => {
+        // Country filter
+        if (ambassadorFilters.country !== 'all' && ambassador.countryCode !== ambassadorFilters.country) return false;
+        
+        // State filter
+        if (ambassadorFilters.state !== 'all' && ambassador.stateCode !== ambassadorFilters.state) return false;
+        
+        // Month/Year filter
+        if (ambassadorFilters.month !== 'all' || ambassadorFilters.year !== 'all') {
+          const createdDate = ambassador.createdAt?.toDate();
+          if (createdDate) {
+            if (ambassadorFilters.month !== 'all' && createdDate.getMonth() + 1 !== parseInt(ambassadorFilters.month)) return false;
+            if (ambassadorFilters.year !== 'all' && createdDate.getFullYear() !== parseInt(ambassadorFilters.year)) return false;
+          }
+        }
+        
+        // Status filter
+        if (ambassadorFilters.status !== 'all') {
+          if (ambassadorFilters.status === 'pending' && ambassador.isApproved) return false;
+          if (ambassadorFilters.status === 'approved' && !ambassador.isApproved) return false;
+          if (ambassadorFilters.status === 'active' && (!ambassador.isApproved || !ambassador.isActive)) return false;
+          if (ambassadorFilters.status === 'inactive' && (!ambassador.isApproved || ambassador.isActive)) return false;
+        }
+        
+        return true;
+      });
 
       ambassadorsList.sort((a, b) => {
         if (!a.isApproved && b.isApproved) return -1;
@@ -420,6 +481,7 @@ export default function AdminPanel() {
     }
   };
 
+  // UPDATED loadUsers with filter logic
   const loadUsers = async () => {
     if (!canViewFeature('users')) return;
     
@@ -432,6 +494,32 @@ export default function AdminPanel() {
       });
 
       usersList = filterByAdminAccess(usersList, 'user');
+
+      // Apply user filters
+      usersList = usersList.filter(user => {
+        // Country filter
+        if (userFilters.country !== 'all' && user.countryCode !== userFilters.country) return false;
+        
+        // State filter
+        if (userFilters.state !== 'all' && user.stateCode !== userFilters.state) return false;
+        
+        // Month/Year filter
+        if (userFilters.month !== 'all' || userFilters.year !== 'all') {
+          const createdDate = user.createdAt?.toDate();
+          if (createdDate) {
+            if (userFilters.month !== 'all' && createdDate.getMonth() + 1 !== parseInt(userFilters.month)) return false;
+            if (userFilters.year !== 'all' && createdDate.getFullYear() !== parseInt(userFilters.year)) return false;
+          }
+        }
+        
+        // Plan type filter
+        if (userFilters.planType !== 'all') {
+          if (userFilters.planType === 'none' && user.planType) return false;
+          if (userFilters.planType !== 'none' && user.planType !== userFilters.planType) return false;
+        }
+        
+        return true;
+      });
 
       usersList.sort((a, b) => {
         const dateA = a.createdAt?.toDate() || new Date(0);
@@ -470,6 +558,7 @@ export default function AdminPanel() {
     }
   };
 
+  // UPDATED loadAmbassadorPayouts with country/state filters
   const loadAmbassadorPayouts = async () => {
     try {
       const paymentsSnapshot = await getDocs(collection(db, 'payments'));
@@ -480,6 +569,12 @@ export default function AdminPanel() {
         const paymentDate = payment.createdAt?.toDate();
         
         if (payment.referralCode && paymentDate) {
+          // Apply country filter
+          if (payoutFilter.country !== 'all' && payment.countryCode !== payoutFilter.country) return;
+          
+          // Apply state filter
+          if (payoutFilter.state !== 'all' && payment.stateCode !== payoutFilter.state) return;
+          
           const month = paymentDate.getMonth() + 1;
           const year = paymentDate.getFullYear();
           
@@ -702,7 +797,20 @@ export default function AdminPanel() {
       const countryInfo = COUNTRIES[countryFormData.countryCode];
       if (!countryInfo) {
         alert('Invalid country code');
+        setLoading(false);
         return;
+      }
+
+      // Check for duplicate country (only when adding new, not editing)
+      if (!editingCountry) {
+        const duplicate = countrySettings.find(
+          c => c.countryCode === countryFormData.countryCode
+        );
+        if (duplicate) {
+          alert(`${countryInfo.name} is already configured. Please edit the existing entry instead.`);
+          setLoading(false);
+          return;
+        }
       }
 
       const countryData = {
@@ -712,6 +820,8 @@ export default function AdminPanel() {
         symbol: countryInfo.symbol,
         individualPrice: parseFloat(countryFormData.individualPrice),
         familyPrice: parseFloat(countryFormData.familyPrice),
+        individualDiscount: parseFloat(countryFormData.individualDiscount),
+        familyDiscount: parseFloat(countryFormData.familyDiscount),
         individualCommission: parseFloat(countryFormData.individualCommission),
         familyCommission: parseFloat(countryFormData.familyCommission),
         isActive: countryFormData.isActive,
@@ -818,12 +928,12 @@ export default function AdminPanel() {
                 Password
               </label>
               <input
-                type="password"
+                type="text"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                placeholder="••••••••"
+                placeholder="Enter password"
               />
             </div>
 
@@ -856,7 +966,7 @@ export default function AdminPanel() {
   }
 
   
-  // Return the dashboard component with all props  
+  // Return the dashboard component with all props - UPDATED with new filter props
   return <AdminDashboard
     currentAdmin={currentAdmin}
     stats={stats}
@@ -921,5 +1031,9 @@ export default function AdminPanel() {
     countryFormData={countryFormData}
     setCountryFormData={setCountryFormData}
     handleSaveCountry={handleSaveCountry}
+    userFilters={userFilters}
+    setUserFilters={setUserFilters}
+    ambassadorFilters={ambassadorFilters}
+    setAmbassadorFilters={setAmbassadorFilters}
   />;
 }

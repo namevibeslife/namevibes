@@ -39,6 +39,7 @@ export default function AmbassadorDashboard() {
     year: new Date().getFullYear(),
     month: 'all'
   });
+  const [paymentHistory, setPaymentHistory] = useState([]);
 
   const months = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -52,6 +53,7 @@ export default function AmbassadorDashboard() {
   useEffect(() => {
     if (ambassador) {
       loadAnalytics();
+      loadPaymentHistory();
     }
   }, [ambassador, filter]);
 
@@ -181,6 +183,45 @@ export default function AmbassadorDashboard() {
       console.error('Error loading analytics:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPaymentHistory = async () => {
+    if (!ambassador?.referralCode) return;
+
+    try {
+      const payoutRequestsRef = collection(db, 'payoutRequests');
+      const q = query(
+        payoutRequestsRef, 
+        where('referralCode', '==', ambassador.referralCode)
+      );
+      const snapshot = await getDocs(q);
+
+      const history = [];
+      snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        history.push({
+          id: doc.id,
+          month: data.month,
+          year: data.year,
+          amount: data.commissionAmount,
+          currency: data.currency,
+          currencySymbol: data.currencySymbol,
+          status: data.status,
+          paidAt: data.paidAt,
+          paymentNote: data.paymentNote
+        });
+      });
+
+      // Sort by year and month descending
+      history.sort((a, b) => {
+        if (b.year !== a.year) return b.year - a.year;
+        return b.month - a.month;
+      });
+
+      setPaymentHistory(history);
+    } catch (error) {
+      console.error('Error loading payment history:', error);
     }
   };
 
@@ -324,6 +365,55 @@ export default function AmbassadorDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Payment History Section - NEW */}
+        {paymentHistory.length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4">Payment History</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b-2 border-gray-200">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Month/Year</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Note</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {paymentHistory.map((payment) => (
+                    <tr key={payment.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {months[payment.month - 1]} {payment.year}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                        {payment.currencySymbol}{payment.amount}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+                          payment.status === 'paid' 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {payment.status.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {payment.paidAt 
+                          ? new Date(payment.paidAt.toDate()).toLocaleDateString() 
+                          : '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {payment.paymentNote || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
         {/* Analytics Grid */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">

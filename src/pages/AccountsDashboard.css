@@ -1,0 +1,439 @@
+/* Accounts Dashboard Styles */
+
+.accounts-dashboard {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.accounts-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 24px;
+  color: white;
+}
+
+/* Header */
+.accounts-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.accounts-header h1 {
+  margin: 0;
+  color: #667eea;
+  font-size: 28px;
+}
+
+.accounts-logout-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.accounts-logout-btn:hover {
+  background: #c82333;
+}
+
+/* Tabs */
+.accounts-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.accounts-tabs button {
+  flex: 1;
+  background: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #667eea;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.accounts-tabs button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.accounts-tabs button.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+/* Section */
+.accounts-section {
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.accounts-section h2 {
+  margin: 0 0 10px 0;
+  color: #667eea;
+  font-size: 24px;
+}
+
+.accounts-section p {
+  margin: 0 0 20px 0;
+  color: #666;
+}
+
+/* Filters */
+.accounts-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.accounts-filters select {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  background: white;
+  color: #333;
+}
+
+.accounts-filters select:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.accounts-download-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.accounts-download-btn:hover {
+  background: #218838;
+}
+
+/* Table */
+.accounts-table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.accounts-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.accounts-table thead tr {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.accounts-table th {
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 2px solid #667eea;
+}
+
+.accounts-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #333;
+}
+
+.accounts-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+/* Status Badge */
+.status-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background: #ffc107;
+  color: #856404;
+}
+
+.status-badge.paid {
+  background: #28a745;
+  color: white;
+}
+
+/* Mark as Paid Button */
+.mark-paid-btn {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.3s;
+}
+
+.mark-paid-btn:hover {
+  background: #764ba2;
+}
+
+.paid-info {
+  font-size: 12px;
+  color: #28a745;
+  font-weight: 500;
+}
+
+/* Revenue Section Titles */
+.revenue-section-title {
+  margin: 30px 0 15px 0;
+  color: #667eea;
+  font-size: 20px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+/* Download All Data Section */
+.download-filters {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.date-range {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.date-input {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-input label {
+  font-weight: 600;
+  color: #667eea;
+  min-width: 50px;
+}
+
+.date-input select {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  background: white;
+}
+
+.download-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.download-buttons h3 {
+  margin: 10px 0 10px 0;
+  color: #667eea;
+  font-size: 18px;
+}
+
+.download-large-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.download-large-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h2 {
+  margin: 0 0 20px 0;
+  color: #667eea;
+  font-size: 24px;
+}
+
+.modal-info {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.modal-info p {
+  margin: 8px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.modal-info strong {
+  color: #667eea;
+  font-weight: 600;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.modal-form label {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 14px;
+}
+
+.modal-form select,
+.modal-form input {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.modal-form select:focus,
+.modal-form input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.confirm-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.confirm-btn:hover {
+  background: #218838;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 30px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.cancel-btn:hover {
+  background: #5a6268;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .accounts-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .accounts-tabs {
+    flex-direction: column;
+  }
+
+  .accounts-filters {
+    flex-direction: column;
+  }
+
+  .accounts-table-container {
+    font-size: 12px;
+  }
+
+  .accounts-table th,
+  .accounts-table td {
+    padding: 10px;
+  }
+
+  .date-range {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 20px;
+  }
+}
