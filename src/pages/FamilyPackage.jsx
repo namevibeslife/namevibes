@@ -4,9 +4,10 @@ import UserNav from '../components/UserNav';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { parseNameToElements } from '../utils/elements';
+import { parseNameToElements, textColorFor } from '../utils/elements';
 import { Download, Plus, X, Share2 } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
+import UnmatchedLetters from '../components/UnmatchedLetters';
 import { findCommonElements, buildFamilyPDF } from '../utils/familyReport';
 
 const RELATIONS = [
@@ -168,15 +169,16 @@ export default function FamilyPackage() {
                     <div key={i} className="flex flex-col items-center">
                       <div
                         className="relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
-                        style={{ backgroundColor: el.color }}
+                        style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                       >
-                        <div className="text-base font-mono text-gray-800 font-bold">{el.number}</div>
-                        <div className="text-7xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
-                        <div className="text-base text-gray-800 text-center font-bold">{el.name}</div>
+                        <div className="text-base font-mono font-bold">{el.number}</div>
+                        <div className="text-7xl font-bold text-center leading-none">{el.symbol}</div>
+                        <div className="text-base text-center font-bold">{el.name}</div>
                       </div>
                     </div>
                   ))}
                 </div>
+                <UnmatchedLetters name={person.fullName} className="-mt-3 mb-6" />
 
                 <div className="overflow-x-auto">
                   <h4 className="text-2xl font-bold text-gray-800 mb-4">Element Colors & Meanings</h4>
@@ -235,11 +237,11 @@ export default function FamilyPackage() {
                     <div key={i} className="flex flex-col items-center">
                       <div
                         className="relative border-4 border-purple-600 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
-                        style={{ backgroundColor: el.color }}
+                        style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                       >
-                        <div className="text-base font-mono text-gray-800 font-bold">{el.number}</div>
-                        <div className="text-7xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
-                        <div className="text-base text-gray-800 text-center font-bold">{el.name}</div>
+                        <div className="text-base font-mono font-bold">{el.number}</div>
+                        <div className="text-7xl font-bold text-center leading-none">{el.symbol}</div>
+                        <div className="text-base text-center font-bold">{el.name}</div>
                       </div>
                     </div>
                   ))}

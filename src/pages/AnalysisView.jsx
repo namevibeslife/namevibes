@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { parseNameToElements } from '../utils/elements';
+import { parseNameToElements, textColorFor } from '../utils/elements';
 
 export default function AnalysisView() {
   const navigate = useNavigate();
@@ -77,11 +77,11 @@ export default function AnalysisView() {
               <div
                 key={i}
                 className="border-4 border-gray-800 rounded-lg p-3 w-28 h-28 flex flex-col justify-between"
-                style={{ backgroundColor: el.color }}
+                style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
               >
-                <div className="text-sm font-mono text-gray-800 font-bold">{el.number}</div>
-                <div className="text-4xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
-                <div className="text-xs text-gray-800 text-center font-bold">{el.name}</div>
+                <div className="text-sm font-mono font-bold">{el.number}</div>
+                <div className="text-4xl font-bold text-center leading-none">{el.symbol}</div>
+                <div className="text-xs text-center font-bold">{el.name}</div>
               </div>
             ))}
           </div>

@@ -91,7 +91,7 @@ export default function LandingPage() {
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-white">
           <h2 className="text-4xl font-bold mb-4">Ready to Discover Your Vibes?</h2>
-          <p className="text-xl mb-8 opacity-90">Join 10,000+ users who found their name chemistry</p>
+          <p className="text-xl mb-8 opacity-90">See which elements of the universe live in your name</p>
           <button
             onClick={() => navigate('/login')}
             className="px-10 py-4 bg-white text-purple-600 text-lg font-semibold rounded-xl hover:bg-gray-100 transition shadow-xl"

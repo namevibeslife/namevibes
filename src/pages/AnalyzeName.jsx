@@ -4,8 +4,9 @@ import UserNav from '../components/UserNav';
 import { Sparkles, Share2, Instagram } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { parseNameToElements } from '../utils/elements';
+import { parseNameToElements, textColorFor } from '../utils/elements';
 import { useAuthStore } from '../store/authStore';
+import UnmatchedLetters from '../components/UnmatchedLetters';
 import { countAnalysesThisMonth, planFeatures } from '../utils/plan';
 
 export default function AnalyzeName() {
@@ -169,20 +170,21 @@ export default function AnalyzeName() {
                   <div
                     key={idx}
                     className="relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
-                    style={{ backgroundColor: el.color }}
+                    style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                   >
-                    <div className="text-base font-mono text-gray-800 font-bold">
+                    <div className="text-base font-mono font-bold">
                       {el.number}
                     </div>
-                    <div className="text-7xl font-bold text-gray-800 text-center leading-none">
+                    <div className="text-7xl font-bold text-center leading-none">
                       {el.symbol}
                     </div>
-                    <div className="text-base text-gray-800 text-center font-bold">
+                    <div className="text-base text-center font-bold">
                       {el.name}
                     </div>
                   </div>
                 ))}
               </div>
+              <UnmatchedLetters name={result.name} className="mt-3" />
             </div>
 
             <div className="overflow-x-auto">

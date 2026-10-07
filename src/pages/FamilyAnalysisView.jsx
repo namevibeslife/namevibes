@@ -6,6 +6,7 @@ import { db, auth } from '../firebase';
 import { Users, Download } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import { findCommonElements, buildFamilyPDF } from '../utils/familyReport';
+import { textColorFor } from '../utils/elements';
 
 export default function FamilyAnalysisView() {
   const navigate = useNavigate();
@@ -114,11 +115,11 @@ export default function FamilyAnalysisView() {
                       <div
                         key={elIdx}
                         className="border-4 border-gray-800 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
-                        style={{ backgroundColor: el.color }}
+                        style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                       >
-                        <div className="text-sm font-mono text-gray-800 font-bold">{el.number}</div>
-                        <div className="text-5xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
-                        <div className="text-sm text-gray-800 text-center font-bold">{el.name}</div>
+                        <div className="text-sm font-mono font-bold">{el.number}</div>
+                        <div className="text-5xl font-bold text-center leading-none">{el.symbol}</div>
+                        <div className="text-sm text-center font-bold">{el.name}</div>
                       </div>
                     ))}
                   </div>
@@ -136,11 +137,11 @@ export default function FamilyAnalysisView() {
                   <div
                     key={idx}
                     className="border-4 border-purple-600 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
-                    style={{ backgroundColor: el.color }}
+                    style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                   >
-                    <div className="text-sm font-mono text-gray-800 font-bold">{el.number}</div>
-                    <div className="text-5xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
-                    <div className="text-sm text-gray-800 text-center font-bold">{el.name}</div>
+                    <div className="text-sm font-mono font-bold">{el.number}</div>
+                    <div className="text-5xl font-bold text-center leading-none">{el.symbol}</div>
+                    <div className="text-sm text-center font-bold">{el.name}</div>
                   </div>
                 ))}
               </div>

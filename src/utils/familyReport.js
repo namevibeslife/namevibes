@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import { textColorFor } from './elements';
 
 // Shared by the Family Package page and saved family analyses.
 // `results` is a list of { relation, fullName, elements }.
@@ -132,7 +133,7 @@ export function buildFamilyPDF(results) {
       pdf.rect(xPos, rowYPos, boxSize, boxSize);
 
       pdf.setFontSize(9);
-      pdf.setTextColor(0);
+      pdf.setTextColor(textColorFor(element.color));
       pdf.setFont('helvetica', 'bold');
       pdf.text(element.number.toString(), xPos + 2, rowYPos + 4);
 
@@ -144,6 +145,7 @@ export function buildFamilyPDF(results) {
       pdf.setFontSize(8);
       pdf.setFont('helvetica', 'bold');
       const nameWidth = pdf.getTextWidth(element.name);
+      pdf.setTextColor(0); // name sits below the tile, on white
       pdf.text(element.name, xPos + (boxSize - nameWidth) / 2, rowYPos + boxSize + 5);
 
       xPos += boxSize + boxGap;
@@ -200,7 +202,7 @@ export function buildFamilyPDF(results) {
         pdf.rect(xPos, rowYPos, boxSize, boxSize);
 
         pdf.setFontSize(9);
-        pdf.setTextColor(0);
+        pdf.setTextColor(textColorFor(element.color));
         pdf.setFont('helvetica', 'bold');
         pdf.text(element.number.toString(), xPos + 2, rowYPos + 4);
 
@@ -212,6 +214,7 @@ export function buildFamilyPDF(results) {
         pdf.setFontSize(8);
         pdf.setFont('helvetica', 'bold');
         const nameWidth = pdf.getTextWidth(element.name);
+        pdf.setTextColor(0); // name sits below the tile, on white
         pdf.text(element.name, xPos + (boxSize - nameWidth) / 2, rowYPos + boxSize + 5);
 
         xPos += boxSize + boxGap;
