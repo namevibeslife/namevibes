@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { COUNTRIES } from '../data/countries';
+import { useAuthStore } from '../store/authStore';
 
 export default function ProfileComplete() {
   const navigate = useNavigate();
+  const refreshProfile = useAuthStore(state => state.refreshProfile);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     fullName: '',
@@ -32,7 +34,7 @@ export default function ProfileComplete() {
     try {
       const user = auth.currentUser;
       if (!user) {
-        navigate('/signin');
+        navigate('/login');
         return;
       }
 
@@ -110,11 +112,12 @@ export default function ProfileComplete() {
       const user = auth.currentUser;
       if (!user) {
         alert('Please sign in first');
-        navigate('/signin');
+        navigate('/login');
         return;
       }
 
-      // Validate referral code format if provided
+      // Validate the referral code against active ambassador codes
+      let ambassadorEmail = null;
       if (formData.referralCode) {
         const cleaned = formData.referralCode.replace(/\s/g, '');
         if (cleaned.length !== 9) {
@@ -122,16 +125,25 @@ export default function ProfileComplete() {
           setLoading(false);
           return;
         }
+        const codeDoc = await getDoc(doc(db, 'referralCodes', cleaned));
+        if (!codeDoc.exists() || !codeDoc.data().active) {
+          alert('This referral code is not valid. Please check it, or leave it empty to continue without one.');
+          setLoading(false);
+          return;
+        }
+        ambassadorEmail = codeDoc.data().ambassadorEmail;
       }
 
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
         ...formData,
+        ambassadorEmail,
         email: user.email,
         profileComplete: true,
         createdAt: new Date()
       }, { merge: true });
 
+      await refreshProfile();
       navigate('/pricing');
     } catch (error) {
       console.error('Error saving profile:', error);

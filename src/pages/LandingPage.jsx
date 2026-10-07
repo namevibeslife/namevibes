@@ -103,7 +103,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 text-center text-gray-600">
-        <p>© 2025 NameVibes. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} NameVibes. All rights reserved.</p>
       </footer>
     </div>
   );

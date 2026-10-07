@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import { auth, db } from '../firebase';
-import { doc, getDoc } from 'firebase/firestore';
+import { auth } from '../firebase';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -13,31 +12,12 @@ export default function LoginPage() {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(auth, provider);
-      const userDoc = await getDoc(doc(db, 'users', result.user.uid));
-      
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        
-        // User has paid? Go to dashboard
-        if (userData.planType) {
-          navigate('/dashboard');
-        } 
-        // User completed profile but no plan? Go to pricing
-        else if (userData.profileComplete) {
-          navigate('/pricing');
-        } 
-        // User didn't complete profile? Go to profile
-        else {
-          navigate('/profile-complete');
-        }
-      } else {
-        // Brand new user
-        navigate('/profile-complete');
-      }
+      // The login route's guard sends the user on (profile, pricing or dashboard) once signed in
+      await signInWithPopup(auth, provider);
     } catch (error) {
-      alert('Sign-in failed. Please try again.');
-    } finally {
+      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+        alert('Sign-in failed. Please try again.');
+      }
       setLoading(false);
     }
   };

@@ -8,7 +8,8 @@ import {
   doc,
   getDoc 
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { 
   Users, 
   DollarSign, 
@@ -46,9 +47,15 @@ export default function AmbassadorDashboard() {
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  useEffect(() => {
-    loadAmbassadorData();
-  }, []);
+  // Wait for the Google session to be restored before loading (database rules require it)
+  useEffect(() => onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      sessionStorage.clear();
+      navigate('/ambassador');
+      return;
+    }
+    loadAmbassadorData(user);
+  }), []);
 
   useEffect(() => {
     if (ambassador) {
@@ -57,13 +64,12 @@ export default function AmbassadorDashboard() {
     }
   }, [ambassador, filter]);
 
-  const loadAmbassadorData = async () => {
+  const loadAmbassadorData = async (user) => {
     try {
-      // Check session storage instead of Firebase Auth
       const ambassadorId = sessionStorage.getItem('ambassadorId');
       const ambassadorEmail = sessionStorage.getItem('ambassadorEmail');
 
-      if (!ambassadorId || !ambassadorEmail) {
+      if (!ambassadorId || ambassadorEmail !== user.email.toLowerCase()) {
         navigate('/ambassador');
         return;
       }
@@ -101,7 +107,7 @@ export default function AmbassadorDashboard() {
     try {
       // Get all users who used this referral code
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('referralCode', '==', ambassador.referralCode));
+      const q = query(usersRef, where('ambassadorEmail', '==', ambassador.email));
       const usersSnapshot = await getDocs(q);
 
       const stats = {
@@ -192,8 +198,8 @@ export default function AmbassadorDashboard() {
     try {
       const payoutRequestsRef = collection(db, 'payoutRequests');
       const q = query(
-        payoutRequestsRef, 
-        where('referralCode', '==', ambassador.referralCode)
+        payoutRequestsRef,
+        where('ambassadorEmail', '==', ambassador.email)
       );
       const snapshot = await getDocs(q);
 
@@ -228,6 +234,7 @@ export default function AmbassadorDashboard() {
   const handleLogout = async () => {
     try {
       sessionStorage.clear();
+      await signOut(auth);
       navigate('/ambassador');
     } catch (error) {
       console.error('Error logging out:', error);

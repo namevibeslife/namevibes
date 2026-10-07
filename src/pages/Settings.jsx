@@ -95,7 +95,7 @@ export default function Settings() {
 
             <div className="border-b border-gray-200 pb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Sign Out All Devices
+                Sign Out & Clear This Device
               </h3>
               <p className="text-sm text-gray-600 mb-3">
                 Clear all cached data and sign out from all devices where you're logged in. 
@@ -121,7 +121,7 @@ export default function Settings() {
                 className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Trash2 size={18} />
-                {clearing ? 'Clearing...' : 'Sign Out All Devices & Clear Cache'}
+                {clearing ? 'Clearing...' : 'Sign Out & Clear This Device'}
               </button>
             </div>
           </div>

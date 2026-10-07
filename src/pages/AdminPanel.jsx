@@ -13,7 +13,8 @@ import {
   deleteDoc,
   Timestamp 
 } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { COUNTRIES } from '../data/countries';
 import { 
   Users, 
@@ -50,8 +51,6 @@ export default function AdminPanel() {
   const [currentAdmin, setCurrentAdmin] = useState(null);
   
   // Login state
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loginError, setLoginError] = useState('');
   
   // Dashboard stats
@@ -60,7 +59,7 @@ export default function AdminPanel() {
     totalPayments: 0,
     pendingAmbassadors: 0,
     activeAmbassadors: 0,
-    totalRevenue: 0
+    revenueByCurrency: {}
   });
 
   // Super Admin - Admin Management
@@ -69,7 +68,6 @@ export default function AdminPanel() {
   const [editingAdmin, setEditingAdmin] = useState(null);
   const [adminFormData, setAdminFormData] = useState({
     email: '',
-    password: '',
     role: 'admin',
     countries: [],
     states: [],
@@ -146,8 +144,35 @@ export default function AdminPanel() {
     isActive: true
   });
 
+  // Admins sign in with Google; access comes from an admins/{email} document
   useEffect(() => {
-    checkAdminSession();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        setCurrentAdmin(null);
+        setIsLoggedIn(false);
+        setLoading(false);
+        return;
+      }
+      try {
+        const adminDoc = await getDoc(doc(db, 'admins', user.email.toLowerCase()));
+        if (adminDoc.exists()) {
+          setCurrentAdmin({ id: adminDoc.id, ...adminDoc.data() });
+          setIsLoggedIn(true);
+          setLoginError('');
+          loadDashboardStats();
+        } else {
+          setCurrentAdmin(null);
+          setIsLoggedIn(false);
+          setLoginError(`${user.email} is not an admin account.`);
+        }
+      } catch (error) {
+        console.error('Admin check error:', error);
+        setLoginError('Could not verify admin access: ' + error.message);
+      } finally {
+        setLoading(false);
+      }
+    });
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
@@ -171,74 +196,22 @@ export default function AdminPanel() {
     ambassadorFilters
   ]);
 
-  const checkAdminSession = async () => {
-    const adminSession = sessionStorage.getItem('adminLoggedIn');
-    const adminEmail = sessionStorage.getItem('adminEmail');
-    
-    if (adminSession === 'true' && adminEmail) {
-      try {
-        const adminsRef = collection(db, 'admins');
-        const querySnapshot = await getDocs(adminsRef);
-        
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          if (data.email === adminEmail) {
-            setCurrentAdmin({ id: doc.id, ...data });
-            setIsLoggedIn(true);
-            loadDashboardStats();
-          }
-        });
-      } catch (error) {
-        console.error('Session check error:', error);
-      }
-    }
-    setLoading(false);
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async () => {
     setLoginError('');
-    setLoading(true);
-
     try {
-      const adminsRef = collection(db, 'admins');
-      const querySnapshot = await getDocs(adminsRef);
-
-      let adminFound = false;
-      let adminData = null;
-
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        if (data.email === email && data.password === password) {
-          adminFound = true;
-          adminData = { id: doc.id, ...data };
-        }
-      });
-
-      if (adminFound) {
-        sessionStorage.setItem('adminLoggedIn', 'true');
-        sessionStorage.setItem('adminEmail', email);
-        sessionStorage.setItem('adminRole', adminData.role || 'admin');
-        setCurrentAdmin(adminData);
-        setIsLoggedIn(true);
-        loadDashboardStats();
-      } else {
-        setLoginError('Invalid email or password');
-      }
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      // onAuthStateChanged above checks admin access once signed in
+      await signInWithPopup(auth, provider);
     } catch (error) {
-      console.error('Login error:', error);
-      setLoginError('Login failed: ' + error.message);
-    } finally {
-      setLoading(false);
+      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+        setLoginError('Sign-in failed: ' + error.message);
+      }
     }
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('adminLoggedIn');
-    sessionStorage.removeItem('adminEmail');
-    sessionStorage.removeItem('adminRole');
-    setCurrentAdmin(null);
-    setIsLoggedIn(false);
+  const handleLogout = async () => {
+    await signOut(auth);
     navigate('/');
   };
 
@@ -294,7 +267,6 @@ export default function AdminPanel() {
     setEditingAdmin(null);
     setAdminFormData({
       email: '',
-      password: '',
       role: 'admin',
       countries: [],
       states: [],
@@ -307,7 +279,6 @@ export default function AdminPanel() {
     setEditingAdmin(admin);
     setAdminFormData({
       email: admin.email,
-      password: admin.password,
       role: admin.role,
       countries: admin.countries || [],
       states: admin.states || [],
@@ -320,9 +291,10 @@ export default function AdminPanel() {
     try {
       setLoading(true);
 
+      // Admin documents are keyed by the admin's Google email; security rules look them up that way
+      const adminEmail = adminFormData.email.trim().toLowerCase();
       const adminData = {
-        email: adminFormData.email,
-        password: adminFormData.password,
+        email: adminEmail,
         role: adminFormData.role,
         countries: adminFormData.countries,
         states: adminFormData.states,
@@ -331,15 +303,17 @@ export default function AdminPanel() {
         updatedBy: currentAdmin.email
       };
 
-      if (editingAdmin) {
-        await updateDoc(doc(db, 'admins', editingAdmin.id), adminData);
+      if (editingAdmin && editingAdmin.id === adminEmail) {
+        await updateDoc(doc(db, 'admins', adminEmail), adminData);
         alert('Admin updated successfully!');
       } else {
-        await addDoc(collection(db, 'admins'), {
+        await setDoc(doc(db, 'admins', adminEmail), {
           ...adminData,
-          createdAt: Timestamp.now()
+          createdAt: editingAdmin?.createdAt || Timestamp.now()
         });
-        alert('Admin created successfully!');
+        // Email changed while editing: the old document no longer grants access
+        if (editingAdmin) await deleteDoc(doc(db, 'admins', editingAdmin.id));
+        alert(editingAdmin ? 'Admin updated successfully!' : 'Admin created! They can now sign in with Google using ' + adminEmail);
       }
 
       setShowAdminModal(false);
@@ -380,18 +354,22 @@ export default function AdminPanel() {
 
       const paymentsSnapshot = await getDocs(collection(db, 'payments'));
       let filteredPayments = [];
-      let totalRevenue = 0;
-      
+
       paymentsSnapshot.forEach(doc => {
-        const data = { id: doc.id, ...doc.data() };
-        filteredPayments.push(data);
-        if (data.status === 'success' || data.status === 'paid') {
-          totalRevenue += data.amount || 0;
-        }
+        filteredPayments.push({ id: doc.id, ...doc.data() });
       });
-      
+
       filteredPayments = filterByAdminAccess(filteredPayments, 'payment');
       const totalPayments = filteredPayments.length;
+
+      // Totals are kept per currency; adding rupees and dollars together is meaningless
+      const revenueByCurrency = {};
+      filteredPayments.forEach(payment => {
+        if (payment.status === 'success' || payment.status === 'paid') {
+          const currency = payment.currency || 'INR';
+          revenueByCurrency[currency] = (revenueByCurrency[currency] || 0) + (payment.amount || 0);
+        }
+      });
 
       const ambassadorsSnapshot = await getDocs(collection(db, 'ambassadors'));
       let filteredAmbassadors = [];
@@ -418,7 +396,7 @@ export default function AdminPanel() {
         totalPayments,
         pendingAmbassadors,
         activeAmbassadors,
-        totalRevenue
+        revenueByCurrency
       });
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -644,6 +622,19 @@ export default function AdminPanel() {
     setShowApprovalModal(true);
   };
 
+  // referralCodes/{code without spaces} is what the profile form checks a code against,
+  // and what links referred users to their ambassador
+  const syncReferralCode = async (ambassador, active) => {
+    if (!ambassador.referralCode) return;
+    await setDoc(doc(db, 'referralCodes', ambassador.referralCode.replace(/\s/g, '')), {
+      code: ambassador.referralCode,
+      ambassadorId: ambassador.id,
+      ambassadorEmail: ambassador.email.toLowerCase(),
+      active,
+      updatedAt: Timestamp.now()
+    });
+  };
+
   const handleApprove = async () => {
     try {
       setLoading(true);
@@ -661,6 +652,7 @@ export default function AdminPanel() {
         commissionRateIndividual: 15,
         commissionRateFamily: 25
       });
+      await syncReferralCode({ ...selectedAmbassador, referralCode }, true);
 
       alert('Ambassador approved successfully!');
       setShowApprovalModal(false);
@@ -691,6 +683,7 @@ export default function AdminPanel() {
         rejectedBy: currentAdmin.email,
         rejectionReason: reason
       });
+      await syncReferralCode(ambassador, false);
 
       alert('Ambassador rejected.');
       loadAmbassadors();
@@ -713,6 +706,7 @@ export default function AdminPanel() {
         deactivatedAt: !ambassador.isActive ? null : Timestamp.now(),
         deactivatedBy: !ambassador.isActive ? null : currentAdmin.email
       });
+      await syncReferralCode(ambassador, !ambassador.isActive);
 
       alert(`Ambassador ${!ambassador.isActive ? 'activated' : 'deactivated'} successfully!`);
       loadAmbassadors();
@@ -908,35 +902,7 @@ export default function AdminPanel() {
             <p className="text-gray-600 mt-2">NameVibes Management System</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Email Address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                placeholder="admin@namevibes.life"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Password
-              </label>
-              <input
-                type="text"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
-                placeholder="Enter password"
-              />
-            </div>
-
+          <div className="space-y-6">
             {loginError && (
               <div className="bg-red-50 border-2 border-red-200 rounded-lg p-3 text-red-700 text-sm">
                 {loginError}
@@ -944,13 +910,26 @@ export default function AdminPanel() {
             )}
 
             <button
-              type="submit"
+              onClick={handleLogin}
               disabled={loading}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50"
             >
-              {loading ? 'Logging in...' : 'Sign In'}
+              {loading ? 'Checking...' : 'Sign in with Google'}
             </button>
-          </form>
+
+            {loginError && auth.currentUser && (
+              <button
+                onClick={() => signOut(auth)}
+                className="w-full text-sm text-gray-600 hover:text-gray-800"
+              >
+                Use a different Google account
+              </button>
+            )}
+
+            <p className="text-xs text-gray-500 text-center">
+              Use the Google account a super admin added under Admin Management.
+            </p>
+          </div>
 
           <div className="mt-6 text-center">
             <button

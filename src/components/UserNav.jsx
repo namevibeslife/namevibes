@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Menu, X, Home, Sparkles, Users, Calculator, BookOpen, Settings, LogOut } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
 
 export default function UserNav() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const profile = useAuthStore(state => state.profile);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -20,11 +23,13 @@ export default function UserNav() {
   const menuItems = [
     { icon: Home, label: 'Dashboard', path: '/dashboard' },
     { icon: Sparkles, label: 'Analyze Name', path: '/analyze' },
-    { icon: Users, label: 'Family Analysis', path: '/family' },
+    { icon: Users, label: 'Family Analysis', path: '/family', familyOnly: true },
     { icon: Calculator, label: 'Numerology Calculator', path: '/numerology-calculator' },
     { icon: BookOpen, label: 'Zodiac Name Guide', path: '/zodiac-syllables' },
     { icon: Settings, label: 'Settings', path: '/settings' },
-  ];
+  ].filter(item => !item.familyOnly || profile?.planType === 'family');
+
+  const itemClass = (path) => location.pathname === path ? 'text-purple-600' : 'text-gray-700';
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -39,14 +44,14 @@ export default function UserNav() {
           </h1>
 
           {/* Desktop Menu */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden xl:flex items-center gap-6">
             {menuItems.map((item) => {
               const Icon = item.icon;
               return (
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className="flex items-center gap-2 text-gray-700 hover:text-purple-600 transition font-medium"
+                  className={`flex items-center gap-2 ${itemClass(item.path)} hover:text-purple-600 transition font-medium whitespace-nowrap`}
                 >
                   <Icon size={18} />
                   <span>{item.label}</span>
@@ -65,7 +70,9 @@ export default function UserNav() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+            className="xl:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -73,7 +80,7 @@ export default function UserNav() {
 
         {/* Mobile Menu Dropdown */}
         {isMenuOpen && (
-          <nav className="md:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
+          <nav className="xl:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
             <div className="flex flex-col gap-2">
               {menuItems.map((item) => {
                 const Icon = item.icon;
@@ -84,7 +91,7 @@ export default function UserNav() {
                       navigate(item.path);
                       setIsMenuOpen(false);
                     }}
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition font-medium text-left"
+                    className={`flex items-center gap-3 px-4 py-3 ${itemClass(item.path)} hover:bg-purple-50 hover:text-purple-600 rounded-lg transition font-medium text-left`}
                   >
                     <Icon size={20} />
                     <span>{item.label}</span>

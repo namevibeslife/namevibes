@@ -1,13 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
-import { db } from '../firebase';
+import { db, auth } from '../firebase';
+import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'firebase/auth';
 import { COUNTRIES } from '../data/countries';
 import { UserCheck, ArrowLeft } from 'lucide-react';
 
 export default function AmbassadorRegistration() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  // Applicants sign in with Google first, so an application can only be filed for your own email
+  const [authUser, setAuthUser] = useState(undefined);
+
+  useEffect(() => onAuthStateChanged(auth, (user) => {
+    setAuthUser(user);
+    if (user) setFormData(data => ({ ...data, email: user.email.toLowerCase() }));
+  }), []);
+
+  const handleGoogleSignIn = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+    } catch (error) {
+      if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+        alert('Sign-in failed: ' + error.message);
+      }
+    }
+  };
   const [formData, setFormData] = useState({
     // Personal Details
     firstName: '',
@@ -81,7 +101,7 @@ export default function AmbassadorRegistration() {
 
         mobileNumber: formData.mobileNumber,
         alternateMobile: formData.alternateMobile,
-        email: formData.email,
+        email: auth.currentUser.email.toLowerCase(),
 
         countryCode: formData.countryCode,
         countryName: country?.name || '',
@@ -157,6 +177,21 @@ export default function AmbassadorRegistration() {
             <p className="text-gray-600 mt-2">Join the NameVibes family and earn rewards</p>
           </div>
 
+          {authUser === undefined ? (
+            <div className="text-center py-8 text-gray-600">Loading...</div>
+          ) : !authUser ? (
+            <div className="text-center py-8 space-y-4">
+              <p className="text-gray-700">
+                Sign in with the Google account you'll use as an ambassador. You'll use it to log in once approved.
+              </p>
+              <button
+                onClick={handleGoogleSignIn}
+                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+              >
+                Continue with Google
+              </button>
+            </div>
+          ) : (
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Personal Details */}
             <div>
@@ -282,9 +317,10 @@ export default function AmbassadorRegistration() {
                     type="email"
                     name="email"
                     required
+                    readOnly
                     value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    title="Your Google sign-in email"
+                    className="w-full px-4 py-2 border-2 border-gray-200 bg-gray-100 rounded-lg text-gray-600"
                   />
                 </div>
               </div>
@@ -587,6 +623,7 @@ export default function AmbassadorRegistration() {
               </button>
             </div>
           </form>
+          )}
         </div>
       </div>
     </div>

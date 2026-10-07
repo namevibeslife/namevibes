@@ -3,9 +3,23 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { ArrowLeft, CreditCard } from 'lucide-react';
+import { useAuthStore } from '../store/authStore';
+
+// In mock mode (npm run dev:mock) no gateway scripts load; payments are simulated
+const IS_MOCK = import.meta.env.MODE === 'mock';
+
+const loadScript = (src) => new Promise((resolve, reject) => {
+  if (document.querySelector(`script[src="${src}"]`)) return resolve();
+  const script = document.createElement('script');
+  script.src = src;
+  script.onload = resolve;
+  script.onerror = () => reject(new Error(`Failed to load ${src}`));
+  document.body.appendChild(script);
+});
 
 export default function PaymentPage() {
   const navigate = useNavigate();
+  const refreshProfile = useAuthStore(state => state.refreshProfile);
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(null);
@@ -84,7 +98,7 @@ export default function PaymentPage() {
       if (userDoc.exists()) {
         const data = userDoc.data();
         setUserProfile(data);
-        setPaymentMethod(data.countryCode === 'IN' ? 'razorpay' : 'paypal');
+        setPaymentMethod(IS_MOCK ? 'mock' : data.countryCode === 'IN' ? 'razorpay' : 'paypal');
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -94,6 +108,7 @@ export default function PaymentPage() {
   const handleRazorpayPayment = async () => {
     setLoading(true);
     try {
+      await loadScript('https://checkout.razorpay.com/v1/checkout.js');
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: amount * 100,
@@ -145,7 +160,7 @@ export default function PaymentPage() {
         userEmail: user.email,
         planType,
         amount,
-        currency: gateway === 'razorpay' ? 'INR' : 'USD',
+        currency: currency || (gateway === 'razorpay' ? 'INR' : 'USD'),
         gateway,
         transactionId,
         referralCode: referralCode || null,
@@ -153,6 +168,7 @@ export default function PaymentPage() {
         createdAt: new Date()
       });
 
+      await refreshProfile();
       navigate('/dashboard');
     } catch (error) {
       console.error('Error saving payment:', error);
@@ -205,7 +221,23 @@ export default function PaymentPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Payment Method</h3>
 
-            {paymentMethod === 'razorpay' ? (
+            {paymentMethod === 'mock' ? (
+              <div className="border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-amber-800 font-semibold">Mock mode: no real payment gateway is used.</p>
+                <button
+                  onClick={() => savePaymentSuccess('mock', `mock_${Date.now()}`)}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
+                >
+                  Simulate successful payment
+                </button>
+                <button
+                  onClick={() => alert('Payment failed. Please try again.')}
+                  className="w-full bg-red-100 hover:bg-red-200 text-red-700 py-3 rounded-lg font-semibold transition"
+                >
+                  Simulate failed payment
+                </button>
+              </div>
+            ) : paymentMethod === 'razorpay' ? (
               <button
                 onClick={handleRazorpayPayment}
                 disabled={loading}
@@ -237,7 +269,7 @@ export default function PaymentPage() {
 
           {/* Security Notice */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            🔒 Secure payment powered by {paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal'}
+            🔒 Secure payment powered by {paymentMethod === 'mock' ? 'nothing (mock mode)' : paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal'}
           </div>
         </div>
       </div>

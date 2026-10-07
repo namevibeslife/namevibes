@@ -5,7 +5,8 @@ import {
   collection, 
   query, 
   where, 
-  getDocs, 
+  getDocs,
+  getDoc,
   updateDoc, 
   doc,
   orderBy,
@@ -59,21 +60,17 @@ function AccountsDashboard() {
         return;
       }
 
-      // Check if user has Accounts permission
-      const adminQuery = query(
-        collection(db, 'admins'),
-        where('email', '==', user.email)
-      );
-      const adminSnapshot = await getDocs(adminQuery);
-      
-      if (adminSnapshot.empty) {
+      // Check if user has Accounts permission (super admins always do)
+      const adminDoc = await getDoc(doc(db, 'admins', user.email.toLowerCase()));
+
+      if (!adminDoc.exists()) {
         alert('Access denied. Accounts permission required.');
         navigate('/admin');
         return;
       }
 
-      const adminData = adminSnapshot.docs[0].data();
-      if (!adminData.features || !adminData.features.includes('Accounts')) {
+      const adminData = adminDoc.data();
+      if (adminData.role !== 'super' && !adminData.features?.includes('Accounts')) {
         alert('Access denied. Accounts permission required.');
         navigate('/admin');
         return;

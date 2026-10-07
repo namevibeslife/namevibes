@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { Users } from 'lucide-react';
+import { Users, Download } from 'lucide-react';
+import AskAIPanel from '../components/AskAIPanel';
+import { findCommonElements, buildFamilyPDF } from '../utils/familyReport';
 
 export default function FamilyAnalysisView() {
   const navigate = useNavigate();
@@ -54,6 +56,14 @@ export default function FamilyAnalysisView() {
   if (!analysis) {
     return null;
   }
+
+  // Saved data keeps relations and elements in two parallel lists
+  const results = (analysis.elementData || []).map((person, idx) => ({
+    relation: analysis.members?.[idx]?.relation || '',
+    fullName: person.fullName,
+    elements: person.elements || []
+  }));
+  const commonElements = findCommonElements(results);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -117,7 +127,37 @@ export default function FamilyAnalysisView() {
             </div>
           )}
 
-          <div className="mt-8 text-center">
+          {commonElements.length > 0 && (
+            <div className="mb-8 pt-8 border-t-2 border-purple-200">
+              <h2 className="text-3xl font-bold text-purple-600 mb-2 text-center">The Harmony</h2>
+              <p className="text-gray-600 mb-6 text-center italic">"Common Elements Across All Family Members"</p>
+              <div className="flex flex-wrap gap-4 justify-center p-6 bg-purple-50 rounded-xl mb-6">
+                {commonElements.map((el, idx) => (
+                  <div
+                    key={idx}
+                    className="border-4 border-purple-600 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
+                    style={{ backgroundColor: el.color }}
+                  >
+                    <div className="text-sm font-mono text-gray-800 font-bold">{el.number}</div>
+                    <div className="text-5xl font-bold text-gray-800 text-center leading-none">{el.symbol}</div>
+                    <div className="text-sm text-gray-800 text-center font-bold">{el.name}</div>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-6 border-2 border-purple-300">
+                <AskAIPanel results={results} />
+              </div>
+            </div>
+          )}
+
+          <div className="mt-8 flex flex-wrap gap-3 justify-center">
+            <button
+              onClick={() => buildFamilyPDF(results).save('NameVibes_Family_Report.pdf')}
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition font-semibold"
+            >
+              <Download size={20} />
+              Download PDF
+            </button>
             <button
               onClick={() => navigate('/family')}
               className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"

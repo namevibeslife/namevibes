@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { COUNTRIES, getPricing, getDiscountedPrice } from '../data/countries';
@@ -7,6 +7,7 @@ import { Check, ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function Pricing() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -95,6 +96,13 @@ export default function Pricing() {
           <p className="text-xl text-gray-600">
             Unlock the chemistry in names
           </p>
+          {location.state?.reason && (
+            <div className="mt-4 inline-block bg-purple-50 border-2 border-purple-300 rounded-lg px-6 py-3 text-purple-800 font-medium">
+              {location.state.reason === 'family-required'
+                ? 'The Family Package is part of the Family plan.'
+                : 'Choose a plan to unlock name analyses and insights.'}
+            </div>
+          )}
           {hasReferral && (
             <div className="mt-4 inline-block bg-green-100 border-2 border-green-500 rounded-lg px-6 py-3">
               <p className="text-green-800 font-semibold">

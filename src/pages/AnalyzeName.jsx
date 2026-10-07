@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { Sparkles, Share2, Instagram } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements } from '../utils/elements';
+import { useAuthStore } from '../store/authStore';
+import { countAnalysesThisMonth, planFeatures } from '../utils/plan';
 
 export default function AnalyzeName() {
   const navigate = useNavigate();
+  const profile = useAuthStore(state => state.profile);
   const [name, setName] = useState('');
   const [result, setResult] = useState(null);
+  const [analysesUsed, setAnalysesUsed] = useState(null);
+  const monthlyLimit = planFeatures(profile)?.monthlyAnalyses ?? 0;
+  const remaining = analysesUsed === null ? null : Math.max(monthlyLimit - analysesUsed, 0);
+
+  useEffect(() => {
+    if (auth.currentUser) {
+      countAnalysesThisMonth(auth.currentUser.uid)
+        .then(setAnalysesUsed)
+        .catch(error => console.error('Error counting analyses:', error));
+    }
+  }, []);
 
   const saveAnalysis = async (fullName, elements) => {
     try {
@@ -28,7 +42,11 @@ export default function AnalyzeName() {
   };
 
   const handleAnalyze = async () => {
-    if (!name.trim()) return;
+    if (!name.trim() || remaining === null) return;
+    if (remaining <= 0) {
+      alert(`You've used all ${monthlyLimit} analyses for this month. Your allowance resets on the 1st.`);
+      return;
+    }
 
     const elements = parseNameToElements(name);
 
@@ -38,11 +56,12 @@ export default function AnalyzeName() {
     });
 
     await saveAnalysis(name, elements);
+    setAnalysesUsed(used => used + 1);
   };
 
   const handleShare = (platform) => {
     const text = `Check out my name chemistry on NameVibes! ${result.name} = ${result.elements.map(e => e.symbol).join('-')}`;
-    const url = 'https://namevibes.life?ref=NV2024XYZ';
+    const url = 'https://namevibes.life';
     
     if (platform === 'whatsapp') {
       window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
@@ -61,7 +80,11 @@ export default function AnalyzeName() {
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-xl p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Analyze Name</h1>
-            <p className="text-gray-600 mb-6">3 of 8 analyses remaining this month</p>
+            <p className={`mb-6 ${remaining === 0 ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
+              {remaining === null
+                ? 'Checking your monthly allowance...'
+                : `${remaining} of ${monthlyLimit} analyses remaining this month`}
+            </p>
 
             <div className="space-y-4">
               <div>
@@ -88,15 +111,17 @@ export default function AnalyzeName() {
               </button>
             </div>
 
-            <div className="mt-6 text-center text-sm text-gray-500">
-              <p>⚠️ No download on Individual plan</p>
-              <button
-                onClick={() => navigate('/pricing')}
-                className="text-purple-600 hover:underline"
-              >
-                Upgrade to Family for downloads →
-              </button>
-            </div>
+            {profile?.planType === 'individual' && (
+              <div className="mt-6 text-center text-sm text-gray-500">
+                <p>⚠️ No download on Individual plan</p>
+                <button
+                  onClick={() => navigate('/pricing')}
+                  className="text-purple-600 hover:underline"
+                >
+                  Upgrade to Family for downloads →
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

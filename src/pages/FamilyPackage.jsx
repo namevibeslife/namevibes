@@ -5,8 +5,9 @@ import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements } from '../utils/elements';
-import { Download, Plus, X, Share2, ExternalLink } from 'lucide-react';
-import jsPDF from 'jspdf';
+import { Download, Plus, X, Share2 } from 'lucide-react';
+import AskAIPanel from '../components/AskAIPanel';
+import { findCommonElements, buildFamilyPDF } from '../utils/familyReport';
 
 const RELATIONS = [
   'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister',
@@ -42,7 +43,7 @@ export default function FamilyPackage() {
 
   const handleShare = () => {
     const text = `Check out our family name chemistry on NameVibes!`;
-    const url = 'https://namevibes.life?ref=NV2024XYZ';
+    const url = 'https://namevibes.life';
     window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
   };
 
@@ -94,7 +95,7 @@ export default function FamilyPackage() {
     }
 
     const analyzed = validNames.map(nameData => {
-      const fullName = `${nameData.firstName} ${nameData.middleName} ${nameData.lastName}`.trim();
+      const fullName = [nameData.firstName, nameData.middleName, nameData.lastName].map(n => n.trim()).filter(Boolean).join(' ');
       const elements = parseNameToElements(fullName);
       
       return {
@@ -109,218 +110,16 @@ export default function FamilyPackage() {
     setHarmonyStep('results');
   };
 
-  const findCommonElements = () => {
-    if (!results || results.length < 2) return [];
-    
-    const allElementSymbols = results.map(r => 
-      r.elements.map(e => e.symbol)
-    );
-    
-    const firstSet = new Set(allElementSymbols[0]);
-    const commonSymbols = [...firstSet].filter(symbol =>
-      allElementSymbols.every(symbols => symbols.includes(symbol))
-    );
-    
-    // Get all unique elements that match the common symbols
-    const allElements = results.flatMap(r => r.elements);
-    const uniqueCommon = [];
-    const seenSymbols = new Set();
-    
-    for (const element of allElements) {
-      if (commonSymbols.includes(element.symbol) && !seenSymbols.has(element.symbol)) {
-        uniqueCommon.push(element);
-        seenSymbols.add(element.symbol);
-      }
-    }
-    
-    return uniqueCommon;
+
+  const downloadPDF = () => {
+    buildFamilyPDF(results).save(`NameVibes_Family_Report.pdf`);
   };
 
-  const downloadPDF = async () => {
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    const pageWidth = 210;
-    const pageHeight = 297;
-    const margin = 20;
-    let yPos = margin;
 
-    const addNewPage = () => {
-      pdf.addPage();
-      yPos = margin;
-      pdf.setFontSize(10);
-      pdf.setTextColor(100);
-      pdf.text('www.namevibes.life', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 10;
-    };
-
-    pdf.setFontSize(24);
-    pdf.setTextColor(147, 51, 234);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('NameVibes', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 8;
-
-    pdf.setFontSize(14);
-    pdf.setTextColor(100);
-    pdf.setFont('helvetica', 'normal');
-    pdf.text('Family Chemistry Report', pageWidth / 2, yPos, { align: 'center' });
-    yPos += 15;
-
-    for (let i = 0; i < results.length; i++) {
-      const person = results[i];
-      
-      if (yPos > pageHeight - 100) {
-        addNewPage();
-      }
-
-      pdf.setFontSize(12);
-      pdf.setTextColor(100);
-      pdf.setFont('helvetica', 'bold');
-      if (results.length > 1) {
-        pdf.text(person.relation.toUpperCase(), margin, yPos);
-        yPos += 7;
-      }
-      
-      pdf.setFontSize(18);
-      pdf.setTextColor(0);
-      pdf.text(person.fullName, margin, yPos);
-      yPos += 12;
-
-      const boxSize = 28;
-      const boxGap = 6;
-      const elementsPerRow = 5;
-      let xPos = margin;
-      let rowYPos = yPos;
-
-      for (let j = 0; j < person.elements.length; j++) {
-        const element = person.elements[j];
-        
-        if (j > 0 && j % elementsPerRow === 0) {
-          xPos = margin;
-          rowYPos += boxSize + 18;
-        }
-
-        if (rowYPos > pageHeight - 50) {
-          addNewPage();
-          rowYPos = yPos;
-          xPos = margin;
-        }
-
-        const rgb = hexToRgb(element.color);
-        pdf.setFillColor(rgb.r, rgb.g, rgb.b);
-        pdf.rect(xPos, rowYPos, boxSize, boxSize, 'F');
-        
-        pdf.setDrawColor(80);
-        pdf.setLineWidth(0.5);
-        pdf.rect(xPos, rowYPos, boxSize, boxSize);
-
-        pdf.setFontSize(9);
-        pdf.setTextColor(0);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text(element.number.toString(), xPos + 2, rowYPos + 4);
-
-        pdf.setFontSize(20);
-        pdf.setFont('helvetica', 'bold');
-        const symbolWidth = pdf.getTextWidth(element.symbol);
-        pdf.text(element.symbol, xPos + (boxSize - symbolWidth) / 2, rowYPos + boxSize / 2 + 4);
-
-        pdf.setFontSize(8);
-        pdf.setFont('helvetica', 'bold');
-        const nameWidth = pdf.getTextWidth(element.name);
-        pdf.text(element.name, xPos + (boxSize - nameWidth) / 2, rowYPos + boxSize + 5);
-
-        xPos += boxSize + boxGap;
-      }
-
-      yPos = rowYPos + boxSize + 20;
-      
-      if (i < results.length - 1) {
-        pdf.setDrawColor(200);
-        pdf.setLineWidth(0.3);
-        pdf.line(margin, yPos, pageWidth - margin, yPos);
-        yPos += 10;
-      }
-    }
-
-    if (results.length > 1) {
-      const commonElements = findCommonElements();
-      
-      if (commonElements.length > 0) {
-        addNewPage();
-        
-        pdf.setFontSize(22);
-        pdf.setTextColor(147, 51, 234);
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('The Harmony', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 8;
-        
-        pdf.setFontSize(12);
-        pdf.setTextColor(100);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text('Common Elements Across All Names', pageWidth / 2, yPos, { align: 'center' });
-        yPos += 15;
-
-        const boxSize = 28;
-        const boxGap = 6;
-        const elementsPerRow = 5;
-        let xPos = margin;
-        let rowYPos = yPos;
-
-        for (let j = 0; j < commonElements.length; j++) {
-          const element = commonElements[j];
-          
-          if (j > 0 && j % elementsPerRow === 0) {
-            xPos = margin;
-            rowYPos += boxSize + 18;
-          }
-
-          const rgb = hexToRgb(element.color);
-          pdf.setFillColor(rgb.r, rgb.g, rgb.b);
-          pdf.rect(xPos, rowYPos, boxSize, boxSize, 'F');
-          
-          pdf.setDrawColor(80);
-          pdf.setLineWidth(0.5);
-          pdf.rect(xPos, rowYPos, boxSize, boxSize);
-
-          pdf.setFontSize(9);
-          pdf.setTextColor(0);
-          pdf.setFont('helvetica', 'bold');
-          pdf.text(element.number.toString(), xPos + 2, rowYPos + 4);
-
-          pdf.setFontSize(20);
-          pdf.setFont('helvetica', 'bold');
-          const symbolWidth = pdf.getTextWidth(element.symbol);
-          pdf.text(element.symbol, xPos + (boxSize - symbolWidth) / 2, rowYPos + boxSize / 2 + 4);
-
-          pdf.setFontSize(8);
-          pdf.setFont('helvetica', 'bold');
-          const nameWidth = pdf.getTextWidth(element.name);
-          pdf.text(element.name, xPos + (boxSize - nameWidth) / 2, rowYPos + boxSize + 5);
-
-          xPos += boxSize + boxGap;
-        }
-      }
-    }
-
-    pdf.setFontSize(8);
-    pdf.setTextColor(150);
-    const date = new Date().toLocaleDateString();
-    pdf.text(date, margin, pageHeight - 10);
-    pdf.text('www.namevibes.life', pageWidth - margin, pageHeight - 10, { align: 'right' });
-
-    pdf.save(`NameVibes_Family_Report.pdf`);
-  };
-
-  function hexToRgb(hex) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? {
-      r: parseInt(result[1], 16),
-      g: parseInt(result[2], 16),
-      b: parseInt(result[3], 16)
-    } : { r: 255, g: 255, b: 255 };
-  }
 
   if (results) {
     const displayedResults = results.slice(0, showingCount);
-    const commonElements = results.length > 1 ? findCommonElements() : [];
+    const commonElements = findCommonElements(results);
 
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -490,16 +289,10 @@ export default function FamilyPackage() {
                   <p className="text-xl text-purple-900 text-center font-semibold mb-4">
                     Your harmony elements <span className="font-bold">{commonElements.map(e => e.name).join(', ')}</span> represent shared connection and energy across all names.
                   </p>
-                    <button
-                      onClick={() => {
-                        const prompt = `I discovered that these elements: ${commonElements.map(e => `${e.name} (${e.symbol})`).join(', ')} are the harmony elements in my family's names. Can you help me understand what this means and how these elements connect us?`;
-                        window.open(`https://claude.ai/new?q=${encodeURIComponent(prompt)}`, '_blank');
-                      }}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition"
-                    >
-                      <ExternalLink size={20} />
-                      Deepen Your Understanding with AI (Free)
-                    </button>
+                    <AskAIPanel
+                      results={results}
+                      contextLabels={contextOptions.filter(o => selectedContext.includes(o.id)).map(o => o.label)}
+                    />
                   </div>
                 )}
               </div>

@@ -4,12 +4,14 @@ import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebas
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Sparkles, Users, Calendar, LogOut, Settings, ArrowRight } from 'lucide-react';
+import { countAnalysesThisMonth, isPlanActive, planFeatures } from '../utils/plan';
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [recentAnalyses, setRecentAnalyses] = useState([]);
+  const [analysesUsed, setAnalysesUsed] = useState(0);
 
   useEffect(() => {
     loadUserProfile();
@@ -50,6 +52,7 @@ export default function Dashboard() {
       }));
       
       setRecentAnalyses(analyses);
+      setAnalysesUsed(await countAnalysesThisMonth(user.uid));
     } catch (error) {
       console.error('Error loading analyses:', error);
     }
@@ -86,6 +89,7 @@ export default function Dashboard() {
 
   const renewalDate = userProfile?.renewalDate?.toDate();
   const formattedRenewalDate = renewalDate ? renewalDate.toLocaleDateString() : 'N/A';
+  const planActive = isPlanActive(userProfile);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
@@ -117,27 +121,33 @@ export default function Dashboard() {
             <div className="space-y-2">
               <p className="text-gray-600">
                 <strong>Plan:</strong> {userProfile.planType.charAt(0).toUpperCase() + userProfile.planType.slice(1)} Yearly
-                {userProfile.planActive && <span className="ml-2 text-green-600">(Renews: {formattedRenewalDate})</span>}
+                {planActive
+                  ? <span className="ml-2 text-green-600">(Renews: {formattedRenewalDate})</span>
+                  : <span className="ml-2 text-red-600">(Expired {formattedRenewalDate})</span>}
               </p>
-              <p className="text-gray-600">
-                <strong>Analyses Used:</strong> 0/8 this month
-              </p>
+              {planActive && (
+                <p className="text-gray-600">
+                  <strong>Analyses Used:</strong> {analysesUsed}/{planFeatures(userProfile).monthlyAnalyses} this month
+                </p>
+              )}
             </div>
           )}
         </div>
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <button
-            onClick={() => navigate('/analyze')}
-            className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
-          >
-            <Sparkles className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Analyze New Name</h3>
-            <p className="text-purple-100 text-sm">Discover the chemistry in any name</p>
-          </button>
+          {planActive && (
+            <button
+              onClick={() => navigate('/analyze')}
+              className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
+            >
+              <Sparkles className="w-12 h-12 mb-4" />
+              <h3 className="text-xl font-bold mb-2">Analyze New Name</h3>
+              <p className="text-purple-100 text-sm">Discover the chemistry in any name</p>
+            </button>
+          )}
 
-          {userProfile?.planType === 'family' && (
+          {planActive && userProfile?.planType === 'family' && (
             <button
               onClick={() => navigate('/family')}
               className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
@@ -148,14 +158,20 @@ export default function Dashboard() {
             </button>
           )}
 
-          {!userProfile?.planType && (
+          {(!planActive || userProfile?.planType === 'individual') && (
             <button
               onClick={() => navigate('/pricing')}
               className="bg-gradient-to-br from-green-500 to-green-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
             >
               <Calendar className="w-12 h-12 mb-4" />
-              <h3 className="text-xl font-bold mb-2">Upgrade Plan</h3>
-              <p className="text-green-100 text-sm">Get unlimited access</p>
+              <h3 className="text-xl font-bold mb-2">
+                {!userProfile?.planType ? 'Choose a Plan' : !planActive ? 'Renew Your Plan' : 'Upgrade to Family'}
+              </h3>
+              <p className="text-green-100 text-sm">
+                {userProfile?.planType === 'individual' && planActive
+                  ? 'Family harmony, 50 names & PDF reports'
+                  : 'Unlock name analyses and insights'}
+              </p>
             </button>
           )}
 

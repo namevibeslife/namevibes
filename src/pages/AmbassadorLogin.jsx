@@ -24,7 +24,7 @@ export default function AmbassadorLogin() {
 
       // Check if this email exists in ambassadors collection
       const ambassadorsRef = collection(db, 'ambassadors');
-      const q = query(ambassadorsRef, where('email', '==', user.email));
+      const q = query(ambassadorsRef, where('email', '==', user.email.toLowerCase()));
       const snapshot = await getDocs(q);
 
       console.log('Ambassador query results:', snapshot.size);
@@ -59,7 +59,7 @@ export default function AmbassadorLogin() {
 
       // Store ambassador session
       sessionStorage.setItem('ambassadorId', ambassadorDoc.id);
-      sessionStorage.setItem('ambassadorEmail', ambassador.email);
+      sessionStorage.setItem('ambassadorEmail', ambassador.email.toLowerCase());
       sessionStorage.setItem('ambassadorName', ambassador.fullName);
       
       console.log('Login successful, redirecting to dashboard...');

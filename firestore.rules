@@ -1,0 +1,124 @@
+rules_version = '2';
+
+// NameVibes Firestore security rules.
+// Deploy with: firebase deploy --only firestore:rules
+//
+// Roles:
+//   user        - any Google-signed-in person; owns users/{uid}
+//   admin       - has a document at admins/{their Google email}
+//   super admin - admin whose document has role == 'super'
+//   ambassador  - has an ambassadors document with their email; sees users who used their code
+//
+// Plan/payment fields can't be written from the browser. Payments must be confirmed by the
+// payment server (Admin SDK), which bypasses these rules.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function myEmail() {
+      return request.auth.token.email.lower();
+    }
+
+    function verifiedEmail() {
+      return signedIn() && request.auth.token.email != null && request.auth.token.email_verified == true;
+    }
+
+    function adminPath() {
+      return /databases/$(database)/documents/admins/$(myEmail());
+    }
+
+    function isAdmin() {
+      return verifiedEmail() && exists(adminPath());
+    }
+
+    function isSuperAdmin() {
+      return isAdmin() && get(adminPath()).data.role == 'super';
+    }
+
+    function isAmbassadorFor(data) {
+      return verifiedEmail() && data.ambassadorEmail == myEmail();
+    }
+
+    // Fields only the payment server may set
+    function touchesPlanFields() {
+      return request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys()
+        .hasAny(['planType', 'planActive', 'paidAmount', 'paidAt', 'planExpiry', 'renewalDate']);
+    }
+
+    // ambassadorEmail must come from a real, active referral code
+    function validReferralLink() {
+      let data = request.resource.data;
+      let unchanged = resource != null && data.get('ambassadorEmail', null) == resource.data.get('ambassadorEmail', null);
+      return unchanged
+        || data.get('ambassadorEmail', null) == null
+        || (data.get('referralCode', '') is string
+            && exists(/databases/$(database)/documents/referralCodes/$(data.referralCode.replace(' ', '')))
+            && get(/databases/$(database)/documents/referralCodes/$(data.referralCode.replace(' ', ''))).data.ambassadorEmail == data.ambassadorEmail
+            && get(/databases/$(database)/documents/referralCodes/$(data.referralCode.replace(' ', ''))).data.active == true);
+    }
+
+    match /users/{uid} {
+      allow read: if (signedIn() && request.auth.uid == uid) || isAdmin() || isAmbassadorFor(resource.data);
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && !touchesPlanFields()
+        && validReferralLink();
+      allow delete: if isSuperAdmin();
+
+      match /analyses/{analysisId} {
+        allow read: if (signedIn() && request.auth.uid == uid) || isAdmin();
+        allow create: if signedIn() && request.auth.uid == uid;
+        allow delete: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    match /payments/{paymentId} {
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      allow write: if false; // payment server only
+    }
+
+    match /admins/{email} {
+      allow get: if (verifiedEmail() && email == myEmail()) || isAdmin();
+      allow list: if isAdmin();
+      allow write: if isSuperAdmin();
+    }
+
+    match /ambassadors/{ambassadorId} {
+      allow read: if isAdmin() || (verifiedEmail() && resource.data.email == myEmail());
+      // Applications: only for your own email, and never pre-approved
+      allow create: if verifiedEmail()
+        && request.resource.data.email == myEmail()
+        && request.resource.data.isApproved == false
+        && request.resource.data.isActive == false
+        && !request.resource.data.keys().hasAny(['referralCode', 'approvedAt', 'approvedBy']);
+      allow update: if isAdmin();
+      allow delete: if isSuperAdmin();
+    }
+
+    match /referralCodes/{code} {
+      allow get: if signedIn();
+      allow list, write: if isAdmin();
+    }
+
+    match /payoutRequests/{requestId} {
+      allow read: if isAdmin() || isAmbassadorFor(resource.data);
+      allow write: if isAdmin();
+    }
+
+    match /countrySettings/{countryId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /revenueReports/{reportId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Anything else (auditLogs, payouts, older collections) is admin-only
+    match /{collection}/{docId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}
