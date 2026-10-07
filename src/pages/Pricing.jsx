@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { COUNTRIES, getPricing, getDiscountedPrice } from '../data/countries';
+import { COUNTRIES } from '../data/countries';
+import { loadCountryPricing, discountedPrice } from '../utils/pricing';
 import { Check, ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function Pricing() {
   const navigate = useNavigate();
   const location = useLocation();
   const [userProfile, setUserProfile] = useState(null);
+  const [pricing, setPricing] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,6 +28,7 @@ export default function Pricing() {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         setUserProfile(userDoc.data());
+        setPricing(await loadCountryPricing(userDoc.data().countryCode));
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -35,13 +38,11 @@ export default function Pricing() {
   };
 
   const handleSelectPlan = (planType) => {
-    if (!userProfile) return;
+    if (!userProfile || !pricing) return;
 
-    const pricing = getPricing(userProfile.countryCode, planType);
+    const plan = pricing.plans[planType];
     const hasReferral = userProfile.referralCodeUsed || userProfile.referralCode;
-    const finalPrice = hasReferral 
-      ? Math.round(getDiscountedPrice(pricing.price, planType))
-      : pricing.price;
+    const finalPrice = hasReferral ? discountedPrice(plan) : plan.price;
 
     navigate('/payment', {
       state: {
@@ -66,16 +67,19 @@ export default function Pricing() {
   }
 
   const countryInfo = COUNTRIES[userProfile?.countryCode] || COUNTRIES.US;
-  const individualPricing = getPricing(userProfile?.countryCode, 'individual');
-  const familyPricing = getPricing(userProfile?.countryCode, 'family');
-  
+  // Prices come from Admin → Country Pricing when configured (see utils/pricing.js)
+  const individualPricing = { symbol: pricing?.symbol || countryInfo.symbol };
+  const familyPricing = individualPricing;
+
   const hasReferral = userProfile?.referralCodeUsed || userProfile?.referralCode;
-  
-  const individualPrice = individualPricing.price;
-  const familyPrice = familyPricing.price;
-  
-  const individualDiscountedPrice = hasReferral ? Math.round(getDiscountedPrice(individualPrice, 'individual')) : null;
-  const familyDiscountedPrice = hasReferral ? Math.round(getDiscountedPrice(familyPrice, 'family')) : null;
+
+  const individualPrice = pricing?.plans.individual.price;
+  const familyPrice = pricing?.plans.family.price;
+
+  // A discount only shows when there's a referral code and the discount actually lowers the price
+  const discountFor = (plan) => (hasReferral && plan && discountedPrice(plan) < plan.price ? discountedPrice(plan) : null);
+  const individualDiscountedPrice = discountFor(pricing?.plans.individual);
+  const familyDiscountedPrice = discountFor(pricing?.plans.family);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-12 px-4">
@@ -109,7 +113,7 @@ export default function Pricing() {
                 🎉 Referral Code Applied: {userProfile.referralCodeUsed || userProfile.referralCode}
               </p>
               <p className="text-green-700 text-sm">
-                10% off Individual • 20% off Family
+                {pricing?.plans.individual.discountPercent}% off Individual • {pricing?.plans.family.discountPercent}% off Family
               </p>
             </div>
           )}
@@ -122,7 +126,7 @@ export default function Pricing() {
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-800 mb-2">Individual</h3>
               <div className="mb-4">
-                {hasReferral ? (
+                {individualDiscountedPrice !== null ? (
                   <>
                     <p className="text-gray-500 line-through text-lg">
                       {individualPricing.symbol}{individualPrice}
@@ -188,7 +192,7 @@ export default function Pricing() {
             <div className="text-center mb-6 mt-4">
               <h3 className="text-2xl font-bold text-white mb-2">Family</h3>
               <div className="mb-4">
-                {hasReferral ? (
+                {familyDiscountedPrice !== null ? (
                   <>
                     <p className="text-purple-200 line-through text-lg">
                       {familyPricing.symbol}{familyPrice}

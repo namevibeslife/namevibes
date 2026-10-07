@@ -435,7 +435,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         .payout-management {
           margin-top: 20px;
         }
