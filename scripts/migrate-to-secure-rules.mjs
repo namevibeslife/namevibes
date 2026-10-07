@@ -2,7 +2,8 @@
 // Must run BEFORE deploying firestore.rules (it relies on the current open rules).
 //
 //   node scripts/migrate-to-secure-rules.mjs           -> dry run: prints what would change
-//   node scripts/migrate-to-secure-rules.mjs --apply   -> makes the changes
+//   node scripts/migrate-to-secure-rules.mjs --apply   -> makes the changes (backs up to scripts/backups/ first)
+//   add --super=you@gmail.com,other@gmail.com to grant super admin to Google accounts
 //
 // What it does:
 //   1. admins: re-keys each admin document by lowercase email (admins/{email}) and drops the
@@ -11,6 +12,8 @@
 //   3. users: adds ambassadorEmail to users who signed up with a valid referral code.
 import { initializeApp } from 'firebase/app';
 import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, deleteDoc, Timestamp } from 'firebase/firestore';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 
 const firebaseConfig = {
   apiKey: 'AIzaSyAkU1zvysoWojve9q9v-jDJWUITbFSnIdc',
@@ -19,8 +22,41 @@ const firebaseConfig = {
 };
 
 const APPLY = process.argv.includes('--apply');
+// --super=a@gmail.com,b@gmail.com adds super admins (Google accounts that can sign in)
+const SUPER_ADMINS = (process.argv.find(a => a.startsWith('--super=')) || '--super=')
+  .slice('--super='.length).split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 const db = getFirestore(initializeApp(firebaseConfig));
 const log = (...args) => console.log(APPLY ? '[apply]' : '[dry run]', ...args);
+
+// Before changing anything, save the affected collections locally so the migration can be undone
+async function backup() {
+  const data = {};
+  for (const name of ['admins', 'ambassadors', 'referralCodes']) {
+    const snapshot = await getDocs(collection(db, name));
+    data[name] = Object.fromEntries(snapshot.docs.map(d => [d.id, d.data()]));
+  }
+  const dir = new URL('./backups/', import.meta.url);
+  mkdirSync(dir, { recursive: true });
+  const file = new URL(`migration-backup-${Date.now()}.json`, dir);
+  writeFileSync(file, JSON.stringify(data, null, 2));
+  log(`backup written to ${fileURLToPath(file)}`);
+}
+
+async function addSuperAdmins() {
+  for (const email of SUPER_ADMINS) {
+    log(`admins/${email} -> super admin`);
+    if (APPLY) {
+      await setDoc(doc(db, 'admins', email), {
+        email,
+        role: 'super',
+        countries: ['ALL'],
+        states: ['ALL'],
+        features: ['users', 'payments', 'ambassadors', 'countries', 'Accounts'],
+        createdAt: Timestamp.now()
+      }, { merge: true });
+    }
+  }
+}
 
 async function migrateAdmins() {
   const snapshot = await getDocs(collection(db, 'admins'));
@@ -88,7 +124,9 @@ async function linkReferredUsers(codes) {
   log(`users: ${linked} linked to their ambassador, ${unknown} with a code that matches no approved ambassador (left as is)`);
 }
 
+if (APPLY) await backup();
 await migrateAdmins();
+await addSuperAdmins();
 const codes = await migrateAmbassadors();
 await linkReferredUsers(codes);
 console.log(APPLY ? '\nDone.' : '\nDry run only. Re-run with --apply to make these changes.');
