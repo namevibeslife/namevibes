@@ -65,12 +65,12 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       <UserNav />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-6">
+        <div className="bg-paper rounded-2xl shadow-xl p-8 mb-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h2>
           
           <div className="space-y-4">
@@ -127,7 +127,7 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-paper rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">About</h2>
           <div className="space-y-2 text-gray-600">
             <p><strong>App:</strong> NameVibes</p>

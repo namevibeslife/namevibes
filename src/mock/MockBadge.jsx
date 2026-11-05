@@ -17,7 +17,7 @@ export default function MockBadge() {
   return (
     <div className="fixed bottom-3 left-3 z-[9999] text-xs">
       {open && (
-        <div className="mb-2 bg-white border-2 border-amber-400 rounded-lg shadow-lg p-3 w-60">
+        <div className="mb-2 bg-paper border-2 border-amber-400 rounded-lg shadow-lg p-3 w-60">
           <div className="font-bold text-amber-700 mb-1">Mock mode</div>
           <div className="text-gray-700 mb-2">
             No real Firebase, Google sign-in or payments. Data is stored in this browser only.

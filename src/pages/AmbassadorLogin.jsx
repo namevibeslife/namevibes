@@ -78,18 +78,18 @@ export default function AmbassadorLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen site-midnight flex items-center justify-center p-4">
+      <div className="bg-paper rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-6"
+          className="flex items-center gap-2 text-brand-600 hover:text-brand-700 mb-6"
         >
           <ArrowLeft size={20} />
           Back to Home
         </button>
 
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <UserCheck className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-gray-800">Ambassador Login</h1>
@@ -100,7 +100,7 @@ export default function AmbassadorLogin() {
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-white border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center gap-3 px-6 py-3 bg-paper border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-6 h-6" viewBox="0 0 24 24">
               <path
@@ -137,7 +137,7 @@ export default function AmbassadorLogin() {
             Want to become an ambassador?{' '}
             <button
               onClick={() => navigate('/ambassador/register')}
-              className="text-purple-600 hover:text-purple-700 font-medium"
+              className="text-brand-600 hover:text-brand-700 font-medium"
             >
               Apply here
             </button>

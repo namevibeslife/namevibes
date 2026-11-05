@@ -1,3 +1,4 @@
+import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
@@ -123,17 +124,17 @@ export default function FamilyPackage() {
     const commonElements = findCommonElements(results);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <div className="min-h-screen site-background">
         <UserNav />
   
         <div className="container mx-auto max-w-6xl py-8 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <div className="bg-paper rounded-2xl shadow-2xl p-8">
             <div className="mb-8">
               <h2 className="text-4xl font-bold text-center mb-4">
                 {results.length === 1 ? 'Name Chemistry' : 'Family Chemistry Analysis'}
               </h2>
               
-              <div className="flex gap-4 justify-center mb-6">
+              <div className="flex flex-wrap gap-4 justify-center mb-6">
                 <button
                   onClick={handleShare}
                   className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
@@ -143,7 +144,7 @@ export default function FamilyPackage() {
                 </button>
                 <button
                   onClick={downloadPDF}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition"
+                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-500 text-white rounded-lg hover:from-brand-600 hover:to-brand-600 transition"
                 >
                   <Download size={20} />
                   Download PDF
@@ -155,10 +156,11 @@ export default function FamilyPackage() {
               </p>
             </div>
 
+            <ChemistryPoster people={results} family />
             {displayedResults.map((person, idx) => (
               <div key={idx} className="mb-12 pb-8 border-b-2 border-gray-100 last:border-0">
                 {results.length > 1 && (
-                  <div className="text-xs font-bold text-purple-600 uppercase tracking-wide mb-1">
+                  <div className="text-xs font-bold text-brand-600 uppercase tracking-wide mb-1">
                     {person.relation}
                   </div>
                 )}
@@ -168,7 +170,7 @@ export default function FamilyPackage() {
                   {person.elements.map((el, i) => (
                     <div key={i} className="flex flex-col items-center">
                       <div
-                        className="relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
+                        className="element-card relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
                         style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                       >
                         <div className="text-base font-mono font-bold">{el.number}</div>
@@ -184,7 +186,7 @@ export default function FamilyPackage() {
                   <h4 className="text-2xl font-bold text-gray-800 mb-4">Element Colors & Meanings</h4>
                   <table className="w-full border-collapse">
                     <thead>
-                      <tr className="bg-purple-600 text-white">
+                      <tr className="bg-brand-600 text-white">
                         <th className="border border-gray-300 px-4 py-3 text-left">#</th>
                         <th className="border border-gray-300 px-4 py-3 text-left">Element</th>
                         <th className="border border-gray-300 px-4 py-3 text-left">Atomic Number</th>
@@ -219,24 +221,24 @@ export default function FamilyPackage() {
             {results.length > showingCount && (
               <button
                 onClick={() => setShowingCount(showingCount + 10)}
-                className="w-full py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition font-semibold"
+                className="w-full py-3 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 transition font-semibold"
               >
                 Show More ({results.length - showingCount} remaining)
               </button>
             )}
 
             {results.length > 1 && commonElements.length > 0 && (
-              <div className="mt-12 pt-8 border-t-2 border-purple-200">
-                <h3 className="text-3xl font-bold text-purple-600 mb-2 text-center">The Harmony</h3>
+              <div className="mt-12 pt-8 border-t-2 border-brand-200">
+                <h3 className="text-3xl font-bold text-brand-600 mb-2 text-center">The Harmony</h3>
                 <p className="text-gray-600 mb-6 text-center text-lg italic">
                   "Common Elements Across All Family Members"
                 </p>
 
-                <div className="flex flex-wrap gap-6 justify-center p-6 bg-purple-50 rounded-xl mb-6">
+                <div className="flex flex-wrap gap-6 justify-center p-6 bg-brand-50 rounded-xl mb-6">
                   {commonElements.map((el, i) => (
                     <div key={i} className="flex flex-col items-center">
                       <div
-                        className="relative border-4 border-purple-600 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
+                        className="element-card relative border-4 border-brand-600 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
                         style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                       >
                         <div className="text-base font-mono font-bold">{el.number}</div>
@@ -250,14 +252,14 @@ export default function FamilyPackage() {
                 {harmonyStep === 'results' && (
                   <button
                     onClick={() => setHarmonyStep('context')}
-                    className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition"
+                    className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-xl font-bold text-lg hover:from-brand-700 hover:to-ocean-700 transition"
                   >
                     Know Your Harmony - Press to Know More
                   </button>
                 )}
 
                 {harmonyStep === 'context' && (
-                  <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mt-6">
+                  <div className="bg-ocean-50 rounded-xl p-6 border-2 border-ocean-200 mt-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">
                       Why are you exploring this? (Optional)
                     </h3>
@@ -271,7 +273,7 @@ export default function FamilyPackage() {
                             type="checkbox"
                             checked={selectedContext.includes(option.id)}
                             onChange={() => toggleContext(option.id)}
-                            className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-500"
+                            className="w-5 h-5 text-brand-600 rounded focus:ring-2 focus:ring-brand-500"
                           />
                           <span className="text-gray-700">{option.label}</span>
                         </label>
@@ -279,7 +281,7 @@ export default function FamilyPackage() {
                     </div>
                     <button
                       onClick={() => setHarmonyStep('interpretation')}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition"
+                      className="w-full bg-gradient-to-r from-ocean-600 to-brand-600 text-white py-3 rounded-lg font-semibold hover:from-ocean-700 hover:to-brand-700 transition"
                     >
                       Get Interpretation
                     </button>
@@ -287,8 +289,8 @@ export default function FamilyPackage() {
                 )}
 
                 {harmonyStep === 'interpretation' && (
-                 <div className="mt-6 bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-8 border-2 border-purple-300">
-                  <p className="text-xl text-purple-900 text-center font-semibold mb-4">
+                 <div className="mt-6 bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-8 border-2 border-brand-300">
+                  <p className="text-xl text-brand-900 text-center font-semibold mb-4">
                     Your harmony elements <span className="font-bold">{commonElements.map(e => e.name).join(', ')}</span> represent shared connection and energy across all names.
                   </p>
                     <AskAIPanel
@@ -306,11 +308,11 @@ export default function FamilyPackage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       <UserNav />
   
         <div className="container mx-auto max-w-4xl py-8 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <div className="bg-paper rounded-2xl shadow-2xl p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Family Package</h1>
             <p className="text-gray-600 mb-8">
               Analyze up to 50 names • Showing {Math.min(names.length, 10)} at once
@@ -339,7 +341,7 @@ export default function FamilyPackage() {
                         type="text"
                         value={nameData.firstName}
                         onChange={(e) => updateName(nameData.id, 'firstName', e.target.value)}
-                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -350,7 +352,7 @@ export default function FamilyPackage() {
                         type="text"
                         value={nameData.middleName}
                         onChange={(e) => updateName(nameData.id, 'middleName', e.target.value)}
-                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -361,7 +363,7 @@ export default function FamilyPackage() {
                         type="text"
                         value={nameData.lastName}
                         onChange={(e) => updateName(nameData.id, 'lastName', e.target.value)}
-                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                       />
                     </div>
                     <div>
@@ -371,7 +373,7 @@ export default function FamilyPackage() {
                       <select
                         value={nameData.relation}
                         onChange={(e) => updateName(nameData.id, 'relation', e.target.value)}
-                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                        className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                       >
                         {RELATIONS.map(rel => (
                           <option key={rel} value={rel}>{rel}</option>
@@ -385,7 +387,7 @@ export default function FamilyPackage() {
               <button
                 onClick={addName}
                 disabled={names.length >= 50}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
+                className="w-full flex items-center justify-center gap-2 py-3 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
                 <Plus size={20} />
                 Add Another Name ({names.length}/50)
@@ -395,7 +397,7 @@ export default function FamilyPackage() {
             <div className="mt-8">
               <button
                 onClick={handleAnalyzeAll}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-semibold hover:from-purple-700 hover:to-blue-700 transition"
+                className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-xl font-semibold hover:from-brand-700 hover:to-ocean-700 transition"
               >
                 Analyze All Names
               </button>

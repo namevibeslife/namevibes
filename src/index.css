@@ -19,3 +19,83 @@ body {
 #root {
   min-height: 100vh;
 }
+
+:root {
+  color: #302c23;
+  background: #fcf8ed;
+  --gold: #a47928;
+  --ivory: #fcf8ed;
+  --ink: #102523;
+}
+body { line-height: 1.6; }
+h1, h2, h3, h4 { font-family: Georgia, 'Times New Roman', serif; letter-spacing: -.025em; line-height: 1.2; }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #a47928; outline-offset: 4px; }
+input, select, textarea { background-color: #fffdf7; accent-color: #89601c; }
+::selection { background: #e8d3a0; color: #302c23; }
+.site-background, .element-insights-page {
+  background-color: var(--ivory);
+  background-image: url('/theme/molecules.svg'), radial-gradient(ellipse at 0% 0%, #e8d3a055, transparent 55%), radial-gradient(ellipse at 100% 65%, #bfd7cf55, transparent 50%);
+  background-size: 620px, auto, auto;
+}
+.bg-paper.rounded-2xl, .bg-paper.rounded-xl { border: 1px solid #e8d3a080; }
+.site-midnight { background: url('/theme/molecules.svg') 0 0 / 620px, radial-gradient(ellipse at top left, #29433a, transparent 65%), #081716; }
+nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
+.element-tile {
+  width: 104px; min-height: 132px; padding: 10px 8px; flex-shrink: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  border: 1px solid #e8d3a0; border-radius: 9px;
+  background-image: linear-gradient(140deg, #ffffff65, transparent 45%, #00000018);
+  box-shadow: inset 0 0 0 3px #ffffff25, 0 5px 14px #00000030;
+}
+.element-number { align-self: flex-start; font-size: 13px; font-weight: 600; }
+.element-card { border: 1px solid #b88b36; background-image: linear-gradient(140deg, #ffffff55, transparent 45%, #00000018); box-shadow: inset 0 0 0 3px #ffffff25, 0 5px 14px #302c2320; }
+.element-symbol { font-family: Georgia, serif; font-size: 46px; line-height: 1.1; }
+.element-name { font-size: 11px; font-weight: 600; }
+.chemistry-poster {
+  position: relative; padding: clamp(20px, 4vw, 48px); margin-bottom: 32px;
+  border: 1px solid #b88b36; outline: 1px solid #b88b3660; outline-offset: -8px;
+  border-radius: 3px; overflow: hidden; text-align: center;
+  background-image: url('/theme/molecules.svg'), radial-gradient(ellipse at 50% 100%, #b88b362b, transparent 55%);
+  background-size: 520px, auto;
+  box-shadow: 0 20px 50px #302c231c;
+}
+.poster-midnight { background-color: #081716; color: #f5ead1; --poster-gold: #ebc979; --poster-line: #b88b3670; }
+.poster-ivory { background-color: #fbf2da; color: #362a17; --poster-gold: #815817; --poster-line: #b88b3680; }
+.poster-heading > svg { margin: 0 auto 10px; color: var(--poster-gold); }
+.poster-brand { font-family: Georgia, serif; letter-spacing: .28em; font-size: 24px; color: var(--poster-gold); }
+.poster-eyebrow { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; margin: 10px 0; }
+.poster-heading h2 { font-size: clamp(24px, 3.8vw, 40px); color: var(--poster-gold); margin-bottom: 24px; }
+.poster-rule { display: flex; gap: 12px; align-items: center; justify-content: center; color: var(--poster-gold); margin: 18px auto; max-width: 580px; }
+.poster-rule::before, .poster-rule::after { content: ''; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #b88b36); }
+.poster-rule::after { transform: rotate(180deg); }
+.poster-person { min-width: 0; padding: 20px 12px; border: 1px solid var(--poster-line); border-radius: 12px; }
+.poster-person h3 { font-size: clamp(26px, 4.6vw, 52px); overflow-wrap: anywhere; color: var(--poster-gold); }
+.poster-elements { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.poster-family-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.poster-family-grid h3 { font-size: clamp(24px, 3vw, 32px); }
+.poster-family-grid .element-tile { width: 76px; min-height: 103px; }
+.poster-family-grid .element-symbol { font-size: 34px; }
+.poster-stats { display: flex; justify-content: space-evenly; flex-wrap: wrap; gap: 16px; padding: 18px; margin: 24px 0; border-block: 1px solid var(--poster-line); font-size: 12px; }
+.poster-stats strong { color: var(--poster-gold); font-size: 22px; margin-right: 6px; }
+.poster-meanings h3, .poster-harmony h3 { color: var(--poster-gold); font-size: 26px; margin-bottom: 18px; }
+.poster-meanings > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; text-align: left; }
+.poster-meanings p { padding: 14px; border: 1px solid var(--poster-line); border-radius: 8px; font-size: 13px; }
+.poster-meanings strong { display: block; color: var(--poster-gold); margin-bottom: 4px; }
+.poster-footer p { font-family: Georgia, serif; font-size: 25px; font-style: italic; color: var(--poster-gold); }
+.poster-footer small { display: block; font-size: 9px; letter-spacing: .14em; margin-top: 12px; }
+.landing-hero { max-width: 1050px; margin: auto; }
+.landing-hero .hero-kicker { color: #89601c; letter-spacing: .25em; font-size: 11px; text-transform: uppercase; margin-bottom: 24px; }
+.landing-showcase { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+@media (max-width: 640px) {
+  .poster-family-grid, .poster-meanings > div { grid-template-columns: 1fr; }
+  .element-tile { width: 76px; min-height: 106px; }
+  .element-symbol { font-size: 34px; }
+  .poster-brand { font-size: 20px; }
+  .poster-eyebrow { letter-spacing: .12em; }
+  .chemistry-poster { padding: 22px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+}

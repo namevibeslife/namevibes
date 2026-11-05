@@ -57,9 +57,9 @@ export default function Pricing() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -82,26 +82,26 @@ export default function Pricing() {
   const familyDiscountedPrice = discountFor(pricing?.plans.family);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-12 px-4">
+    <div className="min-h-screen site-background py-12 px-4">
       <div className="max-w-6xl mx-auto">
         
         <button
           onClick={() => navigate('/dashboard')}
-          className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-8 font-medium"
+          className="flex items-center gap-2 text-brand-600 hover:text-brand-700 mb-8 font-medium"
         >
           <ArrowLeft size={20} />
           Back to Dashboard
         </button>
 
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
             Choose Your Plan
           </h1>
           <p className="text-xl text-gray-600">
             Unlock the chemistry in names
           </p>
           {location.state?.reason && (
-            <div className="mt-4 inline-block bg-purple-50 border-2 border-purple-300 rounded-lg px-6 py-3 text-purple-800 font-medium">
+            <div className="mt-4 inline-block bg-brand-50 border-2 border-brand-300 rounded-lg px-6 py-3 text-brand-800 font-medium">
               {location.state.reason === 'family-required'
                 ? 'The Family Package is part of the Family plan.'
                 : 'Choose a plan to unlock name analyses and insights.'}
@@ -122,7 +122,7 @@ export default function Pricing() {
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-12">
           
           {/* Individual Plan */}
-          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-gray-200 hover:border-purple-500 transition">
+          <div className="bg-paper rounded-2xl shadow-xl p-8 border-2 border-gray-200 hover:border-brand-500 transition">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-bold text-gray-800 mb-2">Individual</h3>
               <div className="mb-4">
@@ -131,7 +131,7 @@ export default function Pricing() {
                     <p className="text-gray-500 line-through text-lg">
                       {individualPricing.symbol}{individualPrice}
                     </p>
-                    <p className="text-5xl font-bold text-purple-600">
+                    <p className="text-5xl font-bold text-brand-600">
                       {individualPricing.symbol}{individualDiscountedPrice}
                     </p>
                     <p className="text-green-600 font-semibold mt-1">
@@ -139,7 +139,7 @@ export default function Pricing() {
                     </p>
                   </>
                 ) : (
-                  <p className="text-5xl font-bold text-purple-600">
+                  <p className="text-5xl font-bold text-brand-600">
                     {individualPricing.symbol}{individualPrice}
                   </p>
                 )}
@@ -174,14 +174,14 @@ export default function Pricing() {
 
             <button
               onClick={() => handleSelectPlan('individual')}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition transform hover:scale-105 shadow-lg"
+              className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-brand-700 hover:to-ocean-700 transition transform hover:scale-105 shadow-lg"
             >
               Select Individual
             </button>
           </div>
 
           {/* Family Plan */}
-          <div className="bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl shadow-2xl p-8 border-4 border-purple-700 relative">
+          <div className="bg-gradient-to-br from-brand-600 to-ocean-600 rounded-2xl shadow-2xl p-8 border-4 border-brand-700 relative">
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
               <span className="bg-yellow-400 text-gray-900 px-6 py-2 rounded-full text-sm font-bold shadow-lg flex items-center gap-2">
                 <Sparkles size={16} />
@@ -194,7 +194,7 @@ export default function Pricing() {
               <div className="mb-4">
                 {familyDiscountedPrice !== null ? (
                   <>
-                    <p className="text-purple-200 line-through text-lg">
+                    <p className="text-brand-200 line-through text-lg">
                       {familyPricing.symbol}{familyPrice}
                     </p>
                     <p className="text-5xl font-bold text-white">
@@ -209,7 +209,7 @@ export default function Pricing() {
                     {familyPricing.symbol}{familyPrice}
                   </p>
                 )}
-                <p className="text-purple-100 mt-2">per year</p>
+                <p className="text-brand-100 mt-2">per year</p>
               </div>
             </div>
 
@@ -238,7 +238,7 @@ export default function Pricing() {
 
             <button
               onClick={() => handleSelectPlan('family')}
-              className="w-full bg-white text-purple-600 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-lg"
+              className="w-full bg-paper text-brand-600 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-lg"
             >
               Select Family
             </button>

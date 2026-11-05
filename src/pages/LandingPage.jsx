@@ -1,3 +1,5 @@
+import ChemistryPoster from '../components/ChemistryPoster';
+import { parseNameToElements } from '../utils/elements';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
@@ -6,26 +8,27 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Atom className="w-8 h-8 text-purple-600" />
+          <Atom className="w-8 h-8 text-brand-600" />
           <span className="text-2xl font-bold text-gray-800">NameVibes</span>
         </div>
         <button
           onClick={() => navigate('/login')}
-          className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+          className="px-6 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition"
         >
           Sign In
         </button>
       </header>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
+      <section className="landing-hero container mx-auto px-4 py-20 text-center">
+        <p className="hero-kicker">A name. A vibration. A chemistry. A unique you.</p>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
           Discover Your Name's<br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-blue-600">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-ocean-600">
             Hidden Chemistry
           </span>
         </h1>
@@ -37,14 +40,14 @@ export default function LandingPage() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
             onClick={() => navigate('/login')}
-            className="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white text-lg font-semibold rounded-xl hover:from-purple-700 hover:to-blue-700 transform hover:scale-105 transition shadow-lg"
+            className="px-8 py-4 bg-gradient-to-r from-brand-600 to-ocean-600 text-white text-lg font-semibold rounded-xl hover:from-brand-700 hover:to-ocean-700 transform hover:scale-105 transition shadow-lg"
           >
             <Sparkles className="inline mr-2" size={20} />
             Get Started
           </button>
           <button
             onClick={() => navigate('/learn-more')}
-            className="px-8 py-4 bg-white text-purple-600 text-lg font-semibold rounded-xl hover:bg-gray-50 transition shadow-lg border-2 border-purple-200"
+            className="px-8 py-4 bg-paper text-brand-600 text-lg font-semibold rounded-xl hover:bg-gray-50 transition shadow-lg border-2 border-brand-200"
           >
             <BookOpen className="inline mr-2" size={20} />
             Learn More
@@ -52,12 +55,13 @@ export default function LandingPage() {
         </div>
       </section>
 
+      <section className="landing-showcase" aria-label="Example name poster"><p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">Your name, beautifully elemental / Sample poster</p><ChemistryPoster people={[{ fullName: "Sreshan S Nair", elements: parseNameToElements("Sreshan S Nair") }]} /></section>
       {/* Features */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-3 gap-8">
-          <div className="bg-white rounded-2xl p-8 shadow-xl">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-              <Atom className="w-8 h-8 text-purple-600" />
+          <div className="bg-paper rounded-2xl p-8 shadow-xl">
+            <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mb-4">
+              <Atom className="w-8 h-8 text-brand-600" />
             </div>
             <h3 className="text-2xl font-bold mb-3">Periodic Elements</h3>
             <p className="text-gray-600">
@@ -65,9 +69,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-xl">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-              <span className="text-3xl font-bold text-blue-600">9</span>
+          <div className="bg-paper rounded-2xl p-8 shadow-xl">
+            <div className="w-16 h-16 bg-ocean-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-3xl font-bold text-ocean-600">9</span>
             </div>
             <h3 className="text-2xl font-bold mb-3">Chaldean Numerology</h3>
             <p className="text-gray-600">
@@ -75,9 +79,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-xl">
-            <div className="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
-              <span className="text-2xl font-bold text-indigo-600">ॐ</span>
+          <div className="bg-paper rounded-2xl p-8 shadow-xl">
+            <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mb-4">
+              <span className="text-2xl font-bold text-brand-600">ॐ</span>
             </div>
             <h3 className="text-2xl font-bold mb-3">Hindu Astrology</h3>
             <p className="text-gray-600">
@@ -89,12 +93,12 @@ export default function LandingPage() {
 
       {/* CTA */}
       <section className="container mx-auto px-4 py-16 text-center">
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-3xl p-12 text-white">
+        <div className="bg-gradient-to-r from-brand-600 to-ocean-600 rounded-3xl p-12 text-white">
           <h2 className="text-4xl font-bold mb-4">Ready to Discover Your Vibes?</h2>
           <p className="text-xl mb-8 opacity-90">See which elements of the universe live in your name</p>
           <button
             onClick={() => navigate('/login')}
-            className="px-10 py-4 bg-white text-purple-600 text-lg font-semibold rounded-xl hover:bg-gray-100 transition shadow-xl"
+            className="px-10 py-4 bg-paper text-brand-600 text-lg font-semibold rounded-xl hover:bg-gray-100 transition shadow-xl"
           >
             Start Your Journey
           </button>

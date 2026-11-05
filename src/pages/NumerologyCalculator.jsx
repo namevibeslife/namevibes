@@ -233,14 +233,14 @@ export default function NumerologyCalculator() {
 
   if (results) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+      <div className="min-h-screen site-background">
         <UserNav />
 
         <div className="max-w-4xl mx-auto px-4 py-6">
           {/* Header Card */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6 mb-6">
             <div className="text-center">
-              <div className="text-sm text-purple-600 font-semibold mb-1">{results.relation}</div>
+              <div className="text-sm text-brand-600 font-semibold mb-1">{results.relation}</div>
               <h2 className="text-3xl font-bold text-gray-800 mb-2">{results.fullName}</h2>
               <p className="text-gray-600 text-sm italic">
                 "Every number carries a unique vibration and meaning"
@@ -251,9 +251,9 @@ export default function NumerologyCalculator() {
           {/* Numbers Grid */}
           <div className="space-y-4">
             {/* Destiny Number */}
-            <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="bg-paper rounded-xl shadow-lg p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-brand-500 flex items-center justify-center">
                   <span className="text-3xl font-bold text-white">{results.destinyNumber}</span>
                 </div>
                 <div>
@@ -268,9 +268,9 @@ export default function NumerologyCalculator() {
 
             {/* Life Path Number */}
             {results.lifePathNumber && (
-              <div className="bg-white rounded-xl shadow-lg p-5">
+              <div className="bg-paper rounded-xl shadow-lg p-5">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-ocean-500 to-cyan-500 flex items-center justify-center">
                     <span className="text-3xl font-bold text-white">{results.lifePathNumber}</span>
                   </div>
                   <div>
@@ -285,9 +285,9 @@ export default function NumerologyCalculator() {
             )}
 
             {/* Soul Urge Number */}
-            <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="bg-paper rounded-xl shadow-lg p-5">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-brand-500 to-rose-500 flex items-center justify-center">
                   <span className="text-3xl font-bold text-white">{results.soulUrgeNumber}</span>
                 </div>
                 <div>
@@ -301,7 +301,7 @@ export default function NumerologyCalculator() {
             </div>
 
             {/* Personality Number */}
-            <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="bg-paper rounded-xl shadow-lg p-5">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
                   <span className="text-3xl font-bold text-white">{results.personalityNumber}</span>
@@ -317,7 +317,7 @@ export default function NumerologyCalculator() {
             </div>
 
             {/* Expression Number */}
-            <div className="bg-white rounded-xl shadow-lg p-5">
+            <div className="bg-paper rounded-xl shadow-lg p-5">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center">
                   <span className="text-3xl font-bold text-white">{results.expressionNumber}</span>
@@ -334,8 +334,8 @@ export default function NumerologyCalculator() {
           </div>
 
           {/* Info Box */}
-          <div className="mt-6 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-5 border-2 border-purple-200">
-            <h4 className="text-lg font-bold text-purple-800 mb-2">✨ Understanding Your Numbers</h4>
+          <div className="mt-6 bg-gradient-to-r from-brand-50 to-ocean-50 rounded-xl p-5 border-2 border-brand-200">
+            <h4 className="text-lg font-bold text-brand-800 mb-2">✨ Understanding Your Numbers</h4>
             <p className="text-sm text-gray-700 leading-relaxed">
               These numbers reveal different aspects of your personality and life path. 
               Use them as guidance to understand your strengths, challenges, and life purpose.
@@ -347,13 +347,13 @@ export default function NumerologyCalculator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       <UserNav />
 
       <div className="max-w-2xl mx-auto px-4 py-6">
-        <div className="bg-white rounded-xl shadow-lg p-6">
+        <div className="bg-paper rounded-xl shadow-lg p-6">
           <div className="text-center mb-6">
-            <Calculator className="w-16 h-16 mx-auto mb-3 text-purple-600" />
+            <Calculator className="w-16 h-16 mx-auto mb-3 text-brand-600" />
             <h2 className="text-2xl font-bold text-gray-800 mb-2">
               Discover Your Numbers
             </h2>
@@ -371,7 +371,7 @@ export default function NumerologyCalculator() {
               <select
                 value={relation}
                 onChange={(e) => setRelation(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               >
                 {RELATIONS.map(rel => (
                   <option key={rel} value={rel}>{rel}</option>
@@ -389,7 +389,7 @@ export default function NumerologyCalculator() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Enter first name"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
@@ -403,7 +403,7 @@ export default function NumerologyCalculator() {
                 value={middleName}
                 onChange={(e) => setMiddleName(e.target.value)}
                 placeholder="Enter middle name"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
@@ -417,7 +417,7 @@ export default function NumerologyCalculator() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Enter last name"
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
@@ -430,14 +430,14 @@ export default function NumerologyCalculator() {
                 type="date"
                 value={birthDate}
                 onChange={(e) => setBirthDate(e.target.value)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
             {/* Calculate Button */}
             <button
               onClick={handleCalculate}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:from-purple-700 hover:to-blue-700 transition transform active:scale-95"
+              className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-xl font-bold text-lg hover:from-brand-700 hover:to-ocean-700 transition transform active:scale-95"
             >
               Calculate My Numbers
             </button>
@@ -445,27 +445,27 @@ export default function NumerologyCalculator() {
         </div>
 
         {/* Info */}
-        <div className="mt-6 bg-white rounded-xl shadow-lg p-5">
+        <div className="mt-6 bg-paper rounded-xl shadow-lg p-5">
           <h3 className="text-lg font-bold text-gray-800 mb-3">📖 What You'll Discover</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">•</span>
+              <span className="text-brand-600 font-bold">•</span>
               <span><strong>Destiny Number:</strong> Your life purpose and mission</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">•</span>
+              <span className="text-brand-600 font-bold">•</span>
               <span><strong>Life Path Number:</strong> Your journey and key lessons</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">•</span>
+              <span className="text-brand-600 font-bold">•</span>
               <span><strong>Soul Urge Number:</strong> Your deepest desires</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">•</span>
+              <span className="text-brand-600 font-bold">•</span>
               <span><strong>Personality Number:</strong> How others perceive you</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">•</span>
+              <span className="text-brand-600 font-bold">•</span>
               <span><strong>Expression Number:</strong> Your natural talents</span>
             </li>
           </ul>

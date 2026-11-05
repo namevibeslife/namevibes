@@ -1,3 +1,5 @@
+import PosterDownload from '../components/PosterDownload';
+import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
@@ -42,9 +44,9 @@ export default function AnalysisView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading analysis...</p>
         </div>
       </div>
@@ -56,11 +58,11 @@ export default function AnalysisView() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       <UserNav />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-paper rounded-2xl shadow-xl p-8">
           {/* Name Title */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2 text-center">
@@ -71,12 +73,14 @@ export default function AnalysisView() {
             </p>
           </div>
 
+          <ChemistryPoster people={[{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }]} />
+            <PosterDownload person={{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }} />
           {/* Element data isn't stored for individual analyses, so rebuild it from the name */}
           <div className="flex flex-wrap gap-4 justify-center p-6 bg-gray-50 rounded-xl mb-6">
             {parseNameToElements(analysis.fullName || '').map((el, i) => (
               <div
                 key={i}
-                className="border-4 border-gray-800 rounded-lg p-3 w-28 h-28 flex flex-col justify-between"
+                className="element-card border-4 border-gray-800 rounded-lg p-3 w-28 h-28 flex flex-col justify-between"
                 style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
               >
                 <div className="text-sm font-mono font-bold">{el.number}</div>
@@ -89,7 +93,7 @@ export default function AnalysisView() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="bg-purple-600 text-white">
+                <tr className="bg-brand-600 text-white">
                   <th className="border border-gray-300 px-4 py-3 text-left">Element</th>
                   <th className="border border-gray-300 px-4 py-3 text-left">Life Meaning</th>
                 </tr>
@@ -108,7 +112,7 @@ export default function AnalysisView() {
           <div className="mt-8 text-center">
             <button
               onClick={() => navigate('/analyze')}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+              className="px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition font-semibold"
             >
               Analyze Another Name
             </button>

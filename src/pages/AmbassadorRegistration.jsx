@@ -158,19 +158,19 @@ export default function AmbassadorRegistration() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-purple-900 py-12 px-4">
+    <div className="min-h-screen site-midnight py-12 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
+        <div className="bg-paper rounded-2xl shadow-2xl p-8">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-6"
+            className="flex items-center gap-2 text-brand-600 hover:text-brand-700 mb-6"
           >
             <ArrowLeft size={20} />
             Back to Home
           </button>
 
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <UserCheck className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800">Become an Ambassador</h1>
@@ -186,7 +186,7 @@ export default function AmbassadorRegistration() {
               </p>
               <button
                 onClick={handleGoogleSignIn}
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+                className="px-6 py-3 bg-brand-600 text-white rounded-lg font-semibold hover:bg-brand-700 transition"
               >
                 Continue with Google
               </button>
@@ -205,7 +205,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.firstName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -215,7 +215,7 @@ export default function AmbassadorRegistration() {
                     name="middleName"
                     value={formData.middleName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -226,7 +226,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.lastName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.motherName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -251,7 +251,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.dob}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -264,7 +264,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.gender}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="">Select Gender</option>
                     <option value="Male">Male</option>
@@ -280,7 +280,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.profession}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -298,7 +298,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.mobileNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -308,7 +308,7 @@ export default function AmbassadorRegistration() {
                     name="alternateMobile"
                     value={formData.alternateMobile}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -337,7 +337,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.countryCode}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="">Select Country</option>
                     {Object.values(COUNTRIES).map(country => (
@@ -353,7 +353,7 @@ export default function AmbassadorRegistration() {
                     value={formData.stateCode}
                     onChange={handleChange}
                     disabled={!formData.countryCode}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none disabled:bg-gray-100"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none disabled:bg-gray-100"
                   >
                     <option value="">Select State</option>
                     {getAvailableStates().map(state => (
@@ -372,7 +372,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -383,7 +383,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.zipCode}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -394,7 +394,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.addressLine1}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -412,7 +412,7 @@ export default function AmbassadorRegistration() {
                     value={formData.instagram}
                     onChange={handleChange}
                     placeholder="@username"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -423,7 +423,7 @@ export default function AmbassadorRegistration() {
                     value={formData.facebook}
                     onChange={handleChange}
                     placeholder="Profile URL"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -434,7 +434,7 @@ export default function AmbassadorRegistration() {
                     value={formData.youtube}
                     onChange={handleChange}
                     placeholder="Channel URL"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -445,7 +445,7 @@ export default function AmbassadorRegistration() {
                     value={formData.twitter}
                     onChange={handleChange}
                     placeholder="@username"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -463,7 +463,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.bankAccountName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -474,7 +474,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.bankName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -485,7 +485,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.accountNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -495,7 +495,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.accountType}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="savings">Savings</option>
                     <option value="current">Current</option>
@@ -509,7 +509,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.ifscCode}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -519,7 +519,7 @@ export default function AmbassadorRegistration() {
                     name="branchName"
                     value={formData.branchName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -530,7 +530,7 @@ export default function AmbassadorRegistration() {
                     value={formData.upiId}
                     onChange={handleChange}
                     placeholder="username@paytm"
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -540,7 +540,7 @@ export default function AmbassadorRegistration() {
                     name="panNumber"
                     value={formData.panNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -553,7 +553,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.idType}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="Aadhaar">Aadhaar</option>
                     <option value="Passport">Passport</option>
@@ -569,7 +569,7 @@ export default function AmbassadorRegistration() {
                     required
                     value={formData.idNumber}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -586,7 +586,7 @@ export default function AmbassadorRegistration() {
                     name="nomineeName"
                     value={formData.nomineeName}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -596,7 +596,7 @@ export default function AmbassadorRegistration() {
                     name="nomineeRelation"
                     value={formData.nomineeRelation}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -606,7 +606,7 @@ export default function AmbassadorRegistration() {
                     name="nomineeContact"
                     value={formData.nomineeContact}
                     onChange={handleChange}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -617,7 +617,7 @@ export default function AmbassadorRegistration() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50"
+                className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-brand-700 hover:to-ocean-700 transition disabled:opacity-50"
               >
                 {loading ? 'Submitting...' : 'Submit Application'}
               </button>

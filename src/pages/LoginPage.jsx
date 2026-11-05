@@ -23,10 +23,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-600 via-blue-600 to-purple-700 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen site-midnight flex items-center justify-center p-4">
+      <div className="bg-paper rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
             NameVibes
           </h1>
           <p className="text-gray-600">Discover the chemistry in your name</p>
@@ -35,14 +35,14 @@ export default function LoginPage() {
         <button
           onClick={handleGoogleSignIn}
           disabled={loading}
-          className="w-full bg-white border-2 border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-3 disabled:opacity-50"
+          className="w-full bg-paper border-2 border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-semibold hover:bg-gray-50 transition flex items-center justify-center gap-3 disabled:opacity-50"
         >
           <img src="https://www.google.com/favicon.ico" alt="Google" className="w-5 h-5" />
           {loading ? 'Signing in...' : 'Continue with Google'}
         </button>
 
         <div className="mt-6 text-center">
-          <button onClick={() => navigate('/')} className="text-purple-600 hover:text-purple-700 text-sm font-medium">
+          <button onClick={() => navigate('/')} className="text-brand-600 hover:text-brand-700 text-sm font-medium">
             ← Back to Home
           </button>
         </div>

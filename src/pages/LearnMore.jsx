@@ -8,8 +8,8 @@ export default function LearnMore() {
   const { user } = useAuthStore();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 px-6 py-12">
-      <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+    <div className="min-h-screen site-background px-6 py-12">
+      <div className="max-w-4xl mx-auto bg-paper rounded-2xl shadow-lg p-8">
         
         <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">
           Learn More
@@ -19,7 +19,7 @@ export default function LearnMore() {
         <div className="flex justify-center gap-6 mb-8">
           <button
             onClick={() => navigate("/")}
-            className="text-purple-600 font-semibold hover:underline"
+            className="text-brand-600 font-semibold hover:underline"
           >
             Home
           </button>
@@ -27,7 +27,7 @@ export default function LearnMore() {
           {user && (
             <button
               onClick={() => navigate("/dashboard")}
-              className="text-purple-600 font-semibold hover:underline"
+              className="text-brand-600 font-semibold hover:underline"
             >
               Dashboard
             </button>
@@ -40,7 +40,7 @@ export default function LearnMore() {
             onClick={() => setMode("science")}
             className={`px-6 py-2 rounded-full font-semibold transition ${
               mode === "science"
-                ? "bg-purple-600 text-white"
+                ? "bg-brand-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
@@ -50,7 +50,7 @@ export default function LearnMore() {
             onClick={() => setMode("spiritual")}
             className={`px-6 py-2 rounded-full font-semibold transition ${
               mode === "spiritual"
-                ? "bg-purple-600 text-white"
+                ? "bg-brand-600 text-white"
                 : "bg-gray-100 text-gray-700 hover:bg-gray-200"
             }`}
           >
@@ -74,7 +74,7 @@ export default function LearnMore() {
               <li>Sound-based vibrational patterns</li>
             </ul>
 
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="bg-brand-50 border border-brand-200 rounded-lg p-4">
               <p className="font-semibold">Example:</p>
               <p className="font-mono">
                 BLESSINGS → B – Li – Es – S – In – G – S
@@ -87,7 +87,7 @@ export default function LearnMore() {
               personality traits, emotional balance, and compatibility.
             </p>
 
-            <p className="font-semibold text-purple-600">
+            <p className="font-semibold text-brand-600">
               Right vibrations create better alignment.
             </p>
           </div>
@@ -104,7 +104,7 @@ export default function LearnMore() {
               Vibration shapes experience.
             </p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-ocean-50 border border-ocean-200 rounded-lg p-4">
               <p className="font-semibold">Example:</p>
               <p className="font-mono">
                 BLESSINGS → B – Li – Es – S – In – G – S
@@ -117,7 +117,7 @@ export default function LearnMore() {
               <strong>energetic signature</strong>.
             </p>
 
-            <p className="font-semibold text-purple-600">
+            <p className="font-semibold text-brand-600">
               Right vibes matter — whether it’s a name, a child, or a brand.
             </p>
           </div>

@@ -262,17 +262,17 @@ export default function AdminDashboard(props) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen site-background">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-paper border-b border-gray-200 sticky top-0 z-10">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <Settings className="w-8 h-8 text-purple-600" />
+            <Settings className="w-8 h-8 text-brand-600" />
             <div>
               <h1 className="text-xl font-bold text-gray-800">NameVibes Admin</h1>
               <p className="text-xs text-gray-500">
                 {currentAdmin?.email}
-                {currentAdmin?.role === 'super' && <span className="ml-2 text-purple-600 font-bold">● SUPER ADMIN</span>}
+                {currentAdmin?.role === 'super' && <span className="ml-2 text-brand-600 font-bold">● SUPER ADMIN</span>}
               </p>
             </div>
           </div>
@@ -288,13 +288,13 @@ export default function AdminDashboard(props) {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-screen p-4">
+        <aside className="w-64 bg-paper border-r border-gray-200 min-h-screen p-4">
           <nav className="space-y-2">
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                 activeTab === 'dashboard'
-                  ? 'bg-purple-100 text-purple-700 font-semibold'
+                  ? 'bg-brand-100 text-brand-700 font-semibold'
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
@@ -307,7 +307,7 @@ export default function AdminDashboard(props) {
                 onClick={() => setActiveTab('superadmin')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeTab === 'superadmin'
-                    ? 'bg-purple-100 text-purple-700 font-semibold'
+                    ? 'bg-brand-100 text-brand-700 font-semibold'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -321,7 +321,7 @@ export default function AdminDashboard(props) {
                 onClick={() => setActiveTab('users')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeTab === 'users'
-                    ? 'bg-purple-100 text-purple-700 font-semibold'
+                    ? 'bg-brand-100 text-brand-700 font-semibold'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -335,7 +335,7 @@ export default function AdminDashboard(props) {
                 onClick={() => setActiveTab('ambassadors')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeTab === 'ambassadors'
-                    ? 'bg-purple-100 text-purple-700 font-semibold'
+                    ? 'bg-brand-100 text-brand-700 font-semibold'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -355,7 +355,7 @@ export default function AdminDashboard(props) {
                   onClick={() => setActiveTab('payments')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     activeTab === 'payments'
-                      ? 'bg-purple-100 text-purple-700 font-semibold'
+                      ? 'bg-brand-100 text-brand-700 font-semibold'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -367,7 +367,7 @@ export default function AdminDashboard(props) {
                   onClick={() => setActiveTab('payouts')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     activeTab === 'payouts'
-                      ? 'bg-purple-100 text-purple-700 font-semibold'
+                      ? 'bg-brand-100 text-brand-700 font-semibold'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -379,7 +379,7 @@ export default function AdminDashboard(props) {
                   onClick={() => setActiveTab('payoutsManagement')}
                   className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                     activeTab === 'payoutsManagement'
-                      ? 'bg-purple-100 text-purple-700 font-semibold'
+                      ? 'bg-brand-100 text-brand-700 font-semibold'
                       : 'text-gray-700 hover:bg-gray-100'
                   }`}
                 >
@@ -394,7 +394,7 @@ export default function AdminDashboard(props) {
                 onClick={() => setActiveTab('countries')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeTab === 'countries'
-                    ? 'bg-purple-100 text-purple-700 font-semibold'
+                    ? 'bg-brand-100 text-brand-700 font-semibold'
                     : 'text-gray-700 hover:bg-gray-100'
                 }`}
               >
@@ -413,17 +413,17 @@ export default function AdminDashboard(props) {
               <h2 className="text-2xl font-bold text-gray-800 mb-6">Dashboard Overview</h2>
 
               <div className="grid md:grid-cols-5 gap-6 mb-8">
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+                <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-ocean-500">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Total Users</p>
                       <p className="text-3xl font-bold text-gray-800">{stats.totalUsers}</p>
                     </div>
-                    <Users className="w-12 h-12 text-blue-500 opacity-20" />
+                    <Users className="w-12 h-12 text-ocean-500 opacity-20" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+                <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-green-500">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Total Payments</p>
@@ -433,7 +433,7 @@ export default function AdminDashboard(props) {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+                <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-brand-500">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
@@ -445,11 +445,11 @@ export default function AdminDashboard(props) {
                               .join(' + ')}
                       </p>
                     </div>
-                    <DollarSign className="w-12 h-12 text-purple-500 opacity-20" />
+                    <DollarSign className="w-12 h-12 text-brand-500 opacity-20" />
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
+                <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-yellow-500">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Pending Ambassadors</p>
@@ -459,26 +459,26 @@ export default function AdminDashboard(props) {
                   </div>
                 </div>
 
-                <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-indigo-500">
+                <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-brand-500">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-gray-600 mb-1">Active Ambassadors</p>
                       <p className="text-3xl font-bold text-gray-800">{stats.activeAmbassadors}</p>
                     </div>
-                    <UserCheck className="w-12 h-12 text-indigo-500 opacity-20" />
+                    <UserCheck className="w-12 h-12 text-brand-500 opacity-20" />
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-paper rounded-xl shadow-lg p-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
                 <div className="grid md:grid-cols-4 gap-4">
                   {canViewFeature('ambassadors') && (
                     <button
                       onClick={() => setActiveTab('ambassadors')}
-                      className="p-4 bg-purple-50 border-2 border-purple-200 rounded-lg hover:bg-purple-100 transition text-left"
+                      className="p-4 bg-brand-50 border-2 border-brand-200 rounded-lg hover:bg-brand-100 transition text-left"
                     >
-                      <UserCheck className="w-6 h-6 text-purple-600 mb-2" />
+                      <UserCheck className="w-6 h-6 text-brand-600 mb-2" />
                       <p className="font-semibold text-gray-800">Review Ambassadors</p>
                       <p className="text-sm text-gray-600">{stats.pendingAmbassadors} pending</p>
                     </button>
@@ -487,9 +487,9 @@ export default function AdminDashboard(props) {
                   {canViewFeature('users') && (
                     <button
                       onClick={() => setActiveTab('users')}
-                      className="p-4 bg-blue-50 border-2 border-blue-200 rounded-lg hover:bg-blue-100 transition text-left"
+                      className="p-4 bg-ocean-50 border-2 border-ocean-200 rounded-lg hover:bg-ocean-100 transition text-left"
                     >
-                      <Users className="w-6 h-6 text-blue-600 mb-2" />
+                      <Users className="w-6 h-6 text-ocean-600 mb-2" />
                       <p className="font-semibold text-gray-800">Manage Users</p>
                       <p className="text-sm text-gray-600">{stats.totalUsers} total</p>
                     </button>
@@ -528,14 +528,14 @@ export default function AdminDashboard(props) {
                 <h2 className="text-2xl font-bold text-gray-800">Super Admin - Manage Admins</h2>
                 <button
                   onClick={handleAddAdmin}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                 >
                   <Plus size={20} />
                   Add Admin
                 </button>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-paper rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
@@ -552,7 +552,7 @@ export default function AdminDashboard(props) {
                         <td className="px-6 py-4 text-sm text-gray-900">{admin.email}</td>
                         <td className="px-6 py-4">
                           <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                            admin.role === 'super' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                            admin.role === 'super' ? 'bg-brand-100 text-brand-800' : 'bg-ocean-100 text-ocean-800'
                           }`}>
                             {admin.role}
                           </span>
@@ -567,7 +567,7 @@ export default function AdminDashboard(props) {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleEditAdmin(admin)}
-                              className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
+                              className="p-2 bg-ocean-100 text-ocean-700 rounded-lg hover:bg-ocean-200"
                             >
                               <Edit size={16} />
                             </button>
@@ -598,7 +598,7 @@ export default function AdminDashboard(props) {
                 <h2 className="text-2xl font-bold text-gray-800">User Management</h2>
                 <button
                   onClick={loadUsers}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                 >
                   Refresh
                 </button>
@@ -614,7 +614,7 @@ export default function AdminDashboard(props) {
                 years={years}
               />
 
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-paper rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
@@ -637,8 +637,8 @@ export default function AdminDashboard(props) {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                            user.planType === 'family' ? 'bg-purple-100 text-purple-800' :
-                            user.planType === 'individual' ? 'bg-blue-100 text-blue-800' :
+                            user.planType === 'family' ? 'bg-brand-100 text-brand-800' :
+                            user.planType === 'individual' ? 'bg-ocean-100 text-ocean-800' :
                             'bg-gray-100 text-gray-800'
                           }`}>
                             {user.planType || 'none'}
@@ -673,7 +673,7 @@ export default function AdminDashboard(props) {
                 <h2 className="text-2xl font-bold text-gray-800">Ambassador Management</h2>
                 <button
                   onClick={loadAmbassadors}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                 >
                   Refresh
                 </button>
@@ -690,7 +690,7 @@ export default function AdminDashboard(props) {
               />
 
               {ambassadors.length === 0 ? (
-                <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div className="bg-paper rounded-xl shadow-lg p-12 text-center">
                   <UserCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-600 text-lg">No ambassadors yet</p>
                   <p className="text-gray-500 text-sm mt-2">Ambassador applications will appear here</p>
@@ -698,7 +698,7 @@ export default function AdminDashboard(props) {
               ) : (
                 <div className="space-y-4">
                   {ambassadors.map(ambassador => (
-                    <div key={ambassador.id} className="bg-white rounded-xl shadow-lg p-6">
+                    <div key={ambassador.id} className="bg-paper rounded-xl shadow-lg p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
@@ -722,7 +722,7 @@ export default function AdminDashboard(props) {
                             )}
                           </div>
                           {ambassador.referralCode && (
-                            <p className="text-sm text-purple-600 font-mono font-bold mb-2">
+                            <p className="text-sm text-brand-600 font-mono font-bold mb-2">
                               Code: {ambassador.referralCode}
                             </p>
                           )}
@@ -761,7 +761,7 @@ export default function AdminDashboard(props) {
                               </button>
                               <button
                                 onClick={() => handleEditBankDetails(ambassador)}
-                                className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                                className="flex items-center gap-1 px-4 py-2 bg-ocean-600 text-white rounded-lg hover:bg-ocean-700 text-sm"
                               >
                                 <Edit size={16} />
                                 Edit Bank
@@ -838,7 +838,7 @@ export default function AdminDashboard(props) {
                   )}
                   <button
                     onClick={loadPayments}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                   >
                     Refresh
                   </button>
@@ -846,12 +846,12 @@ export default function AdminDashboard(props) {
               </div>
 
               {/* Enhanced Filters */}
-              <div className="bg-white rounded-xl shadow-lg p-4 mb-6">
+              <div className="bg-paper rounded-xl shadow-lg p-4 mb-6">
                 <div className="grid md:grid-cols-5 gap-4">
                   <select
                     value={paymentFilter.gateway}
                     onChange={(e) => setPaymentFilter({...paymentFilter, gateway: e.target.value})}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="all">All Gateways</option>
                     <option value="razorpay">Razorpay</option>
@@ -863,7 +863,7 @@ export default function AdminDashboard(props) {
                     onChange={(e) => {
                       setPaymentFilter({...paymentFilter, country: e.target.value, state: 'all'});
                     }}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     <option value="all">All Countries</option>
                     {Object.values(COUNTRIES).map(country => (
@@ -875,7 +875,7 @@ export default function AdminDashboard(props) {
                     value={paymentFilter.state}
                     onChange={(e) => setPaymentFilter({...paymentFilter, state: e.target.value})}
                     disabled={paymentFilter.country === 'all'}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none disabled:bg-gray-100"
+                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none disabled:bg-gray-100"
                   >
                     <option value="all">All States</option>
                     {paymentFilter.country !== 'all' && 
@@ -888,7 +888,7 @@ export default function AdminDashboard(props) {
                   <select
                     value={paymentFilter.month}
                     onChange={(e) => setPaymentFilter({...paymentFilter, month: parseInt(e.target.value)})}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     {months.map((month, idx) => (
                       <option key={idx} value={idx + 1}>{month}</option>
@@ -898,7 +898,7 @@ export default function AdminDashboard(props) {
                   <select
                     value={paymentFilter.year}
                     onChange={(e) => setPaymentFilter({...paymentFilter, year: parseInt(e.target.value)})}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   >
                     {years.map(year => (
                       <option key={year} value={year}>{year}</option>
@@ -907,18 +907,18 @@ export default function AdminDashboard(props) {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-paper rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Date</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Plan</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Amount</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Gateway</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Country</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">State</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Referral</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Plan</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Amount</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Gateway</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Country</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">State</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Referral</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -978,7 +978,7 @@ export default function AdminDashboard(props) {
                 <h2 className="text-2xl font-bold text-gray-800">Ambassador Payouts</h2>
                 <button
                   onClick={loadAmbassadorPayouts}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                 >
                   Refresh
                 </button>
@@ -994,16 +994,16 @@ export default function AdminDashboard(props) {
                 years={years}
               />
 
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-paper rounded-xl shadow-lg overflow-hidden">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Referral Code</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Sales Count</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Total Sales</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Total Commission</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Referral Code</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Sales Count</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Sales</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Commission</th>
                       {currentAdmin?.role === 'super' && (
-                        <th className="px-6 py-3 text-left text-xs font-medium text-white bg-blue-600 uppercase">Action</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Action</th>
                       )}
                     </tr>
                   </thead>
@@ -1011,7 +1011,7 @@ export default function AdminDashboard(props) {
                     {ambassadorPayouts.map((payout, idx) => (
                       <tr key={idx} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="font-mono font-bold text-purple-600">{payout.referralCode}</span>
+                          <span className="font-mono font-bold text-brand-600">{payout.referralCode}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {payout.count}
@@ -1026,7 +1026,7 @@ export default function AdminDashboard(props) {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <button
                               onClick={() => handleSharePayoutWithAccounts(payout)}
-                              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                              className="flex items-center gap-2 px-4 py-2 bg-ocean-600 text-white rounded-lg hover:bg-ocean-700 text-sm"
                             >
                               <Share2 size={16} />
                               Share with Accounts
@@ -1053,7 +1053,7 @@ export default function AdminDashboard(props) {
                 <h2 className="text-2xl font-bold text-gray-800">Country Pricing Management</h2>
                 <button
                   onClick={handleAddCountry}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                 >
                   <Plus size={20} />
                   Add Country
@@ -1061,13 +1061,13 @@ export default function AdminDashboard(props) {
               </div>
 
               {countrySettings.length === 0 ? (
-                <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+                <div className="bg-paper rounded-xl shadow-lg p-12 text-center">
                   <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-600 text-lg">No country settings configured</p>
                   <p className="text-gray-500 text-sm mt-2">Add countries to set custom pricing</p>
                   <button
                     onClick={handleAddCountry}
-                    className="mt-4 px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    className="mt-4 px-6 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
                   >
                     Add First Country
                   </button>
@@ -1075,7 +1075,7 @@ export default function AdminDashboard(props) {
               ) : (
                 <div className="grid md:grid-cols-2 gap-6">
                   {countrySettings.map(country => (
-                    <div key={country.id} className="bg-white rounded-xl shadow-lg p-6">
+                    <div key={country.id} className="bg-paper rounded-xl shadow-lg p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div>
                           <h3 className="text-xl font-bold text-gray-800">{country.countryName}</h3>
@@ -1084,7 +1084,7 @@ export default function AdminDashboard(props) {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleEditCountry(country)}
-                            className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200"
+                            className="p-2 bg-ocean-100 text-ocean-700 rounded-lg hover:bg-ocean-200"
                           >
                             <Edit size={16} />
                           </button>
@@ -1123,13 +1123,13 @@ export default function AdminDashboard(props) {
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
                           <span className="text-sm text-gray-600">Individual Commission</span>
-                          <span className="text-sm font-semibold text-purple-600">
+                          <span className="text-sm font-semibold text-brand-600">
                             {country.individualCommission}%
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-2">
                           <span className="text-sm text-gray-600">Family Commission</span>
-                          <span className="text-sm font-semibold text-purple-600">
+                          <span className="text-sm font-semibold text-brand-600">
                             {country.familyCommission}%
                           </span>
                         </div>
@@ -1153,13 +1153,13 @@ export default function AdminDashboard(props) {
       {/* Share Payout Modal */}
       {showSharePayoutModal && selectedPayoutData && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-md p-6">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Share Payout with Accounts</h3>
             
             <div className="space-y-3 mb-6">
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Referral Code:</span>
-                <span className="font-mono font-bold text-purple-600">{selectedPayoutData.referralCode}</span>
+                <span className="font-mono font-bold text-brand-600">{selectedPayoutData.referralCode}</span>
               </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Period:</span>
@@ -1197,7 +1197,7 @@ export default function AdminDashboard(props) {
               <button
                 onClick={confirmSharePayout}
                 disabled={sharingLoading}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-ocean-600 text-white rounded-lg hover:bg-ocean-700 disabled:opacity-50"
               >
                 {sharingLoading ? 'Sharing...' : 'Confirm & Share'}
               </button>
@@ -1209,7 +1209,7 @@ export default function AdminDashboard(props) {
       {/* Share Revenue Report Modal */}
       {showShareRevenueModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-md p-6">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Share Revenue Report with Accounts</h3>
             
             <div className="space-y-3 mb-6">
@@ -1256,7 +1256,7 @@ export default function AdminDashboard(props) {
       {/* Bank Details Modal */}
       {showBankModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Edit Bank Details</h3>
             
             <div className="space-y-4 mb-6">
@@ -1389,7 +1389,7 @@ export default function AdminDashboard(props) {
               <button
                 onClick={handleSaveBankDetails}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-ocean-600 text-white rounded-lg hover:bg-ocean-700 disabled:opacity-50"
               >
                 {loading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -1401,7 +1401,7 @@ export default function AdminDashboard(props) {
       {/* Country Modal */}
       {showCountryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-lg p-6">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               {editingCountry ? 'Edit Country Settings' : 'Add Country'}
             </h3>
@@ -1508,7 +1508,7 @@ export default function AdminDashboard(props) {
                   type="checkbox"
                   checked={countryFormData.isActive}
                   onChange={(e) => setCountryFormData({...countryFormData, isActive: e.target.checked})}
-                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500"
                 />
                 <label className="text-sm font-medium text-gray-700">
                   Active
@@ -1526,7 +1526,7 @@ export default function AdminDashboard(props) {
               <button
                 onClick={handleSaveCountry}
                 disabled={loading || !countryFormData.countryCode}
-                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50"
               >
                 {loading ? 'Saving...' : 'Save Country'}
               </button>
@@ -1540,7 +1540,7 @@ export default function AdminDashboard(props) {
       {/* MODALS */}
       {showAdminModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-2xl p-6 max-h-[90vh] overflow-y-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               {editingAdmin ? 'Edit Admin' : 'Add New Admin'}
             </h3>
@@ -1635,7 +1635,7 @@ export default function AdminDashboard(props) {
               <button
                 onClick={handleSaveAdmin}
                 disabled={loading || !adminFormData.email}
-                className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50"
               >
                 {loading ? 'Saving...' : 'Save Admin'}
               </button>
@@ -1647,7 +1647,7 @@ export default function AdminDashboard(props) {
       {/* Approval Modal */}
       {showApprovalModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-md p-6">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Approve Ambassador</h3>
             
             <div className="space-y-4 mb-6">

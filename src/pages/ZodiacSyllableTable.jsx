@@ -329,7 +329,7 @@ export default function ZodiacSyllableTable() {
   const currentData = system === 'western' ? westernZodiac : vedicZodiac;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       <UserNav />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
@@ -342,7 +342,7 @@ export default function ZodiacSyllableTable() {
                 setSystem(e.target.value);
                 setSelectedSign(null);
               }}
-              className="appearance-none bg-gradient-to-r from-purple-600 to-blue-600 text-white px-4 py-2 pr-10 rounded-lg font-semibold text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-400"
+              className="appearance-none bg-gradient-to-r from-brand-600 to-ocean-600 text-white px-4 py-2 pr-10 rounded-lg font-semibold text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
               <option value="western">Western Zodiac</option>
               <option value="vedic">Vedic Astrology</option>
@@ -367,7 +367,7 @@ export default function ZodiacSyllableTable() {
           {currentData.map((zodiac) => (
             <div
               key={zodiac.sign}
-              className="bg-white rounded-xl shadow-lg border-2 border-gray-100 overflow-hidden"
+              className="bg-paper rounded-xl shadow-lg border-2 border-gray-100 overflow-hidden"
             >
               {/* Card Header - Always Visible */}
               <div
@@ -386,7 +386,7 @@ export default function ZodiacSyllableTable() {
                     <span className={`px-2 py-1 rounded-full text-white text-xs font-semibold ${
                       zodiac.element === 'Fire' ? 'bg-red-500' :
                       zodiac.element === 'Earth' ? 'bg-green-600' :
-                      zodiac.element === 'Air' ? 'bg-blue-400' : 'bg-blue-600'
+                      zodiac.element === 'Air' ? 'bg-ocean-400' : 'bg-ocean-600'
                     }`}>
                       {zodiac.element}
                     </span>
@@ -394,13 +394,13 @@ export default function ZodiacSyllableTable() {
                 </div>
 
                 {/* Syllables - Always Visible */}
-                <div className="mt-3 bg-gradient-to-r from-purple-50 to-blue-50 rounded-lg p-3">
+                <div className="mt-3 bg-gradient-to-r from-brand-50 to-ocean-50 rounded-lg p-3">
                   <p className="text-xs text-gray-600 font-semibold mb-2">✨ Auspicious Syllables:</p>
                   <div className="flex flex-wrap gap-2">
                     {zodiac.syllables.map((syl, idx) => (
                       <span
                         key={idx}
-                        className="bg-white px-3 py-1 rounded-full text-purple-700 text-sm font-bold border border-purple-200"
+                        className="bg-paper px-3 py-1 rounded-full text-brand-700 text-sm font-bold border border-brand-200"
                       >
                         {syl}
                       </span>
@@ -412,7 +412,7 @@ export default function ZodiacSyllableTable() {
               {/* Expandable Details */}
               {selectedSign === zodiac.sign && (
                 <div className="px-4 pb-4 space-y-3 border-t border-gray-100 pt-3">
-                  <div className="bg-blue-50 rounded-lg p-3">
+                  <div className="bg-ocean-50 rounded-lg p-3">
                     <p className="text-xs font-semibold text-gray-700 mb-1">📝 Example Names:</p>
                     <p className="text-sm text-gray-800">{zodiac.nameExamples}</p>
                   </div>
@@ -422,12 +422,12 @@ export default function ZodiacSyllableTable() {
                     <p className="text-sm text-gray-800">{zodiac.luckyNumbers}</p>
                   </div>
 
-                  <div className="bg-pink-50 rounded-lg p-3">
+                  <div className="bg-brand-50 rounded-lg p-3">
                     <p className="text-xs font-semibold text-gray-700 mb-1">🎨 Lucky Colors:</p>
                     <p className="text-sm text-gray-800">{zodiac.colors}</p>
                   </div>
 
-                  <div className="bg-purple-50 rounded-lg p-3">
+                  <div className="bg-brand-50 rounded-lg p-3">
                     <p className="text-xs font-semibold text-gray-700 mb-1">✨ Personality:</p>
                     <p className="text-sm text-gray-800">{zodiac.traits}</p>
                   </div>
@@ -443,23 +443,23 @@ export default function ZodiacSyllableTable() {
         </div>
 
         {/* How to Use Guide */}
-        <div className="mt-6 bg-white rounded-xl shadow-lg p-5 border-2 border-purple-100">
-          <h4 className="text-lg font-bold text-purple-800 mb-3">💡 How to Use</h4>
+        <div className="mt-6 bg-paper rounded-xl shadow-lg p-5 border-2 border-brand-100">
+          <h4 className="text-lg font-bold text-brand-800 mb-3">💡 How to Use</h4>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">1.</span>
+              <span className="text-brand-600 font-bold">1.</span>
               <span>Find your zodiac sign based on birth date</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">2.</span>
+              <span className="text-brand-600 font-bold">2.</span>
               <span>Choose names starting with the auspicious syllables</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">3.</span>
+              <span className="text-brand-600 font-bold">3.</span>
               <span>Tap any card to see more details and examples</span>
             </li>
             <li className="flex gap-2">
-              <span className="text-purple-600 font-bold">4.</span>
+              <span className="text-brand-600 font-bold">4.</span>
               <span>Switch between Western and Vedic systems using dropdown above</span>
             </li>
           </ul>

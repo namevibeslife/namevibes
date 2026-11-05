@@ -2,7 +2,7 @@
 
 .accounts-dashboard {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
   padding: 20px;
 }
 
@@ -29,7 +29,7 @@
 
 .accounts-header h1 {
   margin: 0;
-  color: #667eea;
+  color: #89601c;
   font-size: 28px;
 }
 
@@ -64,7 +64,7 @@
   cursor: pointer;
   font-size: 16px;
   font-weight: 500;
-  color: #667eea;
+  color: #89601c;
   transition: all 0.3s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -75,7 +75,7 @@
 }
 
 .accounts-tabs button.active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
   color: white;
 }
 
@@ -89,7 +89,7 @@
 
 .accounts-section h2 {
   margin: 0 0 10px 0;
-  color: #667eea;
+  color: #89601c;
   font-size: 24px;
 }
 
@@ -118,7 +118,7 @@
 
 .accounts-filters select:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #89601c;
 }
 
 .accounts-download-btn {
@@ -150,7 +150,7 @@
 }
 
 .accounts-table thead tr {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
   color: white;
 }
 
@@ -159,7 +159,7 @@
   text-align: left;
   font-weight: 600;
   font-size: 14px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #89601c;
 }
 
 .accounts-table td {
@@ -194,7 +194,7 @@
 
 /* Mark as Paid Button */
 .mark-paid-btn {
-  background: #667eea;
+  background: #89601c;
   color: white;
   border: none;
   padding: 8px 16px;
@@ -205,7 +205,7 @@
 }
 
 .mark-paid-btn:hover {
-  background: #764ba2;
+  background: #214d47;
 }
 
 .paid-info {
@@ -217,9 +217,9 @@
 /* Revenue Section Titles */
 .revenue-section-title {
   margin: 30px 0 15px 0;
-  color: #667eea;
+  color: #89601c;
   font-size: 20px;
-  border-bottom: 2px solid #667eea;
+  border-bottom: 2px solid #89601c;
   padding-bottom: 10px;
 }
 
@@ -246,7 +246,7 @@
 
 .date-input label {
   font-weight: 600;
-  color: #667eea;
+  color: #89601c;
   min-width: 50px;
 }
 
@@ -267,12 +267,12 @@
 
 .download-buttons h3 {
   margin: 10px 0 10px 0;
-  color: #667eea;
+  color: #89601c;
   font-size: 18px;
 }
 
 .download-large-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
   color: white;
   border: none;
   padding: 15px 30px;
@@ -316,7 +316,7 @@
 
 .modal-content h2 {
   margin: 0 0 20px 0;
-  color: #667eea;
+  color: #89601c;
   font-size: 24px;
 }
 
@@ -334,7 +334,7 @@
 }
 
 .modal-info strong {
-  color: #667eea;
+  color: #89601c;
   font-weight: 600;
 }
 
@@ -347,7 +347,7 @@
 
 .modal-form label {
   font-weight: 600;
-  color: #667eea;
+  color: #89601c;
   font-size: 14px;
 }
 
@@ -362,7 +362,7 @@
 .modal-form select:focus,
 .modal-form input:focus {
   outline: none;
-  border-color: #667eea;
+  border-color: #89601c;
 }
 
 .modal-actions {

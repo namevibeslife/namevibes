@@ -72,7 +72,7 @@ export default function ElementInsightsPage() {
 
           <div className="element-category">
             <h3>⚛️ Noble Gases (Group 18) - The Independent Souls</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Element</th>
@@ -119,12 +119,12 @@ export default function ElementInsightsPage() {
                   <td>Powerful but invisible influence</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="element-category">
             <h3>🔥 Alkali Metals (Group 1) - The Reactive Leaders</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Element</th>
@@ -171,12 +171,12 @@ export default function ElementInsightsPage() {
                   <td>Rarest, most reactive, unstable genius</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="element-category">
             <h3>💪 Alkaline Earth Metals (Group 2) - The Stable Supporters</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Element</th>
@@ -223,7 +223,7 @@ export default function ElementInsightsPage() {
                   <td>Radioactive glow, dangerous beauty</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="element-category">
@@ -240,7 +240,7 @@ export default function ElementInsightsPage() {
 
           <div className="element-category">
             <h3>🧬 Non-metals - The Life Essentials</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Element</th>
@@ -280,12 +280,12 @@ export default function ElementInsightsPage() {
                   <td>Transformative, purifying, volcanic</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="element-category">
             <h3>⚡ Halogens (Group 17) - The Intense Reactors</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Element</th>
@@ -320,7 +320,7 @@ export default function ElementInsightsPage() {
                   <td>Rarest natural, fleeting presence</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
         </section>
 
@@ -347,7 +347,7 @@ export default function ElementInsightsPage() {
 
           <div className="nakshatra-group">
             <h3>🔥 Fire Nakshatras (Ruled by Sun, Mars, Ketu)</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Nakshatra</th>
@@ -412,12 +412,12 @@ export default function ElementInsightsPage() {
                   <td>Root investigation, spiritual depth</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="nakshatra-group">
             <h3>🌊 Water Nakshatras (Ruled by Moon, Mercury)</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Nakshatra</th>
@@ -464,12 +464,12 @@ export default function ElementInsightsPage() {
                   <td>Journey completion, nourishing</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="nakshatra-group">
             <h3>🌍 Earth Nakshatras (Ruled by Mars, Rahu, Saturn)</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Nakshatra</th>
@@ -534,12 +534,12 @@ export default function ElementInsightsPage() {
                   <td>Deep wisdom, serpent power</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="nakshatra-group">
             <h3>💨 Air Nakshatras (Ruled by Jupiter)</h3>
-            <table>
+            <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
                   <th>Nakshatra</th>
@@ -568,7 +568,7 @@ export default function ElementInsightsPage() {
                   <td>Intense transformation, dual nature</td>
                 </tr>
               </tbody>
-            </table>
+            </table></div>
           </div>
 
           <div className="correction">

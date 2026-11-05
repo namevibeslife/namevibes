@@ -78,9 +78,9 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -92,12 +92,12 @@ export default function Dashboard() {
   const planActive = isPlanActive(userProfile);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-paper shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
               NameVibes
             </h1>
             <button
@@ -113,7 +113,7 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}
-        <div className="bg-white rounded-2xl shadow-xl p-8 mb-8">
+        <div className="bg-paper rounded-2xl shadow-xl p-8 mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
             👋 Welcome, {userProfile?.fullName}!
           </h2>
@@ -139,22 +139,22 @@ export default function Dashboard() {
           {planActive && (
             <button
               onClick={() => navigate('/analyze')}
-              className="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
+              className="bg-gradient-to-br from-brand-500 to-brand-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
             >
               <Sparkles className="w-12 h-12 mb-4" />
               <h3 className="text-xl font-bold mb-2">Analyze New Name</h3>
-              <p className="text-purple-100 text-sm">Discover the chemistry in any name</p>
+              <p className="text-brand-100 text-sm">Discover the chemistry in any name</p>
             </button>
           )}
 
           {planActive && userProfile?.planType === 'family' && (
             <button
               onClick={() => navigate('/family')}
-              className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
+              className="bg-gradient-to-br from-ocean-500 to-ocean-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
             >
               <Users className="w-12 h-12 mb-4" />
               <h3 className="text-xl font-bold mb-2">Family Package</h3>
-              <p className="text-blue-100 text-sm">Analyze up to 50 names together</p>
+              <p className="text-ocean-100 text-sm">Analyze up to 50 names together</p>
             </button>
           )}
 
@@ -193,7 +193,7 @@ export default function Dashboard() {
             {/* Zodiac Name Guide */}
             <div
               onClick={() => navigate('/zodiac-syllables')}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
+              className="bg-paper rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-brand-500"
             >
               <div className="text-5xl mb-4 text-center">♈</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
@@ -203,7 +203,7 @@ export default function Dashboard() {
                 Choose auspicious syllables for names based on zodiac signs
               </p>
               <div className="flex justify-center">
-                <span className="text-purple-600 font-semibold flex items-center gap-2">
+                <span className="text-brand-600 font-semibold flex items-center gap-2">
                   View Guide <ArrowRight size={18} />
                 </span>
               </div>
@@ -212,7 +212,7 @@ export default function Dashboard() {
             {/* Numerology Calculator */}
             <div
               onClick={() => navigate('/numerology-calculator')}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
+              className="bg-paper rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-brand-500"
             >
               <div className="text-5xl mb-4 text-center">🔢</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
@@ -222,7 +222,7 @@ export default function Dashboard() {
                 Calculate life path, destiny, and soul numbers
               </p>
               <div className="flex justify-center">
-                <span className="text-purple-600 font-semibold flex items-center gap-2">
+                <span className="text-brand-600 font-semibold flex items-center gap-2">
                   Calculate Now <ArrowRight size={18} />
                 </span>
               </div>
@@ -231,7 +231,7 @@ export default function Dashboard() {
             {/* Element Insights - NEW */}
             <div
               onClick={() => navigate('/element-insights')}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-purple-500"
+              className="bg-paper rounded-2xl p-8 shadow-lg hover:shadow-2xl transition cursor-pointer border-2 border-transparent hover:border-brand-500"
             >
               <div className="text-5xl mb-4 text-center">⚛️</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
@@ -241,7 +241,7 @@ export default function Dashboard() {
                 Unlock cosmic secrets of periodic elements and Vedic Nakshatras
               </p>
               <div className="flex justify-center">
-                <span className="text-purple-600 font-semibold flex items-center gap-2">
+                <span className="text-brand-600 font-semibold flex items-center gap-2">
                   Explore Insights <ArrowRight size={18} />
                 </span>
               </div>
@@ -250,7 +250,7 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Analyses */}
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-paper rounded-2xl shadow-xl p-8">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">Recent Analyses</h3>
           {recentAnalyses.length > 0 ? (
             <div className="space-y-3">
@@ -258,7 +258,7 @@ export default function Dashboard() {
                 <button
                   key={analysis.id}
                   onClick={() => handleViewAnalysis(analysis)}
-                  className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-purple-50 hover:border-purple-300 border-2 border-transparent transition cursor-pointer"
+                  className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-brand-50 hover:border-brand-300 border-2 border-transparent transition cursor-pointer"
                 >
                   <div className="flex-1 text-left">
                     <div className="font-semibold text-gray-800">
@@ -271,7 +271,7 @@ export default function Dashboard() {
                       {analysis.timestamp?.toDate().toLocaleDateString()}
                     </div>
                   </div>
-                  <ArrowRight className="text-purple-600" size={20} />
+                  <ArrowRight className="text-brand-600" size={20} />
                 </button>
               ))}
             </div>

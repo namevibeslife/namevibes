@@ -181,20 +181,20 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-12 px-4">
+    <div className="min-h-screen site-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-paper rounded-2xl shadow-xl p-8">
           
           {/* Back Button */}
           <button
             onClick={() => navigate('/pricing')}
-            className="flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-6 font-medium"
+            className="flex items-center gap-2 text-brand-600 hover:text-brand-700 mb-6 font-medium"
           >
             <ArrowLeft size={20} />
             Back to Pricing
           </button>
 
-          <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
             Complete Payment
           </h2>
           <p className="text-center text-gray-600 mb-8">
@@ -202,17 +202,17 @@ export default function PaymentPage() {
           </p>
 
           {/* Plan Summary */}
-          <div className="bg-gradient-to-r from-purple-100 to-blue-100 rounded-xl p-6 mb-8">
+          <div className="bg-gradient-to-r from-brand-100 to-ocean-100 rounded-xl p-6 mb-8">
             <div className="flex justify-between items-center mb-4">
               <span className="text-lg text-gray-700 capitalize">{planType} Plan - Yearly</span>
-              <span className="text-3xl font-bold text-purple-600">
+              <span className="text-3xl font-bold text-brand-600">
                 {symbol}{amount}
               </span>
             </div>
             {referralCode && (
-              <div className="bg-white rounded-lg p-3 text-sm">
+              <div className="bg-paper rounded-lg p-3 text-sm">
                 <span className="text-gray-600">Referral Code Applied: </span>
-                <span className="font-mono font-bold text-purple-600">{referralCode}</span>
+                <span className="font-mono font-bold text-brand-600">{referralCode}</span>
               </div>
             )}
           </div>
@@ -241,7 +241,7 @@ export default function PaymentPage() {
               <button
                 onClick={handleRazorpayPayment}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white py-4 rounded-lg font-semibold text-lg hover:from-blue-700 hover:to-blue-800 transition disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-ocean-600 to-ocean-700 text-white py-4 rounded-lg font-semibold text-lg hover:from-ocean-700 hover:to-ocean-800 transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <CreditCard size={24} />
                 {loading ? 'Processing...' : 'Pay with Razorpay'}
@@ -251,7 +251,7 @@ export default function PaymentPage() {
                 <div id="paypal-button-container" className="mb-4"></div>
                 {!paypalLoaded && (
                   <div className="text-center py-4">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean-600 mx-auto"></div>
                     <p className="text-gray-600 mt-2">Loading PayPal...</p>
                   </div>
                 )}

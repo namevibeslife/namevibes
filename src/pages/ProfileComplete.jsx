@@ -154,10 +154,10 @@ export default function ProfileComplete() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 py-12 px-4">
+    <div className="min-h-screen site-background py-12 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
-          <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+        <div className="bg-paper rounded-2xl shadow-xl p-8">
+          <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
             Complete Your Profile
           </h2>
           <p className="text-center text-gray-600 mb-8">
@@ -175,7 +175,7 @@ export default function ProfileComplete() {
                 required
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 placeholder="Enter your full name"
               />
             </div>
@@ -190,7 +190,7 @@ export default function ProfileComplete() {
                 required
                 value={formData.dob}
                 onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
               />
             </div>
 
@@ -203,7 +203,7 @@ export default function ProfileComplete() {
                 required
                 value={formData.gender}
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
               >
                 <option value="">Select gender</option>
                 <option value="male">Male</option>
@@ -226,20 +226,20 @@ export default function ProfileComplete() {
                   setShowCountryDropdown(true);
                 }}
                 onFocus={() => setShowCountryDropdown(true)}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                 placeholder="Type to search country..."
                 autoComplete="off"
               />
               
               {showCountryDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-1 bg-paper border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   {getFilteredCountries().length > 0 ? (
                     getFilteredCountries().map(country => (
                       <button
                         key={country.code}
                         type="button"
                         onClick={() => handleCountrySelect(country)}
-                        className="w-full px-4 py-3 text-left hover:bg-purple-50 border-b border-gray-100 last:border-b-0"
+                        className="w-full px-4 py-3 text-left hover:bg-brand-50 border-b border-gray-100 last:border-b-0"
                       >
                         <div className="font-medium text-gray-800">{country.name}</div>
                         <div className="text-xs text-gray-500">{country.code}</div>
@@ -269,20 +269,20 @@ export default function ProfileComplete() {
                     setShowStateDropdown(true);
                   }}
                   onFocus={() => setShowStateDropdown(true)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                   placeholder="Type to search state..."
                   autoComplete="off"
                 />
                 
                 {showStateDropdown && (
-                  <div className="absolute z-10 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 w-full mt-1 bg-paper border-2 border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                     {getFilteredStates().length > 0 ? (
                       getFilteredStates().map(state => (
                         <button
                           key={state.code}
                           type="button"
                           onClick={() => handleStateSelect(state)}
-                          className="w-full px-4 py-3 text-left hover:bg-purple-50 border-b border-gray-100 last:border-b-0"
+                          className="w-full px-4 py-3 text-left hover:bg-brand-50 border-b border-gray-100 last:border-b-0"
                         >
                           <div className="font-medium text-gray-800">{state.name}</div>
                           <div className="text-xs text-gray-500">{state.code}</div>
@@ -307,7 +307,7 @@ export default function ProfileComplete() {
                 type="text"
                 value={formData.referralCode}
                 onChange={handleReferralCodeChange}
-                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none font-mono"
+                className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono"
                 placeholder="IN TN 00001"
                 maxLength={11}
               />
@@ -320,7 +320,7 @@ export default function ProfileComplete() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-brand-700 hover:to-ocean-700 transition disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Continue to Pricing'}
             </button>

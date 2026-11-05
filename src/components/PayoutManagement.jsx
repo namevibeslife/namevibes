@@ -484,7 +484,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
         }
 
         .payout-table thead tr {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
           color: white;
         }
 
@@ -524,7 +524,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
         }
 
         .payout-mark-paid-btn {
-          background: #667eea;
+          background: #89601c;
           color: white;
           border: none;
           padding: 8px 16px;
@@ -534,7 +534,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
         }
 
         .payout-mark-paid-btn:hover {
-          background: #764ba2;
+          background: #214d47;
         }
 
         .payout-summary {
@@ -545,7 +545,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
         }
 
         .summary-card {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
           color: white;
           padding: 20px;
           border-radius: 10px;
@@ -589,7 +589,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
 
         .payout-modal-content h2 {
           margin: 0 0 20px 0;
-          color: #667eea;
+          color: #89601c;
         }
 
         .payout-modal-info {
@@ -615,7 +615,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
 
         .info-label {
           font-weight: 600;
-          color: #667eea;
+          color: #89601c;
           font-size: 14px;
         }
 
@@ -634,7 +634,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
 
         .payout-modal-form label {
           font-weight: 600;
-          color: #667eea;
+          color: #89601c;
           font-size: 14px;
         }
 

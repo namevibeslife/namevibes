@@ -67,7 +67,7 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
       {shareFiles && (
         <button
           onClick={handleShareToAIApp}
-          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-700 hover:to-purple-700 transition mb-3"
+          className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-brand-600 text-white py-3 rounded-lg font-semibold hover:from-brand-700 hover:to-brand-700 transition mb-3"
         >
           <Share2 size={20} />
           Send PDF to my AI app
@@ -79,7 +79,7 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
           <button
             key={provider.name}
             onClick={() => handleAskAI(provider)}
-            className="flex items-center justify-center gap-2 bg-white text-purple-700 border-2 border-purple-300 py-3 rounded-lg font-semibold hover:bg-purple-50 transition"
+            className="flex items-center justify-center gap-2 bg-paper text-brand-700 border-2 border-brand-300 py-3 rounded-lg font-semibold hover:bg-brand-50 transition"
           >
             <ExternalLink size={18} />
             Ask {provider.name}
@@ -96,14 +96,14 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
 
       <button
         onClick={() => setShowHelp(!showHelp)}
-        className="mt-4 flex items-center gap-1 text-sm text-purple-700 font-semibold mx-auto hover:underline"
+        className="mt-4 flex items-center gap-1 text-sm text-brand-700 font-semibold mx-auto hover:underline"
       >
         <HelpCircle size={16} />
         {showHelp ? 'Hide help' : 'How does this work?'}
       </button>
 
       {showHelp && (
-        <div className="mt-3 bg-white rounded-lg p-4 text-sm text-gray-700 space-y-2 border border-purple-200">
+        <div className="mt-3 bg-paper rounded-lg p-4 text-sm text-gray-700 space-y-2 border border-brand-200">
           {shareFiles && (
             <p>
               <strong>Send PDF to my AI app:</strong> opens your phone's share menu with the PDF report attached.

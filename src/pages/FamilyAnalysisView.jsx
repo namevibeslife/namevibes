@@ -1,3 +1,4 @@
+import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
@@ -45,9 +46,9 @@ export default function FamilyAnalysisView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50 flex items-center justify-center">
+      <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading family analysis...</p>
         </div>
       </div>
@@ -67,15 +68,15 @@ export default function FamilyAnalysisView() {
   const commonElements = findCommonElements(results);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-blue-50">
+    <div className="min-h-screen site-background">
       <UserNav />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-xl p-8">
+        <div className="bg-paper rounded-2xl shadow-xl p-8">
           {/* Family Title */}
           <div className="mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <Users className="w-10 h-10 text-purple-600" />
+              <Users className="w-10 h-10 text-brand-600" />
               <h1 className="text-4xl font-bold text-gray-800">
                 Family Chemistry Analysis
               </h1>
@@ -83,19 +84,20 @@ export default function FamilyAnalysisView() {
             <p className="text-center text-gray-600">
               Analyzed on {analysis.timestamp?.toDate().toLocaleDateString()}
             </p>
-            <p className="text-center text-purple-600 font-semibold mt-2">
+            <p className="text-center text-brand-600 font-semibold mt-2">
               {analysis.count} Family Members
             </p>
           </div>
 
+          <ChemistryPoster people={results} family />
           {/* Family Members List */}
           {analysis.members && analysis.members.length > 0 && (
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Family Members</h2>
               <div className="grid md:grid-cols-2 gap-4">
                 {analysis.members.map((member, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border-2 border-purple-200">
-                    <p className="text-sm text-purple-600 font-semibold mb-1">{member.relation}</p>
+                  <div key={idx} className="bg-gradient-to-r from-brand-50 to-ocean-50 rounded-xl p-6 border-2 border-brand-200">
+                    <p className="text-sm text-brand-600 font-semibold mb-1">{member.relation}</p>
                     <p className="text-xl font-bold text-gray-800">{member.fullName}</p>
                   </div>
                 ))}
@@ -114,7 +116,7 @@ export default function FamilyAnalysisView() {
                     {person.elements && person.elements.map((el, elIdx) => (
                       <div
                         key={elIdx}
-                        className="border-4 border-gray-800 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
+                        className="element-card border-4 border-gray-800 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
                         style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                       >
                         <div className="text-sm font-mono font-bold">{el.number}</div>
@@ -129,14 +131,14 @@ export default function FamilyAnalysisView() {
           )}
 
           {commonElements.length > 0 && (
-            <div className="mb-8 pt-8 border-t-2 border-purple-200">
-              <h2 className="text-3xl font-bold text-purple-600 mb-2 text-center">The Harmony</h2>
+            <div className="mb-8 pt-8 border-t-2 border-brand-200">
+              <h2 className="text-3xl font-bold text-brand-600 mb-2 text-center">The Harmony</h2>
               <p className="text-gray-600 mb-6 text-center italic">"Common Elements Across All Family Members"</p>
-              <div className="flex flex-wrap gap-4 justify-center p-6 bg-purple-50 rounded-xl mb-6">
+              <div className="flex flex-wrap gap-4 justify-center p-6 bg-brand-50 rounded-xl mb-6">
                 {commonElements.map((el, idx) => (
                   <div
                     key={idx}
-                    className="border-4 border-purple-600 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
+                    className="element-card border-4 border-brand-600 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
                     style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
                   >
                     <div className="text-sm font-mono font-bold">{el.number}</div>
@@ -145,7 +147,7 @@ export default function FamilyAnalysisView() {
                   </div>
                 ))}
               </div>
-              <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-xl p-6 border-2 border-purple-300">
+              <div className="bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-6 border-2 border-brand-300">
                 <AskAIPanel results={results} />
               </div>
             </div>
@@ -154,14 +156,14 @@ export default function FamilyAnalysisView() {
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
             <button
               onClick={() => buildFamilyPDF(results).save('NameVibes_Family_Report.pdf')}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition font-semibold"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-500 text-white rounded-lg hover:from-brand-600 hover:to-brand-600 transition font-semibold"
             >
               <Download size={20} />
               Download PDF
             </button>
             <button
               onClick={() => navigate('/family')}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold"
+              className="px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition font-semibold"
             >
               Analyze Another Family
             </button>

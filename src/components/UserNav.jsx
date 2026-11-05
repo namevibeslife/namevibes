@@ -29,16 +29,16 @@ export default function UserNav() {
     { icon: Settings, label: 'Settings', path: '/settings' },
   ].filter(item => !item.familyOnly || profile?.planType === 'family');
 
-  const itemClass = (path) => location.pathname === path ? 'text-purple-600' : 'text-gray-700';
+  const itemClass = (path) => location.pathname === path ? 'text-brand-600' : 'text-gray-700';
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-paper shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <h1 
             onClick={() => navigate('/dashboard')}
-            className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent cursor-pointer"
+            className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent cursor-pointer"
           >
             NameVibes
           </h1>
@@ -51,7 +51,7 @@ export default function UserNav() {
                 <button
                   key={item.path}
                   onClick={() => navigate(item.path)}
-                  className={`flex items-center gap-2 ${itemClass(item.path)} hover:text-purple-600 transition font-medium whitespace-nowrap`}
+                  className={`flex items-center gap-2 ${itemClass(item.path)} hover:text-brand-600 transition font-medium whitespace-nowrap`}
                 >
                   <Icon size={18} />
                   <span>{item.label}</span>
@@ -91,7 +91,7 @@ export default function UserNav() {
                       navigate(item.path);
                       setIsMenuOpen(false);
                     }}
-                    className={`flex items-center gap-3 px-4 py-3 ${itemClass(item.path)} hover:bg-purple-50 hover:text-purple-600 rounded-lg transition font-medium text-left`}
+                    className={`flex items-center gap-3 px-4 py-3 ${itemClass(item.path)} hover:bg-brand-50 hover:text-brand-600 rounded-lg transition font-medium text-left`}
                   >
                     <Icon size={20} />
                     <span>{item.label}</span>

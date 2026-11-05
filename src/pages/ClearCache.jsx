@@ -49,8 +49,8 @@ export default function ClearCache() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-600 via-orange-600 to-red-700 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+    <div className="min-h-screen site-midnight flex items-center justify-center p-4">
+      <div className="bg-paper rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-4xl">🔥</span>
@@ -76,8 +76,8 @@ export default function ClearCache() {
         </div>
 
         {auth.currentUser && (
-          <div className="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
+          <div className="bg-ocean-50 border-2 border-ocean-300 rounded-lg p-4 mb-6">
+            <p className="text-sm text-ocean-800">
               <strong>Currently signed in:</strong><br />
               {auth.currentUser.email}
             </p>

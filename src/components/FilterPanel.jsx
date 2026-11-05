@@ -43,9 +43,9 @@ export default function FilterPanel({
   const showStatus = filterType === 'ambassadors';
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+    <div className="bg-paper rounded-xl shadow-lg p-6 mb-6">
       <div className="flex items-center gap-2 mb-4">
-        <Filter className="w-5 h-5 text-purple-600" />
+        <Filter className="w-5 h-5 text-brand-600" />
         <h3 className="text-lg font-bold text-gray-800">Filters</h3>
       </div>
 
@@ -59,7 +59,7 @@ export default function FilterPanel({
             <select
               value={filters.gateway || 'all'}
               onChange={(e) => handleFilterUpdate('gateway', e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
             >
               <option value="all">All Gateways</option>
               <option value="razorpay">Razorpay</option>
@@ -77,7 +77,7 @@ export default function FilterPanel({
             <select
               value={filters.country || 'all'}
               onChange={(e) => handleFilterUpdate('country', e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
             >
               <option value="all">All Countries</option>
               {Object.values(COUNTRIES).map(country => (
@@ -99,7 +99,7 @@ export default function FilterPanel({
               value={filters.state || 'all'}
               onChange={(e) => handleFilterUpdate('state', e.target.value)}
               disabled={!filters.country || filters.country === 'all'}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none disabled:bg-gray-100 disabled:cursor-not-allowed"
             >
               <option value="all">All States</option>
               {filters.country && filters.country !== 'all' && 
@@ -122,7 +122,7 @@ export default function FilterPanel({
             <select
               value={filters.month || 'all'}
               onChange={(e) => handleFilterUpdate('month', e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
             >
               <option value="all">All Months</option>
               {months.map((month, idx) => (
@@ -143,7 +143,7 @@ export default function FilterPanel({
             <select
               value={filters.year || 'all'}
               onChange={(e) => handleFilterUpdate('year', e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
             >
               <option value="all">All Years</option>
               {years.map(year => (
@@ -164,7 +164,7 @@ export default function FilterPanel({
             <select
               value={filters.planType || 'all'}
               onChange={(e) => handleFilterUpdate('planType', e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
             >
               <option value="all">All Plans</option>
               <option value="none">No Plan</option>
@@ -183,7 +183,7 @@ export default function FilterPanel({
             <select
               value={filters.status || 'all'}
               onChange={(e) => handleFilterUpdate('status', e.target.value)}
-              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending Approval</option>
@@ -202,13 +202,13 @@ export default function FilterPanel({
             <span className="text-sm font-medium text-gray-600">Active Filters:</span>
             
             {filters.gateway && filters.gateway !== 'all' && (
-              <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">
+              <span className="px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-semibold">
                 Gateway: {filters.gateway}
               </span>
             )}
             
             {filters.country && filters.country !== 'all' && (
-              <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">
+              <span className="px-3 py-1 bg-ocean-100 text-ocean-700 rounded-full text-xs font-semibold">
                 Country: {COUNTRIES[filters.country]?.name}
               </span>
             )}
@@ -226,13 +226,13 @@ export default function FilterPanel({
             )}
             
             {filters.year && filters.year !== 'all' && (
-              <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-semibold">
+              <span className="px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-semibold">
                 Year: {filters.year}
               </span>
             )}
             
             {filters.planType && filters.planType !== 'all' && (
-              <span className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold capitalize">
+              <span className="px-3 py-1 bg-brand-100 text-brand-700 rounded-full text-xs font-semibold capitalize">
                 Plan: {filters.planType}
               </span>
             )}

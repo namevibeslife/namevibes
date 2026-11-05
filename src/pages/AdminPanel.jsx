@@ -892,10 +892,10 @@ export default function AdminPanel() {
   // Login Screen
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
+      <div className="min-h-screen site-midnight flex items-center justify-center p-4">
+        <div className="bg-paper rounded-2xl shadow-2xl p-8 w-full max-w-md">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <Settings className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800">Admin Panel</h1>
@@ -912,7 +912,7 @@ export default function AdminPanel() {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 rounded-lg font-semibold hover:from-purple-700 hover:to-blue-700 transition disabled:opacity-50"
+              className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-3 rounded-lg font-semibold hover:from-brand-700 hover:to-ocean-700 transition disabled:opacity-50"
             >
               {loading ? 'Checking...' : 'Sign in with Google'}
             </button>
@@ -934,7 +934,7 @@ export default function AdminPanel() {
           <div className="mt-6 text-center">
             <button
               onClick={() => navigate('/')}
-              className="text-purple-600 hover:text-purple-700 text-sm font-medium"
+              className="text-brand-600 hover:text-brand-700 text-sm font-medium"
             >
               ← Back to Home
             </button>

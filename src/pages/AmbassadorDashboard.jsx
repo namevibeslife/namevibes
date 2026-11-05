@@ -259,19 +259,19 @@ export default function AmbassadorDashboard() {
 
   if (loading && !ambassador) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-xl text-gray-600">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen site-background">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-paper border-b border-gray-200 sticky top-0 z-10">
         <div className="px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <UserCheck className="w-8 h-8 text-purple-600" />
+            <UserCheck className="w-8 h-8 text-brand-600" />
             <div>
               <h1 className="text-xl font-bold text-gray-800">Ambassador Dashboard</h1>
               <p className="text-xs text-gray-500">{ambassador?.fullName}</p>
@@ -289,16 +289,16 @@ export default function AmbassadorDashboard() {
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Referral Code Card */}
-        <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl shadow-lg p-8 mb-6 text-white">
+        <div className="bg-gradient-to-r from-brand-600 to-ocean-600 rounded-2xl shadow-lg p-8 mb-6 text-white">
           <h2 className="text-2xl font-bold mb-2">Your Referral Code</h2>
           <div className="text-5xl font-bold tracking-wider mb-4">
             {ambassador?.referralCode || 'N/A'}
           </div>
-          <p className="text-purple-100">Share this code with your network to earn commissions!</p>
+          <p className="text-brand-100">Share this code with your network to earn commissions!</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-paper rounded-xl shadow-lg p-6 mb-6">
           <h3 className="text-lg font-bold text-gray-800 mb-4">Filters</h3>
           <div className="flex gap-4">
             <div>
@@ -306,7 +306,7 @@ export default function AmbassadorDashboard() {
               <select
                 value={filter.year}
                 onChange={(e) => setFilter({ ...filter, year: e.target.value })}
-                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500"
               >
                 <option value="all">All Years</option>
                 {[2024, 2025, 2026, 2027].map(year => (
@@ -319,7 +319,7 @@ export default function AmbassadorDashboard() {
               <select
                 value={filter.month}
                 onChange={(e) => setFilter({ ...filter, month: e.target.value })}
-                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                className="px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500"
               >
                 <option value="all">All Months</option>
                 {months.map((month, index) => (
@@ -332,17 +332,17 @@ export default function AmbassadorDashboard() {
 
         {/* Stats Cards */}
         <div className="grid md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-blue-500">
+          <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-ocean-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Referrals</p>
                 <p className="text-3xl font-bold text-gray-800">{analytics.totalReferrals}</p>
               </div>
-              <Users className="w-12 h-12 text-blue-500 opacity-20" />
+              <Users className="w-12 h-12 text-ocean-500 opacity-20" />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-500">
+          <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-green-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
@@ -352,17 +352,17 @@ export default function AmbassadorDashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-purple-500">
+          <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-brand-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Your Commission</p>
                 <p className="text-3xl font-bold text-gray-800">₹{calculateCommission()}</p>
               </div>
-              <TrendingUp className="w-12 h-12 text-purple-500 opacity-20" />
+              <TrendingUp className="w-12 h-12 text-brand-500 opacity-20" />
             </div>
           </div>
 
-          <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
+          <div className="bg-paper rounded-xl shadow-lg p-6 border-l-4 border-orange-500">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Renewals Due</p>
@@ -375,7 +375,7 @@ export default function AmbassadorDashboard() {
 
         {/* Payment History Section - NEW */}
         {paymentHistory.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6 mb-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Payment History</h3>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -425,9 +425,9 @@ export default function AmbassadorDashboard() {
         {/* Analytics Grid */}
         <div className="grid md:grid-cols-2 gap-6 mb-6">
           {/* By Country */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6">
             <div className="flex items-center gap-2 mb-4">
-              <Globe className="w-5 h-5 text-purple-600" />
+              <Globe className="w-5 h-5 text-brand-600" />
               <h3 className="text-lg font-bold text-gray-800">By Country</h3>
             </div>
             <div className="space-y-2">
@@ -435,7 +435,7 @@ export default function AmbassadorDashboard() {
                 Object.entries(analytics.byCountry).map(([country, count]) => (
                   <div key={country} className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-gray-700">{country}</span>
-                    <span className="font-bold text-purple-600">{count}</span>
+                    <span className="font-bold text-brand-600">{count}</span>
                   </div>
                 ))
               ) : (
@@ -445,9 +445,9 @@ export default function AmbassadorDashboard() {
           </div>
 
           {/* By State */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6">
             <div className="flex items-center gap-2 mb-4">
-              <MapPin className="w-5 h-5 text-purple-600" />
+              <MapPin className="w-5 h-5 text-brand-600" />
               <h3 className="text-lg font-bold text-gray-800">By State</h3>
             </div>
             <div className="space-y-2">
@@ -455,7 +455,7 @@ export default function AmbassadorDashboard() {
                 Object.entries(analytics.byState).map(([state, count]) => (
                   <div key={state} className="flex justify-between items-center py-2 border-b border-gray-100">
                     <span className="text-gray-700">{state}</span>
-                    <span className="font-bold text-purple-600">{count}</span>
+                    <span className="font-bold text-brand-600">{count}</span>
                   </div>
                 ))
               ) : (
@@ -465,26 +465,26 @@ export default function AmbassadorDashboard() {
           </div>
 
           {/* By Gender */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">By Gender</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-700">Male</span>
-                <span className="font-bold text-blue-600">{analytics.byGender.Male}</span>
+                <span className="font-bold text-ocean-600">{analytics.byGender.Male}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-700">Female</span>
-                <span className="font-bold text-pink-600">{analytics.byGender.Female}</span>
+                <span className="font-bold text-brand-600">{analytics.byGender.Female}</span>
               </div>
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
                 <span className="text-gray-700">Other</span>
-                <span className="font-bold text-purple-600">{analytics.byGender.Other}</span>
+                <span className="font-bold text-brand-600">{analytics.byGender.Other}</span>
               </div>
             </div>
           </div>
 
           {/* By Package */}
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">By Package</h3>
             <div className="space-y-2">
               <div className="flex justify-between items-center py-2 border-b border-gray-100">
@@ -501,7 +501,7 @@ export default function AmbassadorDashboard() {
 
         {/* Renewal Alerts */}
         {analytics.renewalAlerts.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Upcoming Renewals (Next 30 Days)</h3>
             <div className="space-y-2">
               {analytics.renewalAlerts.map((alert, index) => (
@@ -523,13 +523,13 @@ export default function AmbassadorDashboard() {
 
         {/* Month-wise Breakdown */}
         {Object.keys(analytics.byMonth).length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+          <div className="bg-paper rounded-xl shadow-lg p-6 mt-6">
             <h3 className="text-lg font-bold text-gray-800 mb-4">Month-wise Sign-ups</h3>
             <div className="grid md:grid-cols-3 gap-4">
               {Object.entries(analytics.byMonth).map(([month, count]) => (
                 <div key={month} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
                   <p className="text-sm text-gray-600">{month}</p>
-                  <p className="text-2xl font-bold text-purple-600">{count}</p>
+                  <p className="text-2xl font-bold text-brand-600">{count}</p>
                 </div>
               ))}
             </div>
