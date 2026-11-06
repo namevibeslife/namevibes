@@ -38,5 +38,5 @@ export function buildAIPrompt(results, contextLabels = []) {
 }
 
 export function buildFamilyPDF(results) {
-  return buildPosterPDF(results, findCommonElements(results));
+  return buildPosterPDF(results);
 }

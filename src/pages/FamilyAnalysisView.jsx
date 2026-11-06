@@ -1,3 +1,4 @@
+import PosterDownload from '../components/PosterDownload';
 import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -6,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Users, Download } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
-import { findCommonElements, buildFamilyPDF } from '../utils/familyReport';
+import { findCommonElements } from '../utils/familyReport';
 import { textColorFor } from '../utils/elements';
 
 export default function FamilyAnalysisView() {
@@ -90,6 +91,7 @@ export default function FamilyAnalysisView() {
           </div>
 
           <ChemistryPoster people={results} family />
+            <PosterDownload people={results} family />
           {/* Family Members List */}
           {analysis.members && analysis.members.length > 0 && (
             <div className="mb-8">
@@ -154,13 +156,6 @@ export default function FamilyAnalysisView() {
           )}
 
           <div className="mt-8 flex flex-wrap gap-3 justify-center">
-            <button
-              onClick={() => buildFamilyPDF(results).save('NameVibes_Family_Report.pdf')}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-500 text-white rounded-lg hover:from-brand-600 hover:to-brand-600 transition font-semibold"
-            >
-              <Download size={20} />
-              Download PDF
-            </button>
             <button
               onClick={() => navigate('/family')}
               className="px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition font-semibold"

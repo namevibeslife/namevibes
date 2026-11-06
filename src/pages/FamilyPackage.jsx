@@ -1,3 +1,4 @@
+import PosterDownload from '../components/PosterDownload';
 import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +10,7 @@ import { parseNameToElements, textColorFor } from '../utils/elements';
 import { Download, Plus, X, Share2 } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import UnmatchedLetters from '../components/UnmatchedLetters';
-import { findCommonElements, buildFamilyPDF } from '../utils/familyReport';
+import { findCommonElements } from '../utils/familyReport';
 
 const RELATIONS = [
   'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister',
@@ -113,9 +114,6 @@ export default function FamilyPackage() {
   };
 
 
-  const downloadPDF = () => {
-    buildFamilyPDF(results).save(`NameVibes_Family_Report.pdf`);
-  };
 
 
 
@@ -142,13 +140,6 @@ export default function FamilyPackage() {
                   <Share2 size={20} />
                   Share on WhatsApp
                 </button>
-                <button
-                  onClick={downloadPDF}
-                  className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-brand-500 to-brand-500 text-white rounded-lg hover:from-brand-600 hover:to-brand-600 transition"
-                >
-                  <Download size={20} />
-                  Download PDF
-                </button>
               </div>
 
               <p className="text-center text-lg text-gray-600 italic font-medium">
@@ -157,6 +148,7 @@ export default function FamilyPackage() {
             </div>
 
             <ChemistryPoster people={results} family />
+            <PosterDownload people={results} family />
             {displayedResults.map((person, idx) => (
               <div key={idx} className="mb-12 pb-8 border-b-2 border-gray-100 last:border-0">
                 {results.length > 1 && (

@@ -55,7 +55,17 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="landing-showcase" aria-label="Example name poster"><p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">Your name, beautifully elemental / Sample poster</p><ChemistryPoster people={[{ fullName: "Sreshan S Nair", elements: parseNameToElements("Sreshan S Nair") }]} /></section>
+      <section className="max-w-3xl mx-auto px-6 pb-14 text-center" aria-labelledby="about-namevibes">
+        <h2 id="about-namevibes" className="text-3xl text-brand-800 mb-6">A lifelong companion. A world within.</h2>
+        <div className="space-y-4 text-gray-700 text-lg">
+          <p>From the cradle to the grave, your name is your constant companion, defining your identity throughout life's journey.</p>
+          <p>Every name carries a unique vibration, an energy that resonates with who you are.</p>
+          <p>But have you ever wondered what lies within the letters of your name?</p>
+          <p><strong>NameVibes</strong> uncovers the fascinating connection between your name and the elements of the periodic table.</p>
+          <p className="font-semibold text-brand-700">Discover the elements. Explore the connections. Feel your NameVibes.</p>
+        </div>
+      </section>
+      <section className="landing-showcase" aria-label="Example name poster"><p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">Your name, beautifully elemental / Sample poster</p><ChemistryPoster people={[{ fullName: "Radhe Krishna", elements: parseNameToElements("Radhe Krishna") }]} /></section>
       {/* Features */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-3 gap-8">
