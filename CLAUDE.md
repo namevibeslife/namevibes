@@ -48,22 +48,23 @@ The user requested a consistent theme across every page and generated posters, b
 - PDF validation: sample individual poster fits one page; sample two-person report uses two pages; long-name stress case uses six pages. Text bounding boxes stayed inside the pages.
 - Screenshots and sample PDFs are under `artifacts/` and are local verification artifacts, not deployment source.
 
-## Git and deployment status — unfinished
+## Git and deployment status - live
 
 The user explicitly authorized pushing to GitHub and deploying the existing production site.
 
-- Theme implementation is committed locally as `9b2286d` (`Apply gold and ivory theme across pages and chemistry posters`).
-- GitHub `main` was last verified at `8ab02779db2404764808e0b01efa61496ec4579d`.
-- Push attempts failed with HTTP 403. Read-only permission checks confirmed none of the GitHub accounts currently saved in Git Credential Manager has push permission on this repository.
-- Attempted device login for `namevibeslife`; it failed because the host aborted the network connection. No successful authorization was established.
-- The remote commit and production homepage still showed the previous release at the last verification. Do not claim the new theme is live.
-- Next required step: authenticate Git with `namevibeslife` or another account that has write access, then push the local commits using `git push -u origin main`.
-- After pushing, inspect GitHub/Vercel deployment status and verify that production serves the gold theme, `/theme/molecules.svg`, and the new poster interface. The expected Git-connected Vercel deployment must be verified rather than assumed.
+- Theme implementation commit: `9b2286d` (Apply gold and ivory theme across pages and chemistry posters).
+- Implementation and initial handoff were pushed to GitHub `main` through `aa4919b` after successful Git Credential Manager browser authentication as `namevibeslife`.
+- Repository-local Git credential username is now `namevibeslife` so future pushes select the correct saved account.
+- Vercel automatically started deployments for the connected `namevibes` and `namevibes-whi6` projects.
+- Production verified at https://namevibes.life: HTTP 200, gold browser theme colour, new midnight poster with live rendered sample name, and HTTP 200 for `/theme/molecules.svg`.
+- Production headless Chromium mobile check at 390px found no horizontal overflow or JavaScript runtime errors.
+- Earlier HTTP 403 errors and the failed device-login attempt are resolved. No further authentication action is required for this deployment.
+- This handoff update is a documentation-only follow-up to the verified implementation release.
 - No database rules, payments, production data, or hosting configuration were changed as part of this work.
 
 ## Preserve local work
 
 - `public/icons/` contains pre-existing local modifications relative to the remote repository; these were left intact and excluded from the theme commit.
 - `Claude outputs/`, `vibes templates/`, and `artifacts/` contain local reference/verification assets. Do not add them indiscriminately to a deployment commit.
-- An untracked `push-to-github.bat` appeared during this session. It was inspected but not run or modified. It copies broad folder contents and deletes a temporary checkout; prefer pushing the prepared Git checkout directly once authentication is fixed.
+- An untracked `push-to-github.bat` appeared during this session. It was inspected but not run or modified. It copies broad folder contents and deletes a temporary checkout; prefer pushing this Git checkout directly.
 - Never print or commit credentials, `.env` files, or tokens. Do not reset or overwrite unrelated local changes when completing deployment.
