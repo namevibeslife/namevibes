@@ -64,6 +64,7 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .poster-midnight { background-color: #081716; color: #f5ead1; --poster-gold: #ebc979; --poster-line: #b88b3670; }
 .poster-ivory { background-color: #fbf2da; color: #362a17; --poster-gold: #815817; --poster-line: #b88b3680; }
 .poster-heading > svg { margin: 0 auto 10px; color: var(--poster-gold); }
+.poster-logo { display: block; height: clamp(64px, 14vw, 104px); width: auto; margin: 0 auto 8px; }
 .poster-brand { font-family: Georgia, serif; letter-spacing: .28em; font-size: 24px; color: var(--poster-gold); }
 .poster-eyebrow { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; margin: 10px 0; }
 .poster-heading h2 { font-size: clamp(24px, 3.8vw, 40px); color: var(--poster-gold); margin-bottom: 24px; }
