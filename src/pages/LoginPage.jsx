@@ -12,6 +12,7 @@ import {
 import { Eye, EyeOff } from 'lucide-react';
 import { auth } from '../firebase';
 import { GoogleButton, AppleButton } from '../components/AuthButtons';
+import Logo from '../components/Logo';
 
 const QUIET_CODES = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
 
@@ -122,8 +123,8 @@ export default function LoginPage() {
     <div className="min-h-screen site-midnight flex items-center justify-center p-4">
       <div className="bg-paper rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-6">
-          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
-            NameVibes
+          <h1 className="mb-2">
+            <Logo className="h-20 w-auto mx-auto" />
           </h1>
           <p className="text-gray-600">Discover the chemistry in your name</p>
         </div>
