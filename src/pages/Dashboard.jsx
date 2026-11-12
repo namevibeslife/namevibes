@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Logo from '../components/Logo';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
@@ -97,8 +98,8 @@ export default function Dashboard() {
       <header className="bg-paper shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
-              NameVibes
+            <h1>
+              <Logo className="h-10 w-auto" />
             </h1>
             <button
               onClick={handleLogout}
