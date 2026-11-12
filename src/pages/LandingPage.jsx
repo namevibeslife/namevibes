@@ -13,7 +13,7 @@ export default function LandingPage() {
       {/* Header */}
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
         <div className="flex items-center">
-          <Logo className="h-12 sm:h-14 w-auto" />
+          <Logo className="h-20 sm:h-28 md:h-32 w-auto" />
         </div>
         {loading ? (
           <div className="h-10 w-28" aria-hidden="true" />
