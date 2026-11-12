@@ -1,6 +1,17 @@
 # NameVibes project handoff
 
-Updated: 6 November 2026 (Asia/Calcutta).
+Updated: 12 November 2026 (Asia/Calcutta).
+
+## Latest changes - 12 November 2026
+
+- Homepage sample is now the supplied infographic edited to the neutral name Vibes. Asset: public/theme/vibes-sample.png. Its correct elemental split is V + I + Be + S (23, 53, 4, 16). The earlier Radhe Krishna sample is superseded.
+- The user's full introductory copy remains on the homepage. The sample can be opened full size for readable mobile viewing.
+- Website backgrounds use champagne/gold shading and dimensional chemical structures from public/theme/golden-chemistry.svg.
+- Download panels offer Golden and Dark styles with a live, minimal poster preview. The selected style applies to both PDF and PNG, including family-member images. Changing the name or style invalidates an already-prepared share image.
+- Exported posters show only the name and elemental split, plus decorative branding. Interpretation tables, counts, and harmony reports remain out of exports. On-screen analysis details remain available.
+- PNG export uses 1080 x 1350 for typical names; long names expand. Native file sharing is available only when navigator.canShare supports the file; otherwise users save the PNG and upload it to Instagram/Facebook. The app does not auto-post to social accounts.
+- Existing active-plan download restrictions are unchanged.
+- Validation: both selected styles rendered and downloaded as one-page PDFs and 1080 x 1350 PNGs for Vibes; background pixels matched the selected palette; export details were absent; simulated native share received one image/png file; tested mobile flows had no overflow or JavaScript errors.
 
 ## Project
 

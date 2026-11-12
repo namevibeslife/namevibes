@@ -14,11 +14,11 @@ export function ElementTile({ element }) {
 }
 
 // Live text and real analysis data keep every poster personal, accessible and responsive.
-export default function ChemistryPoster({ people, family = false }) {
+export default function ChemistryPoster({ people, family = false, theme = family ? 'gold' : 'dark', minimal = false }) {
   const elements = people.flatMap(person => person.elements || []);
   const unique = [...new Map(elements.map(el => [el.symbol, el])).values()];
   const common = family ? findCommonElements(people) : [];
-  return <article className={`chemistry-poster ${family ? 'poster-ivory' : 'poster-midnight'}`} aria-label={family ? 'Family chemistry poster' : 'Personal chemistry poster'}>
+  return <article className={`chemistry-poster ${theme === 'gold' ? 'poster-ivory' : 'poster-midnight'}`} aria-label={family ? 'Family chemistry poster' : 'Personal chemistry poster'}>
     <header className="poster-heading">
       <Atom size={44} strokeWidth={1} aria-hidden="true" />
       <p className="poster-brand">NAMEVIBES</p>
@@ -37,18 +37,18 @@ export default function ChemistryPoster({ people, family = false }) {
         {!person.elements?.length && <p>No periodic elements found in this name.</p>}
       </section>)}
     </div>
-    <div className="poster-stats">
+    {!minimal && <div className="poster-stats">
       <span><strong>{elements.length}</strong> Total elements</span>
       <span><strong>{unique.length}</strong> Unique elements</span>
       {family && <span><strong>{people.length}</strong> Connected names</span>}
-    </div>
-    {family ? <section className="poster-harmony">
+    </div>}
+    {!minimal && (family ? <section className="poster-harmony">
       <h3>Different elements. A stronger us.</h3>
       <p>{common.length ? `Our shared elements: ${common.map(el => `${el.name} (${el.symbol})`).join(' · ')}` : 'Unique individuals. Beautifully connected.'}</p>
     </section> : unique.length > 0 && <section className="poster-meanings">
       <h3>The elements that make your name</h3>
       <div>{unique.map(el => <p key={el.symbol}><strong>{el.symbol} · {el.name}</strong><span>{el.meaning}</span></p>)}</div>
-    </section>}
+    </section>)}
     <footer className="poster-footer">
       <div className="poster-rule" aria-hidden="true">◇</div>
       <p>More than a name. A higher you.</p>

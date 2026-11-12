@@ -2,7 +2,7 @@
 
 .element-insights-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #fcf8ed 0%, #f6ebcf 100%);
+  background: url('/theme/golden-chemistry.svg') 0 0 / 1200px, linear-gradient(135deg, #fffdf5 0%, #f6e5bc 100%);
 }
 
 /* Quick Navigation */

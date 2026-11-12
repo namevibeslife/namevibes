@@ -3,12 +3,12 @@ import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 
 // Vector text and tiles stay crisp in print. Every continuation page has the same frame.
-export function buildPosterPDF(people) {
+export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'dark' } = {}) {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const family = people.length > 1;
-  const ink = family ? '#362a17' : '#f5ead1';
-  const gold = family ? '#815817' : '#ebc979';
-  const background = family ? '#fbf2da' : '#081716';
+  const ink = theme === 'gold' ? '#362a17' : '#f5ead1';
+  const gold = theme === 'gold' ? '#815817' : '#ebc979';
+  const background = theme === 'gold' ? '#fbf2da' : '#081716';
   let firstPage = true;
   let y = 0;
   function frame(subtitle) {

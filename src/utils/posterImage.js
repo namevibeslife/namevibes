@@ -2,7 +2,7 @@ import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 
 // Normal names use a 1080 x 1350 social image; long names expand without losing tiles.
-export async function buildPosterImage(person, family = false) {
+export async function buildPosterImage(person, family = false, theme = family ? 'gold' : 'dark') {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
@@ -19,8 +19,8 @@ export async function buildPosterImage(person, family = false) {
   const rows = Math.ceil(elements.length / 5);
   canvas.width = 1080;
   canvas.height = Math.max(1350, top + rows * 195 + 200);
-  const gold = family ? '#815817' : '#ebc979';
-  ctx.fillStyle = family ? '#fbf2da' : '#081716';
+  const gold = theme === 'gold' ? '#815817' : '#ebc979';
+  ctx.fillStyle = theme === 'gold' ? '#fbf2da' : '#081716';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.strokeStyle = '#b88b36'; ctx.lineWidth = 2;
   ctx.strokeRect(24, 24, 1032, canvas.height - 48);

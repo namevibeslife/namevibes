@@ -36,8 +36,8 @@ input, select, textarea { background-color: #fffdf7; accent-color: #89601c; }
 ::selection { background: #e8d3a0; color: #302c23; }
 .site-background, .element-insights-page {
   background-color: var(--ivory);
-  background-image: url('/theme/molecules.svg'), radial-gradient(ellipse at 0% 0%, #e8d3a055, transparent 55%), radial-gradient(ellipse at 100% 65%, #bfd7cf55, transparent 50%);
-  background-size: 620px, auto, auto;
+  background-image: url('/theme/golden-chemistry.svg'), radial-gradient(ellipse at 10% 0%, #f0cd7580, transparent 55%), radial-gradient(ellipse at 100% 65%, #edcc8070, transparent 50%), linear-gradient(135deg, #fffdf5, #f8edcf 55%, #fff9e9);
+  background-size: 1200px, auto, auto, auto;
 }
 .bg-paper.rounded-2xl, .bg-paper.rounded-xl { border: 1px solid #e8d3a080; }
 .site-midnight { background: url('/theme/molecules.svg') 0 0 / 620px, radial-gradient(ellipse at top left, #29433a, transparent 65%), #081716; }
@@ -88,6 +88,7 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .landing-hero { max-width: 1050px; margin: auto; }
 .landing-hero .hero-kicker { color: #89601c; letter-spacing: .25em; font-size: 11px; text-transform: uppercase; margin-bottom: 24px; }
 .landing-showcase { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
+.sample-artwork { display: block; width: 100%; height: auto; border: 1px solid #c89b48; border-radius: 16px; box-shadow: 0 20px 65px #9f6d2530; }
 @media (max-width: 640px) {
   .poster-family-grid, .poster-meanings > div { grid-template-columns: 1fr; }
   .element-tile { width: 76px; min-height: 106px; }

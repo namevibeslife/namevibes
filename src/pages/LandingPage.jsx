@@ -1,5 +1,3 @@
-import ChemistryPoster from '../components/ChemistryPoster';
-import { parseNameToElements } from '../utils/elements';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
@@ -65,7 +63,7 @@ export default function LandingPage() {
           <p className="font-semibold text-brand-700">Discover the elements. Explore the connections. Feel your NameVibes.</p>
         </div>
       </section>
-      <section className="landing-showcase" aria-label="Example name poster"><p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">Your name, beautifully elemental / Sample poster</p><ChemistryPoster people={[{ fullName: "Radhe Krishna", elements: parseNameToElements("Radhe Krishna") }]} /></section>
+      <section className="landing-showcase" aria-label="Example name poster"><p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">Your name, beautifully elemental / Sample poster</p><a href="/theme/vibes-sample.png" target="_blank" rel="noopener noreferrer" aria-label="View the Vibes sample poster full size"><img src="/theme/vibes-sample.png" alt="NameVibes: how your name becomes a chemistry poster. Vibes maps to V (Vanadium), I (Iodine), Be (Beryllium), and S (Sulfur)." width="1200" height="1312" className="sample-artwork" loading="lazy" /><span className="block text-center text-brand-700 underline mt-3">View sample full size</span></a></section>
       {/* Features */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid md:grid-cols-3 gap-8">
