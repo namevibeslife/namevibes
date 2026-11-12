@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import Logo from '../components/Logo';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -11,9 +12,8 @@ export default function LandingPage() {
     <div className="min-h-screen site-background">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Atom className="w-8 h-8 text-brand-600" />
-          <span className="text-2xl font-bold text-gray-800">NameVibes</span>
+        <div className="flex items-center">
+          <Logo className="h-12 sm:h-14 w-auto" />
         </div>
         {loading ? (
           <div className="h-10 w-28" aria-hidden="true" />
