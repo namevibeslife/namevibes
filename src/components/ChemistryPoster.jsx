@@ -1,5 +1,5 @@
 import React from 'react';
-import { Atom } from 'lucide-react';
+import Logo from './Logo';
 import { textColorFor } from '../utils/elements';
 import { findCommonElements } from '../utils/commonElements';
 import { posterColorFor } from '../utils/posterPalette';
@@ -20,8 +20,7 @@ export default function ChemistryPoster({ people, family = false, theme = family
   const common = family ? findCommonElements(people) : [];
   return <article className={`chemistry-poster ${theme === 'gold' ? 'poster-ivory' : 'poster-midnight'}`} aria-label={family ? 'Family chemistry poster' : 'Personal chemistry poster'}>
     <header className="poster-heading">
-      <Atom size={44} strokeWidth={1} aria-hidden="true" />
-      <p className="poster-brand">NAMEVIBES</p>
+      <Logo variant={theme === 'gold' ? 'light' : 'dark'} className="poster-logo" />
       <p className="poster-eyebrow">Every name has a chemistry</p>
       <div className="poster-rule" aria-hidden="true">◇</div>
       <h2>{family ? 'Our Family Chemistry' : 'The Chemistry of Your Name'}</h2>
