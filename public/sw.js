@@ -2,10 +2,10 @@
 // - Pages: network first, falling back to the cached app shell when offline (so new deploys show up immediately)
 // - /assets/*: cache first (file names contain a content hash, so they never go stale)
 // - Everything cross-origin (Firebase, Google sign-in, payment gateways) is never cached
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL_CACHE = `namevibes-shell-${VERSION}`;
 const ASSET_CACHE = `namevibes-assets-${VERSION}`;
-const SHELL_URLS = ['/', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
+const SHELL_URLS = ['/', '/manifest.webmanifest', '/brand/icon-192.png', '/brand/icon-512.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(SHELL_URLS)).then(() => self.skipWaiting()));
@@ -37,7 +37,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/icons/')) {
+  if (url.pathname.startsWith('/assets/') || url.pathname.startsWith('/brand/icon-') || url.pathname.startsWith('/brand/maskable-')) {
     event.respondWith(
       caches.match(request).then(cached => cached || fetch(request).then(response => {
         if (response.ok) {
