@@ -2,8 +2,21 @@ import jsPDF from 'jspdf';
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 
+// Loads the transparent logo as a data URL so it can be placed in the PDF
+export async function loadPosterLogo(theme) {
+  const response = await fetch(theme === 'gold' ? '/brand/logo-hires.png' : '/brand/logo-dark-hires.png');
+  if (!response.ok) throw new Error('Logo unavailable');
+  const blob = await response.blob();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
 // Vector text and tiles stay crisp in print. Every continuation page has the same frame.
-export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'dark' } = {}) {
+export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'dark', logo = null } = {}) {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const family = people.length > 1;
   const ink = theme === 'gold' ? '#362a17' : '#f5ead1';
@@ -24,16 +37,21 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
       pdf.circle(x, cy, 2);
       pdf.line(x - 3, cy, x + 3, cy);
     }
-    pdf.ellipse(105, 21, 8, 3);
-    pdf.ellipse(105, 21, 3, 8);
-    pdf.circle(105, 21, 1, 'S');
     pdf.setTextColor(gold);
-    pdf.setFont('times', 'normal');
-    pdf.setFontSize(23);
-    pdf.text('N A M E V I B E S', 105, 40, { align: 'center' });
+    if (logo) {
+      // Transparent logo: no box, sits directly on the page colour
+      pdf.addImage(logo, 'PNG', 71, 11, 68, 23, 'nv-logo', 'FAST');
+    } else {
+      pdf.ellipse(105, 21, 8, 3);
+      pdf.ellipse(105, 21, 3, 8);
+      pdf.circle(105, 21, 1, 'S');
+      pdf.setFont('times', 'normal');
+      pdf.setFontSize(23);
+      pdf.text('N A M E V I B E S', 105, 40, { align: 'center' });
+    }
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(8);
-    pdf.text('E V E R Y  N A M E  H A S  A  C H E M I S T R Y', 105, 47, { align: 'center' });
+    pdf.text('E V E R Y  N A M E  H A S  A  C H E M I S T R Y', 105, logo ? 44 : 47, { align: 'center' });
     pdf.line(30, 53, 180, 53);
     pdf.setFont('times', 'normal');
     pdf.setFontSize(16);
