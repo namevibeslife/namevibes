@@ -44,7 +44,7 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="landing-hero container mx-auto px-4 py-20 text-center">
-        <p className="hero-kicker">Your name. Your elements. Your vibration. The energy that connects you to the universe.</p>
+        <p className="hero-kicker">Your name is energy. Discover how it connects you to the universe.</p>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
           Discover Your Name's<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-ocean-600">
