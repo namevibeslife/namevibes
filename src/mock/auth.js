@@ -66,6 +66,12 @@ export class GoogleAuthProvider {
   addScope() {}
 }
 
+export class OAuthProvider {
+  constructor(providerId) { this.providerId = providerId; }
+  setCustomParameters() {}
+  addScope() {}
+}
+
 export class FacebookAuthProvider {
   setCustomParameters() {}
   addScope() {}
@@ -141,3 +147,53 @@ export async function signInWithPopup() {
   setCurrentUser(user);
   return { user };
 }
+
+// ---- Email/password (mock) ----
+const PW_KEY = 'nv_mock_passwords';
+
+function loadPasswords() {
+  try { return JSON.parse(localStorage.getItem(PW_KEY) || '{}'); } catch { return {}; }
+}
+function savePasswords(map) {
+  try { localStorage.setItem(PW_KEY, JSON.stringify(map)); } catch { /* not persisted */ }
+}
+function authError(code) {
+  const error = new Error(code);
+  error.code = code;
+  return error;
+}
+function checkEmail(email) {
+  if (!/^[^@ ]+@[^@ ]+[.][^@ ]+$/.test(email || '')) throw authError('auth/invalid-email');
+}
+
+export async function createUserWithEmailAndPassword(auth, email, password) {
+  checkEmail(email);
+  const key = email.trim().toLowerCase();
+  if ((password || '').length < 6) throw authError('auth/weak-password');
+  const passwords = loadPasswords();
+  if (passwords[key]) throw authError('auth/email-already-in-use');
+  passwords[key] = password;
+  savePasswords(passwords);
+  const user = makeUser({ uid: uidForEmail(key), email: key, displayName: null });
+  user.providerData = [{ providerId: 'password', email: key }];
+  setCurrentUser(user);
+  return { user };
+}
+
+export async function signInWithEmailAndPassword(auth, email, password) {
+  checkEmail(email);
+  const key = email.trim().toLowerCase();
+  const seeded = MOCK_ACCOUNTS.find(a => a.email === key);
+  const passwords = loadPasswords();
+  const ok = passwords[key] ? passwords[key] === password : !!seeded && password === 'password';
+  if (!ok) throw authError('auth/invalid-credential');
+  const user = makeUser({ uid: uidForEmail(key), email: key, displayName: seeded ? seeded.displayName : null });
+  setCurrentUser(user);
+  return { user };
+}
+
+export async function sendPasswordResetEmail(auth, email) {
+  checkEmail(email);
+}
+
+export async function sendEmailVerification() {}
