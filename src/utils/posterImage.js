@@ -1,12 +1,22 @@
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 
+function loadImage(src) {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
+}
+
 // Normal names use a 1080 x 1350 social image; long names expand without losing tiles.
 export async function buildPosterImage(person, family = false, theme = family ? 'gold' : 'dark') {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
   const elements = person.elements || [];
+  const logo = await loadImage(theme === 'gold' ? '/brand/logo-hires.png' : '/brand/logo-dark-hires.png').catch(() => null);
   ctx.font = '64px Georgia';
   const lines = [];
   let line = '';
@@ -25,15 +35,21 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   ctx.strokeStyle = '#b88b36'; ctx.lineWidth = 2;
   ctx.strokeRect(24, 24, 1032, canvas.height - 48);
   ctx.strokeRect(32, 32, 1016, canvas.height - 64);
-  ctx.save(); ctx.translate(540, 104);
-  for (const angle of [0, Math.PI / 3, -Math.PI / 3]) {
-    ctx.save(); ctx.rotate(angle); ctx.beginPath(); ctx.ellipse(0, 0, 42, 15, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  if (logo) {
+    // Transparent logo sits straight on the poster background
+    const logoWidth = 520;
+    ctx.drawImage(logo, (canvas.width - logoWidth) / 2, 50, logoWidth, Math.round(logo.height * logoWidth / logo.width));
+  } else {
+    ctx.save(); ctx.translate(540, 104);
+    for (const angle of [0, Math.PI / 3, -Math.PI / 3]) {
+      ctx.save(); ctx.rotate(angle); ctx.beginPath(); ctx.ellipse(0, 0, 42, 15, 0, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+    }
+    ctx.restore();
   }
-  ctx.restore();
   function text(value, y, size, font = 'Georgia', color = gold) {
     ctx.fillStyle = color; ctx.font = `${size}px ${font}`; ctx.textAlign = 'center'; ctx.fillText(value, 540, y);
   }
-  text('N A M E V I B E S', 205, 43);
+  if (!logo) text('N A M E V I B E S', 205, 43);
   text('EVERY NAME HAS A CHEMISTRY', 252, 19, 'Arial');
   ctx.beginPath(); ctx.moveTo(170, 290); ctx.lineTo(910, 290); ctx.stroke();
   text(family && person.relation ? person.relation.toUpperCase() : 'THE CHEMISTRY OF YOUR NAME', 345, 21, 'Arial');
