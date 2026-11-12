@@ -4,6 +4,7 @@ import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Menu, X, Home, Sparkles, Users, Calculator, BookOpen, Settings, LogOut } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import Logo from './Logo';
 
 export default function UserNav() {
   const navigate = useNavigate();
@@ -36,11 +37,8 @@ export default function UserNav() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <h1 
-            onClick={() => navigate('/dashboard')}
-            className="text-2xl font-bold bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent cursor-pointer"
-          >
-            NameVibes
+          <h1 onClick={() => navigate('/dashboard')} className="cursor-pointer">
+            <Logo className="h-10 w-auto" />
           </h1>
 
           {/* Desktop Menu */}
