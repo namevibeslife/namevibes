@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { UserCheck, ArrowLeft } from 'lucide-react';
 import { GoogleButton } from '../components/AuthButtons';
+import Logo from '../components/Logo';
 
 export default function AmbassadorLogin() {
   const navigate = useNavigate();
@@ -90,6 +91,7 @@ export default function AmbassadorLogin() {
         </button>
 
         <div className="text-center mb-8">
+          <Logo className="h-14 w-auto mx-auto mb-4" />
           <div className="w-16 h-16 bg-brand-600 rounded-full flex items-center justify-center mx-auto mb-4">
             <UserCheck className="w-8 h-8 text-white" />
           </div>
