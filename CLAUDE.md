@@ -1,8 +1,20 @@
 # NameVibes project handoff
 
-Updated: 12 November 2026 (Asia/Calcutta).
+Updated: 13 November 2026 (Asia/Calcutta).
 
-## Latest changes - 12 November 2026
+## Latest changes - 13 November 2026
+
+- Preserved Claude Code's new Logo component, transparent brand assets, homepage sign-in/sign-out controls, and revised hero copy. The existing uncommitted package-lock.json change is unrelated and must not be included in this feature commit.
+- Homepage now renders a real ChemistryPoster for Vibes using parseNameToElements. It includes the four element tiles and full existing meanings, replacing the raster sample/full-size link.
+- Save & Share Poster is the primary image action on new and saved analyses. It prepares a PNG, then offers Save Image and, where supported, Share to Apps using the actual image file. Removed the older text-only WhatsApp links and Instagram copy-text alert.
+- Image saving/sharing is available on active plans; PDF downloads remain restricted by pdfDownload. Expired/inactive accounts do not see export controls.
+- Family preview and shared PNG contain ALL family members and their tiles, followed by shared elements, member counts and meanings. No individual-member selector remains in family sharing.
+- findSharedElements counts each symbol at most once per member and returns elements present in two or more members. Labels distinguish shared-by-all from shared-by-some. Existing findCommonElements keeps its all-members intersection for the separate harmony interpretation flow.
+- Family posters explicitly explain no-overlap and one-member cases. Family PDFs retain each member's elemental page and append shared-element meanings. Individual PDFs remain minimal.
+- New src/utils/familyPosterImage.js draws the complete family in one responsive-height PNG and preserves the selected Golden/Dark theme and current logo. Very large families scale to a maximum 14,000px height to stay within practical canvas limits.
+- Verification: production build passed; mobile homepage shows Vibes and four meanings; a three-member family exports all names plus all/partial shared meanings in both styles; native share stub received NameVibes_Family_Poster.png as image/png; PDF text checks found all members/shared meanings with no out-of-page text; active Individual plan has image sharing but no PDF button. No runtime errors or mobile overflow in tested flows.
+
+## Previous changes - 12 November 2026
 
 - Homepage sample is now the supplied infographic edited to the neutral name Vibes. Asset: public/theme/vibes-sample.png. Its correct elemental split is V + I + Be + S (23, 53, 4, 16). The earlier Radhe Krishna sample is superseded.
 - The user's full introductory copy remains on the homepage. The sample can be opened full size for readable mobile viewing.

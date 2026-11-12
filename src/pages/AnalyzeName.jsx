@@ -3,7 +3,7 @@ import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
-import { Sparkles, Share2, Instagram } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements, textColorFor } from '../utils/elements';
@@ -62,16 +62,6 @@ export default function AnalyzeName() {
     setAnalysesUsed(used => used + 1);
   };
 
-  const handleShare = (platform) => {
-    const text = `Check out my name chemistry on NameVibes! ${result.name} = ${result.elements.map(e => e.symbol).join('-')}`;
-    const url = 'https://namevibes.life';
-    
-    if (platform === 'whatsapp') {
-      window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
-    } else if (platform === 'instagram') {
-      alert('Copy this text and share on Instagram: ' + text);
-    }
-  };
 
   if (!result) {
     return (
@@ -114,12 +104,12 @@ export default function AnalyzeName() {
 
             {profile?.planType === 'individual' && (
               <div className="mt-6 text-center text-sm text-gray-500">
-                <p>⚠️ No download on Individual plan</p>
+                <p>Poster image saving and sharing included</p>
                 <button
                   onClick={() => navigate('/pricing')}
                   className="text-brand-600 hover:underline"
                 >
-                  Upgrade to Family for downloads →
+                  Upgrade to Family for PDF downloads →
                 </button>
               </div>
             )}
@@ -140,22 +130,6 @@ export default function AnalyzeName() {
               <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
                 Chemistry of "{result.name.toUpperCase()}"
               </h1>
-              <div className="flex flex-wrap gap-4 justify-center mb-6">
-                <button
-                  onClick={() => handleShare('whatsapp')}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                >
-                  <Share2 size={20} />
-                  Share on WhatsApp
-                </button>
-                <button
-                  onClick={() => handleShare('instagram')}
-                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-brand-500 to-brand-500 text-white rounded-lg hover:from-brand-600 hover:to-brand-600 transition"
-                >
-                  <Instagram size={20} />
-                  Share on Instagram
-                </button>
-              </div>
               
               <p className="text-center text-lg text-gray-600 italic font-medium mb-8">
                 "Elements of the Universe Found in Your Name"

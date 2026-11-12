@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
+import { findSharedElements } from './commonElements';
 
 // Loads the transparent logo as a data URL so it can be placed in the PDF
 export async function loadPosterLogo(theme) {
@@ -114,6 +115,26 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
       pdf.setTextColor(ink); pdf.setFontSize(11);
       pdf.text('No periodic elements found in this name.', 105, y, { align: 'center' }); y += 12;
     }
+  }
+  if (family) {
+    frame('Common elements & their meaning');
+    const shared = findSharedElements(people);
+    if (!shared.length) {
+      pdf.setTextColor(ink); pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11);
+      pdf.text('No elements are shared between these names.', 105, y + 12, { align: 'center' });
+    }
+    shared.forEach(el => {
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11);
+      const meaning = pdf.splitTextToSize(el.meaning || '', 160);
+      const height = 24 + meaning.length * 5;
+      if (y + height > 258) frame('Common elements / continued');
+      pdf.setTextColor(gold); pdf.setFont('times', 'bold'); pdf.setFontSize(16);
+      pdf.text(`${el.symbol} / ${el.name}`, 22, y + 8);
+      pdf.setTextColor(ink); pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
+      pdf.text(`Shared by ${el.memberCount} of ${people.length} members`, 22, y + 16);
+      pdf.setFontSize(11); pdf.text(meaning, 22, y + 23);
+      y += height + 8;
+    });
   }
   if (firstPage) frame('Your Name Chemistry');
   return pdf;

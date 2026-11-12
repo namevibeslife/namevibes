@@ -7,7 +7,7 @@ import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { parseNameToElements, textColorFor } from '../utils/elements';
-import { Download, Plus, X, Share2 } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import UnmatchedLetters from '../components/UnmatchedLetters';
 import { findCommonElements } from '../utils/familyReport';
@@ -44,11 +44,6 @@ export default function FamilyPackage() {
     );
   };
 
-  const handleShare = () => {
-    const text = `Check out our family name chemistry on NameVibes!`;
-    const url = 'https://namevibes.life';
-    window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`);
-  };
 
   const addName = () => {
     if (names.length < 50) {
@@ -131,16 +126,6 @@ export default function FamilyPackage() {
               <h2 className="text-4xl font-bold text-center mb-4">
                 {results.length === 1 ? 'Name Chemistry' : 'Family Chemistry Analysis'}
               </h2>
-              
-              <div className="flex flex-wrap gap-4 justify-center mb-6">
-                <button
-                  onClick={handleShare}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition"
-                >
-                  <Share2 size={20} />
-                  Share on WhatsApp
-                </button>
-              </div>
 
               <p className="text-center text-lg text-gray-600 italic font-medium">
                 "Elements of the Universe Found in Your Names"
