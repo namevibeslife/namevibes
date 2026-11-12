@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { ArrowLeft, CreditCard } from 'lucide-react';
+import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 
 // In mock mode (npm run dev:mock) no gateway scripts load; payments are simulated
@@ -25,6 +25,7 @@ export default function PaymentPage() {
   const [paymentMethod, setPaymentMethod] = useState(null);
   const [userProfile, setUserProfile] = useState(null);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
+  const [paid, setPaid] = useState(false);
 
   const { planType, amount, currency, symbol, referralCode } = location.state || {};
 
@@ -98,7 +99,16 @@ export default function PaymentPage() {
       if (userDoc.exists()) {
         const data = userDoc.data();
         setUserProfile(data);
-        setPaymentMethod(IS_MOCK ? 'mock' : data.countryCode === 'IN' ? 'razorpay' : 'paypal');
+        // While testers are checking the flow, the server can switch on a no-card test payment
+        let testMode = false;
+        if (!IS_MOCK) {
+          try {
+            testMode = (await (await fetch('/api/payment-mode')).json()).testMode === true;
+          } catch {
+            // no test mode: normal checkout
+          }
+        }
+        setPaymentMethod(IS_MOCK ? 'mock' : testMode ? 'test' : data.countryCode === 'IN' ? 'razorpay' : 'paypal');
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -133,6 +143,27 @@ export default function PaymentPage() {
       console.error('Razorpay error:', error);
       alert('Payment failed. Please try again.');
     } finally {
+      setLoading(false);
+    }
+  };
+
+  // Test mode: the server activates the plan without a card, then we show the success screen
+  const handleTestPayment = async () => {
+    setLoading(true);
+    try {
+      const token = await auth.currentUser.getIdToken();
+      const res = await fetch('/api/test-activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ planType, amount, currency, referralCode: referralCode || null })
+      });
+      if (!res.ok) throw new Error('Test payment was not accepted');
+      setPaid(true);
+      await refreshProfile();
+      setTimeout(() => navigate('/dashboard'), 2200);
+    } catch (error) {
+      console.error('Test payment error:', error);
+      alert('Test payment failed. Please try again.');
       setLoading(false);
     }
   };
@@ -178,6 +209,19 @@ export default function PaymentPage() {
 
   if (!planType || !amount) {
     return null;
+  }
+
+  if (paid) {
+    return (
+      <div className="min-h-screen site-background flex items-center justify-center px-4">
+        <div className="bg-paper rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
+          <CheckCircle size={72} className="text-green-600 mx-auto mb-4" />
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Payment successful</h2>
+          <p className="text-gray-600 mb-1 capitalize">Your {planType} plan is now active.</p>
+          <p className="text-gray-500 text-sm">Taking you to your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -237,6 +281,17 @@ export default function PaymentPage() {
                   Simulate failed payment
                 </button>
               </div>
+            ) : paymentMethod === 'test' ? (
+              <div className="border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg p-4 space-y-3">
+                <p className="text-sm text-amber-800 font-semibold">Test mode: no card needed. Click below to simulate a successful payment.</p>
+                <button
+                  onClick={handleTestPayment}
+                  disabled={loading}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg font-semibold text-lg transition disabled:opacity-50"
+                >
+                  {loading ? 'Processing...' : `Pay ${symbol}${amount} (test)`}
+                </button>
+              </div>
             ) : paymentMethod === 'razorpay' ? (
               <button
                 onClick={handleRazorpayPayment}
@@ -269,7 +324,7 @@ export default function PaymentPage() {
 
           {/* Security Notice */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            🔒 Secure payment powered by {paymentMethod === 'mock' ? 'nothing (mock mode)' : paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal'}
+            🔒 Secure payment powered by {paymentMethod === 'mock' ? 'nothing (mock mode)' : paymentMethod === 'test' ? 'nothing (test mode)' : paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal'}
           </div>
         </div>
       </div>
