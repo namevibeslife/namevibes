@@ -87,7 +87,20 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .poster-footer p { font-family: Georgia, serif; font-size: 25px; font-style: italic; color: var(--poster-gold); }
 .poster-footer small { display: block; font-size: 9px; letter-spacing: .14em; margin-top: 12px; }
 .landing-hero { max-width: 1050px; margin: auto; }
-.landing-hero .hero-kicker { color: #89601c; letter-spacing: .25em; font-size: 11px; text-transform: uppercase; margin-bottom: 24px; }
+.landing-hero .hero-kicker {
+  display: inline-block;
+  max-width: 100%;
+  color: #172b4d;
+  background-color: #fffaf0;
+  border: 1px solid #d8b96e;
+  border-radius: 14px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.7;
+  letter-spacing: .04em;
+  margin-bottom: 24px;
+}
 .landing-showcase { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
 .sample-artwork { display: block; width: 100%; height: auto; border: 1px solid #c89b48; border-radius: 16px; box-shadow: 0 20px 65px #9f6d2530; }
 @media (max-width: 640px) {

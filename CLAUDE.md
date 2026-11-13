@@ -4,6 +4,8 @@ Updated: 13 November 2026 (Asia/Calcutta).
 
 ## Latest changes - 13 November 2026
 
+- Homepage hero tagline readability: dark navy text on a solid warm-ivory panel with a gold border, 14px semibold sentence-case lettering and reduced tracking. This prevents the text blending into the golden molecular background.
+
 - Preserved Claude Code's new Logo component, transparent brand assets, homepage sign-in/sign-out controls, and revised hero copy. The existing uncommitted package-lock.json change is unrelated and must not be included in this feature commit.
 - Homepage now renders a real ChemistryPoster for Vibes using parseNameToElements. It includes the four element tiles and full existing meanings, replacing the raster sample/full-size link.
 - Save & Share Poster is the primary image action on new and saved analyses. It prepares a PNG, then offers Save Image and, where supported, Share to Apps using the actual image file. Removed the older text-only WhatsApp links and Instagram copy-text alert.
