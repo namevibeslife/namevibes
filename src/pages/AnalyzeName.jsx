@@ -1,12 +1,11 @@
 import PosterDownload from '../components/PosterDownload';
-import ChemistryPoster from '../components/ChemistryPoster';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { Sparkles } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { parseNameToElements, textColorFor } from '../utils/elements';
+import { parseNameToElements } from '../utils/elements';
 import { useAuthStore } from '../store/authStore';
 import UnmatchedLetters from '../components/UnmatchedLetters';
 import { countAnalysesThisMonth, planFeatures } from '../utils/plan';
@@ -136,33 +135,11 @@ export default function AnalyzeName() {
               </p>
             </div>
 
-            <ChemistryPoster people={[{ fullName: result.name, elements: result.elements }]} />
-            <PosterDownload person={{ fullName: result.name, elements: result.elements }} />
-            <div className="mb-8">
-              <div className="flex flex-wrap gap-6 justify-center p-6 bg-gray-50 rounded-xl">
-                {result.elements.map((el, idx) => (
-                  <div
-                    key={idx}
-                    className="element-card relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
-                    style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
-                  >
-                    <div className="text-base font-mono font-bold">
-                      {el.number}
-                    </div>
-                    <div className="text-7xl font-bold text-center leading-none">
-                      {el.symbol}
-                    </div>
-                    <div className="text-base text-center font-bold">
-                      {el.name}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <UnmatchedLetters name={result.name} className="mt-3" />
-            </div>
+            <PosterDownload person={{ fullName: result.name, elements: result.elements }} showPreparedPreview={false} />
 
             <div className="overflow-x-auto">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">Element Colors & Meanings</h2>
+              <UnmatchedLetters name={result.name} className="mb-4" />
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-brand-600 text-white">

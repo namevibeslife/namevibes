@@ -13,6 +13,8 @@ Updated: 13 November 2026 (Asia/Calcutta).
 
 ## Latest changes - 13 November 2026
 
+- /analyze results now render only the selectable Golden/Dark poster inside PosterDownload, followed by Element Colors & Meanings. Removed the preceding dark poster and separate duplicate element tiles. Unmatched-letter information remains in the meanings section. This route passes showPreparedPreview=false so Save & Share reveals controls without adding another image preview; other routes retain their existing preview behavior. Browser validation confirmed one poster before/after preparation, four meaning rows for Vibes, both theme options, successful PNG download, and no mobile overflow/runtime errors.
+
 - Homepage hero tagline readability: dark navy text on a solid warm-ivory panel with a gold border, 14px semibold sentence-case lettering and reduced tracking. This prevents the text blending into the golden molecular background.
 
 - Preserved Claude Code's new Logo component, transparent brand assets, homepage sign-in/sign-out controls, and revised hero copy. The existing uncommitted package-lock.json change is unrelated and must not be included in this feature commit.

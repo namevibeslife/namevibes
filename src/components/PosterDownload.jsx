@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { planFeatures } from '../utils/plan';
 import ChemistryPoster from './ChemistryPoster';
 
-export default function PosterDownload({ person, people, family = false }) {
+export default function PosterDownload({ person, people, family = false, showPreparedPreview = true }) {
   const profile = useAuthStore(state => state.profile);
   const features = planFeatures(profile);
   const [busy, setBusy] = useState(false);
@@ -75,7 +75,7 @@ export default function PosterDownload({ person, people, family = false }) {
     <p className="text-sm text-gray-600">{family ? 'One image with the whole family, shared elements and their meanings.' : 'Your name and element tiles, ready to save or share as an image.'}</p>
     {prepared && <div className="space-y-3" ref={readyPanel}>
       <p role="status" className="font-semibold text-brand-800">Your poster is ready. Save it or choose an app to share it.</p>
-      <img src={prepared.url} alt={family ? 'Full family poster with shared elements and meanings' : `Share poster for ${list[0].fullName}`} className="max-h-96 max-w-full mx-auto rounded-lg" />
+      {showPreparedPreview && <img src={prepared.url} alt={family ? 'Full family poster with shared elements and meanings' : `Share poster for ${list[0].fullName}`} className="max-h-96 max-w-full mx-auto rounded-lg" />}
       <div className="flex flex-wrap justify-center gap-3">
         <a href={prepared.url} download={prepared.file.name} className={buttonClass}><Download size={18} />Save Image</a>
         {canShare && <button onClick={share} disabled={busy} className={buttonClass}><Share2 size={18} />Share to Apps</button>}
