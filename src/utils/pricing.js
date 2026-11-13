@@ -13,8 +13,8 @@ const DEFAULT_DISCOUNTS = { individual: 10, family: 20 };
 export async function loadCountryPricing(countryCode) {
   const country = COUNTRIES[countryCode] || COUNTRIES.US;
   const fallback = {
-    currency: country.currency,
-    symbol: country.symbol,
+    currency: country.currency || 'USD',
+    symbol: country.symbol || '$',
     plans: {
       individual: { price: getPricing(countryCode, 'individual').price, discountPercent: DEFAULT_DISCOUNTS.individual },
       family: { price: getPricing(countryCode, 'family').price, discountPercent: DEFAULT_DISCOUNTS.family }
@@ -28,8 +28,8 @@ export async function loadCountryPricing(countryCode) {
 
     const valid = (n) => Number.isFinite(n) && n >= 0;
     return {
-      currency: settings.currency || fallback.currency,
-      symbol: settings.symbol || fallback.symbol,
+      currency: settings.currency || fallback.currency || 'USD',
+      symbol: settings.symbol || fallback.symbol || '$',
       plans: {
         individual: {
           price: valid(settings.individualPrice) && settings.individualPrice > 0 ? settings.individualPrice : fallback.plans.individual.price,

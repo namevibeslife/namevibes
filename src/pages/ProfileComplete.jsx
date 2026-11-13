@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { COUNTRIES } from '../data/countries';
+import { COUNTRIES, getActiveCountries } from '../data/countries';
+import { detectBrowserCountry } from '../utils/countryDetect';
 import { useAuthStore } from '../store/authStore';
 
 export default function ProfileComplete() {
@@ -26,9 +27,35 @@ export default function ProfileComplete() {
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [showStateDropdown, setShowStateDropdown] = useState(false);
 
+  // Countries admin has activated, and whether the current selection came from auto-detection
+  const [activeCountries, setActiveCountries] = useState([]);
+  const [autoDetected, setAutoDetected] = useState(false);
+
   useEffect(() => {
     checkExistingProfile();
+    loadActiveCountriesAndDetect();
   }, []);
+
+  const loadActiveCountriesAndDetect = async () => {
+    try {
+      const [settingsSnapshot, detectedCode] = await Promise.all([
+        getDocs(collection(db, 'countrySettings')),
+        detectBrowserCountry()
+      ]);
+
+      const active = getActiveCountries(settingsSnapshot.docs.map(d => d.data()));
+      setActiveCountries(active);
+
+      const match = detectedCode && active.find(c => c.code === detectedCode);
+      if (match) {
+        setFormData(prev => ({ ...prev, countryCode: match.code, countryName: match.name }));
+        setCountrySearch(match.name);
+        setAutoDetected(true);
+      }
+    } catch (error) {
+      console.error('Error loading country list:', error);
+    }
+  };
 
   const checkExistingProfile = async () => {
     try {
@@ -61,10 +88,12 @@ export default function ProfileComplete() {
     }
   };
 
-  // Filter countries based on search
+  // Filter countries based on search. Only countries an admin has activated are offered;
+  // if none are activated yet, fall back to the full list so sign-up never blocks on that.
   const getFilteredCountries = () => {
-    if (!countrySearch) return Object.values(COUNTRIES);
-    return Object.values(COUNTRIES).filter(country =>
+    const options = activeCountries.length > 0 ? activeCountries : Object.values(COUNTRIES);
+    if (!countrySearch) return options;
+    return options.filter(country =>
       country.name.toLowerCase().includes(countrySearch.toLowerCase())
     );
   };
@@ -92,6 +121,7 @@ export default function ProfileComplete() {
     setCountrySearch(country.name);
     setStateSearch('');
     setShowCountryDropdown(false);
+    setAutoDetected(false);
   };
 
   const handleStateSelect = (state) => {
@@ -251,6 +281,11 @@ export default function ProfileComplete() {
                     </div>
                   )}
                 </div>
+              )}
+              {autoDetected && (
+                <p className="text-xs text-brand-600 mt-1">
+                  Detected automatically based on your location — change it if this isn't right.
+                </p>
               )}
             </div>
 

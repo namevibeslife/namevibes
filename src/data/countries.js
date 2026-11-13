@@ -423,18 +423,39 @@ export const COUNTRIES = {
   }
 };
 
+// Countries an admin has activated under Admin -> Country Pricing, merged with their static
+// metadata (states, gateway). Only these are offered in the sign-up country picker. A country
+// missing a currency/symbol in its admin settings falls back to USD/$.
+export const getActiveCountries = (countrySettings = []) => {
+  const activeByCode = new Map(
+    countrySettings.filter(s => s.isActive).map(s => [s.countryCode, s])
+  );
+  return Object.values(COUNTRIES)
+    .filter(country => activeByCode.has(country.code))
+    .map(country => {
+      const settings = activeByCode.get(country.code);
+      return {
+        ...country,
+        currency: settings.currency || country.currency || 'USD',
+        symbol: settings.symbol || country.symbol || '$'
+      };
+    });
+};
+
 export const getPricing = (countryCode, planType) => {
   const country = COUNTRIES[countryCode] || COUNTRIES.US;
-  
+  const currency = country.currency || 'USD';
+  const symbol = country.symbol || '$';
+
   const prices = {
-    individual: country.currency === 'INR' ? 99 : 3,
-    family: country.currency === 'INR' ? 299 : 6
+    individual: currency === 'INR' ? 99 : 3,
+    family: currency === 'INR' ? 299 : 6
   };
-  
+
   return {
     price: prices[planType],
-    currency: country.currency,
-    symbol: country.symbol
+    currency,
+    symbol
   };
 };
 
