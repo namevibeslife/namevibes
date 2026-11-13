@@ -1,15 +1,14 @@
 import PosterDownload from '../components/PosterDownload';
-import ChemistryPoster from '../components/ChemistryPoster';
+import ElementMeanings from '../components/ElementMeanings';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { parseNameToElements, textColorFor } from '../utils/elements';
+import { parseNameToElements } from '../utils/elements';
 import { Plus, X } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
-import UnmatchedLetters from '../components/UnmatchedLetters';
 import { findCommonElements } from '../utils/familyReport';
 
 const RELATIONS = [
@@ -132,68 +131,8 @@ export default function FamilyPackage() {
               </p>
             </div>
 
-            <ChemistryPoster people={results} family />
             <PosterDownload people={results} family />
-            {displayedResults.map((person, idx) => (
-              <div key={idx} className="mb-12 pb-8 border-b-2 border-gray-100 last:border-0">
-                {results.length > 1 && (
-                  <div className="text-xs font-bold text-brand-600 uppercase tracking-wide mb-1">
-                    {person.relation}
-                  </div>
-                )}
-                <h3 className="text-3xl font-bold text-gray-800 mb-6">{person.fullName}</h3>
-
-                <div className="flex flex-wrap gap-6 justify-center p-6 bg-gray-50 rounded-xl mb-6">
-                  {person.elements.map((el, i) => (
-                    <div key={i} className="flex flex-col items-center">
-                      <div
-                        className="element-card relative border-4 border-gray-800 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
-                        style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
-                      >
-                        <div className="text-base font-mono font-bold">{el.number}</div>
-                        <div className="text-7xl font-bold text-center leading-none">{el.symbol}</div>
-                        <div className="text-base text-center font-bold">{el.name}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <UnmatchedLetters name={person.fullName} className="-mt-3 mb-6" />
-
-                <div className="overflow-x-auto">
-                  <h4 className="text-2xl font-bold text-gray-800 mb-4">Element Colors & Meanings</h4>
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="bg-brand-600 text-white">
-                        <th className="border border-gray-300 px-4 py-3 text-left">#</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Element</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Atomic Number</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Color</th>
-                        <th className="border border-gray-300 px-4 py-3 text-left">Life Meaning</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {person.elements.map((el, i) => (
-                        <tr key={i} className="hover:bg-gray-50">
-                          <td className="border border-gray-300 px-4 py-3 font-semibold">{i + 1}</td>
-                          <td className="border border-gray-300 px-4 py-3 font-semibold">{el.name}</td>
-                          <td className="border border-gray-300 px-4 py-3">{el.number}</td>
-                          <td className="border border-gray-300 px-4 py-3">
-                            <div className="flex items-center gap-3">
-                              <div
-                                className="w-12 h-12 rounded border-2 border-gray-400"
-                                style={{ backgroundColor: el.color }}
-                              />
-                              <span className="font-mono text-sm">{el.color}</span>
-                            </div>
-                          </td>
-                          <td className="border border-gray-300 px-4 py-3 text-gray-700">{el.meaning}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            ))}
+            <ElementMeanings people={displayedResults} />
 
             {results.length > showingCount && (
               <button
@@ -210,21 +149,6 @@ export default function FamilyPackage() {
                 <p className="text-gray-600 mb-6 text-center text-lg italic">
                   "Common Elements Across All Family Members"
                 </p>
-
-                <div className="flex flex-wrap gap-6 justify-center p-6 bg-brand-50 rounded-xl mb-6">
-                  {commonElements.map((el, i) => (
-                    <div key={i} className="flex flex-col items-center">
-                      <div
-                        className="element-card relative border-4 border-brand-600 rounded-lg p-4 w-40 h-40 flex flex-col justify-between"
-                        style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
-                      >
-                        <div className="text-base font-mono font-bold">{el.number}</div>
-                        <div className="text-7xl font-bold text-center leading-none">{el.symbol}</div>
-                        <div className="text-base text-center font-bold">{el.name}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
 
                 {harmonyStep === 'results' && (
                   <button

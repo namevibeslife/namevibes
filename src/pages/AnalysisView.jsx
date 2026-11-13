@@ -1,11 +1,11 @@
 import PosterDownload from '../components/PosterDownload';
-import ChemistryPoster from '../components/ChemistryPoster';
+import ElementMeanings from '../components/ElementMeanings';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { parseNameToElements, textColorFor } from '../utils/elements';
+import { parseNameToElements } from '../utils/elements';
 
 export default function AnalysisView() {
   const navigate = useNavigate();
@@ -73,41 +73,8 @@ export default function AnalysisView() {
             </p>
           </div>
 
-          <ChemistryPoster people={[{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }]} />
-            <PosterDownload person={{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }} />
-          {/* Element data isn't stored for individual analyses, so rebuild it from the name */}
-          <div className="flex flex-wrap gap-4 justify-center p-6 bg-gray-50 rounded-xl mb-6">
-            {parseNameToElements(analysis.fullName || '').map((el, i) => (
-              <div
-                key={i}
-                className="element-card border-4 border-gray-800 rounded-lg p-3 w-28 h-28 flex flex-col justify-between"
-                style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
-              >
-                <div className="text-sm font-mono font-bold">{el.number}</div>
-                <div className="text-4xl font-bold text-center leading-none">{el.symbol}</div>
-                <div className="text-xs text-center font-bold">{el.name}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="bg-brand-600 text-white">
-                  <th className="border border-gray-300 px-4 py-3 text-left">Element</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left">Life Meaning</th>
-                </tr>
-              </thead>
-              <tbody>
-                {parseNameToElements(analysis.fullName || '').map((el, i) => (
-                  <tr key={i}>
-                    <td className="border border-gray-300 px-4 py-3 font-semibold">{el.name} ({el.symbol})</td>
-                    <td className="border border-gray-300 px-4 py-3 text-gray-700">{el.meaning}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <PosterDownload person={{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }} />
+          <ElementMeanings people={[{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }]} />
 
           <div className="mt-8 text-center">
             <button

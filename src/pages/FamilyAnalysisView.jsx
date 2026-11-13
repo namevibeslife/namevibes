@@ -1,14 +1,13 @@
 import PosterDownload from '../components/PosterDownload';
-import ChemistryPoster from '../components/ChemistryPoster';
+import ElementMeanings from '../components/ElementMeanings';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { Users, Download } from 'lucide-react';
+import { Users } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import { findCommonElements } from '../utils/familyReport';
-import { textColorFor } from '../utils/elements';
 
 export default function FamilyAnalysisView() {
   const navigate = useNavigate();
@@ -90,65 +89,13 @@ export default function FamilyAnalysisView() {
             </p>
           </div>
 
-          <ChemistryPoster people={results} family />
-            <PosterDownload people={results} family />
-          {/* Family Members List */}
-          {analysis.members && analysis.members.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Family Members</h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {analysis.members.map((member, idx) => (
-                  <div key={idx} className="bg-gradient-to-r from-brand-50 to-ocean-50 rounded-xl p-6 border-2 border-brand-200">
-                    <p className="text-sm text-brand-600 font-semibold mb-1">{member.relation}</p>
-                    <p className="text-xl font-bold text-gray-800">{member.fullName}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Element Data Display */}
-          {analysis.elementData && analysis.elementData.length > 0 && (
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">Element Breakdown</h2>
-              {analysis.elementData.map((person, idx) => (
-                <div key={idx} className="mb-6 bg-gray-50 rounded-xl p-6">
-                  <h3 className="text-xl font-bold text-gray-800 mb-4">{person.fullName}</h3>
-                  <div className="flex flex-wrap gap-4">
-                    {person.elements && person.elements.map((el, elIdx) => (
-                      <div
-                        key={elIdx}
-                        className="element-card border-4 border-gray-800 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
-                        style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
-                      >
-                        <div className="text-sm font-mono font-bold">{el.number}</div>
-                        <div className="text-5xl font-bold text-center leading-none">{el.symbol}</div>
-                        <div className="text-sm text-center font-bold">{el.name}</div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <PosterDownload people={results} family />
+          <ElementMeanings people={results} />
 
           {commonElements.length > 0 && (
             <div className="mb-8 pt-8 border-t-2 border-brand-200">
               <h2 className="text-3xl font-bold text-brand-600 mb-2 text-center">The Harmony</h2>
               <p className="text-gray-600 mb-6 text-center italic">"Common Elements Across All Family Members"</p>
-              <div className="flex flex-wrap gap-4 justify-center p-6 bg-brand-50 rounded-xl mb-6">
-                {commonElements.map((el, idx) => (
-                  <div
-                    key={idx}
-                    className="element-card border-4 border-brand-600 rounded-lg p-4 w-32 h-32 flex flex-col justify-between"
-                    style={{ backgroundColor: el.color, color: textColorFor(el.color) }}
-                  >
-                    <div className="text-sm font-mono font-bold">{el.number}</div>
-                    <div className="text-5xl font-bold text-center leading-none">{el.symbol}</div>
-                    <div className="text-sm text-center font-bold">{el.name}</div>
-                  </div>
-                ))}
-              </div>
               <div className="bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-6 border-2 border-brand-300">
                 <AskAIPanel results={results} />
               </div>

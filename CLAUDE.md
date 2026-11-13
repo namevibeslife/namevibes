@@ -1,6 +1,6 @@
 # NameVibes project handoff
 
-Updated: 13 November 2026 (Asia/Calcutta).
+Updated: 14 November 2026 (Asia/Calcutta).
 
 ## Green logo rollout - 13 November 2026
 
@@ -11,7 +11,15 @@ Updated: 13 November 2026 (Asia/Calcutta).
 - Committed as `6d5b697` ("Roll out the approved green NameVibes logo across icons, manifest and posters") and pushed straight to `main` on https://github.com/namevibeslife/namevibes (no rebase was needed; origin/main had not moved since the prior session). `package-lock.json`, `artifacts/`, `docs/` and `public/icons/` were excluded from this commit as instructed.
 - Live verification at https://namevibes.life after deployment: HTTP 200 and byte-identical content for `/brand/logo-green.png`, `/brand/og-image-green.png`, `/brand/icon-green-192.png` and `/manifest.webmanifest`; `sw.js` serves `VERSION = 'v3'`; homepage `<head>` now points at `icon-green-192.png`, `favicon-green-32.png`, `apple-touch-icon-green.png` and `og-image-green.png?v=3` for both `og:image` and `twitter:image`; a headless-Chromium load of the live homepage showed the correctly proportioned logo (800x272 natural, no stretching) and no console/page errors. GitHub's commit-status API only reported two unrelated Vercel project deployments (no Cloudflare check posted there), so Cloudflare Pages deployment was confirmed directly against the live site instead.
 
-## Latest changes - 13 November 2026
+## Latest changes - 14 November 2026
+
+- Unified fresh family, saved family and saved single results with /analyze: one selectable Golden/Dark poster, save/share controls, then Element Colors & Meanings.
+- Removed duplicate posters, standalone element-tile grids, redundant saved-family member cards and extra harmony tiles. Shared elements and significance remain inside the family poster; the optional harmony interpretation flow remains below the meaning tables.
+- Added src/components/ElementMeanings.jsx to share the member-by-member meaning tables, atomic numbers, colour swatches and unmatched-letter notices across result pages. Family detail pagination is retained.
+- PosterDownload defaults to no second prepared-image preview. Saved results remain viewable and theme-selectable without an active plan, but export controls retain their active-plan/PDF restrictions.
+- Build passed. Mobile browser checks verified exactly one poster and zero duplicate element-card grids on fresh/saved family and saved single routes; family exports still use NameVibes_Family_Poster.png and include shared meanings; no extra preview after preparation; no mobile overflow or runtime errors. Individual PDF restriction remains intact.
+
+## Previous changes - 13 November 2026
 
 - /analyze results now render only the selectable Golden/Dark poster inside PosterDownload, followed by Element Colors & Meanings. Removed the preceding dark poster and separate duplicate element tiles. Unmatched-letter information remains in the meanings section. This route passes showPreparedPreview=false so Save & Share reveals controls without adding another image preview; other routes retain their existing preview behavior. Browser validation confirmed one poster before/after preparation, four meaning rows for Vibes, both theme options, successful PNG download, and no mobile overflow/runtime errors.
 

@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { planFeatures } from '../utils/plan';
 import ChemistryPoster from './ChemistryPoster';
 
-export default function PosterDownload({ person, people, family = false, showPreparedPreview = true }) {
+export default function PosterDownload({ person, people, family = false, showPreparedPreview = false }) {
   const profile = useAuthStore(state => state.profile);
   const features = planFeatures(profile);
   const [busy, setBusy] = useState(false);
@@ -21,7 +21,6 @@ export default function PosterDownload({ person, people, family = false, showPre
   }, [identity, theme]);
   useEffect(() => () => { if (prepared) URL.revokeObjectURL(prepared.url); }, [prepared]);
   useEffect(() => { if (prepared) readyPanel.current?.scrollIntoView({ behavior: 'auto', block: 'nearest' }); }, [prepared]);
-  if (!features) return null;
   async function download() {
     setBusy(true); setMessage('');
     try {
@@ -68,12 +67,12 @@ export default function PosterDownload({ person, people, family = false, showPre
     <div className="max-w-4xl mx-auto" aria-live="polite">
       <ChemistryPoster people={list} family={family} theme={theme} minimal />
     </div>
-    <div className="flex flex-wrap justify-center gap-3">
+    {features && <div className="flex flex-wrap justify-center gap-3">
       <button onClick={prepare} disabled={busy} className={buttonClass}><Share2 size={18} />{busy ? 'Preparing...' : 'Save & Share Poster'}</button>
       {features.pdfDownload && <button onClick={download} disabled={busy} className={buttonClass}><Download size={18} />Download Poster PDF</button>}
-    </div>
+    </div>}
     <p className="text-sm text-gray-600">{family ? 'One image with the whole family, shared elements and their meanings.' : 'Your name and element tiles, ready to save or share as an image.'}</p>
-    {prepared && <div className="space-y-3" ref={readyPanel}>
+    {prepared && features && <div className="space-y-3" ref={readyPanel}>
       <p role="status" className="font-semibold text-brand-800">Your poster is ready. Save it or choose an app to share it.</p>
       {showPreparedPreview && <img src={prepared.url} alt={family ? 'Full family poster with shared elements and meanings' : `Share poster for ${list[0].fullName}`} className="max-h-96 max-w-full mx-auto rounded-lg" />}
       <div className="flex flex-wrap justify-center gap-3">
