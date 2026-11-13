@@ -29,7 +29,7 @@ Updated: 13 November 2026 (Asia/Calcutta).
 
 - React 18 + Vite + Tailwind application. Firebase provides authentication and Firestore.
 - Repository: https://github.com/namevibeslife/namevibes
-- Production: https://namevibes.life (Vercel).
+- Production: https://namevibes.life (Cloudflare Pages; older Vercel integrations also report deployment statuses).
 - Local checkout now has Git initialized, with `origin` pointing to the repository and local branch `main` based on remote `main`.
 - `npm run dev:mock` uses local test accounts/data without accessing the production database. `npm run dev` uses real Firebase. `npm run build` creates the production bundle in `dist/`.
 
@@ -71,7 +71,15 @@ The user requested a consistent theme across every page and generated posters, b
 - PDF validation: sample individual poster fits one page; sample two-person report uses two pages; long-name stress case uses six pages. Text bounding boxes stayed inside the pages.
 - Screenshots and sample PDFs are under `artifacts/` and are local verification artifacts, not deployment source.
 
-## Git and deployment status - live
+## Current deployment - 13 November 2026
+
+- Feature commit 72b53aa is pushed to GitHub main and successfully deployed by Cloudflare Pages (check conclusion: success).
+- Verified production HTTP 200, live Vibes name and four element meanings, absence of the old full-size image link, and no JavaScript runtime errors or horizontal overflow at 390px.
+- Integrated the six newer upstream commits through 259f505, preserving the user's payment-page and Cloudflare hosting changes.
+- Also checked saved-family no-overlap messaging, prepared-image reset after style changes, share cancellation retaining Save Image, and a 50-member family image export (1080 x 11170).
+- This documentation update records that verified release.
+
+## Earlier deployment history
 
 The user explicitly authorized pushing to GitHub and deploying the existing production site.
 
