@@ -16,7 +16,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
   const elements = person.elements || [];
-  const logo = await loadImage(theme === 'gold' ? '/brand/logo-hires.png' : '/brand/logo-dark-hires.png').catch(() => null);
+  const logo = await loadImage(theme === 'gold' ? '/brand/logo-green-hires.png' : '/brand/logo-green-dark-hires.png').catch(() => null);
   ctx.font = '64px Georgia';
   const lines = [];
   let line = '';
@@ -37,8 +37,8 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   ctx.strokeRect(32, 32, 1016, canvas.height - 64);
   if (logo) {
     // Transparent logo sits straight on the poster background
-    const logoWidth = 520;
-    ctx.drawImage(logo, (canvas.width - logoWidth) / 2, 50, logoWidth, Math.round(logo.height * logoWidth / logo.width));
+    const logoWidth = 440;
+    ctx.drawImage(logo, (canvas.width - logoWidth) / 2, 46, logoWidth, Math.round(logo.height * logoWidth / logo.width));
   } else {
     ctx.save(); ctx.translate(540, 104);
     for (const angle of [0, Math.PI / 3, -Math.PI / 3]) {

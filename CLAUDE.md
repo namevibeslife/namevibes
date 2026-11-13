@@ -2,6 +2,14 @@
 
 Updated: 13 November 2026 (Asia/Calcutta).
 
+## Green logo rollout - 13 November 2026
+
+- Approved master `public/brand/namevibes-green-transparent.png` (2149 x 732 RGBA, SHA-256 6bdd770a...ccad4) is untouched. Derivatives are proportional resizes only, new names so caches refresh: `logo-green.png` (800 x 272), `logo-green-hires.png` (1600 x 545), `logo-green-dark.png` / `logo-green-dark-hires.png` (same logo on a discreet ivory rounded backing for midnight surfaces), `icon-green-192/512.png` and `favicon-green-32.png` and `apple-touch-icon-green.png` (atom cropped from the original), `maskable-green-192/512.png` (atom at 56% on ivory, inside the safe zone), `og-image-green.png` (1200 x 630, logo on ivory with gold border).
+- Changed: `src/components/Logo.jsx` (new sources, intrinsic 800 x 272, dark 800 x 315), `src/utils/posterImage.js`, `familyPosterImage.js`, `posterReport.js` (new logo files; PDF logo now sized proportionally instead of a fixed 68 x 23 box), `index.html` (icons, og/twitter image `?v=3`), `public/manifest.webmanifest` (icons and shortcuts), `public/sw.js` (cache VERSION v3, new icon paths).
+- Old `public/brand/logo*.png`, `icon-*.png`, `og-image.png` and `public/icons/` are left in place but no longer referenced. Repo-wide search confirmed no other active code still references the old paths.
+- Validation completed: master hash and dimensions reverified bit-for-bit unchanged. `npm run build` passed cleanly. Headless Chromium (Playwright, mock mode) checked homepage, sign-in and dashboard at 1440px and 390px: no stretched logos, no horizontal overflow, no console/page errors. Generated individual (Golden/Dark) and full two-member family (Golden/Dark) posters as PNG and PDF: logo kept its proportions in every case, the dark variant's logo stayed readable on its ivory backing, and the PDF logo was centred, proportional and did not overlap text. Confirmed the Individual plan shows image sharing but no PDF button, the Family plan shows both, family exports included all members plus shared-element meanings, and `dist/manifest.webmanifest` plus every icon/og-image path resolved with the new `-green` filenames and service worker `VERSION = 'v3'`.
+- Commit hash, push confirmation, Cloudflare Pages deployment result and live namevibes.life checks are recorded in the dated entry below once pushed.
+
 ## Latest changes - 13 November 2026
 
 - Homepage hero tagline readability: dark navy text on a solid warm-ivory panel with a gold border, 14px semibold sentence-case lettering and reduced tracking. This prevents the text blending into the golden molecular background.

@@ -1,8 +1,10 @@
 import React from 'react';
 
-// The NameVibes wordmark. The PNGs have transparent backgrounds, so it sits directly on any surface.
-// Use variant="dark" on midnight surfaces: the same logo with a light "Name" for contrast.
+// The NameVibes glossy green/blue logo (approved master: /brand/namevibes-green-transparent.png).
+// Transparent PNG; sits directly on light surfaces. variant="dark" uses the same unchanged logo on a
+// discreet ivory backing so the blue "Name" stays readable on midnight surfaces.
 export default function Logo({ variant = 'light', className = '', ...rest }) {
-  const src = variant === 'dark' ? '/brand/logo-dark.png' : '/brand/logo.png';
-  return <img src={src} alt="NameVibes" width="800" height="270" draggable="false" className={className} {...rest} />;
+  const dark = variant === 'dark';
+  const src = dark ? '/brand/logo-green-dark.png' : '/brand/logo-green.png';
+  return <img src={src} alt="NameVibes" width="800" height={dark ? 315 : 272} draggable="false" className={className} {...rest} />;
 }

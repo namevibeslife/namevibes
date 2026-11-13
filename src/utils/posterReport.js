@@ -5,7 +5,7 @@ import { findSharedElements } from './commonElements';
 
 // Loads the transparent logo as a data URL so it can be placed in the PDF
 export async function loadPosterLogo(theme) {
-  const response = await fetch(theme === 'gold' ? '/brand/logo-hires.png' : '/brand/logo-dark-hires.png');
+  const response = await fetch(theme === 'gold' ? '/brand/logo-green-hires.png' : '/brand/logo-green-dark-hires.png');
   if (!response.ok) throw new Error('Logo unavailable');
   const blob = await response.blob();
   return new Promise((resolve, reject) => {
@@ -41,7 +41,9 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     pdf.setTextColor(gold);
     if (logo) {
       // Transparent logo: no box, sits directly on the page colour
-      pdf.addImage(logo, 'PNG', 71, 11, 68, 23, 'nv-logo', 'FAST');
+      const logoW = theme === 'gold' ? 64 : 56;
+      const logoH = theme === 'gold' ? logoW * 732 / 2149 : logoW * 315 / 800; // keep the master's proportions
+      pdf.addImage(logo, 'PNG', (210 - logoW) / 2, 11, logoW, logoH, 'nv-logo', 'FAST');
     } else {
       pdf.ellipse(105, 21, 8, 3);
       pdf.ellipse(105, 21, 3, 8);
