@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Copy, Check, Share2, Mail } from 'lucide-react';
 import { buildShareLink, buildShareMessage, buildTelegramMessage } from '../utils/referralCode';
 
@@ -30,8 +30,31 @@ const XIcon = (props) => (
     <path d="M18.24 3H21l-6.3 7.2L22 21h-6.2l-4.85-6.35L5.35 21H2.58l6.75-7.7L2 3h6.35l4.38 5.8L18.24 3Zm-1.08 16.17h1.52L7.9 4.73H6.27l10.89 14.44Z"/>
   </svg>
 );
+const LinkedInIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" aria-hidden="true" {...props}>
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+);
+const MessengerIcon = (props) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" fillRule="evenodd" aria-hidden="true" {...props}>
+    <path d="M.001 11.639C.001 4.949 5.241 0 12.001 0S24 4.95 24 11.639c0 6.689-5.24 11.638-12 11.638-1.21 0-2.38-.16-3.47-.46a.96.96 0 00-.64.05l-2.39 1.05a.96.96 0 01-1.35-.85l-.07-2.14a.97.97 0 00-.32-.68A11.39 11.39 0 01.002 11.64zm8.32-2.19l-3.52 5.6c-.35.53.32 1.139.82.75l3.79-2.87c.26-.2.6-.2.87 0l2.8 2.1c.84.63 2.04.4 2.6-.48l3.52-5.6c.35-.53-.32-1.13-.82-.75l-3.79 2.87c-.25.2-.6.2-.86 0l-2.8-2.1a1.8 1.8 0 00-2.61.48z"/>
+  </svg>
+);
 
-const TAP = 'min-w-[44px] min-h-[44px] w-full flex flex-col items-center justify-center gap-1.5 rounded-xl border border-brand-200/70 bg-paper hover:bg-brand-50 transition px-2 py-3';
+const TAP = 'min-w-[44px] min-h-[44px] w-full flex flex-col items-center justify-center gap-1.5 rounded-xl border border-brand-200/70 bg-paper hover:bg-brand-50 transition px-2 py-3 text-center leading-tight';
+
+const EMAIL_SUBJECT = 'Discover the hidden elements in your name';
+
+// Native share sheets only list a useful set of apps on phones and tablets; on desktop the OS
+// list is tiny (Windows especially), so desktop relies on the explicit buttons instead. Mobile =
+// touch + a mobile UA (iPadOS reports a Mac UA but still has multi-touch).
+function isMobileDevice() {
+  if (typeof navigator === 'undefined') return false;
+  const hasTouch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
+  const mobileUA = /Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(navigator.userAgent || '');
+  const iPadOS = navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1;
+  return hasTouch && (mobileUA || iPadOS);
+}
 
 function copyToClipboard(text) {
   if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
@@ -51,10 +74,13 @@ export default function ReferralShareCard({ code }) {
   const [copied, setCopied] = useState(false);
   const [messageCopied, setMessageCopied] = useState(false);
 
+  // The timer lives in a ref: showToast is recreated every render, so a property on it would never
+  // cancel the previous toast's timer and an older timer would wipe out a newer toast early.
+  const toastTimer = useRef(null);
   const showToast = (text) => {
     setToast(text);
-    window.clearTimeout(showToast._t);
-    showToast._t = window.setTimeout(() => setToast(''), 2600);
+    window.clearTimeout(toastTimer.current);
+    toastTimer.current = window.setTimeout(() => setToast(''), 2600);
   };
 
   if (!code) return null;
@@ -76,7 +102,18 @@ export default function ReferralShareCard({ code }) {
     window.setTimeout(() => setMessageCopied(false), 1800);
   };
 
-  const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
+  const isMobile = isMobileDevice();
+  // Only on phones/tablets - see isMobileDevice. Desktop uses the explicit buttons below.
+  const canNativeShare = isMobile && typeof navigator !== 'undefined' && !!navigator.share;
+
+  // Starts the clipboard copy and opens the destination in the same click, so both stay inside
+  // the user gesture (opening a new tab first would steal focus and make the copy fail). The
+  // copy is the fallback if the tab is blocked or the site ignores prefilled text.
+  const copyAndOpen = (url, toastText) => {
+    const copying = copyToClipboard(message).catch(() => {});
+    window.open(url, '_blank', 'noopener,noreferrer');
+    copying.then(() => showToast(toastText));
+  };
 
   const handleNativeShare = async () => {
     try {
@@ -92,9 +129,35 @@ export default function ReferralShareCard({ code }) {
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   };
 
-  const openEmail = () => {
-    const subject = encodeURIComponent('Discover the hidden elements in your name');
-    window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(message)}`;
+  // mailto: does nothing on desktop browsers with no default mail app, so desktop opens Gmail's
+  // web compose in a new tab by default; phones keep mailto: (opens the phone's mail app).
+  // Outlook and the default mail app are offered as alternatives under the buttons.
+  const openEmail = (provider = isMobile ? 'mailto' : 'gmail') => {
+    const subject = encodeURIComponent(EMAIL_SUBJECT);
+    const body = encodeURIComponent(message);
+    if (provider === 'mailto') {
+      const copying = copyToClipboard(message).catch(() => {});
+      window.location.href = `mailto:?subject=${subject}&body=${body}`;
+      copying.then(() => showToast('Message copied'));
+      return;
+    }
+    const url = provider === 'outlook'
+      ? `https://outlook.live.com/mail/0/deeplink/compose?subject=${subject}&body=${body}`
+      : `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
+    copyAndOpen(url, 'Message copied');
+  };
+
+  const openMessenger = () => {
+    // No reliable Messenger share URL - copy the message and open Messenger to paste it.
+    copyAndOpen('https://www.messenger.com/', 'Message copied. Paste it in Messenger.');
+  };
+
+  const openLinkedIn = () => {
+    // LinkedIn's share dialog only takes the link, so the message is copied to paste into the post.
+    copyAndOpen(
+      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`,
+      'Message copied. Paste it into your LinkedIn post.'
+    );
   };
 
   const openFacebook = async () => {
@@ -141,9 +204,9 @@ export default function ReferralShareCard({ code }) {
         </div>
         <p className="text-brand-100 text-sm mb-6">Share this code with your network to earn commissions!</p>
 
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 max-w-xl">
+        <div className="grid grid-cols-3 gap-3 max-w-xl">
           {canNativeShare && (
-            <button type="button" onClick={handleNativeShare} className={`${TAP} bg-white text-brand-700 border-transparent hover:bg-brand-50 col-span-3 sm:col-span-4`} aria-label="Share">
+            <button type="button" onClick={handleNativeShare} className={`${TAP} bg-white text-brand-700 border-transparent hover:bg-brand-50 col-span-3`} aria-label="Share">
               <Share2 size={20} />
               <span className="text-xs font-semibold">Share</span>
             </button>
@@ -152,7 +215,7 @@ export default function ReferralShareCard({ code }) {
             <WhatsAppIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">WhatsApp</span>
           </button>
-          <button type="button" onClick={openEmail} className={`${TAP} bg-white/95 text-brand-600`} aria-label="Share by email">
+          <button type="button" onClick={() => openEmail()} className={`${TAP} bg-white/95 text-brand-600`} aria-label="Share by email">
             <Mail size={22} />
             <span className="text-xs font-semibold text-gray-700">Email</span>
           </button>
@@ -171,6 +234,37 @@ export default function ReferralShareCard({ code }) {
           <button type="button" onClick={openX} className={`${TAP} bg-white/95 text-gray-900`} aria-label="Share on X">
             <XIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">X</span>
+          </button>
+          <button type="button" onClick={openLinkedIn} className={`${TAP} bg-white/95 text-[#0A66C2]`} aria-label="Share on LinkedIn">
+            <LinkedInIcon className="w-6 h-6" />
+            <span className="text-xs font-semibold text-gray-700">LinkedIn</span>
+          </button>
+          <button type="button" onClick={openMessenger} className={`${TAP} bg-white/95 text-[#0084FF]`} aria-label="Share on Messenger">
+            <MessengerIcon className="w-6 h-6" />
+            <span className="text-xs font-semibold text-gray-700">Messenger</span>
+          </button>
+          <button type="button" onClick={handleCopyMessage} className={`${TAP} bg-white/95 text-brand-600`} aria-label="Copy message to clipboard">
+            {messageCopied ? <Check size={22} /> : <Copy size={22} />}
+            <span className="text-xs font-semibold text-gray-700">{messageCopied ? 'Copied' : 'Copy message'}</span>
+          </button>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center text-xs text-brand-100">
+          <span>Email with:</span>
+          <button
+            type="button"
+            onClick={() => openEmail('outlook')}
+            className="min-h-[44px] px-2 underline underline-offset-2 hover:text-white"
+          >
+            Outlook
+          </button>
+          <span aria-hidden="true">&middot;</span>
+          <button
+            type="button"
+            onClick={() => openEmail('mailto')}
+            className="min-h-[44px] px-2 underline underline-offset-2 hover:text-white"
+          >
+            Default mail app
           </button>
         </div>
 

@@ -194,7 +194,7 @@ export default function Dashboard() {
             {/* Zodiac Name Guide */}
             <div
               onClick={() => navigate('/zodiac-syllables')}
-              className="bg-transparent rounded-2xl p-8 shadow-none transition cursor-pointer border border-brand-200/50 hover:border-brand-500"
+              className="bg-transparent rounded-2xl p-8 transition cursor-pointer kb-card"
             >
               <div className="text-5xl mb-4 text-center">♈</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
@@ -213,7 +213,7 @@ export default function Dashboard() {
             {/* Numerology Calculator */}
             <div
               onClick={() => navigate('/numerology-calculator')}
-              className="bg-transparent rounded-2xl p-8 shadow-none transition cursor-pointer border border-brand-200/50 hover:border-brand-500"
+              className="bg-transparent rounded-2xl p-8 transition cursor-pointer kb-card"
             >
               <div className="text-5xl mb-4 text-center">🔢</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
@@ -232,7 +232,7 @@ export default function Dashboard() {
             {/* Element Insights - NEW */}
             <div
               onClick={() => navigate('/element-insights')}
-              className="bg-transparent rounded-2xl p-8 shadow-none transition cursor-pointer border border-brand-200/50 hover:border-brand-500"
+              className="bg-transparent rounded-2xl p-8 transition cursor-pointer kb-card"
             >
               <div className="text-5xl mb-4 text-center">⚛️</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
@@ -251,7 +251,7 @@ export default function Dashboard() {
             {/* Hora & Muhurat */}
             <div
               onClick={() => navigate('/hora-muhurat')}
-              className="bg-transparent rounded-2xl p-8 shadow-none transition cursor-pointer border border-brand-200/50 hover:border-brand-500"
+              className="bg-transparent rounded-2xl p-8 transition cursor-pointer kb-card"
             >
               <div className="text-5xl mb-4 text-center">🕉️</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">

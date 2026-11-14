@@ -232,7 +232,7 @@ export default function HoraMuhurat() {
 
             {viewingToday && curHora >= 0 && (
               <Card className="text-center">
-                <p className="text-xs uppercase tracking-widest text-gray-600">Current hora</p>
+                <p className="hora-label text-sm md:text-base uppercase tracking-widest font-semibold">Current hora</p>
                 <p className="text-3xl font-bold font-serif" style={{ color: GREEN }}>
                   {data.horas[curHora].lord}
                 </p>

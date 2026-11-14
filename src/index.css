@@ -97,6 +97,18 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
   50% { transform: translateY(3px); box-shadow: 0 0 16px 4px #2f9e44cc, 0 0 28px 8px #10571760; }
 }
 .expand-arrow { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; color: #105717; background: #fffdf7; border: 2px solid #105717; animation: arrow-glow 2.4s ease-in-out infinite; }
+/* Dashboard Knowledge Base cards: slow glowing outline in the logo green */
+@keyframes kb-glow {
+  0%,100% { border-color:#105717; box-shadow:0 0 6px 1px #10571760, inset 0 0 6px 0 #10571722; }
+  50% { border-color:#2f9e44; box-shadow:0 0 22px 5px #2f9e44aa, 0 0 42px 9px #10571750, inset 0 0 14px 2px #2f9e4440; }
+}
+.kb-card { border-width:2px; border-style:solid; border-color:#105717; box-shadow:0 0 6px 1px #10571740; animation: kb-glow 4s ease-in-out infinite; }
+/* Hora page "Current hora" label: same green, gently pulsing text glow, same 4s timing */
+@keyframes hora-glow {
+  0%,100% { text-shadow: 0 0 4px #2f9e4455, 0 0 10px #10571733; }
+  50% { text-shadow: 0 0 8px #2f9e4499, 0 0 16px #10571755; }
+}
+.hora-label { color:#105717; text-shadow: 0 0 8px #2f9e4499, 0 0 16px #10571755; animation: hora-glow 4s ease-in-out infinite; }
 .landing-hero { max-width: 1050px; margin: auto; }
 .landing-hero .hero-kicker {
   display: inline-block;
@@ -124,4 +136,6 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+  /* Static soft green border / glow instead of the pulse */
+  .kb-card, .hora-label { animation: none !important; }
 }
