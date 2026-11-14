@@ -14,6 +14,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AnalyzeName = lazy(() => import('./pages/AnalyzeName'));
 const ZodiacSyllableTable = lazy(() => import('./pages/ZodiacSyllableTable'));
 const NumerologyCalculator = lazy(() => import('./pages/NumerologyCalculator'));
+const HoraMuhurat = lazy(() => import('./pages/HoraMuhurat'));
 const FamilyPackage = lazy(() => import('./pages/FamilyPackage'));
 const AnalysisView = lazy(() => import('./pages/AnalysisView'));
 const FamilyAnalysisView = lazy(() => import('./pages/FamilyAnalysisView'));
@@ -92,6 +93,7 @@ function App() {
           <Route path="/analysis/:analysisId" element={<ProtectedRoute requiresProfile><AnalysisView /></ProtectedRoute>} />
           <Route path="/family-analysis/:analysisId" element={<ProtectedRoute requiresProfile><FamilyAnalysisView /></ProtectedRoute>} />
           <Route path="/zodiac-syllables" element={<ProtectedRoute requiresPlan><ZodiacSyllableTable /></ProtectedRoute>} />
+          <Route path="/hora-muhurat" element={<ProtectedRoute requiresPlan><HoraMuhurat /></ProtectedRoute>} />
           <Route path="/numerology-calculator" element={<ProtectedRoute requiresPlan><NumerologyCalculator /></ProtectedRoute>} />
           <Route path="/element-insights" element={<ProtectedRoute requiresPlan><ElementInsightsPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />

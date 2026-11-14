@@ -190,7 +190,7 @@ export default function Dashboard() {
         {/* Knowledge Base Cards */}
         <div className="mb-8">
           <h3 className="text-2xl font-bold text-gray-800 mb-4">Knowledge Base</h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
             {/* Zodiac Name Guide */}
             <div
               onClick={() => navigate('/zodiac-syllables')}
@@ -244,6 +244,25 @@ export default function Dashboard() {
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
                   Explore Your Connections <ArrowRight size={18} />
+                </span>
+              </div>
+            </div>
+
+            {/* Hora & Muhurat */}
+            <div
+              onClick={() => navigate('/hora-muhurat')}
+              className="bg-transparent rounded-2xl p-8 shadow-none transition cursor-pointer border border-brand-200/50 hover:border-brand-500"
+            >
+              <div className="text-5xl mb-4 text-center">🕉️</div>
+              <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
+                Today's Hora &amp; Muhurat
+              </h3>
+              <p className="text-gray-600 text-center mb-4">
+                See the planetary hora for every hour of the day, plus auspicious and avoid timings for your city.
+              </p>
+              <div className="flex justify-center">
+                <span className="text-brand-600 font-semibold flex items-center gap-2">
+                  View Today's Timings <ArrowRight size={18} />
                 </span>
               </div>
             </div>
