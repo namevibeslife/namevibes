@@ -86,6 +86,12 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .poster-meanings strong { display: block; color: var(--poster-gold); margin-bottom: 4px; }
 .poster-footer p { font-family: Georgia, serif; font-size: 25px; font-style: italic; color: var(--poster-gold); }
 .poster-footer small { display: block; font-size: 9px; letter-spacing: .14em; margin-top: 12px; }
+/* Slowly glowing gold outline (zodiac guide cards) */
+@keyframes gold-glow {
+  0%, 100% { border-color: #e8d3a080; box-shadow: 0 0 2px 0 #c49a4230, inset 0 0 2px 0 #c49a4220; }
+  50% { border-color: #c49a42; box-shadow: 0 0 14px 2px #d8b96e90, inset 0 0 8px 0 #d8b96e40; }
+}
+.glow-outline { animation: gold-glow 5s ease-in-out infinite; }
 .landing-hero { max-width: 1050px; margin: auto; }
 .landing-hero .hero-kicker {
   display: inline-block;
