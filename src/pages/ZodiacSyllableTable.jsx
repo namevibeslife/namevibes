@@ -3,6 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
 import { ChevronDown } from 'lucide-react';
 
+const INTRO = {
+  western: {
+    heading: "Discover a Name That Resonates with Your Zodiac Sign",
+    paragraphs: [
+      "In Western astrology, every zodiac sign is traditionally associated with distinct qualities, energies and personality traits.",
+      "Whether you're naming a newborn, starting a business or beginning something new, explore names and starting syllables traditionally associated with your zodiac sign.",
+      "According to astrological beliefs, choosing a name aligned with these qualities is thought to create a symbolic harmony between the name, the individual's identity and the universal energies represented by the zodiac."
+    ]
+  },
+  vedic: {
+    heading: "Discover a Name That Resonates with Your Birth Star",
+    paragraphs: [
+      "In Vedic astrology, the moment of birth determines a child's Nakshatra (birth star) and Pada (quarter). Each of the 27 Nakshatras is traditionally associated with specific sounds and syllables believed to carry distinct cosmic vibrations.",
+      "For generations, families have used these auspicious syllables when naming newborns, believing that a name beginning with the recommended sound creates harmony with the cosmic energies associated with the child's birth star.",
+      "This traditional practice can also inspire the naming of businesses, ventures and new beginnings, with the belief that a thoughtfully chosen name symbolises harmony, positivity and auspicious beginnings."
+    ]
+  }
+};
+
 export default function ZodiacSyllableTable() {
   const navigate = useNavigate();
   const [selectedSign, setSelectedSign] = useState(null);
@@ -356,11 +375,14 @@ export default function ZodiacSyllableTable() {
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
             {system === 'western' ? '🌟 Western Zodiac' : '🕉️ Vedic Astrology'}
           </h2>
-          <p className="text-gray-600 text-sm">
-            {system === 'western' 
-              ? 'Based on Western/Tropical astrology system'
-              : 'Based on Vedic/Hindu Nakshatra system'}
-          </p>
+          <div className="max-w-3xl mx-auto mt-4">
+            <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-3">{INTRO[system].heading}</h3>
+            <div className="space-y-3">
+              {INTRO[system].paragraphs.map((text, i) => (
+                <p key={i} className="text-gray-700 text-sm md:text-base leading-relaxed text-left md:text-center">{text}</p>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Mobile-Optimized Cards */}
