@@ -201,11 +201,11 @@ export default function Dashboard() {
                 Zodiac Name Guide
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                Choose auspicious syllables for names based on zodiac signs
+                Discover which starting letters and sounds are traditionally considered lucky for your name, based on your zodiac sign and birth details.
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  View Guide <ArrowRight size={18} />
+                  Explore Name Guide <ArrowRight size={18} />
                 </span>
               </div>
             </div>
@@ -220,11 +220,11 @@ export default function Dashboard() {
                 Numerology Calculator
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                Calculate life path, destiny, and soul numbers
+                Discover what the numbers in your name and date of birth traditionally reveal about your personality, natural strengths, and life journey.
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  Calculate Now <ArrowRight size={18} />
+                  Discover Your Numbers <ArrowRight size={18} />
                 </span>
               </div>
             </div>
@@ -239,11 +239,11 @@ export default function Dashboard() {
                 Element & Nakshatra Guide
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                Unlock cosmic secrets of periodic elements and Vedic Nakshatras
+                Explore the chemical elements hidden in the letters of your name and discover how your birth star connects with traditional Vedic beliefs.
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  Explore Insights <ArrowRight size={18} />
+                  Explore Your Connections <ArrowRight size={18} />
                 </span>
               </div>
             </div>
