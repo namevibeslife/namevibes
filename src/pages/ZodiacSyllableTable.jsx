@@ -368,7 +368,7 @@ export default function ZodiacSyllableTable() {
           {currentData.map((zodiac) => (
             <div
               key={zodiac.sign}
-              className="bg-transparent rounded-xl shadow-none border border-brand-200/50 overflow-hidden"
+              className="bg-transparent rounded-xl shadow-none border border-brand-200/50 overflow-hidden glow-outline"
             >
               {/* Card Header - Always Visible */}
               <div
@@ -444,7 +444,7 @@ export default function ZodiacSyllableTable() {
         </div>
 
         {/* How to Use Guide */}
-        <div className="mt-6 bg-transparent rounded-xl shadow-none p-5 border border-brand-200/50">
+        <div className="mt-6 bg-transparent rounded-xl shadow-none p-5 border border-brand-200/50 glow-outline">
           <h4 className="text-lg font-bold text-brand-800 mb-3">💡 How to Use</h4>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex gap-2">
