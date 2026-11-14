@@ -468,7 +468,3 @@ export const getAmbassadorCommission = (price, planType) => {
   const rate = planType === 'individual' ? 0.15 : 0.25;
   return price * rate;
 };
-
-export const generateReferralCode = (countryCode, stateCode, number) => {
-  return `${countryCode} ${stateCode} ${number.toString().padStart(5, '0')}`;
-};

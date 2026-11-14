@@ -239,3 +239,25 @@ export async function deleteDoc(ref) {
   delete store[ref.path];
   persist();
 }
+
+// Single-client mock: no real optimistic concurrency, just runs the callback against the
+// store with get/set/update/delete, then persists. Good enough for local testing.
+export async function runTransaction(firestore, updateFunction) {
+  await delay();
+  const tx = {
+    get: async (ref) => makeDocSnapshot(ref.path),
+    set: (ref, data) => { store[ref.path] = encode(data); },
+    update: (ref, data) => {
+      if (store[ref.path] === undefined) {
+        const error = new Error(`No document to update: ${ref.path}`);
+        error.code = 'not-found';
+        throw error;
+      }
+      store[ref.path] = { ...store[ref.path], ...encode(data) };
+    },
+    delete: (ref) => { delete store[ref.path]; }
+  };
+  const result = await updateFunction(tx);
+  persist();
+  return result;
+}

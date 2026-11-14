@@ -59,6 +59,11 @@ export default function AdminDashboard(props) {
     handleReject,
     handleToggleActive,
     handleEditBankDetails,
+    migrationPreview,
+    migrationResults,
+    migrationRunning,
+    handleDryRunMigration,
+    handleRunMigration,
     payments,
     getFilteredPayments,
     paymentFilter,
@@ -679,6 +684,89 @@ export default function AdminDashboard(props) {
                 </button>
               </div>
 
+              {currentAdmin?.role === 'super' && (
+                <div className="bg-paper rounded-xl shadow-lg p-6 mb-6 border-2 border-brand-200">
+                  <h3 className="text-lg font-bold text-gray-800 mb-1">Referral Code Migration</h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    One-time move from the old "CC SS NNNNN" codes to random NV-XXXXXX codes. Dry run first -
+                    nothing is written until you run it for real.
+                  </p>
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <button
+                      onClick={handleDryRunMigration}
+                      className="px-4 py-2 bg-ocean-600 text-white rounded-lg hover:bg-ocean-700 text-sm font-semibold"
+                    >
+                      Dry Run
+                    </button>
+                    <button
+                      onClick={handleRunMigration}
+                      disabled={migrationRunning || !migrationPreview}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 text-sm font-semibold"
+                    >
+                      {migrationRunning ? 'Migrating...' : 'Run Migration For Real'}
+                    </button>
+                  </div>
+
+                  {migrationPreview && (
+                    <div className="overflow-x-auto">
+                      <p className="text-xs text-gray-500 mb-2">
+                        {migrationPreview.length === 0
+                          ? 'Nothing to migrate - every ambassador already has a current-format code.'
+                          : `Dry run preview - ${migrationPreview.length} ambassador(s) would change:`}
+                      </p>
+                      {migrationPreview.length > 0 && (
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left text-gray-500 border-b">
+                              <th className="py-1 pr-4">Ambassador</th>
+                              <th className="py-1 pr-4">Old code</th>
+                              <th className="py-1 pr-4">New code (preview)</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {migrationPreview.map(row => (
+                              <tr key={row.ambassadorId} className="border-b border-gray-100">
+                                <td className="py-1 pr-4">{row.ambassadorName} <span className="text-gray-400">({row.ambassadorEmail})</span></td>
+                                <td className="py-1 pr-4 font-mono">{row.oldCode}</td>
+                                <td className="py-1 pr-4 font-mono text-brand-600">{row.newCode}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  )}
+
+                  {migrationResults && (
+                    <div className="overflow-x-auto mt-4">
+                      <p className="text-xs text-gray-500 mb-2">Migration result:</p>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-left text-gray-500 border-b">
+                            <th className="py-1 pr-4">Ambassador</th>
+                            <th className="py-1 pr-4">Old code</th>
+                            <th className="py-1 pr-4">New code</th>
+                            <th className="py-1 pr-4">Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {migrationResults.map(row => (
+                            <tr key={row.ambassadorId} className="border-b border-gray-100">
+                              <td className="py-1 pr-4">{row.ambassadorEmail}</td>
+                              <td className="py-1 pr-4 font-mono">{row.oldCode}</td>
+                              <td className="py-1 pr-4 font-mono text-brand-600">{row.newCode || '-'}</td>
+                              <td className={`py-1 pr-4 font-semibold ${row.status === 'ok' ? 'text-green-600' : 'text-red-600'}`}>
+                                {row.status === 'ok' ? 'OK' : `Failed: ${row.error}`}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <FilterPanel
                 filterType="ambassadors"
                 filters={ambassadorFilters}
@@ -724,6 +812,9 @@ export default function AdminDashboard(props) {
                           {ambassador.referralCode && (
                             <p className="text-sm text-brand-600 font-mono font-bold mb-2">
                               Code: {ambassador.referralCode}
+                              {ambassador.legacyCode && (
+                                <span className="text-gray-400 font-normal ml-2">(was {ambassador.legacyCode})</span>
+                              )}
                             </p>
                           )}
                         </div>
@@ -1651,43 +1742,10 @@ export default function AdminDashboard(props) {
             <h3 className="text-2xl font-bold text-gray-800 mb-4">Approve Ambassador</h3>
             
             <div className="space-y-4 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Country Code</label>
-                <input
-                  type="text"
-                  value={approvalData.countryCode}
-                  disabled
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg bg-gray-100 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">State Code</label>
-                <input
-                  type="text"
-                  value={approvalData.stateCode}
-                  disabled
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg bg-gray-100 font-mono"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Referral Number (5 digits)</label>
-                <input
-                  type="text"
-                  value={approvalData.referralNumber}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 5);
-                    setApprovalData({...approvalData, referralNumber: value});
-                  }}
-                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg font-mono"
-                  placeholder="00001"
-                  maxLength={5}
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Full code: {approvalData.countryCode} {approvalData.stateCode} {approvalData.referralNumber.padStart(5, '0')}
-                </p>
-              </div>
+              <p className="text-sm text-gray-600 bg-brand-50 border border-brand-200 rounded-lg px-3 py-2">
+                A random, unique referral code (format <span className="font-mono">NV-XXXXXX</span>) will be generated
+                for this ambassador on approval.
+              </p>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Payout Frequency</label>
@@ -1712,7 +1770,7 @@ export default function AdminDashboard(props) {
               </button>
               <button
                 onClick={handleApprove}
-                disabled={loading || approvalData.referralNumber.length !== 5}
+                disabled={loading}
                 className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
               >
                 {loading ? 'Approving...' : 'Approve'}

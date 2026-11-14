@@ -10,9 +10,9 @@ import {
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { 
-  Users, 
-  DollarSign, 
+import {
+  Users,
+  DollarSign,
   Calendar,
   TrendingUp,
   LogOut,
@@ -20,6 +20,7 @@ import {
   Globe,
   MapPin
 } from 'lucide-react';
+import ReferralShareCard from '../components/ReferralShareCard';
 
 export default function AmbassadorDashboard() {
   const navigate = useNavigate();
@@ -289,12 +290,8 @@ export default function AmbassadorDashboard() {
 
       <div className="max-w-7xl mx-auto p-6">
         {/* Referral Code Card */}
-        <div className="bg-gradient-to-r from-brand-600 to-ocean-600 rounded-2xl shadow-lg p-8 mb-6 text-white">
-          <h2 className="text-2xl font-bold mb-2">Your Referral Code</h2>
-          <div className="text-5xl font-bold tracking-wider mb-4">
-            {ambassador?.referralCode || 'N/A'}
-          </div>
-          <p className="text-brand-100">Share this code with your network to earn commissions!</p>
+        <div className="mb-6">
+          <ReferralShareCard code={ambassador?.referralCode} />
         </div>
 
         {/* Filters */}

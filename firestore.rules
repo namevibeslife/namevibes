@@ -93,13 +93,25 @@ service cloud.firestore {
         && request.resource.data.isApproved == false
         && request.resource.data.isActive == false
         && !request.resource.data.keys().hasAny(['referralCode', 'approvedAt', 'approvedBy']);
-      allow update: if isAdmin();
+      // Once a code has gone through the referral-code migration (legacyCode is set), it's
+      // locked for good - no further referralCode change, by anyone, through the client SDK.
+      allow update: if isAdmin()
+        && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['referralCode'])
+            || resource.data.get('legacyCode', null) == null);
       allow delete: if isSuperAdmin();
     }
 
     match /referralCodes/{code} {
       allow get: if signedIn();
-      allow list, write: if isAdmin();
+      allow list: if isAdmin();
+      allow create: if isAdmin();
+      // A code's identity (ambassadorId/code) can never change once created; only active/
+      // updatedAt may be toggled (approve/deactivate an ambassador). Never deletable.
+      allow update: if isAdmin()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['active', 'updatedAt'])
+        && request.resource.data.get('ambassadorId', null) == resource.data.get('ambassadorId', null)
+        && request.resource.data.get('code', null) == resource.data.get('code', null);
+      allow delete: if false;
     }
 
     match /payoutRequests/{requestId} {

@@ -1,14 +1,21 @@
 import ChemistryPoster from '../components/ChemistryPoster';
 import { parseNameToElements } from '../utils/elements';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import Logo from '../components/Logo';
+import { captureReferralFromUrl } from '../utils/referralCode';
 
 export default function LandingPage() {
   const navigate = useNavigate();
   const { user, loading, logout } = useAuthStore();
+
+  // Capture ?ref=NV-XXXXXX from a shared link (30-day localStorage), so it's ready to
+  // prefill at sign-up even if the person browses a bit before creating an account.
+  useEffect(() => {
+    captureReferralFromUrl(window.location.search);
+  }, []);
 
   return (
     <div className="min-h-screen site-background">

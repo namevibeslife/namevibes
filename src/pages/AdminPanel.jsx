@@ -16,6 +16,7 @@ import {
 import { db, auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { COUNTRIES } from '../data/countries';
+import { reserveReferralCode, setReferralCodeActive, previewMigration, runMigration, ambassadorsNeedingMigration } from '../utils/referralCodeAdmin';
 import { 
   Users, 
   CreditCard, 
@@ -79,12 +80,7 @@ export default function AdminPanel() {
   const [selectedAmbassador, setSelectedAmbassador] = useState(null);
   const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [showBankModal, setShowBankModal] = useState(false);
-  const [approvalData, setApprovalData] = useState({
-    countryCode: '',
-    stateCode: '',
-    referralNumber: '',
-    payoutFrequency: 'monthly'
-  });
+  const [approvalData, setApprovalData] = useState({ payoutFrequency: 'monthly' });
   const [bankData, setBankData] = useState({});
 
   // User data
@@ -597,49 +593,25 @@ export default function AdminPanel() {
     }
   };
 
-  const generateNextReferralNumber = async (countryCode, stateCode) => {
-    const existing = ambassadors.filter(a => 
-      a.referralCode && a.referralCode.startsWith(`${countryCode} ${stateCode}`)
-    );
-    
-    const nextNumber = existing.length + 1;
-    return nextNumber.toString().padStart(5, '0');
-  };
-
-  const handleApproveClick = async (ambassador) => {
+  const handleApproveClick = (ambassador) => {
     setSelectedAmbassador(ambassador);
-    const nextNumber = await generateNextReferralNumber(
-      ambassador.countryCode,
-      ambassador.stateCode
-    );
-    
-    setApprovalData({
-      countryCode: ambassador.countryCode,
-      stateCode: ambassador.stateCode,
-      referralNumber: nextNumber,
-      payoutFrequency: 'monthly'
-    });
+    setApprovalData({ payoutFrequency: 'monthly' });
     setShowApprovalModal(true);
   };
 
-  // referralCodes/{code without spaces} is what the profile form checks a code against,
-  // and what links referred users to their ambassador
+  // referralCodes/{code} is what the profile form checks a code against, and what links
+  // referred users to their ambassador. syncReferralCode only ever toggles active/updatedAt -
+  // a code's identity is set once, atomically, by reserveReferralCode.
   const syncReferralCode = async (ambassador, active) => {
     if (!ambassador.referralCode) return;
-    await setDoc(doc(db, 'referralCodes', ambassador.referralCode.replace(/\s/g, '')), {
-      code: ambassador.referralCode,
-      ambassadorId: ambassador.id,
-      ambassadorEmail: ambassador.email.toLowerCase(),
-      active,
-      updatedAt: Timestamp.now()
-    });
+    await setReferralCodeActive(ambassador.referralCode, active);
   };
 
   const handleApprove = async () => {
     try {
       setLoading(true);
 
-      const referralCode = `${approvalData.countryCode} ${approvalData.stateCode} ${approvalData.referralNumber}`;
+      const referralCode = await reserveReferralCode(selectedAmbassador.id, selectedAmbassador.email);
 
       const ambassadorRef = doc(db, 'ambassadors', selectedAmbassador.id);
       await updateDoc(ambassadorRef, {
@@ -652,9 +624,8 @@ export default function AdminPanel() {
         commissionRateIndividual: 15,
         commissionRateFamily: 25
       });
-      await syncReferralCode({ ...selectedAmbassador, referralCode }, true);
 
-      alert('Ambassador approved successfully!');
+      alert(`Ambassador approved successfully! Referral code: ${referralCode}`);
       setShowApprovalModal(false);
       loadAmbassadors();
       loadDashboardStats();
@@ -663,6 +634,51 @@ export default function AdminPanel() {
       alert('Error approving ambassador: ' + error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // ---- one-time legacy referral code migration (super-admin only) ----
+  const [migrationPreview, setMigrationPreview] = useState(null);
+  const [migrationResults, setMigrationResults] = useState(null);
+  const [migrationRunning, setMigrationRunning] = useState(false);
+
+  const handleDryRunMigration = () => {
+    const preview = previewMigration(ambassadors);
+    setMigrationPreview(preview);
+    setMigrationResults(null);
+    console.log(`[referral migration] dry run: ${preview.length} ambassador(s) would be migrated`);
+    console.table(preview);
+  };
+
+  const handleRunMigration = async () => {
+    const targets = ambassadorsNeedingMigration(ambassadors);
+    if (targets.length === 0) {
+      alert('Nothing to migrate - every ambassador already has a current-format code.');
+      return;
+    }
+    if (!migrationPreview) {
+      alert('Run a dry run first so you can review what will change.');
+      return;
+    }
+    if (!window.confirm(`This will permanently replace the referral code for ${targets.length} ambassador(s) and cannot be undone through the UI. Continue?`)) {
+      return;
+    }
+
+    setMigrationRunning(true);
+    try {
+      const results = await runMigration(ambassadors, {
+        onProgress: (r) => console.log('[referral migration]', r.status, r.ambassadorEmail, r.oldCode, '->', r.newCode || r.error)
+      });
+      setMigrationResults(results);
+      console.table(results);
+      const failed = results.filter(r => r.status === 'error');
+      alert(`Migration complete: ${results.length - failed.length} succeeded, ${failed.length} failed. See console for details.`);
+      loadAmbassadors();
+    } catch (error) {
+      console.error('Error running referral code migration:', error);
+      alert('Migration failed: ' + error.message);
+    } finally {
+      setMigrationRunning(false);
     }
   };
 
@@ -977,6 +993,11 @@ export default function AdminPanel() {
     handleApproveClick={handleApproveClick}
     handleReject={handleReject}
     handleToggleActive={handleToggleActive}
+    migrationPreview={migrationPreview}
+    migrationResults={migrationResults}
+    migrationRunning={migrationRunning}
+    handleDryRunMigration={handleDryRunMigration}
+    handleRunMigration={handleRunMigration}
     handleEditBankDetails={handleEditBankDetails}
     payments={payments}
     getFilteredPayments={getFilteredPayments}

@@ -4,13 +4,17 @@ import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { COUNTRIES, getActiveCountries } from '../data/countries';
 import { detectBrowserCountry } from '../utils/countryDetect';
+import { normalizeReferralCode, getStoredReferralCode, clearStoredReferralCode } from '../utils/referralCode';
 import { useAuthStore } from '../store/authStore';
 
 export default function ProfileComplete() {
   const navigate = useNavigate();
   const refreshProfile = useAuthStore(state => state.refreshProfile);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  // A referral code captured from a ?ref= share link (see LandingPage) prefills this field,
+  // but the person can still change or clear it.
+  const [referralFromLink] = useState(() => Boolean(getStoredReferralCode()));
+  const [formData, setFormData] = useState(() => ({
     fullName: '',
     dob: '',
     gender: '',
@@ -18,8 +22,8 @@ export default function ProfileComplete() {
     countryName: '',
     stateCode: '',
     stateName: '',
-    referralCode: ''
-  });
+    referralCode: getStoredReferralCode() || ''
+  }));
 
   // Search states
   const [countrySearch, setCountrySearch] = useState('');
@@ -74,18 +78,11 @@ export default function ProfileComplete() {
     }
   };
 
-  const formatReferralCode = (value) => {
-    const cleaned = value.replace(/\s/g, '').toUpperCase();
-    if (cleaned.length <= 2) return cleaned;
-    if (cleaned.length <= 4) return `${cleaned.slice(0, 2)} ${cleaned.slice(2)}`;
-    return `${cleaned.slice(0, 2)} ${cleaned.slice(2, 4)} ${cleaned.slice(4, 9)}`;
-  };
-
   const handleReferralCodeChange = (e) => {
-    const formatted = formatReferralCode(e.target.value);
-    if (formatted.replace(/\s/g, '').length <= 9) {
-      setFormData({ ...formData, referralCode: formatted });
-    }
+    // Codes are case-insensitive and whitespace-free (NV-XXXXXX); uppercase as typed.
+    // A generous length cap just guards against pasting something huge, not against format.
+    const value = e.target.value.toUpperCase().slice(0, 20);
+    setFormData({ ...formData, referralCode: value });
   };
 
   // Filter countries based on search. Only countries an admin has activated are offered;
@@ -146,15 +143,13 @@ export default function ProfileComplete() {
         return;
       }
 
-      // Validate the referral code against active ambassador codes
+      // Validate the referral code against active ambassador codes. Normalized lookup
+      // transparently accepts both current (NV-XXXXXX) and legacy codes - whatever doc id
+      // actually exists under referralCodes/.
       let ambassadorEmail = null;
+      let cleaned = '';
       if (formData.referralCode) {
-        const cleaned = formData.referralCode.replace(/\s/g, '');
-        if (cleaned.length !== 9) {
-          alert('Referral code must be exactly 9 characters (CC SS NNNNN format)');
-          setLoading(false);
-          return;
-        }
+        cleaned = normalizeReferralCode(formData.referralCode);
         const codeDoc = await getDoc(doc(db, 'referralCodes', cleaned));
         if (!codeDoc.exists() || !codeDoc.data().active) {
           alert('This referral code is not valid. Please check it, or leave it empty to continue without one.');
@@ -167,12 +162,14 @@ export default function ProfileComplete() {
       const userRef = doc(db, 'users', user.uid);
       await setDoc(userRef, {
         ...formData,
+        referralCode: cleaned,
         ambassadorEmail,
         email: user.email,
         profileComplete: true,
         createdAt: new Date()
       }, { merge: true });
 
+      clearStoredReferralCode();
       await refreshProfile();
       navigate('/pricing');
     } catch (error) {
@@ -343,12 +340,18 @@ export default function ProfileComplete() {
                 value={formData.referralCode}
                 onChange={handleReferralCodeChange}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono"
-                placeholder="IN TN 00001"
-                maxLength={11}
+                placeholder="NV-XXXXXX"
+                maxLength={20}
               />
-              <p className="text-xs text-gray-500 mt-1">
-                Format: CC SS NNNNN (e.g., IN TN 00001)
-              </p>
+              {referralFromLink && formData.referralCode ? (
+                <p className="text-xs text-brand-600 mt-1">
+                  Applied from your invite link - change or clear it if this isn't right.
+                </p>
+              ) : (
+                <p className="text-xs text-gray-500 mt-1">
+                  Format: NV-XXXXXX (e.g., NV-K7M4Q2)
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}
