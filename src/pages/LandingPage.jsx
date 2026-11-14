@@ -11,8 +11,8 @@ export default function LandingPage() {
   const navigate = useNavigate();
   const { user, loading, logout } = useAuthStore();
 
-  // Capture ?ref=NV-XXXXXX from a shared link (30-day localStorage), so it's ready to
-  // prefill at sign-up even if the person browses a bit before creating an account.
+  // Capture ?ref=<CODE> (e.g. IN482913) from a shared link (30-day localStorage), so it's
+  // ready to prefill at sign-up even if the person browses a bit before creating an account.
   useEffect(() => {
     captureReferralFromUrl(window.location.search);
   }, []);

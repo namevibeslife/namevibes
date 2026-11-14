@@ -1,29 +1,32 @@
 // Ambassador referral codes: generation, formatting and link/message building.
 // Pure - no Firebase imports here, so this is safe to unit-test directly in Node.
 //
-// Format: NV-XXXXXX - 6 characters from an alphabet with the look-alike characters
-// removed (no 0/O, 1/I/L), so a code is easy to read aloud or copy by hand.
-export const CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-export const CODE_LENGTH = 6;
-export const CODE_PREFIX = 'NV-';
+// Format: <CC><6 digits>, e.g. IN482913, US073519 - the ambassador's 2-letter country code
+// followed by 6 random digits (leading zeros allowed). No letters after the country code.
+export const DIGIT_COUNT = 6;
 
-const CODE_PATTERN = new RegExp(`^NV-[${CODE_ALPHABET}]{${CODE_LENGTH}}$`);
+const CODE_PATTERN = /^[A-Z]{2}\d{6}$/;
 
-// crypto.getRandomValues, never Math.random. CODE_ALPHABET.length is 31 (26 letters minus
-// O/I/L, plus 10 digits minus 0/1) - not a power of two, so a plain `byte % 31` would be
-// slightly biased (256 isn't evenly divisible by 31). Rejection sampling removes that bias:
-// any byte >= the largest multiple of 31 under 256 is discarded and redrawn.
-const REJECTION_CEILING = 256 - (256 % CODE_ALPHABET.length);
+// crypto.getRandomValues, never Math.random. 10 isn't a power of two, so a plain `byte % 10`
+// would be slightly biased (256 isn't evenly divisible by 10). Rejection sampling removes
+// that bias: any byte >= the largest multiple of 10 under 256 (250) is discarded and redrawn.
+const REJECTION_CEILING = 250;
 
-export function generateCandidateCode() {
-  let body = '';
+// countryCode must be the ambassador's real 2-letter country code - this never guesses or
+// falls back silently. Callers (approval, migration) must fail clearly if it's missing.
+export function generateCandidateCode(countryCode) {
+  const cc = normalizeReferralCode(countryCode);
+  if (!/^[A-Z]{2}$/.test(cc)) {
+    throw new Error(`Cannot generate a referral code: "${countryCode || ''}" is not a valid 2-letter country code.`);
+  }
+  let digits = '';
   const buf = new Uint8Array(1);
-  while (body.length < CODE_LENGTH) {
+  while (digits.length < DIGIT_COUNT) {
     crypto.getRandomValues(buf);
     if (buf[0] >= REJECTION_CEILING) continue; // biased range - redraw
-    body += CODE_ALPHABET[buf[0] % CODE_ALPHABET.length];
+    digits += String(buf[0] % 10);
   }
-  return `${CODE_PREFIX}${body}`;
+  return `${cc}${digits}`;
 }
 
 // Codes are case-insensitive: callers normalize on both input and lookup.
@@ -39,10 +42,35 @@ export function buildShareLink(code) {
   return `https://namevibes.life/?ref=${normalizeReferralCode(code)}`;
 }
 
-// Short, friendly and editable in one place.
+// Exact text, kept in one place so it's easy to edit. Emojis and line breaks are intentional.
 export function buildShareMessage(code) {
+  const c = normalizeReferralCode(code);
   const link = buildShareLink(code);
-  return `I've been exploring my name's hidden meaning on NameVibes: numerology, astrology and Nakshatra insights. Try it with my code ${normalizeReferralCode(code)}: ${link}`;
+  return [
+    'Your name is more than just an identity. What if it has a connection to the very elements of our universe? 🌌',
+    "I discovered something fascinating on NameVibes — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights.",
+    'Every name has a story. Discover what yours reveals! ✨',
+    `🔗 Explore your NameVibes: ${link}`,
+    `🎁 Try it with my referral code: ${c} this can give you a DISCOUNT`
+  ].join('\n');
+}
+
+// X/Twitter has a character limit the full message usually exceeds - fall back to just the
+// link and code line.
+const X_CHAR_LIMIT = 280;
+
+export function buildShortShareMessage(code) {
+  const c = normalizeReferralCode(code);
+  const link = buildShareLink(code);
+  return [
+    `🔗 Explore your NameVibes: ${link}`,
+    `🎁 Try it with my referral code: ${c} this can give you a DISCOUNT`
+  ].join('\n');
+}
+
+export function buildXShareMessage(code) {
+  const full = buildShareMessage(code);
+  return full.length > X_CHAR_LIMIT ? buildShortShareMessage(code) : full;
 }
 
 // ---------- capturing ?ref= on landing ----------

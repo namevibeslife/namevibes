@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check, Share2, Mail } from 'lucide-react';
-import { buildShareLink, buildShareMessage } from '../utils/referralCode';
+import { buildShareLink, buildShareMessage, buildXShareMessage } from '../utils/referralCode';
 
 // Small brand glyphs the icon library doesn't have. Single-color, inherits currentColor.
 const WhatsAppIcon = (props) => (
@@ -83,7 +83,7 @@ export default function ReferralShareCard({ code }) {
   };
 
   const openEmail = () => {
-    const subject = encodeURIComponent("Try NameVibes - here's my referral code");
+    const subject = encodeURIComponent('Discover the hidden elements in your name');
     window.location.href = `mailto:?subject=${subject}&body=${encodeURIComponent(message)}`;
   };
 
@@ -106,7 +106,9 @@ export default function ReferralShareCard({ code }) {
   };
 
   const openX = () => {
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    // X has a character limit the full message usually exceeds - buildXShareMessage falls
+    // back to just the link and code line in that case.
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(buildXShareMessage(code))}`, '_blank', 'noopener,noreferrer');
   };
 
   return (

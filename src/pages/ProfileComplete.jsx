@@ -4,7 +4,7 @@ import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { COUNTRIES, getActiveCountries } from '../data/countries';
 import { detectBrowserCountry } from '../utils/countryDetect';
-import { normalizeReferralCode, getStoredReferralCode, clearStoredReferralCode } from '../utils/referralCode';
+import { normalizeReferralCode, isWellFormedCode, getStoredReferralCode, clearStoredReferralCode } from '../utils/referralCode';
 import { useAuthStore } from '../store/authStore';
 
 export default function ProfileComplete() {
@@ -79,7 +79,7 @@ export default function ProfileComplete() {
   };
 
   const handleReferralCodeChange = (e) => {
-    // Codes are case-insensitive and whitespace-free (NV-XXXXXX); uppercase as typed.
+    // Codes are case-insensitive and whitespace-free (CCNNNNNN, e.g. IN482913); uppercase as typed.
     // A generous length cap just guards against pasting something huge, not against format.
     const value = e.target.value.toUpperCase().slice(0, 20);
     setFormData({ ...formData, referralCode: value });
@@ -143,13 +143,17 @@ export default function ProfileComplete() {
         return;
       }
 
-      // Validate the referral code against active ambassador codes. Normalized lookup
-      // transparently accepts both current (NV-XXXXXX) and legacy codes - whatever doc id
-      // actually exists under referralCodes/.
+      // Validate the referral code: format first (CCNNNNNN, e.g. IN482913), then against
+      // active ambassador codes.
       let ambassadorEmail = null;
       let cleaned = '';
       if (formData.referralCode) {
         cleaned = normalizeReferralCode(formData.referralCode);
+        if (!isWellFormedCode(cleaned)) {
+          alert('Referral code format should be a 2-letter country code followed by 6 digits (e.g. IN482913).');
+          setLoading(false);
+          return;
+        }
         const codeDoc = await getDoc(doc(db, 'referralCodes', cleaned));
         if (!codeDoc.exists() || !codeDoc.data().active) {
           alert('This referral code is not valid. Please check it, or leave it empty to continue without one.');
@@ -340,7 +344,7 @@ export default function ProfileComplete() {
                 value={formData.referralCode}
                 onChange={handleReferralCodeChange}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none font-mono"
-                placeholder="NV-XXXXXX"
+                placeholder="IN482913"
                 maxLength={20}
               />
               {referralFromLink && formData.referralCode ? (
@@ -349,7 +353,7 @@ export default function ProfileComplete() {
                 </p>
               ) : (
                 <p className="text-xs text-gray-500 mt-1">
-                  Format: NV-XXXXXX (e.g., NV-K7M4Q2)
+                  Format: country code + 6 digits (e.g., IN482913)
                 </p>
               )}
             </div>

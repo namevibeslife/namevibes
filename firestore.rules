@@ -93,11 +93,12 @@ service cloud.firestore {
         && request.resource.data.isApproved == false
         && request.resource.data.isActive == false
         && !request.resource.data.keys().hasAny(['referralCode', 'approvedAt', 'approvedBy']);
-      // Once a code has gone through the referral-code migration (legacyCode is set), it's
-      // locked for good - no further referralCode change, by anyone, through the client SDK.
+      // A referralCode change is only allowed while codeVersion is below the current version
+      // (defaults to 1, i.e. never migrated). Once codeVersion reaches 2, referralCode is
+      // locked for good - no further change, by anyone, through the client SDK.
       allow update: if isAdmin()
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['referralCode'])
-            || resource.data.get('legacyCode', null) == null);
+            || resource.data.get('codeVersion', 1) < 2);
       allow delete: if isSuperAdmin();
     }
 

@@ -688,8 +688,9 @@ export default function AdminDashboard(props) {
                 <div className="bg-paper rounded-xl shadow-lg p-6 mb-6 border-2 border-brand-200">
                   <h3 className="text-lg font-bold text-gray-800 mb-1">Referral Code Migration</h3>
                   <p className="text-sm text-gray-600 mb-4">
-                    One-time move from the old "CC SS NNNNN" codes to random NV-XXXXXX codes. Dry run first -
-                    nothing is written until you run it for real.
+                    Regenerates every approved ambassador's code to the current format: their 2-letter country code
+                    followed by 6 random digits (e.g. IN482913). Dry run first - nothing is written until you run
+                    it for real.
                   </p>
                   <div className="flex flex-wrap gap-3 mb-4">
                     <button
@@ -728,7 +729,9 @@ export default function AdminDashboard(props) {
                               <tr key={row.ambassadorId} className="border-b border-gray-100">
                                 <td className="py-1 pr-4">{row.ambassadorName} <span className="text-gray-400">({row.ambassadorEmail})</span></td>
                                 <td className="py-1 pr-4 font-mono">{row.oldCode}</td>
-                                <td className="py-1 pr-4 font-mono text-brand-600">{row.newCode}</td>
+                                <td className="py-1 pr-4 font-mono text-brand-600">
+                                  {row.error ? <span className="text-red-600 font-sans font-semibold">{row.error}</span> : row.newCode}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -1743,8 +1746,8 @@ export default function AdminDashboard(props) {
             
             <div className="space-y-4 mb-6">
               <p className="text-sm text-gray-600 bg-brand-50 border border-brand-200 rounded-lg px-3 py-2">
-                A random, unique referral code (format <span className="font-mono">NV-XXXXXX</span>) will be generated
-                for this ambassador on approval.
+                A random, unique referral code (their country code plus 6 digits, e.g. <span className="font-mono">IN482913</span>)
+                will be generated for this ambassador on approval. Their country must be set first.
               </p>
 
               <div>

@@ -16,7 +16,7 @@ import {
 import { db, auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { COUNTRIES } from '../data/countries';
-import { reserveReferralCode, setReferralCodeActive, previewMigration, runMigration, ambassadorsNeedingMigration } from '../utils/referralCodeAdmin';
+import { reserveReferralCode, setReferralCodeActive, previewMigration, runMigration, ambassadorsNeedingMigration, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { 
   Users, 
   CreditCard, 
@@ -611,7 +611,7 @@ export default function AdminPanel() {
     try {
       setLoading(true);
 
-      const referralCode = await reserveReferralCode(selectedAmbassador.id, selectedAmbassador.email);
+      const referralCode = await reserveReferralCode(selectedAmbassador.id, selectedAmbassador.email, selectedAmbassador.countryCode);
 
       const ambassadorRef = doc(db, 'ambassadors', selectedAmbassador.id);
       await updateDoc(ambassadorRef, {
@@ -620,6 +620,7 @@ export default function AdminPanel() {
         approvedAt: Timestamp.now(),
         approvedBy: currentAdmin.email,
         referralCode: referralCode,
+        codeVersion: CURRENT_CODE_VERSION,
         payoutFrequency: approvalData.payoutFrequency,
         commissionRateIndividual: 15,
         commissionRateFamily: 25
