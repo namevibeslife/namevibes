@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Copy, Check, Share2, Mail } from 'lucide-react';
-import { buildShareLink, buildShareMessage, buildXShareMessage } from '../utils/referralCode';
+import { buildShareLink, buildShareMessage, buildTelegramMessage } from '../utils/referralCode';
 
 // Small brand glyphs the icon library doesn't have. Single-color, inherits currentColor.
 const WhatsAppIcon = (props) => (
@@ -49,6 +49,7 @@ function copyToClipboard(text) {
 export default function ReferralShareCard({ code }) {
   const [toast, setToast] = useState('');
   const [copied, setCopied] = useState(false);
+  const [messageCopied, setMessageCopied] = useState(false);
 
   const showToast = (text) => {
     setToast(text);
@@ -68,11 +69,20 @@ export default function ReferralShareCard({ code }) {
     window.setTimeout(() => setCopied(false), 1800);
   };
 
+  const handleCopyMessage = async () => {
+    await copyToClipboard(message).catch(() => {});
+    setMessageCopied(true);
+    showToast('Message copied!');
+    window.setTimeout(() => setMessageCopied(false), 1800);
+  };
+
   const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   const handleNativeShare = async () => {
     try {
-      await navigator.share({ title: 'NameVibes', text: message, url: link });
+      // No separate url - the message already contains the ?ref= link, so a separate url
+      // field would show it twice in the share sheet.
+      await navigator.share({ title: 'NameVibes', text: message });
     } catch (error) {
       if (error?.name !== 'AbortError') showToast('Sharing was cancelled.');
     }
@@ -102,13 +112,14 @@ export default function ReferralShareCard({ code }) {
   };
 
   const openTelegram = () => {
-    window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+    // Telegram renders `url` as the shared link/preview; the text omits the link line
+    // (buildTelegramMessage) so it isn't shown twice.
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=${encodeURIComponent(buildTelegramMessage(code))}`, '_blank', 'noopener,noreferrer');
   };
 
   const openX = () => {
-    // X has a character limit the full message usually exceeds - buildXShareMessage falls
-    // back to just the link and code line in that case.
-    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(buildXShareMessage(code))}`, '_blank', 'noopener,noreferrer');
+    // Full message, every time - long text needs X Premium to post, which is fine.
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
   };
 
   return (
@@ -161,6 +172,27 @@ export default function ReferralShareCard({ code }) {
             <XIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">X</span>
           </button>
+        </div>
+
+        <div className="mt-6 max-w-xl">
+          <div className="flex items-center justify-between gap-3 mb-2">
+            <span className="text-sm font-semibold text-brand-100">Message that will be sent</span>
+            <button
+              type="button"
+              onClick={handleCopyMessage}
+              className="min-w-[44px] min-h-[44px] flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 transition font-semibold text-sm"
+              aria-label="Copy message"
+            >
+              {messageCopied ? <Check size={16} /> : <Copy size={16} />}
+              {messageCopied ? 'Copied' : 'Copy message'}
+            </button>
+          </div>
+          <div
+            className="bg-white/10 border border-white/20 rounded-xl p-4 text-sm text-white"
+            style={{ whiteSpace: 'pre-wrap' }}
+          >
+            {message}
+          </div>
         </div>
       </div>
 

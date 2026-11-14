@@ -43,7 +43,9 @@ export function buildShareLink(code) {
 }
 
 // Exact text, kept in one place so it's easy to edit. Emojis and line breaks are intentional.
-export function buildShareMessage(code) {
+// The link line is index 3 - buildTelegramMessage below omits it so Telegram's separate `url`
+// param isn't duplicated in the message text.
+function shareMessageLines(code) {
   const c = normalizeReferralCode(code);
   const link = buildShareLink(code);
   return [
@@ -52,25 +54,17 @@ export function buildShareMessage(code) {
     'Every name has a story. Discover what yours reveals! ✨',
     `🔗 Explore your NameVibes: ${link}`,
     `🎁 Try it with my referral code: ${c} this can give you a DISCOUNT`
-  ].join('\n');
+  ];
 }
 
-// X/Twitter has a character limit the full message usually exceeds - fall back to just the
-// link and code line.
-const X_CHAR_LIMIT = 280;
-
-export function buildShortShareMessage(code) {
-  const c = normalizeReferralCode(code);
-  const link = buildShareLink(code);
-  return [
-    `🔗 Explore your NameVibes: ${link}`,
-    `🎁 Try it with my referral code: ${c} this can give you a DISCOUNT`
-  ].join('\n');
+export function buildShareMessage(code) {
+  return shareMessageLines(code).join('\n');
 }
 
-export function buildXShareMessage(code) {
-  const full = buildShareMessage(code);
-  return full.length > X_CHAR_LIMIT ? buildShortShareMessage(code) : full;
+// Telegram's share URL carries the link separately via `url` (shown as a link preview), so
+// the text omits the "Explore your NameVibes" link line - otherwise the link would appear twice.
+export function buildTelegramMessage(code) {
+  return shareMessageLines(code).filter((_, i) => i !== 3).join('\n');
 }
 
 // ---------- capturing ?ref= on landing ----------
