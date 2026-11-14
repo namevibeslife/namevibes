@@ -1,5 +1,5 @@
 import PosterDownload from '../components/PosterDownload';
-import ElementMeanings from '../components/ElementMeanings';
+import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import UserNav from '../components/UserNav';
@@ -10,6 +10,7 @@ import { parseNameToElements } from '../utils/elements';
 import { Plus, X } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import { findCommonElements } from '../utils/familyReport';
+import { FAMILY_MAX_NAMES } from '../utils/plan';
 
 const RELATIONS = [
   'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister',
@@ -31,7 +32,6 @@ export default function FamilyPackage() {
     { id: 1, firstName: '', middleName: '', lastName: '', relation: 'Father' }
   ]);
   const [results, setResults] = useState(null);
-  const [showingCount, setShowingCount] = useState(10);
   const [harmonyStep, setHarmonyStep] = useState('results');
   const [selectedContext, setSelectedContext] = useState([]);
 
@@ -45,7 +45,7 @@ export default function FamilyPackage() {
 
 
   const addName = () => {
-    if (names.length < 50) {
+    if (names.length < FAMILY_MAX_NAMES) {
       setNames([...names, {
         id: Date.now(),
         firstName: '',
@@ -112,7 +112,6 @@ export default function FamilyPackage() {
 
 
   if (results) {
-    const displayedResults = results.slice(0, showingCount);
     const commonElements = findCommonElements(results);
 
     return (
@@ -132,24 +131,14 @@ export default function FamilyPackage() {
             </div>
 
             <PosterDownload people={results} family />
-            <ElementMeanings people={displayedResults} />
+            <FamilyPersonCards people={results} />
 
-            {results.length > showingCount && (
-              <button
-                onClick={() => setShowingCount(showingCount + 10)}
-                className="w-full py-3 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 transition font-semibold"
-              >
-                Show More ({results.length - showingCount} remaining)
-              </button>
-            )}
-
-            {results.length > 1 && commonElements.length > 0 && (
-              <div className="mt-12 pt-8 border-t-2 border-brand-200">
-                <h3 className="text-3xl font-bold text-brand-600 mb-2 text-center">The Harmony</h3>
-                <p className="text-gray-600 mb-6 text-center text-lg italic">
+            {results.length > 1 && (
+              <FamilyHarmonyCard people={results}>
+                {commonElements.length > 0 && (<>
+                <p className="text-gray-600 mb-4 text-center text-lg italic">
                   "Common Elements Across All Family Members"
                 </p>
-
                 {harmonyStep === 'results' && (
                   <button
                     onClick={() => setHarmonyStep('context')}
@@ -200,7 +189,8 @@ export default function FamilyPackage() {
                     />
                   </div>
                 )}
-              </div>
+                </>)}
+              </FamilyHarmonyCard>
             )}
           </div>
         </div>
@@ -216,7 +206,7 @@ export default function FamilyPackage() {
           <div className="bg-paper rounded-2xl shadow-2xl p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Family Package</h1>
             <p className="text-gray-600 mb-8">
-              Analyze up to 50 names • Showing {Math.min(names.length, 10)} at once
+              Analyze up to {FAMILY_MAX_NAMES} names together
             </p>
 
             <div className="space-y-6">
@@ -287,12 +277,17 @@ export default function FamilyPackage() {
 
               <button
                 onClick={addName}
-                disabled={names.length >= 50}
+                disabled={names.length >= FAMILY_MAX_NAMES}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
                 <Plus size={20} />
-                Add Another Name ({names.length}/50)
+                Add Another Name ({names.length}/{FAMILY_MAX_NAMES})
               </button>
+              {names.length >= FAMILY_MAX_NAMES && (
+                <p role="note" className="text-center text-sm text-gray-600">
+                  You can compare up to {FAMILY_MAX_NAMES} names at a time. Run another analysis for more family members.
+                </p>
+              )}
             </div>
 
             <div className="mt-8">

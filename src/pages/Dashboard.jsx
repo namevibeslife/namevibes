@@ -5,7 +5,7 @@ import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebas
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Sparkles, Users, Calendar, LogOut, Settings, ArrowRight } from 'lucide-react';
-import { countAnalysesThisMonth, isPlanActive, planFeatures } from '../utils/plan';
+import { countAnalysesThisMonth, isPlanActive, planFeatures, FAMILY_MAX_NAMES } from '../utils/plan';
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -155,7 +155,7 @@ export default function Dashboard() {
             >
               <Users className="w-12 h-12 mb-4" />
               <h3 className="text-xl font-bold mb-2">Family Package</h3>
-              <p className="text-ocean-100 text-sm">Analyze up to 50 names together</p>
+              <p className="text-ocean-100 text-sm">Analyze up to {FAMILY_MAX_NAMES} names together</p>
             </button>
           )}
 
@@ -170,7 +170,7 @@ export default function Dashboard() {
               </h3>
               <p className="text-green-100 text-sm">
                 {userProfile?.planType === 'individual' && planActive
-                  ? 'Family harmony, 50 names & PDF reports'
+                  ? `Family harmony, ${FAMILY_MAX_NAMES} names & PDF reports`
                   : 'Unlock name analyses and insights'}
               </p>
             </button>

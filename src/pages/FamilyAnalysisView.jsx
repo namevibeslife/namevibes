@@ -1,5 +1,5 @@
 import PosterDownload from '../components/PosterDownload';
-import ElementMeanings from '../components/ElementMeanings';
+import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import UserNav from '../components/UserNav';
@@ -90,16 +90,17 @@ export default function FamilyAnalysisView() {
           </div>
 
           <PosterDownload people={results} family />
-          <ElementMeanings people={results} />
+          <FamilyPersonCards people={results} />
 
-          {commonElements.length > 0 && (
-            <div className="mb-8 pt-8 border-t-2 border-brand-200">
-              <h2 className="text-3xl font-bold text-brand-600 mb-2 text-center">The Harmony</h2>
-              <p className="text-gray-600 mb-6 text-center italic">"Common Elements Across All Family Members"</p>
-              <div className="bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-6 border-2 border-brand-300">
-                <AskAIPanel results={results} />
-              </div>
-            </div>
+          {results.length > 1 && (
+            <FamilyHarmonyCard people={results}>
+              {commonElements.length > 0 && (<>
+                <p className="text-gray-600 mb-4 text-center text-lg italic">"Common Elements Across All Family Members"</p>
+                <div className="bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-6 border-2 border-brand-300">
+                  <AskAIPanel results={results} />
+                </div>
+              </>)}
+            </FamilyHarmonyCard>
           )}
 
           <div className="mt-8 flex flex-wrap gap-3 justify-center">

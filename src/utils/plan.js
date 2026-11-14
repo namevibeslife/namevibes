@@ -1,8 +1,12 @@
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
+// Most names a single Family analysis can hold. Results screens and the PDF/image exports are
+// designed around this many people. Older saved analyses may hold more and still open and print.
+export const FAMILY_MAX_NAMES = 4;
+
 // What each plan allows. Individual name analyses are capped per calendar month on both plans;
-// Family analyses (up to 50 names each) are a Family-plan feature.
+// Family analyses (up to FAMILY_MAX_NAMES names each) are a Family-plan feature.
 export const PLAN_FEATURES = {
   individual: { monthlyAnalyses: 8, familyPackage: false, pdfDownload: false },
   family: { monthlyAnalyses: 8, familyPackage: true, pdfDownload: true }

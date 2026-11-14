@@ -4,6 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { COUNTRIES } from '../data/countries';
 import { loadCountryPricing, discountedPrice } from '../utils/pricing';
+import { FAMILY_MAX_NAMES } from '../utils/plan';
 import { Check, ArrowLeft, Sparkles } from 'lucide-react';
 
 export default function Pricing() {
@@ -220,7 +221,7 @@ export default function Pricing() {
               </li>
               <li className="flex items-start gap-3">
                 <Check className="w-6 h-6 text-yellow-300 flex-shrink-0 mt-0.5" />
-                <span className="text-white font-semibold">Analyze up to 50 family names</span>
+                <span className="text-white font-semibold">Analyze up to {FAMILY_MAX_NAMES} family names</span>
               </li>
               <li className="flex items-start gap-3">
                 <Check className="w-6 h-6 text-yellow-300 flex-shrink-0 mt-0.5" />
