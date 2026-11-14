@@ -88,10 +88,15 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .poster-footer small { display: block; font-size: 9px; letter-spacing: .14em; margin-top: 12px; }
 /* Slowly glowing gold outline (zodiac guide cards) */
 @keyframes gold-glow {
-  0%, 100% { border-color: #e8d3a080; box-shadow: 0 0 2px 0 #c49a4230, inset 0 0 2px 0 #c49a4220; }
-  50% { border-color: #c49a42; box-shadow: 0 0 14px 2px #d8b96e90, inset 0 0 8px 0 #d8b96e40; }
+  0%, 100% { border-color: #d8b96e; box-shadow: 0 0 6px 1px #d8b96e60, inset 0 0 6px 0 #d8b96e30; }
+  50% { border-color: #f0c040; box-shadow: 0 0 26px 6px #f0c040cc, 0 0 50px 10px #d8b96e60, inset 0 0 16px 2px #f0c04070; }
 }
-.glow-outline { animation: gold-glow 5s ease-in-out infinite; }
+.glow-outline { border-width: 2px; animation: gold-glow 4s ease-in-out infinite; }
+@keyframes arrow-glow {
+  0%, 100% { transform: translateY(-2px); box-shadow: 0 0 4px 0 #105717aa; }
+  50% { transform: translateY(3px); box-shadow: 0 0 16px 4px #2f9e44cc, 0 0 28px 8px #10571760; }
+}
+.expand-arrow { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; color: #105717; background: #fffdf7; border: 2px solid #105717; animation: arrow-glow 2.4s ease-in-out infinite; }
 .landing-hero { max-width: 1050px; margin: auto; }
 .landing-hero .hero-kicker {
   display: inline-block;

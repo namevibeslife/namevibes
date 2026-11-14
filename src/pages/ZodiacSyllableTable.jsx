@@ -384,7 +384,7 @@ export default function ZodiacSyllableTable() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`px-2 py-1 rounded-full text-white text-xs font-semibold ${
+                    <span className={`px-4 py-1.5 rounded-full text-white text-base font-bold ${
                       zodiac.element === 'Fire' ? 'bg-red-500' :
                       zodiac.element === 'Earth' ? 'bg-green-600' :
                       zodiac.element === 'Air' ? 'bg-ocean-400' : 'bg-ocean-600'
@@ -396,7 +396,19 @@ export default function ZodiacSyllableTable() {
 
                 {/* Syllables - Always Visible */}
                 <div className="mt-3 bg-brand-100/20 rounded-lg p-3">
-                  <p className="text-xs text-gray-600 font-semibold mb-2">✨ Auspicious Syllables:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs text-gray-600 font-semibold">✨ Auspicious Syllables:</p>
+                    <span className="flex items-center gap-2 text-xs font-semibold text-[#105717]">
+                      {selectedSign === zodiac.sign ? 'Tap to hide details' : 'Tap to see more'}
+                      <span className="expand-arrow" aria-hidden="true">
+                        <ChevronDown
+                          size={22}
+                          strokeWidth={3}
+                          className={`transition-transform duration-300 ${selectedSign === zodiac.sign ? 'rotate-180' : ''}`}
+                        />
+                      </span>
+                    </span>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {zodiac.syllables.map((syl, idx) => (
                       <span
