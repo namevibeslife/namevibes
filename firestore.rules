@@ -128,9 +128,19 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    // Anything else (auditLogs, payouts, older collections) is admin-only
+    // Anything else (auditLogs, payouts, older collections) is admin-only. Every collection
+    // that already has its own explicit match block above is excluded here. Firestore ORs
+    // every matching rule block together for a given path, so without this exclusion list the
+    // catch-all's unconditional isAdmin() write would silently bypass every tighter rule those
+    // blocks define: super-admin-only writes to admins/, payment-server-only payments/,
+    // touchesPlanFields()/validReferralLink() on users/, the post-migration referralCode lock
+    // on ambassadors/, and the create-only/never-delete lock on referralCodes/.
+    function hasOwnRules(collection) {
+      return collection in ['users', 'payments', 'admins', 'ambassadors', 'referralCodes',
+        'payoutRequests', 'countrySettings', 'revenueReports'];
+    }
     match /{collection}/{docId} {
-      allow read, write: if isAdmin();
+      allow read, write: if isAdmin() && !hasOwnRules(collection);
     }
   }
 }
