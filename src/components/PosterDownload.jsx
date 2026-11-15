@@ -24,9 +24,9 @@ export default function PosterDownload({ person, people, family = false, showPre
   async function download() {
     setBusy(true); setMessage('');
     try {
-      const { buildPosterPDF, loadPosterLogo } = await import('../utils/posterReport');
-      const logo = await loadPosterLogo(theme).catch(() => null);
-      buildPosterPDF(list, { theme, logo, family }).save(family ? 'NameVibes_Family_Posters.pdf' : 'NameVibes_Elemental_Profile.pdf');
+      const { buildPosterPDF, loadPosterLogo, loadPosterArtwork } = await import('../utils/posterReport');
+      const [logo, artwork] = await Promise.all([loadPosterLogo(theme).catch(() => null), loadPosterArtwork(theme).catch(() => null)]);
+      buildPosterPDF(list, { theme, logo, artwork, family }).save(family ? 'NameVibes_Family_Posters.pdf' : 'NameVibes_Elemental_Profile.pdf');
     } catch { setMessage('The PDF could not be downloaded. Please try again.'); }
     finally { setBusy(false); }
   }

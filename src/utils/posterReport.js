@@ -1,3 +1,5 @@
+import { gemTileData } from './posterArtwork';
+export { loadPosterArtwork } from './posterArtwork';
 import jsPDF from 'jspdf';
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
@@ -179,7 +181,7 @@ function planCompactFamily(pdf, people) {
 function drawTile(pdf, el, x, y, w, h) {
   const color = posterColorFor(el);
   pdf.setFillColor(color); pdf.setDrawColor(GOLD_LINE); pdf.setLineWidth(.3);
-  pdf.roundedRect(x, y, w, h, 1.6, 1.6, 'FD');
+  pdf.addImage(gemTileData(color), 'PNG', x, y, w, h, `gem-${color}`, 'FAST');
   pdf.setDrawColor('#ffffff'); pdf.setLineWidth(.15);
   pdf.line(x + 1.6, y + 1.6, x + w - 1.6, y + 1.6);
   pdf.setTextColor(textColorFor(color));
@@ -225,7 +227,8 @@ function drawPersonBlock(pdf, person, x, y, w, h, t, nameFont, gold) {
 
 function drawBand(pdf, people, band, y0, { ink, gold }) {
   pdf.setDrawColor(GOLD_LINE); pdf.setLineWidth(.35);
-  pdf.roundedRect(CONTENT_X, y0, CONTENT_W, band.height, 2.5, 2.5, 'S');
+  pdf.setFillColor(ink === '#362a17' ? '#fff9e8' : '#061b16');
+  pdf.roundedRect(CONTENT_X, y0, CONTENT_W, band.height, 2.5, 2.5, 'FD');
   pdf.setTextColor(gold); pdf.setFont('times', 'bold'); pdf.setFontSize(15);
   pdf.text('The Harmony', 105, y0 + PAD + 4.8, { align: 'center' });
   pdf.setTextColor(ink); pdf.setFont('helvetica', 'italic'); pdf.setFontSize(8.5);
@@ -265,7 +268,7 @@ function drawCompactFamily(pdf, people, plan, colors) {
 
 // Vector text and tiles stay crisp in print. Every continuation page has the same frame.
 // `family` defaults to 'more than one person' but a one-person Family analysis can pass true.
-export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'dark', logo = null, family: familyOption } = {}) {
+export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'dark', logo = null, artwork = null, family: familyOption } = {}) {
   const pdf = new jsPDF('p', 'mm', 'a4');
   const family = familyOption ?? people.length > 1;
   const ink = theme === 'gold' ? '#362a17' : '#f5ead1';
@@ -278,6 +281,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     firstPage = false;
     pdf.setFillColor(background);
     pdf.rect(0, 0, 210, 297, 'F');
+    if (artwork) pdf.addImage(artwork, 'JPEG', 0, 0, 210, 297, 'nv-artwork', 'FAST');
     pdf.setDrawColor('#b88b36');
     pdf.setLineWidth(.35);
     pdf.rect(6, 6, 198, 285);
@@ -384,7 +388,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
         const x = left + i * 35;
         const color = posterColorFor(el);
         pdf.setFillColor(color); pdf.setDrawColor('#b88b36');
-        pdf.roundedRect(x, y, 32, 32, 2, 2, 'FD');
+        pdf.addImage(gemTileData(color), 'PNG', x, y, 32, 32, `gem-${color}`, 'FAST');
         pdf.setDrawColor('#ffffff'); pdf.setLineWidth(.15);
         pdf.line(x + 2, y + 2, x + 30, y + 2);
         pdf.setTextColor(textColorFor(color));

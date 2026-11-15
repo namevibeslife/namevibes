@@ -1,3 +1,4 @@
+import { drawPosterBackground, drawGemTile } from './posterArtwork';
 import { findSharedElements } from './commonElements';
 import { posterColorFor } from './posterPalette';
 import { textColorFor } from './elements';
@@ -43,7 +44,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   ctx.scale(scale, scale);
   const gold = theme === 'gold' ? '#815817' : '#ebc979';
   const ink = theme === 'gold' ? '#362a17' : '#f5ead1';
-  ctx.fillStyle = theme === 'gold' ? '#fbf2da' : '#081716'; ctx.fillRect(0, 0, 1080, logicalHeight);
+  await drawPosterBackground(ctx, 1080, logicalHeight, theme);
   ctx.strokeStyle = '#b88b36'; ctx.lineWidth = 2;
   ctx.strokeRect(24, 24, 1032, logicalHeight - 48); ctx.strokeRect(32, 32, 1016, logicalHeight - 64);
   function text(value, x, y, font, color = gold, align = 'center') {
@@ -75,7 +76,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
         const count = Math.min(4, elements.length - rowIndex * 4);
         const tx = x + (474 - (count * 100 + (count - 1) * 10)) / 2 + index % 4 * 110;
         const ty = tileY + rowIndex * 118;
-        const color = posterColorFor(el); ctx.fillStyle = color; ctx.fillRect(tx, ty, 100, 100);
+        const color = posterColorFor(el); drawGemTile(ctx, tx, ty, 100, 100, color);
         ctx.strokeRect(tx, ty, 100, 100);
         const foreground = textColorFor(color);
         text(String(el.number), tx + 8, ty + 20, '15px Arial', foreground, 'left');
@@ -195,7 +196,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
   canvas.width = W; canvas.height = logicalHeight;
 
   // ---- paint ----
-  ctx.fillStyle = theme === 'gold' ? '#fbf2da' : '#081716'; ctx.fillRect(0, 0, W, logicalHeight);
+  await drawPosterBackground(ctx, W, logicalHeight, theme);
   ctx.strokeStyle = line; ctx.lineWidth = 2;
   ctx.strokeRect(24, 24, 1032, logicalHeight - 48); ctx.strokeRect(32, 32, 1016, logicalHeight - 64);
   try {
@@ -212,7 +213,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
 
   function drawTile(el, x, y) {
     const color = posterColorFor(el);
-    ctx.fillStyle = color; ctx.fillRect(x, y, tile, tileH);
+    drawGemTile(ctx, x, y, tile, tileH, color);
     ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(x, y, tile, tileH);
     const foreground = textColorFor(color);
     text(String(el.number), x + 9, y + Math.round(tile * 0.17), `${Math.round(tile * 0.15)}px Arial`, foreground, 'left');
@@ -247,6 +248,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
 
   y += 20;
   const bandX = (W - bandW) / 2;
+  ctx.fillStyle = theme === 'gold' ? '#fff9e8ed' : '#061b16ed'; ctx.fillRect(bandX, y, bandW, bandH);
   ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(bandX, y, bandW, bandH);
   text('The Harmony', 540, y + 36 + 34, '42px Georgia');
   bandSubtitleLines.forEach((subtitleLine, i) => text(subtitleLine, 540, y + 36 + 46 + 22 + i * 30, 'italic 22px Arial', ink));
@@ -257,7 +259,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
       // chips are drawn at 112px, a touch bigger than the PDF's, so they read at a glance
       const chip = 112;
       const color = posterColorFor(el);
-      ctx.fillStyle = color; ctx.fillRect(ex, by, chip, chip);
+      drawGemTile(ctx, ex, by, chip, chip, color);
       ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(ex, by, chip, chip);
       const foreground = textColorFor(color);
       text(String(el.number), ex + 8, by + 20, '17px Arial', foreground, 'left');

@@ -1,3 +1,4 @@
+import { drawPosterBackground, drawGemTile } from './posterArtwork';
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 
@@ -30,8 +31,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   canvas.width = 1080;
   canvas.height = Math.max(1350, top + rows * 195 + 200);
   const gold = theme === 'gold' ? '#815817' : '#ebc979';
-  ctx.fillStyle = theme === 'gold' ? '#fbf2da' : '#081716';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await drawPosterBackground(ctx, canvas.width, canvas.height, theme);
   ctx.strokeStyle = '#b88b36'; ctx.lineWidth = 2;
   ctx.strokeRect(24, 24, 1032, canvas.height - 48);
   ctx.strokeRect(32, 32, 1016, canvas.height - 64);
@@ -61,7 +61,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
     const x = (1080 - (count * 174 + (count - 1) * 14)) / 2 + (index % 5) * 188;
     const y = gridY + rowIndex * 195;
     const color = posterColorFor(el);
-    ctx.fillStyle = color; ctx.fillRect(x, y, 174, 174);
+    drawGemTile(ctx, x, y, 174, 174, color);
     ctx.strokeStyle = '#b88b36'; ctx.strokeRect(x, y, 174, 174);
     ctx.fillStyle = textColorFor(color); ctx.textAlign = 'left'; ctx.font = '22px Arial';
     ctx.fillText(String(el.number), x + 14, y + 29);

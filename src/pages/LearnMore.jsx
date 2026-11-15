@@ -34,32 +34,26 @@ export default function LearnMore() {
           )}
         </div>
 
-        {/* Toggle */}
-        <div className="flex justify-center gap-4 mb-8">
-          <button
-            onClick={() => setMode("science")}
-            className={`px-6 py-2 rounded-full font-semibold transition ${
-              mode === "science"
-                ? "bg-brand-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            🔬 Science
-          </button>
-          <button
-            onClick={() => setMode("spiritual")}
-            className={`px-6 py-2 rounded-full font-semibold transition ${
-              mode === "spiritual"
-                ? "bg-brand-600 text-white"
-                : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-            }`}
-          >
-            ✨ Spiritual
-          </button>
+        <div className="flex flex-wrap justify-center gap-3 mb-8" aria-label="Learn more topics">
+          {[["science", "Science"], ["spiritual", "Spiritual"], ["explainer", "How It Works"]].map(([key, label]) => (
+            <button key={key} onClick={() => setMode(key)} aria-pressed={mode === key}
+              className={`px-5 py-3 rounded-full font-semibold transition ${mode === key ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
+              {label}
+            </button>
+          ))}
         </div>
 
         {/* Content */}
-        {mode === "science" ? (
+        {mode === "explainer" ? (
+          <section aria-label="How NameVibes works" className="space-y-4 text-center">
+            <h2 className="text-2xl text-brand-700">The Chemistry of Your Name</h2>
+            <p>Explore the letters, discover the elements, and create your own NameVibes poster.</p>
+            <a href="/theme/vibes-sample.png" target="_blank" rel="noreferrer" className="block rounded-xl overflow-hidden border border-amber-200 shadow-lg">
+              <img src="/theme/vibes-sample.png" alt="NameVibes illustrated guide: Vibes becomes Vanadium (V), Iodine (I), Beryllium (Be), and Sulfur (S). Discover your name's elements and create a poster to save and share." className="w-full h-auto" />
+            </a>
+            <a href="/theme/vibes-sample.png" target="_blank" rel="noreferrer" className="inline-block underline text-brand-700 py-2">View the explainer full size</a>
+          </section>
+        ) : mode === "science" ? (
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
               <strong>NameVibes</strong> explores how identity can be understood
