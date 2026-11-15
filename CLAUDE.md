@@ -4,7 +4,7 @@
 - Added generated gold and dark emerald molecular artwork in public/theme/poster-{gold,dark}-art.png. Applied to the single and family on-screen posters, saved/shared PNGs, and PDFs. Gold bevels and dimensional tile lighting share a canvas renderer; PDF names and element labels remain selectable vector text. Family Harmony has a quiet panel for legibility.
 - Preserved the approved green logo, one selectable poster, current family limit and compact layout, legacy export fallback, shared-element meanings, and existing save/native file-share behavior. Decorative imagery contains no generated names or chemical data.
 - Validation: production build passed; Playwright generated all eight single/family gold/dark PNG/PDF combinations without page errors. Four-member PDFs fit one page; PDF text-bound checks found no off-page words. Inspected PNG/PDF renders. At 390px, the third tab switches correctly, single results contain exactly one poster, and neither page overflows horizontally. QA files are in untracked artifacts/rich-posters.
-- Deployment: local changes ready; GitHub HTTPS connections are timing out during fetch. Live deployment is not yet confirmed. Retry fetch/push before claiming this release is live. Unrelated package-lock.json, artifacts/ and docs/ changes are excluded.
+- Deployment verified 16 November 2026 (Asia/Calcutta): pushed e776bf8 to origin/main after GitHub connectivity recovered. Cloudflare Pages completed successfully. Live /learn-more opens the third How It Works tab, both poster artwork assets return HTTP 200 and match local SHA-256 hashes, and Chromium reports no page errors. Unrelated package-lock.json, artifacts/ and docs/ changes remain excluded.
 
 # NameVibes project handoff
 
