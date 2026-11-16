@@ -77,9 +77,9 @@ async function buildLegacyFamilyPosterImage(people, theme) {
         const tx = x + (474 - (count * 100 + (count - 1) * 10)) / 2 + index % 4 * 110;
         const ty = tileY + rowIndex * 118;
         const color = posterColorFor(el); drawGemTile(ctx, tx, ty, 100, 100, color);
-        ctx.strokeRect(tx, ty, 100, 100);
+
         const foreground = textColorFor(color);
-        text(String(el.number), tx + 8, ty + 20, '15px Arial', foreground, 'left');
+        text(String(el.number), tx + 50, ty + 20, 'bold 15px Georgia', foreground);
         text(el.symbol, tx + 50, ty + 65, 'bold 42px Georgia', foreground);
         text(el.name, tx + 50, ty + 88, '12px Arial', foreground);
       });
@@ -214,9 +214,9 @@ async function buildCompactFamilyPosterImage(people, theme) {
   function drawTile(el, x, y) {
     const color = posterColorFor(el);
     drawGemTile(ctx, x, y, tile, tileH, color);
-    ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(x, y, tile, tileH);
+
     const foreground = textColorFor(color);
-    text(String(el.number), x + 9, y + Math.round(tile * 0.17), `${Math.round(tile * 0.15)}px Arial`, foreground, 'left');
+    text(String(el.number), x + tile / 2, y + Math.round(tile * 0.21), `bold ${Math.round(tile * 0.17)}px Georgia`, foreground);
     text(el.symbol, x + tile / 2, y + Math.round(tileH * 0.66), `bold ${Math.round(tile * 0.46)}px Georgia`, foreground);
     text(el.name, x + tile / 2, y + tileH - 12, fitFont(el.name, tile - 12, Math.max(13, Math.round(tile * 0.115)), 'Arial'), foreground);
   }
@@ -260,9 +260,9 @@ async function buildCompactFamilyPosterImage(people, theme) {
       const chip = 112;
       const color = posterColorFor(el);
       drawGemTile(ctx, ex, by, chip, chip, color);
-      ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(ex, by, chip, chip);
+
       const foreground = textColorFor(color);
-      text(String(el.number), ex + 8, by + 20, '17px Arial', foreground, 'left');
+      text(String(el.number), ex + chip / 2, by + 23, 'bold 18px Georgia', foreground);
       text(el.symbol, ex + chip / 2, by + 74, 'bold 52px Georgia', foreground);
       text(el.name, ex + chip / 2, by + chip - 10, fitFont(el.name, chip - 10, 14, 'Arial'), foreground);
       const tx = ex + chip + 22;

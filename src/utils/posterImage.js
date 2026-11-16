@@ -29,7 +29,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   const top = 390 + lines.length * 78;
   const rows = Math.ceil(elements.length / 5);
   canvas.width = 1080;
-  canvas.height = Math.max(1350, top + rows * 195 + 200);
+  canvas.height = Math.max(1350, top + rows * 220 + 200);
   const gold = theme === 'gold' ? '#815817' : '#ebc979';
   await drawPosterBackground(ctx, canvas.width, canvas.height, theme);
   ctx.strokeStyle = '#b88b36'; ctx.lineWidth = 2;
@@ -54,19 +54,19 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   ctx.beginPath(); ctx.moveTo(170, 290); ctx.lineTo(910, 290); ctx.stroke();
   text(family && person.relation ? person.relation.toUpperCase() : 'THE CHEMISTRY OF YOUR NAME', 345, 21, 'Arial');
   lines.forEach((nameLine, i) => text(nameLine, 420 + i * 78, 64));
-  const gridY = Math.max(top, (canvas.height - rows * 195) / 2 + 80);
+  const gridY = Math.max(top, (canvas.height - rows * 220) / 2 + 80);
   elements.forEach((el, index) => {
     const rowIndex = Math.floor(index / 5);
     const count = Math.min(5, elements.length - rowIndex * 5);
     const x = (1080 - (count * 174 + (count - 1) * 14)) / 2 + (index % 5) * 188;
-    const y = gridY + rowIndex * 195;
+    const y = gridY + rowIndex * 220;
     const color = posterColorFor(el);
-    drawGemTile(ctx, x, y, 174, 174, color);
-    ctx.strokeStyle = '#b88b36'; ctx.strokeRect(x, y, 174, 174);
-    ctx.fillStyle = textColorFor(color); ctx.textAlign = 'left'; ctx.font = '22px Arial';
-    ctx.fillText(String(el.number), x + 14, y + 29);
-    ctx.textAlign = 'center'; ctx.font = 'bold 75px Georgia'; ctx.fillText(el.symbol, x + 87, y + 110);
-    ctx.font = '18px Arial'; ctx.fillText(el.name, x + 87, y + 151);
+    drawGemTile(ctx, x, y, 174, 200, color);
+
+    ctx.fillStyle = textColorFor(color); ctx.textAlign = 'center'; ctx.font = 'bold 25px Georgia';
+    ctx.fillText(String(el.number), x + 87, y + 33);
+    ctx.textAlign = 'center'; ctx.font = 'bold 75px Georgia'; ctx.fillText(el.symbol, x + 87, y + 125);
+    ctx.font = 'bold 18px Georgia'; ctx.fillText(el.name, x + 87, y + 177);
   });
   if (!elements.length) text('No periodic elements found in this name.', 700, 24, 'Arial');
   text('More than a name. A higher you.', canvas.height - 105, 30);

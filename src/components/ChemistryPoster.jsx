@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { gemTileData, loadGemTexture } from '../utils/posterArtwork';
 import Logo from './Logo';
 import { textColorFor } from '../utils/elements';
 import { findSharedElements } from '../utils/commonElements';
@@ -6,10 +7,12 @@ import { posterColorFor } from '../utils/posterPalette';
 
 export function ElementTile({ element }) {
   const color = posterColorFor(element);
-  return <div className="element-tile" style={{ backgroundColor: color, color: textColorFor(color) }}>
+  const [textureReady, setTextureReady] = useState(false);
+  useEffect(() => { let active = true; loadGemTexture().then(() => { if (active) setTextureReady(true); }); return () => { active = false; }; }, []);
+  return <div className="element-tile" style={{ backgroundColor: color, color: textColorFor(color), backgroundImage: textureReady ? `url("${gemTileData(color)}")` : undefined }}>
     <span className="element-number">{element.number}</span>
     <strong className="element-symbol">{element.symbol}</strong>
-    <span className="element-name">{element.name}</span>
+    <span className="element-name" style={{ fontSize: element.name.length > 10 ? 9 : element.name.length > 7 ? 10 : undefined }}>{element.name}</span>
   </div>;
 }
 

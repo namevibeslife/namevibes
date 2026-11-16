@@ -187,7 +187,7 @@ function drawTile(pdf, el, x, y, w, h) {
   pdf.setTextColor(textColorFor(color));
   const numberSize = Math.max(5.5, w * 0.33);
   pdf.setFont('helvetica', 'normal'); pdf.setFontSize(numberSize);
-  pdf.text(String(el.number), x + 1.8, y + 1.6 + numberSize * PT + 0.4);
+  pdf.text(String(el.number), x + w / 2, y + 1.6 + numberSize * PT + 0.4, { align: 'center' });
   pdf.setFont('times', 'bold'); pdf.setFontSize(w * 1.15);
   pdf.text(el.symbol, x + w / 2, y + h * 0.62, { align: 'center' });
   const nameSize = fitSize(pdf, el.name, 'helvetica', 'normal', w - 2, Math.max(4.5, w * 0.3), 3.8);
@@ -393,7 +393,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
         pdf.line(x + 2, y + 2, x + 30, y + 2);
         pdf.setTextColor(textColorFor(color));
         pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
-        pdf.text(String(el.number), x + 3, y + 6);
+        pdf.text(String(el.number), x + 16, y + 7, { align: 'center' });
         pdf.setFont('times', 'bold'); pdf.setFontSize(27);
         pdf.text(el.symbol, x + 16, y + 21, { align: 'center' });
         pdf.setFont('helvetica', 'normal'); pdf.setFontSize(7);

@@ -1,9 +1,22 @@
+let crystalTexture = null;
+let texturePromise;
+export function loadGemTexture() {
+  if (!texturePromise) texturePromise = new Promise(resolve => {
+    const image = new Image();
+    image.onload = () => { crystalTexture = image; tileCache.clear(); resolve(); };
+    image.onerror = () => { texturePromise = null; resolve(); };
+    image.src = '/theme/element-crystal-texture.png';
+  });
+  return texturePromise;
+}
+
 // Shared artwork for the on-screen, image and printable posters.
 export function artworkUrl(theme) {
   return `/theme/poster-${theme === 'gold' ? 'gold' : 'dark'}-art.png`;
 }
 
 export async function drawPosterBackground(ctx, width, height, theme) {
+  await loadGemTexture();
   ctx.fillStyle = theme === 'gold' ? '#fbf2da' : '#081716';
   ctx.fillRect(0, 0, width, height);
   try {
@@ -23,28 +36,36 @@ export async function drawPosterBackground(ctx, width, height, theme) {
 
 export function drawGemTile(ctx, x, y, width, height, color) {
   ctx.save();
-  ctx.shadowColor = '#00000045'; ctx.shadowBlur = width * .08; ctx.shadowOffsetY = width * .04;
-  ctx.fillStyle = color; ctx.fillRect(x, y, width, height);
-  ctx.shadowColor = 'transparent';
+  const inset = width * .012, radius = width * .085;
+  ctx.beginPath(); ctx.roundRect(x + inset, y + inset, width - inset * 2, height - inset * 2, radius);
+  ctx.shadowColor = color; ctx.shadowBlur = width * .07;
+  ctx.fillStyle = color; ctx.fill(); ctx.shadowBlur = 0;
+  ctx.save(); ctx.clip();
+  if (crystalTexture) {
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.drawImage(crystalTexture, x, y, width, height);
+    ctx.globalCompositeOperation = 'source-over';
+  }
   const sheen = ctx.createLinearGradient(x, y, x + width, y + height);
-  sheen.addColorStop(0, '#ffffff70'); sheen.addColorStop(.38, '#ffffff08');
-  sheen.addColorStop(.65, '#00000008'); sheen.addColorStop(1, '#00000045');
+  sheen.addColorStop(0, '#ffffff80'); sheen.addColorStop(.22, '#ffffff08');
+  sheen.addColorStop(.65, '#ffffff00'); sheen.addColorStop(1, '#ffffff30');
   ctx.fillStyle = sheen; ctx.fillRect(x, y, width, height);
-  const bevel = Math.max(3, width * .045);
-  ctx.strokeStyle = '#f7df9c'; ctx.lineWidth = Math.max(1, width * .012);
-  ctx.strokeRect(x, y, width, height);
-  ctx.strokeStyle = '#ffffff65'; ctx.strokeRect(x + bevel, y + bevel, width - bevel * 2, height - bevel * 2);
-  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + width, y); ctx.lineTo(x + width - bevel, y + bevel);
-  ctx.lineTo(x + bevel, y + bevel); ctx.lineTo(x + bevel, y + height - bevel); ctx.lineTo(x, y + height);
-  ctx.closePath(); ctx.fillStyle = '#ffffff35'; ctx.fill();
+  ctx.restore();
+  const edge = ctx.createLinearGradient(x, y, x + width, y + height);
+  edge.addColorStop(0, '#ffffff'); edge.addColorStop(.25, color);
+  edge.addColorStop(.5, '#ffffffdd'); edge.addColorStop(.75, color); edge.addColorStop(1, '#ffffff');
+  ctx.strokeStyle = edge; ctx.lineWidth = width * .022; ctx.stroke();
+  ctx.beginPath(); const bevel = width * .035;
+  ctx.roundRect(x + bevel, y + bevel, width - bevel * 2, height - bevel * 2, radius * .8);
+  ctx.strokeStyle = '#ffffff88'; ctx.lineWidth = width * .012; ctx.stroke();
   ctx.restore();
 }
 
 const tileCache = new Map();
 export function gemTileData(color) {
   if (!tileCache.has(color)) {
-    const canvas = document.createElement('canvas'); canvas.width = 240; canvas.height = 240;
-    drawGemTile(canvas.getContext('2d'), 0, 0, 240, 240, color);
+    const canvas = document.createElement('canvas'); canvas.width = 240; canvas.height = 280;
+    drawGemTile(canvas.getContext('2d'), 0, 0, 240, 280, color);
     tileCache.set(color, canvas.toDataURL('image/png'));
   }
   return tileCache.get(color);

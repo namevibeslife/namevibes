@@ -1,3 +1,10 @@
+## Crystal element tiles matching the supplied poster - 16 November 2026
+
+- User clarified that the individual element rectangles should match the rich faceted gemstone tiles in Downloads/namevibes posters and logo/Namevibes_ Elements in My Name.png. Added a neutral generated quartz texture at public/theme/element-crystal-texture.png and tint it using each element's existing poster color.
+- Shared renderer now paints crystal facets, rounded glass edges, reflective highlights and colored glow. On-screen tiles use the same rendered material as PNG/PDF exports. Atomic numbers are centered above symbols; preview/single-image labels use serif type, with smaller preview labels for long element names. Single PNG tiles are taller rectangles. Actual parsed symbols, names and numbers are unchanged.
+- Texture is loaded before exports, cached for previews/PDF reuse, with a gradient fallback if unavailable. Both gold/dark and single/family exports retain their existing layout and shared-element meanings. Approved logo/backgrounds remain.
+- Validation: production build passed; all eight single/family gold/dark PNG/PDF exports succeeded without browser errors. All four sample PDFs remain one page with no off-page text; inspected single PNG, mobile preview and family PDF. Mobile results retain one poster and no horizontal page overflow.
+
 ## Rich poster artwork and third Learn More tab - 15 November 2026
 
 - Learn More now has a third "How It Works" tab showing the existing corrected Vibes chemistry explainer (derived from the user's supplied Chemistry of Your Name image). Keeps the earlier request for a neutral sample and accurate V / I / Be / S elements; full-size link included.
