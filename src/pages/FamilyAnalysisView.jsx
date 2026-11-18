@@ -2,7 +2,6 @@ import PosterDownload from '../components/PosterDownload';
 import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Users } from 'lucide-react';
@@ -69,7 +68,6 @@ export default function FamilyAnalysisView() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="bg-paper rounded-2xl shadow-xl p-8">

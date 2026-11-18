@@ -1,112 +1,61 @@
-import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { signOut } from 'firebase/auth';
-import { auth } from '../firebase';
-import { Menu, X, Home, Sparkles, Users, Calculator, BookOpen, Settings, LogOut } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Home } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
 
+const explore = [
+  ['Home', '/'], ['Know More', '/learn-more'], ['Dashboard', '/dashboard'],
+  ['Analyze Name', '/analyze'], ['Family Analysis', '/family'],
+  ['Element & Nakshatra Insights', '/element-insights'],
+  ['Numerology Calculator', '/numerology-calculator'],
+  ['Zodiac Name Guide', '/zodiac-syllables'], ['Hora & Muhurat', '/hora-muhurat'],
+  ['Plans & Pricing', '/pricing'],
+];
+
+// One shared navigation bar on every route, including public and error pages.
 export default function UserNav() {
-  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
   const location = useLocation();
-  const profile = useAuthStore(state => state.profile);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
-
-  const menuItems = [
-    { icon: Home, label: 'Dashboard', path: '/dashboard' },
-    { icon: Sparkles, label: 'Analyze Name', path: '/analyze' },
-    { icon: Users, label: 'Family Analysis', path: '/family', familyOnly: true },
-    { icon: Calculator, label: 'Numerology Calculator', path: '/numerology-calculator' },
-    { icon: BookOpen, label: 'Zodiac Name Guide', path: '/zodiac-syllables' },
-    { icon: Settings, label: 'Settings', path: '/settings' },
-  ].filter(item => !item.familyOnly || profile?.planType === 'family');
-
-  const itemClass = (path) => location.pathname === path ? 'text-brand-600' : 'text-gray-700';
-
-  return (
-    <header className="bg-paper shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <h1 onClick={() => navigate('/dashboard')} className="cursor-pointer">
-            <Logo className="h-10 w-auto" />
-          </h1>
-
-          {/* Desktop Menu */}
-          <nav className="hidden xl:flex items-center gap-6">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.path}
-                  onClick={() => navigate(item.path)}
-                  className={`flex items-center gap-2 ${itemClass(item.path)} hover:text-brand-600 transition font-medium whitespace-nowrap`}
-                >
-                  <Icon size={18} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </nav>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="xl:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
-            aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
-            aria-expanded={isMenuOpen}
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Menu Dropdown */}
-        {isMenuOpen && (
-          <nav className="xl:hidden mt-4 pb-4 border-t border-gray-200 pt-4">
-            <div className="flex flex-col gap-2">
-              {menuItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <button
-                    key={item.path}
-                    onClick={() => {
-                      navigate(item.path);
-                      setIsMenuOpen(false);
-                    }}
-                    className={`flex items-center gap-3 px-4 py-3 ${itemClass(item.path)} hover:bg-brand-50 hover:text-brand-600 rounded-lg transition font-medium text-left`}
-                  >
-                    <Icon size={20} />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-3 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium mt-2"
-              >
-                <LogOut size={20} />
-                Logout
-              </button>
-            </div>
-          </nav>
-        )}
-      </div>
-    </header>
-  );
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
+  const container = useRef(null);
+  const toggle = useRef(null);
+  useEffect(() => { setOpen(false); setError(''); }, [location.pathname]);
+  useEffect(() => {
+    if (!open) return;
+    const outside = event => { if (!container.current?.contains(event.target)) setOpen(false); };
+    const escape = event => { if (event.key === 'Escape') { setOpen(false); toggle.current?.focus(); } };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
+  }, [open]);
+  const account = user ? [['Settings', '/settings'], ['My Profile', '/profile-complete']] : [['Sign In', '/login']];
+  const partners = [['Ambassador Program', '/ambassador'], ['Become an Ambassador', '/ambassador/register']];
+  if (location.pathname.startsWith('/ambassador')) partners.push(['Ambassador Dashboard', '/ambassador/dashboard']);
+  if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['Admin', '/admin'], ['Accounts', '/accounts']);
+  async function signOut() {
+    try { await logout(); setOpen(false); navigate('/'); }
+    catch { setError('Could not sign out. Please try again.'); }
+  }
+  return <header className="site-navigation" ref={container}>
+    <div className="site-navigation-bar">
+      <Link to="/" aria-label="NameVibes home" className="site-navigation-logo"><Logo /></Link>
+      <nav aria-label="Primary navigation" className="site-navigation-actions">
+        <NavLink to="/" end className="site-home-link"><Home size={18} aria-hidden="true" />Home</NavLink>
+        <button ref={toggle} type="button" aria-expanded={open} aria-controls="site-navigation-menu" onClick={() => setOpen(value => !value)} className="site-menu-toggle">
+          {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />} Menu
+        </button>
+      </nav>
+      {open && <nav id="site-navigation-menu" aria-label="All pages" className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>
+        {[['Explore NameVibes', explore], ['Your account', account], ['Partners', partners]].map(([title, links]) => <section key={title}>
+          <h2>{title}</h2>
+          <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{label}</NavLink>)}</div>
+        </section>)}
+        {user && <button type="button" onClick={signOut} className="site-signout">Sign Out</button>}
+        {error && <p role="alert">{error}</p>}
+      </nav>}
+    </div>
+  </header>;
 }

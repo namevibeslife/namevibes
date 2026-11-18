@@ -2,17 +2,17 @@
 
 .element-insights-page {
   min-height: 100vh;
-  background: url('/theme/golden-chemistry.svg') 0 0 / 1200px, linear-gradient(135deg, #fffdf5 0%, #f6e5bc 100%);
+  background: linear-gradient(#fffaf044, #fffaf044), url('/theme/poster-gold-reference.png') center top / 100% auto repeat-y, #fcf3df;
 }
 
 /* Quick Navigation */
 .insights-nav-menu {
   position: sticky;
-  top: 64px;
+  top: var(--site-nav-height);
   background: linear-gradient(135deg, #89601c 0%, #214d47 100%);
   padding: 15px 0;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 100;
+  z-index: 30;
   margin-bottom: 20px;
 }
 

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import { Calculator } from 'lucide-react';
 
 const RELATIONS = [
@@ -234,7 +233,6 @@ export default function NumerologyCalculator() {
   if (results) {
     return (
       <div className="min-h-screen site-background">
-        <UserNav />
 
         <div className="max-w-4xl mx-auto px-4 py-6">
           {/* Header Card */}
@@ -348,7 +346,6 @@ export default function NumerologyCalculator() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="bg-paper rounded-xl shadow-lg p-6">

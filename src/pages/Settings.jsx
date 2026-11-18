@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Trash2, AlertTriangle, LogOut } from 'lucide-react';
@@ -66,7 +65,6 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         

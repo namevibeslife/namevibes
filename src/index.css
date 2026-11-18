@@ -141,7 +141,7 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 }
 
 /* Shared rich molecular artwork used by image and PDF exports as well. */
-.chemistry-poster.poster-ivory { background-image: url('/theme/poster-gold-art.png'); }
+.chemistry-poster.poster-ivory { background-image: url('/theme/poster-gold-reference.png'); }
 .chemistry-poster.poster-midnight { background-image: url('/theme/poster-dark-art.png'); }
 .chemistry-poster { background-size: 100% 100%; background-repeat: no-repeat; }
 .chemistry-poster .poster-person, .chemistry-poster .poster-harmony { background: #fff9e8c9; box-shadow: inset 0 0 0 3px #e9c98320, 0 8px 24px #5d3d1110; }
@@ -157,3 +157,27 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .chemistry-poster .element-name { font-family: Georgia, serif; font-weight: bold; font-size: 13px; }
 .poster-family-grid .element-number { font-size: 13px; }
 .poster-family-grid .element-name { font-size: 11px; }
+
+/* Persistent Home and a complete disclosure menu on every route. */
+:root { --site-nav-height: 72px; }
+.site-navigation { position: sticky; top: 0; z-index: 40; background: #fffaf0f5; border-bottom: 1px solid #dbc68f; box-shadow: 0 3px 16px #60431312; }
+.site-navigation-bar { position: relative; max-width: 1280px; height: var(--site-nav-height); margin: auto; padding: 0 16px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.site-navigation-logo { display: block; flex-shrink: 1; min-width: 0; }
+.site-navigation-logo img { display: block; width: 148px; height: auto; }
+.site-navigation-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.site-home-link, .site-menu-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-height: 44px; padding: 8px 12px; border-radius: 9px; font-weight: 600; }
+.site-home-link { color: #624515; }
+.site-menu-toggle { background: #79551b; color: #fff; }
+.site-home-link:hover { background: #f1e6ca; }
+.site-menu-toggle:hover { background: #604313; }
+.site-navigation-dropdown { position: absolute; right: 16px; top: calc(100% + 8px); width: min(540px, calc(100vw - 32px)); max-height: calc(100vh - 96px); max-height: calc(100dvh - 96px); overflow-y: auto; overscroll-behavior: contain; background: #fffdf7; padding: 20px; border: 1px solid #d9c28c; border-radius: 14px; box-shadow: 0 16px 48px #241d1740; }
+.site-navigation-dropdown section + section { border-top: 1px solid #e8dcc0; margin-top: 12px; padding-top: 12px; }
+.site-navigation-dropdown h2 { font: 600 12px/1.5 Arial, sans-serif; text-transform: uppercase; letter-spacing: .08em; color: #856021; margin: 0 10px 6px; }
+.site-navigation-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
+.site-navigation-links a { padding: 10px; min-height: 44px; border-radius: 7px; color: #302c23; line-height: 1.5; }
+.site-navigation-links a:hover, .site-navigation-links a[aria-current="page"] { background: #f1e6ca; color: #624515; }
+.site-signout { padding: 10px; min-height: 44px; color: #9b2828; margin-top: 10px; }
+@media (max-width: 420px) { .site-navigation-logo img { width: 122px; } .site-navigation-bar { gap: 6px; padding: 0 12px; } .site-home-link, .site-menu-toggle { padding: 8px; } .site-navigation-links { grid-template-columns: 1fr; } }
+@media print { .site-navigation { display: none; } }
+
+.site-background, .element-insights-page { background-color: #fcf3df; background-image: linear-gradient(#fffaf044, #fffaf044), url('/theme/poster-gold-reference.png'); background-size: auto, 100% auto; background-position: center top; background-repeat: repeat-y; }

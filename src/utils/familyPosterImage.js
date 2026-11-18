@@ -53,7 +53,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   try {
     const logo = await new Promise((resolve, reject) => {
       const image = new Image(); image.onload = () => resolve(image); image.onerror = reject;
-      image.src = theme === 'gold' ? '/brand/logo-green-hires.png' : '/brand/logo-green-dark-hires.png';
+      image.src = '/brand/logo-green-hires.png';
     });
     const height = Math.min(150, logo.height * 460 / logo.width);
     const width = height * logo.width / logo.height;
@@ -202,7 +202,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
   try {
     const logo = await new Promise((resolve, reject) => {
       const image = new Image(); image.onload = () => resolve(image); image.onerror = reject;
-      image.src = theme === 'gold' ? '/brand/logo-green-hires.png' : '/brand/logo-green-dark-hires.png';
+      image.src = '/brand/logo-green-hires.png';
     });
     const height = Math.min(150, logo.height * 460 / logo.width);
     const width = height * logo.width / logo.height;

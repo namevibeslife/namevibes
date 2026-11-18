@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import { ChevronDown } from 'lucide-react';
 
 const INTRO = {
@@ -349,7 +348,6 @@ export default function ZodiacSyllableTable() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
 
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* System Selector */}

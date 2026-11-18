@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import UserNav from '../components/UserNav';
 import { MapPin, Sunrise, Sunset, Clock, Navigation } from 'lucide-react';
 import { PANCHANG_CITIES, DEFAULT_CITY_ID } from '../data/panchangCities';
 import {
@@ -122,7 +121,6 @@ export default function HoraMuhurat() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
       <div className="max-w-5xl mx-auto px-4 py-6 space-y-5">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-gray-800 mb-1">Today&apos;s Hora &amp; Muhurat</h2>

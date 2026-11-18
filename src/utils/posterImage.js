@@ -17,7 +17,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
   const elements = person.elements || [];
-  const logo = await loadImage(theme === 'gold' ? '/brand/logo-green-hires.png' : '/brand/logo-green-dark-hires.png').catch(() => null);
+  const logo = await loadImage('/brand/logo-green-hires.png').catch(() => null);
   ctx.font = '64px Georgia';
   const lines = [];
   let line = '';

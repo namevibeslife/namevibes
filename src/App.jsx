@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './store/authStore';
 import { isPlanActive } from './utils/plan';
+import UserNav from './components/UserNav';
 import LandingPage from './pages/LandingPage';
 
 // Pages load on demand so the first visit only downloads what it needs
@@ -77,6 +78,7 @@ function ProtectedRoute({ children, requiresAuth = true, requiresProfile, requir
 function App() {
   return (
     <BrowserRouter>
+      <UserNav />
       <Suspense fallback={<Spinner />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />

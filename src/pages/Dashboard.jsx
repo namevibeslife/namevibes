@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Logo from '../components/Logo';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { signOut } from 'firebase/auth';
-import { Sparkles, Users, Calendar, LogOut, Settings, ArrowRight } from 'lucide-react';
+import { Sparkles, Users, Calendar, Settings, ArrowRight } from 'lucide-react';
 import { countAnalysesThisMonth, isPlanActive, planFeatures, FAMILY_MAX_NAMES } from '../utils/plan';
 
 export default function Dashboard() {
@@ -59,14 +57,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut(auth);
-      navigate('/');
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-  };
 
   const handleViewAnalysis = (analysis) => {
     // Navigate to the analysis view page with the analysis ID
@@ -94,23 +84,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen site-background">
-      {/* Header */}
-      <header className="bg-paper shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex justify-between items-center">
-            <h1>
-              <Logo className="h-10 w-auto" />
-            </h1>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium"
-            >
-              <LogOut size={18} />
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Welcome Section */}

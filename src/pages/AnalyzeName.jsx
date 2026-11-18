@@ -1,7 +1,6 @@
 import PosterDownload from '../components/PosterDownload';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import { Sparkles } from 'lucide-react';
 import { auth, db } from '../firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -65,7 +64,6 @@ export default function AnalyzeName() {
   if (!result) {
     return (
       <div className="min-h-screen site-background">
-        <UserNav />
 
         <div className="container mx-auto px-4 py-8">
           <div className="max-w-2xl mx-auto bg-paper rounded-2xl shadow-xl p-8">
@@ -120,7 +118,6 @@ export default function AnalyzeName() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
 
       <div className="p-4">
         <div className="max-w-6xl mx-auto">

@@ -4,12 +4,11 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import Logo from '../components/Logo';
 import { captureReferralFromUrl } from '../utils/referralCode';
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const { user, loading, logout } = useAuthStore();
+  const { user } = useAuthStore();
 
   // Capture ?ref=<CODE> (e.g. IN482913) from a shared link (30-day localStorage), so it's
   // ready to prefill at sign-up even if the person browses a bit before creating an account.
@@ -19,37 +18,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen site-background">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6 flex justify-between items-center">
-        <div className="flex items-center">
-          <Logo className="h-20 sm:h-28 md:h-32 w-auto" />
-        </div>
-        {loading ? (
-          <div className="h-10 w-28" aria-hidden="true" />
-        ) : user ? (
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/dashboard')}
-              className="px-5 py-2 text-brand-600 border-2 border-brand-200 rounded-lg hover:bg-paper transition"
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={logout}
-              className="px-5 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition"
-            >
-              Sign Out
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition"
-          >
-            Sign In
-          </button>
-        )}
-      </header>
+
 
       {/* Hero Section */}
       <section className="landing-hero container mx-auto px-4 py-20 text-center">

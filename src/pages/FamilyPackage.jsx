@@ -2,7 +2,6 @@ import PosterDownload from '../components/PosterDownload';
 import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -116,7 +115,6 @@ export default function FamilyPackage() {
 
     return (
       <div className="min-h-screen site-background">
-        <UserNav />
   
         <div className="container mx-auto max-w-6xl py-8 px-4">
           <div className="bg-paper rounded-2xl shadow-2xl p-8">
@@ -200,7 +198,6 @@ export default function FamilyPackage() {
 
   return (
     <div className="min-h-screen site-background">
-      <UserNav />
   
         <div className="container mx-auto max-w-4xl py-8 px-4">
           <div className="bg-paper rounded-2xl shadow-2xl p-8">

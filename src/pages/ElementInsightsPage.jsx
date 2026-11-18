@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import UserNav from '../components/UserNav';
 import './ElementInsightsPage.css';
 
 export default function ElementInsightsPage() {
@@ -15,7 +14,6 @@ export default function ElementInsightsPage() {
 
   return (
     <div className="element-insights-page">
-      <UserNav />
       
       {/* Quick Navigation */}
       <nav className="insights-nav-menu">
