@@ -95,7 +95,7 @@ export default function Dashboard() {
           {userProfile?.planType && (
             <div className="space-y-2">
               <p className="text-gray-600">
-                <strong>Plan:</strong> {userProfile.planType.charAt(0).toUpperCase() + userProfile.planType.slice(1)} Yearly
+                <strong>Plan:</strong> Annual Plan
                 {planActive
                   ? <span className="ml-2 text-green-600">(Renews: {formattedRenewalDate})</span>
                   : <span className="ml-2 text-red-600">(Expired {formattedRenewalDate})</span>}
@@ -140,11 +140,11 @@ export default function Dashboard() {
             >
               <Calendar className="w-12 h-12 mb-4" />
               <h3 className="text-xl font-bold mb-2">
-                {!userProfile?.planType ? 'Choose a Plan' : !planActive ? 'Renew Your Plan' : 'Upgrade to Family'}
+                {!userProfile?.planType ? 'Choose a Plan' : !planActive ? 'Renew Your Plan' : 'Get the Annual Plan'}
               </h3>
               <p className="text-green-100 text-sm">
                 {userProfile?.planType === 'individual' && planActive
-                  ? `Family harmony, ${FAMILY_MAX_NAMES} names & PDF reports`
+                  ? `Family harmony, ${FAMILY_MAX_NAMES} names, PDF reports & more`
                   : 'Unlock name analyses and insights'}
               </p>
             </button>

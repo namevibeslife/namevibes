@@ -2,7 +2,7 @@
 // activate a plan without paying, so testers can walk the whole flow. The plan is written here,
 // on the server, so the Firestore security rules stay locked. Remove the variable to switch it off.
 const API_KEY = 'AIzaSyAkU1zvysoWojve9q9v-jDJWUITbFSnIdc'; // public Firebase web key
-const PLANS = ['individual', 'family'];
+const PLANS = ['family']; // one plan is sold: the NAMASUTRA Annual Plan, stored as 'family'
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,

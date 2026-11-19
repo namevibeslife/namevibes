@@ -12,6 +12,7 @@ import {
   orderBy,
   Timestamp
 } from 'firebase/firestore';
+import { CURRENCY_SYMBOLS } from '../data/countries';
 import './AccountsDashboard.css';
 
 function AccountsDashboard() {
@@ -366,7 +367,7 @@ function AccountsDashboard() {
         p.country || '-',
         p.state || '-',
         p.planType,
-        `${currency === 'INR' ? '₹' : '$'}${p.amount}`,
+        `${CURRENCY_SYMBOLS[currency] || '$'}${p.amount}`,
         p.currency,
         p.gateway,
         p.transactionId,

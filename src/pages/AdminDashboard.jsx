@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
+import AmbassadorInvite from '../components/AmbassadorInvite';
+import InviteMessageBox from '../components/InviteMessageBox';
+import { buildInviteMessage } from '../utils/ambassadorInvite';
 import PayoutManagement from '../components/PayoutManagement';
 import FilterPanel from '../components/FilterPanel';
 import {
@@ -25,8 +28,11 @@ import {
 } from 'lucide-react';
 import { addDoc, collection, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
+import { readPlanSettings } from '../utils/pricing';
+import { CURRENCY_SYMBOLS } from '../data/countries';
 
 export default function AdminDashboard(props) {
+  const [resendFor, setResendFor] = useState(null);
   const {
     currentAdmin,
     stats,
@@ -139,8 +145,8 @@ export default function AdminDashboard(props) {
         state: ambassador.stateName || 'Unknown',
         countryCode: ambassador.countryCode,
         stateCode: ambassador.stateCode,
-        currency: 'INR', // You can make this dynamic based on country
-        currencySymbol: '₹',
+        currency: selectedPayoutData.currency || 'INR',
+        currencySymbol: selectedPayoutData.currencySymbol || '₹',
         salesCount: selectedPayoutData.count,
         totalSales: selectedPayoutData.totalSales,
         commissionAmount: selectedPayoutData.totalCommission,
@@ -684,6 +690,13 @@ export default function AdminDashboard(props) {
                 </button>
               </div>
 
+              <AmbassadorInvite
+                currentAdmin={currentAdmin}
+                ambassadors={ambassadors}
+                countrySettings={countrySettings}
+                onInvited={loadAmbassadors}
+              />
+
               {currentAdmin?.role === 'super' && (
                 <div className="bg-paper rounded-xl shadow-lg p-6 mb-6 border-2 border-brand-200">
                   <h3 className="text-lg font-bold text-gray-800 mb-1">Referral Code Migration</h3>
@@ -784,7 +797,7 @@ export default function AdminDashboard(props) {
                 <div className="bg-paper rounded-xl shadow-lg p-12 text-center">
                   <UserCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-600 text-lg">No ambassadors yet</p>
-                  <p className="text-gray-500 text-sm mt-2">Ambassador applications will appear here</p>
+                  <p className="text-gray-500 text-sm mt-2">Invite an ambassador above to get started</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -809,6 +822,11 @@ export default function AdminDashboard(props) {
                             {ambassador.isApproved && !ambassador.isActive && (
                               <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full">
                                 INACTIVE
+                              </span>
+                            )}
+                            {ambassador.isApproved && (
+                              <span className={`px-3 py-1 text-xs font-semibold rounded-full ${ambassador.lastLoginAt ? 'bg-ocean-100 text-ocean-800' : 'bg-amber-100 text-amber-800'}`}>
+                                {ambassador.lastLoginAt ? 'LOGGED IN' : 'INVITED'}
                               </span>
                             )}
                           </div>
@@ -851,7 +869,13 @@ export default function AdminDashboard(props) {
                                     : 'bg-green-100 text-green-700 hover:bg-green-200'
                                 }`}
                               >
-                                {ambassador.isActive ? 'Deactivate' : 'Activate'}
+                                {ambassador.isActive ? 'Deactivate' : 'Reactivate'}
+                              </button>
+                              <button
+                                onClick={() => setResendFor(resendFor === ambassador.id ? null : ambassador.id)}
+                                className="px-4 py-2 rounded-lg text-sm bg-brand-100 text-brand-800 hover:bg-brand-200"
+                              >
+                                Resend invite
                               </button>
                               <button
                                 onClick={() => handleEditBankDetails(ambassador)}
@@ -864,6 +888,12 @@ export default function AdminDashboard(props) {
                           )}
                         </div>
                       </div>
+
+                      {resendFor === ambassador.id && (
+                        <div className="mb-4">
+                          <InviteMessageBox message={buildInviteMessage(ambassador.email)} onClose={() => setResendFor(null)} />
+                        </div>
+                      )}
 
                       <div className="grid md:grid-cols-3 gap-4 text-sm">
                         <div className="flex items-start gap-2">
@@ -1027,7 +1057,7 @@ export default function AdminDashboard(props) {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                          {payment.currency === 'INR' ? '₹' : '$'}{payment.amount}
+                          {CURRENCY_SYMBOLS[payment.currency] || (payment.currency ? payment.currency + ' ' : '₹')}{payment.amount}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm text-gray-600 capitalize">{payment.gateway}</span>
@@ -1111,10 +1141,10 @@ export default function AdminDashboard(props) {
                           {payout.count}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                          ₹{payout.totalSales.toFixed(2)}
+                          {payout.currencySymbol}{payout.totalSales.toFixed(2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
-                          ₹{payout.totalCommission.toFixed(2)}
+                          {payout.currencySymbol}{payout.totalCommission.toFixed(2)}
                         </td>
                         {currentAdmin?.role === 'super' && (
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -1192,39 +1222,15 @@ export default function AdminDashboard(props) {
 
                       <div className="space-y-3">
                         <div className="flex justify-between items-center py-2 border-b">
-                          <span className="text-sm text-gray-600">Individual Plan</span>
+                          <span className="text-sm text-gray-600">Annual Plan ({readPlanSettings(country).currency})</span>
                           <span className="text-lg font-bold text-gray-800">
-                            {country.symbol}{country.individualPrice}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b">
-                          <span className="text-sm text-gray-600">Family Plan</span>
-                          <span className="text-lg font-bold text-gray-800">
-                            {country.symbol}{country.familyPrice}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b">
-                          <span className="text-sm text-gray-600">Individual Discount</span>
-                          <span className="text-sm font-semibold text-green-600">
-                            {country.individualDiscount}%
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b">
-                          <span className="text-sm text-gray-600">Family Discount</span>
-                          <span className="text-sm font-semibold text-green-600">
-                            {country.familyDiscount}%
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center py-2 border-b">
-                          <span className="text-sm text-gray-600">Individual Commission</span>
-                          <span className="text-sm font-semibold text-brand-600">
-                            {country.individualCommission}%
+                            {readPlanSettings(country).symbol}{readPlanSettings(country).price}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-2">
-                          <span className="text-sm text-gray-600">Family Commission</span>
-                          <span className="text-sm font-semibold text-brand-600">
-                            {country.familyCommission}%
+                          <span className="text-sm text-gray-600">Referral Discount</span>
+                          <span className="text-sm font-semibold text-green-600">
+                            {readPlanSettings(country).discountPercent}%
                           </span>
                         </div>
                       </div>
@@ -1265,11 +1271,11 @@ export default function AdminDashboard(props) {
               </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Total Sales:</span>
-                <span className="font-semibold">₹{selectedPayoutData.totalSales.toFixed(2)}</span>
+                <span className="font-semibold">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Commission Amount:</span>
-                <span className="font-bold text-green-600 text-lg">₹{selectedPayoutData.totalCommission.toFixed(2)}</span>
+                <span className="font-bold text-green-600 text-lg">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalCommission.toFixed(2)}</span>
               </div>
             </div>
 
@@ -1520,82 +1526,49 @@ export default function AdminDashboard(props) {
                 </select>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Individual Price
-                  </label>
-                  <input
-                    type="number"
-                    value={countryFormData.individualPrice}
-                    onChange={(e) => setCountryFormData({...countryFormData, individualPrice: e.target.value})}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Family Price
-                  </label>
-                  <input
-                    type="number"
-                    value={countryFormData.familyPrice}
-                    onChange={(e) => setCountryFormData({...countryFormData, familyPrice: e.target.value})}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
-                  />
-                </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+                <select
+                  value={countryFormData.currency}
+                  onChange={(e) => setCountryFormData({...countryFormData, currency: e.target.value})}
+                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
+                >
+                  {['INR', 'USD', 'EUR', 'AED'].map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Individual Discount (%)
+                    Annual Plan Price ({countryFormData.currency})
                   </label>
                   <input
                     type="number"
-                    value={countryFormData.individualDiscount}
-                    onChange={(e) => setCountryFormData({...countryFormData, individualDiscount: e.target.value})}
+                    min="0"
+                    value={countryFormData.price}
+                    onChange={(e) => setCountryFormData({...countryFormData, price: e.target.value})}
+                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Referral Discount (%)
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    value={countryFormData.referralDiscount}
+                    onChange={(e) => setCountryFormData({...countryFormData, referralDiscount: e.target.value})}
                     className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
                     placeholder="10"
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Family Discount (%)
-                  </label>
-                  <input
-                    type="number"
-                    value={countryFormData.familyDiscount}
-                    onChange={(e) => setCountryFormData({...countryFormData, familyDiscount: e.target.value})}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
-                    placeholder="20"
-                  />
-                </div>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Individual Commission (%)
-                  </label>
-                  <input
-                    type="number"
-                    value={countryFormData.individualCommission}
-                    onChange={(e) => setCountryFormData({...countryFormData, individualCommission: e.target.value})}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Family Commission (%)
-                  </label>
-                  <input
-                    type="number"
-                    value={countryFormData.familyCommission}
-                    onChange={(e) => setCountryFormData({...countryFormData, familyCommission: e.target.value})}
-                    className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
-                  />
-                </div>
-              </div>
+              <p className="text-xs text-gray-500">
+                Ambassador commission is the same everywhere: 30% for the first 300 members, 50% from the 301st.
+              </p>
 
               <div className="flex items-center gap-2">
                 <input

@@ -32,8 +32,8 @@ export default function UserNav() {
     return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
   }, [open]);
   const account = user ? [['Settings', '/settings'], ['My Profile', '/profile-complete']] : [['Sign In', '/login']];
-  const partners = [['Ambassador Program', '/ambassador'], ['Become an Ambassador', '/ambassador/register']];
-  if (location.pathname.startsWith('/ambassador')) partners.push(['Ambassador Dashboard', '/ambassador/dashboard']);
+  // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
+  const partners = [['Ambassador Login', '/ambassador']];
   if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['Admin', '/admin'], ['Accounts', '/accounts']);
   async function signOut() {
     try { await logout(); setOpen(false); navigate('/'); }
@@ -49,7 +49,7 @@ export default function UserNav() {
         </button>
       </nav>
       {open && <nav id="site-navigation-menu" aria-label="All pages" className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>
-        {[['Explore Namasutra', explore], ['Your account', account], ['Partners', partners]].map(([title, links]) => <section key={title}>
+        {[['Explore Namasutra', explore], ['Your account', account], ['Ambassadors', partners]].map(([title, links]) => <section key={title}>
           <h2>{title}</h2>
           <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{label}</NavLink>)}</div>
         </section>)}

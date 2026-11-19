@@ -15,7 +15,9 @@ import {
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
-import { COUNTRIES } from '../data/countries';
+import { COUNTRIES, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT, defaultPriceFor } from '../data/countries';
+import { readPlanSettings } from '../utils/pricing';
+import { computeCommissions } from '../utils/commission';
 import { reserveReferralCode, setReferralCodeActive, previewMigration, runMigration, ambassadorsNeedingMigration, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { 
   Users, 
@@ -131,14 +133,12 @@ export default function AdminPanel() {
   const [editingCountry, setEditingCountry] = useState(null);
   const [countryFormData, setCountryFormData] = useState({
     countryCode: '',
-    individualPrice: 0,
-    familyPrice: 0,
-    individualDiscount: 10,
-    familyDiscount: 20,
-    individualCommission: 15,
-    familyCommission: 25,
+    currency: 'USD',
+    price: 12,
+    referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
     isActive: true
   });
+
 
   // Admins sign in with Google; access comes from an admins/{email} document
   useEffect(() => {
@@ -532,44 +532,42 @@ export default function AdminPanel() {
     }
   };
 
-  // UPDATED loadAmbassadorPayouts with country/state filters
+  // Monthly payout per referral code. Tiered commission (src/utils/commission.js) depends on each
+  // member's rank across ALL of the ambassador's payments, so every payment is ranked first and the
+  // month/country/state filters are applied afterwards.
   const loadAmbassadorPayouts = async () => {
     try {
       const paymentsSnapshot = await getDocs(collection(db, 'payments'));
+      const byCode = {};
+      paymentsSnapshot.forEach(d => {
+        const payment = d.data();
+        if (!payment.referralCode) return;
+        const key = String(payment.referralCode).replace(/\s+/g, '').toUpperCase();
+        (byCode[key] = byCode[key] || []).push({ ...payment, id: d.id, memberId: payment.userId || payment.userEmail });
+      });
+
       const payoutMap = {};
-
-      paymentsSnapshot.forEach(doc => {
-        const payment = doc.data();
-        const paymentDate = payment.createdAt?.toDate();
-        
-        if (payment.referralCode && paymentDate) {
-          // Apply country filter
+      Object.entries(byCode).forEach(([code, list]) => {
+        computeCommissions(list).payments.forEach(payment => {
+          const paymentDate = payment.createdAt?.toDate();
+          if (!paymentDate) return;
           if (payoutFilter.country !== 'all' && payment.countryCode !== payoutFilter.country) return;
-          
-          // Apply state filter
           if (payoutFilter.state !== 'all' && payment.stateCode !== payoutFilter.state) return;
-          
-          const month = paymentDate.getMonth() + 1;
-          const year = paymentDate.getFullYear();
-          
-          if (month === payoutFilter.month && year === payoutFilter.year) {
-            if (!payoutMap[payment.referralCode]) {
-              payoutMap[payment.referralCode] = {
-                referralCode: payment.referralCode,
-                totalSales: 0,
-                totalCommission: 0,
-                count: 0
-              };
-            }
+          if (paymentDate.getMonth() + 1 !== payoutFilter.month || paymentDate.getFullYear() !== payoutFilter.year) return;
 
-            const commissionRate = payment.planType === 'family' ? 0.25 : 0.15;
-            const commission = payment.amount * commissionRate;
-
-            payoutMap[payment.referralCode].totalSales += payment.amount;
-            payoutMap[payment.referralCode].totalCommission += commission;
-            payoutMap[payment.referralCode].count += 1;
-          }
-        }
+          const currency = payment.currency || 'INR';
+          const row = payoutMap[code] = payoutMap[code] || {
+            referralCode: payment.referralCode,
+            currency,
+            currencySymbol: CURRENCY_SYMBOLS[currency] || currency + ' ',
+            totalSales: 0,
+            totalCommission: 0,
+            count: 0
+          };
+          row.totalSales += payment.amount || 0;
+          row.totalCommission += payment.commission;
+          row.count += 1;
+        });
       });
 
       setAmbassadorPayouts(Object.values(payoutMap));
@@ -621,9 +619,7 @@ export default function AdminPanel() {
         approvedBy: currentAdmin.email,
         referralCode: referralCode,
         codeVersion: CURRENT_CODE_VERSION,
-        payoutFrequency: approvalData.payoutFrequency,
-        commissionRateIndividual: 15,
-        commissionRateFamily: 25
+        payoutFrequency: approvalData.payoutFrequency
       });
 
       alert(`Ambassador approved successfully! Referral code: ${referralCode}`);
@@ -779,10 +775,9 @@ export default function AdminPanel() {
     setEditingCountry(null);
     setCountryFormData({
       countryCode: '',
-      individualPrice: 0,
-      familyPrice: 0,
-      individualCommission: 15,
-      familyCommission: 25,
+      currency: 'USD',
+      price: defaultPriceFor('USD'),
+      referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
       isActive: true
     });
     setShowCountryModal(true);
@@ -790,12 +785,13 @@ export default function AdminPanel() {
 
   const handleEditCountry = (country) => {
     setEditingCountry(country);
+    // Older docs only have familyPrice/familyDiscount; readPlanSettings reads those as a fallback
+    const plan = readPlanSettings(country, COUNTRIES[country.countryCode]?.currency);
     setCountryFormData({
       countryCode: country.countryCode,
-      individualPrice: country.individualPrice,
-      familyPrice: country.familyPrice,
-      individualCommission: country.individualCommission,
-      familyCommission: country.familyCommission,
+      currency: plan.currency,
+      price: plan.price,
+      referralDiscount: plan.discountPercent,
       isActive: country.isActive
     });
     setShowCountryModal(true);
@@ -824,17 +820,16 @@ export default function AdminPanel() {
         }
       }
 
+      // One Annual Plan price and one referral discount per country. Old individual/family and
+      // commission fields on existing docs are left untouched (updateDoc merges).
+      const currency = countryFormData.currency || countryInfo.currency || 'USD';
       const countryData = {
         countryCode: countryFormData.countryCode,
         countryName: countryInfo.name,
-        currency: countryInfo.currency,
-        symbol: countryInfo.symbol,
-        individualPrice: (Number(countryFormData.individualPrice) || 0),
-        familyPrice: (Number(countryFormData.familyPrice) || 0),
-        individualDiscount: (Number(countryFormData.individualDiscount) || 0),
-        familyDiscount: (Number(countryFormData.familyDiscount) || 0),
-        individualCommission: (Number(countryFormData.individualCommission) || 0),
-        familyCommission: (Number(countryFormData.familyCommission) || 0),
+        currency,
+        symbol: CURRENCY_SYMBOLS[currency] || countryInfo.symbol || '$',
+        price: Number(countryFormData.price) || 0,
+        referralDiscount: Number(countryFormData.referralDiscount) || 0,
         isActive: countryFormData.isActive,
         updatedAt: Timestamp.now(),
         updatedBy: currentAdmin.email

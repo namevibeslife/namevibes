@@ -442,29 +442,17 @@ export const getActiveCountries = (countrySettings = []) => {
     });
 };
 
-export const getPricing = (countryCode, planType) => {
+// The one NAMASUTRA Annual Plan. In-code fallbacks by currency, used only when a country has no
+// saved price under Admin -> Country Pricing.
+export const DEFAULT_PLAN_PRICES = { INR: 399, USD: 12, EUR: 12, AED: 25 };
+export const DEFAULT_REFERRAL_DISCOUNT = 10;
+export const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', AED: 'AED ' };
+
+export const defaultPriceFor = (currency) => DEFAULT_PLAN_PRICES[currency] ?? DEFAULT_PLAN_PRICES.USD;
+
+export const getPricing = (countryCode) => {
   const country = COUNTRIES[countryCode] || COUNTRIES.US;
   const currency = country.currency || 'USD';
-  const symbol = country.symbol || '$';
-
-  const prices = {
-    individual: currency === 'INR' ? 99 : 3,
-    family: currency === 'INR' ? 299 : 6
-  };
-
-  return {
-    price: prices[planType],
-    currency,
-    symbol
-  };
-};
-
-export const getDiscountedPrice = (price, planType) => {
-  const discount = planType === 'individual' ? 0.10 : 0.20;
-  return price * (1 - discount);
-};
-
-export const getAmbassadorCommission = (price, planType) => {
-  const rate = planType === 'individual' ? 0.15 : 0.25;
-  return price * rate;
+  const symbol = country.symbol || CURRENCY_SYMBOLS[currency] || '$';
+  return { price: defaultPriceFor(currency), currency, symbol };
 };

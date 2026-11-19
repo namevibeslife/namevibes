@@ -106,7 +106,7 @@ export default function AnalyzeName() {
                   onClick={() => navigate('/pricing')}
                   className="text-brand-600 hover:underline"
                 >
-                  Upgrade to Family for PDF downloads →
+                  Get the Annual Plan for PDF downloads →
                 </button>
               </div>
             )}

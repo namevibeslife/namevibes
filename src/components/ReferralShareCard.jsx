@@ -3,7 +3,7 @@ import { Copy, Check, Share2, Mail } from 'lucide-react';
 import { buildShareLink, buildShareMessage, buildTelegramMessage } from '../utils/referralCode';
 
 // Small brand glyphs the icon library doesn't have. Single-color, inherits currentColor.
-const WhatsAppIcon = (props) => (
+export const WhatsAppIcon = (props) => (
   <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" {...props}>
     <path d="M12.04 2c-5.52 0-10 4.48-10 10 0 1.77.46 3.45 1.27 4.9L2 22l5.25-1.38A9.96 9.96 0 0 0 12.04 22c5.52 0 10-4.48 10-10s-4.48-10-10-10Zm0 18.13a8.1 8.1 0 0 1-4.14-1.14l-.3-.18-3.1.82.83-3.02-.2-.31A8.1 8.1 0 1 1 20.14 12a8.1 8.1 0 0 1-8.1 8.13Zm4.45-6.06c-.24-.12-1.44-.71-1.67-.79-.22-.08-.38-.12-.55.12-.16.24-.63.79-.77.95-.14.16-.28.18-.52.06-.24-.12-1.02-.38-1.94-1.2-.72-.64-1.2-1.43-1.34-1.67-.14-.24-.02-.37.1-.49.11-.11.24-.28.36-.42.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.55-1.33-.76-1.82-.2-.48-.4-.42-.55-.42h-.47c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2s.86 2.32.98 2.48c.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.16 1.52.1.46-.07 1.44-.59 1.64-1.16.2-.57.2-1.06.14-1.16-.06-.1-.22-.16-.46-.28Z"/>
   </svg>
@@ -48,7 +48,7 @@ const EMAIL_SUBJECT = 'Discover the hidden elements in your name';
 // Native share sheets only list a useful set of apps on phones and tablets; on desktop the OS
 // list is tiny (Windows especially), so desktop relies on the explicit buttons instead. Mobile =
 // touch + a mobile UA (iPadOS reports a Mac UA but still has multi-touch).
-function isMobileDevice() {
+export function isMobileDevice() {
   if (typeof navigator === 'undefined') return false;
   const hasTouch = (navigator.maxTouchPoints || 0) > 0 || 'ontouchstart' in window;
   const mobileUA = /Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(navigator.userAgent || '');
@@ -56,7 +56,7 @@ function isMobileDevice() {
   return hasTouch && (mobileUA || iPadOS);
 }
 
-function copyToClipboard(text) {
+export function copyToClipboard(text) {
   if (navigator.clipboard?.writeText) return navigator.clipboard.writeText(text);
   // Fallback for older/locked-down browsers
   const el = document.createElement('textarea');

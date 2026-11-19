@@ -75,7 +75,13 @@ service cloud.firestore {
     }
 
     match /payments/{paymentId} {
-      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid);
+      // An ambassador may read payments made with their own referral code (needed for the
+      // tiered commission ranking on their My Followers tab); the code's owner is looked up the
+      // same way the users rule does it.
+      allow read: if isAdmin() || (signedIn() && resource.data.userId == request.auth.uid)
+        || (verifiedEmail() && resource.data.get('referralCode', null) is string
+            && exists(/databases/$(database)/documents/referralCodes/$(resource.data.referralCode.replace(' ', '')))
+            && get(/databases/$(database)/documents/referralCodes/$(resource.data.referralCode.replace(' ', ''))).data.ambassadorEmail == myEmail());
       allow write: if false; // payment server only
     }
 
@@ -87,7 +93,9 @@ service cloud.firestore {
 
     match /ambassadors/{ambassadorId} {
       allow read: if isAdmin() || (verifiedEmail() && resource.data.email == myEmail());
-      // Applications: only for your own email, and never pre-approved
+      // Ambassadors are invite-only: an admin creates the record (already approved, with its code).
+      allow create: if isAdmin();
+      // Legacy public applications (no longer offered): only for your own email, never pre-approved
       allow create: if verifiedEmail()
         && request.resource.data.email == myEmail()
         && request.resource.data.isApproved == false
@@ -96,9 +104,21 @@ service cloud.firestore {
       // A referralCode change is only allowed while codeVersion is below the current version
       // (defaults to 1, i.e. never migrated). Once codeVersion reaches 2, referralCode is
       // locked for good - no further change, by anyone, through the client SDK.
-      allow update: if isAdmin()
+      allow update: if (isAdmin()
         && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['referralCode'])
-            || resource.data.get('codeVersion', 1) < 2);
+            || resource.data.get('codeVersion', 1) < 2));
+      // An approved, active ambassador may update only their own profile/payout details and the
+      // first-login marker - never approval, activation, code, or commission-related fields.
+      allow update: if verifiedEmail()
+        && resource.data.email == myEmail()
+        && resource.data.isApproved == true
+        && resource.data.isActive == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'fullName', 'firstName', 'middleName', 'lastName', 'motherName', 'dob', 'gender', 'profession',
+          'mobileNumber', 'alternateMobile', 'countryCode', 'countryName', 'stateCode', 'stateName',
+          'city', 'zipCode', 'addressLine1', 'socialMedia', 'bankAccountName', 'bankName', 'accountNumber',
+          'accountType', 'ifscCode', 'swiftCode', 'branchName', 'upiId', 'panNumber', 'idType', 'idNumber',
+          'nomineeDetails', 'detailsCompleted', 'detailsCompletedAt', 'lastLoginAt']);
       allow delete: if isSuperAdmin();
     }
 

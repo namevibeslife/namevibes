@@ -21,9 +21,7 @@ const AnalysisView = lazy(() => import('./pages/AnalysisView'));
 const FamilyAnalysisView = lazy(() => import('./pages/FamilyAnalysisView'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Settings = lazy(() => import('./pages/Settings'));
-const AmbassadorLogin = lazy(() => import('./pages/AmbassadorLogin'));
-const AmbassadorRegistration = lazy(() => import('./pages/AmbassadorRegistration'));
-const AmbassadorDashboard = lazy(() => import('./pages/AmbassadorDashboard'));
+const AmbassadorHome = lazy(() => import('./pages/AmbassadorHome'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ElementInsightsPage = lazy(() => import('./pages/ElementInsightsPage'));
 const AccountsDashboard = lazy(() => import('./pages/AccountsDashboard'));
@@ -49,7 +47,7 @@ function homeFor(profile) {
  * - requiresAuth={false}: only for signed-out visitors (login page)
  * - requiresProfile: the profile form must be completed
  * - requiresPlan: an active paid plan is needed
- * - requiresFamily: an active Family plan is needed
+ * - requiresFamily: an active plan that includes the Family Package is needed
  */
 function ProtectedRoute({ children, requiresAuth = true, requiresProfile, requiresPlan, requiresFamily }) {
   const { user, profile, loading } = useAuthStore();
@@ -100,9 +98,10 @@ function App() {
           <Route path="/element-insights" element={<ProtectedRoute requiresPlan><ElementInsightsPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
 
-          <Route path="/ambassador" element={<AmbassadorLogin />} />
-          <Route path="/ambassador/register" element={<AmbassadorRegistration />} />
-          <Route path="/ambassador/dashboard" element={<AmbassadorDashboard />} />
+          {/* Ambassadors are invite-only: no public sign-up. Old links land on the ambassador page. */}
+          <Route path="/ambassador" element={<AmbassadorHome />} />
+          <Route path="/ambassador/register" element={<Navigate to="/ambassador" replace />} />
+          <Route path="/ambassador/dashboard" element={<Navigate to="/ambassador?tab=followers" replace />} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/accounts" element={<AccountsDashboard />} />
           <Route path="*" element={<NotFound />} />

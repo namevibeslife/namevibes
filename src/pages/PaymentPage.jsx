@@ -46,7 +46,7 @@ export default function PaymentPage() {
 
   const loadPayPalScript = () => {
     const script = document.createElement('script');
-    script.src = `https://www.paypal.com/sdk/js?client-id=AcF_1jxK7heQF3978kTbdmXDsjMtMEvtYgdjW63843OyvH2ni78u-ZiMeYXO64wvgsTmFh8ECcqpzR3U&currency=USD`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=AcF_1jxK7heQF3978kTbdmXDsjMtMEvtYgdjW63843OyvH2ni78u-ZiMeYXO64wvgsTmFh8ECcqpzR3U&currency=${encodeURIComponent(currency || 'USD')}`;
     script.addEventListener('load', () => {
       setPaypalLoaded(true);
       renderPayPalButton();
@@ -69,9 +69,9 @@ export default function PaymentPage() {
           purchase_units: [{
             amount: {
               value: amount.toString(),
-              currency_code: 'USD'
+              currency_code: currency || 'USD'
             },
-            description: `Namasutra ${planType} Plan - Yearly`
+            description: 'NAMASUTRA Annual Plan'
           }]
         });
       },
@@ -122,9 +122,9 @@ export default function PaymentPage() {
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: amount * 100,
-        currency: 'INR',
+        currency: currency || 'INR',
         name: 'Namasutra',
-        description: `${planType} Plan - Yearly`,
+        description: 'NAMASUTRA Annual Plan',
         handler: async function (response) {
           await savePaymentSuccess('razorpay', response.razorpay_payment_id);
         },
@@ -217,7 +217,7 @@ export default function PaymentPage() {
         <div className="bg-paper rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
           <CheckCircle size={72} className="text-green-600 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-gray-800 mb-2">Payment successful</h2>
-          <p className="text-gray-600 mb-1 capitalize">Your {planType} plan is now active.</p>
+          <p className="text-gray-600 mb-1">Your plan is now active.</p>
           <p className="text-gray-500 text-sm">Taking you to your dashboard...</p>
         </div>
       </div>
@@ -242,13 +242,13 @@ export default function PaymentPage() {
             Complete Payment
           </h2>
           <p className="text-center text-gray-600 mb-8">
-            Secure payment for your {planType} plan
+            Secure payment for your NAMASUTRA Annual Plan
           </p>
 
           {/* Plan Summary */}
           <div className="bg-gradient-to-r from-brand-100 to-ocean-100 rounded-xl p-6 mb-8">
             <div className="flex justify-between items-center mb-4">
-              <span className="text-lg text-gray-700 capitalize">{planType} Plan - Yearly</span>
+              <span className="text-lg text-gray-700">NAMASUTRA Annual Plan</span>
               <span className="text-3xl font-bold text-brand-600">
                 {symbol}{amount}
               </span>

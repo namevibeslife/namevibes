@@ -82,7 +82,7 @@ export const SEED_DATA = {
     idType: 'Aadhaar', idNumber: '0000 0000 0000',
     isApproved: true, isActive: true, approvedAt: daysAgo(60), approvedBy: 'admin@namevibes.test',
     referralCode: 'IN KL 00001', payoutFrequency: 'monthly',
-    commissionRateIndividual: 15, commissionRateFamily: 25, createdAt: daysAgo(70)
+    createdAt: daysAgo(70)
   },
   'ambassadors/mock-amb-2': {
     fullName: 'Priya Pending', firstName: 'Priya', middleName: '', lastName: 'Pending',
