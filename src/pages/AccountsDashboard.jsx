@@ -14,6 +14,7 @@ import {
 } from 'firebase/firestore';
 import { CURRENCY_SYMBOLS } from '../data/countries';
 import { payoutCodeLabel } from '../utils/payoutLabel';
+import { BankChangeFlag } from '../components/AmbassadorChangeLog';
 import './AccountsDashboard.css';
 
 function AccountsDashboard() {
@@ -816,6 +817,7 @@ function AccountsDashboard() {
             
             <div className="modal-info">
               <p><strong>Referral Code – Ambassador:</strong> {payoutCodeLabel(selectedPayout)}</p>
+              <BankChangeFlag ambassadorEmail={selectedPayout.ambassadorEmail} />
               <p><strong>Period:</strong> {getMonthName(selectedPayout.month)} {selectedPayout.year}</p>
               {selectedPayout.netAmount !== undefined && <p><strong>Tax removed / Net amount:</strong> {selectedPayout.currencySymbol}{selectedPayout.taxAmount} / {selectedPayout.currencySymbol}{selectedPayout.netAmount}</p>}
               <p><strong>Commission Amount (Net of GST):</strong> {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}</p>

@@ -556,9 +556,10 @@ export default function AdminPanel() {
       // code -> ambassador name (full name, or email until they fill in their details). The
       // unfiltered ambassadors list is used so a filter on the Ambassadors tab can't blank names.
       const nameByCode = {};
+      const emailByCode = {};
       (await getDocs(collection(db, 'ambassadors'))).forEach(d => {
         const a = d.data();
-        [a.referralCode, a.legacyCode].filter(Boolean).forEach(c => { nameByCode[String(c).replace(/\s+/g, '').toUpperCase()] = ambassadorLabel(a); });
+        [a.referralCode, a.legacyCode].filter(Boolean).forEach(c => { nameByCode[String(c).replace(/\s+/g, '').toUpperCase()] = ambassadorLabel(a); emailByCode[String(c).replace(/\s+/g, '').toUpperCase()] = a.email || ''; });
       });
       const byCode = {};
       paymentsSnapshot.forEach(d => {
@@ -581,6 +582,7 @@ export default function AdminPanel() {
           const row = payoutMap[code] = payoutMap[code] || {
             referralCode: payment.referralCode,
             ambassadorName: nameByCode[code] || '',
+            ambassadorEmail: emailByCode[code] || '',
             currency,
             currencySymbol: CURRENCY_SYMBOLS[currency] || currency + ' ',
             totalSales: 0,

@@ -1,4 +1,5 @@
 import { payoutCodeLabel } from '../utils/payoutLabel';
+import { BankChangeFlag } from './AmbassadorChangeLog';
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { 
@@ -373,6 +374,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
                 <span className="info-label">Period:</span>
                 <span className="info-value">{getMonthName(selectedPayout.month)} {selectedPayout.year}</span>
               </div>
+              <BankChangeFlag ambassadorEmail={selectedPayout.ambassadorEmail} />
               <div className="info-row">
                 <span className="info-label">Tax removed / Net amount:</span>
                 <span className="info-value">

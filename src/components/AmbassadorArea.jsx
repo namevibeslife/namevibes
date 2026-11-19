@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import ReferralShareCard from './ReferralShareCard';
-import AmbassadorDetailsForm from './AmbassadorDetailsForm';
+import AmbassadorRegister from './AmbassadorRegister';
+import AmbassadorProfileView from './AmbassadorProfileView';
 import AmbassadorFollowers from './AmbassadorFollowers';
 
 const TABS = [['home', 'Home'], ['register', 'Register'], ['followers', 'My Followers']];
@@ -48,6 +49,10 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
   const goto = (key) => setParams(key === 'home' ? {} : { tab: key });
   const [content, setContent] = useState(null);
   const [contentError, setContentError] = useState(false);
+  const [toast, setToast] = useState('');
+  const toastTimer = useRef(null);
+  const notify = (text) => { setToast(text); window.clearTimeout(toastTimer.current); toastTimer.current = window.setTimeout(() => setToast(''), 3500); };
+  useEffect(() => () => window.clearTimeout(toastTimer.current), []);
 
   useEffect(() => {
     let cancelled = false;
@@ -81,6 +86,13 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
               </div>
             )}
             <ReferralShareCard code={ambassador.referralCode} />
+            {ambassador.detailsCompleted && (
+              <section aria-labelledby="saved-details-heading">
+                <h2 id="saved-details-heading" className="font-serif text-2xl font-bold text-gray-900 mb-3">Your saved details</h2>
+                <AmbassadorProfileView ambassador={ambassador} />
+                <p className="mt-2 text-sm text-gray-600">Need to change something? Open the Register tab and choose Edit.</p>
+              </section>
+            )}
           </div>
           {content === null ? <p className="text-center text-gray-600">Loading...</p> : <HomeContent content={content} />}
           {contentError && <p role="status" className="mt-4 text-center text-sm text-gray-500">The welcome text could not be loaded right now.</p>}
@@ -88,11 +100,7 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
       )}
 
       {tab === 'register' && (
-        <section className="max-w-4xl mx-auto" aria-labelledby="register-heading">
-          <h2 id="register-heading" className="font-serif text-3xl font-bold text-gray-900 text-center mb-2">My Details</h2>
-          <p className="text-center text-gray-600 mb-8">Your profile and payout details.</p>
-          <AmbassadorDetailsForm ambassador={ambassador} user={user} onSaved={onAmbassadorChange} />
-        </section>
+        <AmbassadorRegister ambassador={ambassador} user={user} onSaved={onAmbassadorChange} notify={notify} goHome={() => goto('home')} />
       )}
 
       {tab === 'followers' && (
@@ -101,6 +109,8 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
           <AmbassadorFollowers ambassador={ambassador} />
         </section>
       )}
+
+      {toast && <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[90vw] rounded-lg bg-gray-900 text-white px-4 py-3 text-sm shadow-lg">{toast}</div>}
 
       <div className="mt-10 text-center">
         <p className="text-xs text-gray-500 mb-2">Signed in as {ambassador.email}</p>
