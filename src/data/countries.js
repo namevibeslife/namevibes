@@ -444,7 +444,7 @@ export const getActiveCountries = (countrySettings = []) => {
 
 // The one NAMASUTRA Annual Plan. In-code fallbacks by currency, used only when a country has no
 // saved price under Admin -> Country Pricing.
-export const DEFAULT_PLAN_PRICES = { INR: 399, USD: 12, EUR: 12, AED: 25 };
+export const DEFAULT_PLAN_PRICES = { INR: 399, USD: 25, EUR: 25, AED: 50 };
 export const DEFAULT_REFERRAL_DISCOUNT = 10;
 export const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', AED: 'AED ' };
 

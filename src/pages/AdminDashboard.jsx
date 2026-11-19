@@ -149,6 +149,8 @@ export default function AdminDashboard(props) {
         currencySymbol: selectedPayoutData.currencySymbol || '₹',
         salesCount: selectedPayoutData.count,
         totalSales: selectedPayoutData.totalSales,
+        taxAmount: Math.round(selectedPayoutData.totalTax * 100) / 100,
+        netAmount: Math.round(selectedPayoutData.totalNet * 100) / 100,
         commissionAmount: selectedPayoutData.totalCommission,
         bankAccountNumber: ambassador.accountNumber || '',
         bankIFSC: ambassador.ifscCode || '',
@@ -1125,6 +1127,8 @@ export default function AdminDashboard(props) {
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Referral Code</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Sales Count</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Sales</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Tax Removed</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Net Amount</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Commission (Net of GST)</th>
                       {currentAdmin?.role === 'super' && (
                         <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Action</th>
@@ -1142,6 +1146,12 @@ export default function AdminDashboard(props) {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
                           {payout.currencySymbol}{payout.totalSales.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {payout.currencySymbol}{payout.totalTax.toFixed(2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {payout.currencySymbol}{payout.totalNet.toFixed(2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
                           {payout.currencySymbol}{payout.totalCommission.toFixed(2)}
@@ -1227,6 +1237,12 @@ export default function AdminDashboard(props) {
                             {readPlanSettings(country).symbol}{readPlanSettings(country).price}
                           </span>
                         </div>
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="text-sm text-gray-600">Tax included in price</span>
+                          <span className="text-sm font-semibold text-gray-800">
+                            {Number.isFinite(Number(country.taxPercent)) && country.taxPercent !== null && country.taxPercent !== '' ? `${country.taxPercent}%` : country.countryCode === 'IN' ? '18% (default)' : '0% (default)'}
+                          </span>
+                        </div>
                         <div className="flex justify-between items-center py-2">
                           <span className="text-sm text-gray-600">Referral Discount</span>
                           <span className="text-sm font-semibold text-green-600">
@@ -1272,6 +1288,14 @@ export default function AdminDashboard(props) {
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Total Sales:</span>
                 <span className="font-semibold">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalSales.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Tax removed:</span>
+                <span className="font-semibold">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalTax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between py-2 border-b">
+                <span className="text-gray-600">Net amount:</span>
+                <span className="font-semibold">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalNet.toFixed(2)}</span>
               </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Commission Amount (Net of GST):</span>
@@ -1564,6 +1588,25 @@ export default function AdminDashboard(props) {
                     placeholder="10"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tax included in price (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  value={countryFormData.taxPercent}
+                  onChange={(e) => setCountryFormData({...countryFormData, taxPercent: e.target.value})}
+                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
+                  placeholder="e.g. 18 for India"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  GST/VAT/sales tax included in the price. Ambassador commission is calculated on the amount paid excluding this tax. Leave blank to use the default (India 18%, all others 0%).
+                </p>
               </div>
 
               <p className="text-xs text-gray-500">

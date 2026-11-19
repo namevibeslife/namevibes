@@ -10,14 +10,22 @@ export const COMMISSION_TIER1_RATE = 0.30;
 export const COMMISSION_TIER1_MAX_MEMBERS = 300;
 export const COMMISSION_TIER2_RATE = 0.50;
 
-// GST/VAT included in the price, by country (percent). Commission is worked out on the amount
-// paid EXCLUDING this tax. Only India is known; every other country is 0 until a rate is supplied
-// (do not guess VAT for the US, EU or UAE).
+// Tax (GST/VAT/sales tax) included in the price, by country (percent). Commission is worked out on
+// the amount paid EXCLUDING this tax. This is only the fallback: Admin -> Country Pricing can set
+// `taxPercent` per country, which is passed in as options.taxRates. Only India is known here; every
+// other country is 0 until a rate is supplied (do not guess VAT for the US, EU or UAE).
 export const GST_RATE_BY_COUNTRY = { IN: 18 };
 
 // Older payment records carry no countryCode; an INR payment is an India payment.
-const countryOf = (p) => String(p.countryCode || (p.currency === 'INR' ? 'IN' : '')).toUpperCase();
-export const gstRateFor = (p) => GST_RATE_BY_COUNTRY[countryOf(p)] || 0;
+export const countryOf = (p) => String(p.countryCode || (p.currency === 'INR' ? 'IN' : '')).toUpperCase();
+
+// Tax rate (percent) for a payment: the admin's per-country setting if there is one, else the fallback.
+export function taxRateFor(p, taxRates = {}) {
+  const code = countryOf(p);
+  const set = taxRates[code];
+  if (set !== undefined && set !== null && set !== '' && Number.isFinite(Number(set)) && Number(set) >= 0) return Number(set);
+  return GST_RATE_BY_COUNTRY[code] || 0;
+}
 
 const toMillis = (value) => {
   if (value == null) return 0;
@@ -42,7 +50,8 @@ const memberKey = (p) => String(p.memberId ?? p.userId ?? p.userEmail ?? p.email
  * @returns {{ payments: Array, totals: { members, tier, rate, totalCommission, membersToNextTier } }}
  *          payments keeps the input order, each entry extended with { rank, rate, commission }.
  */
-export function computeCommissions(payments = []) {
+export function computeCommissions(payments = [], options = {}) {
+  const taxRates = options.taxRates || {};
   const valid = (payments || []).filter(p => p && (p.status == null || p.status === 'success'));
 
   // Earliest payment time per member
@@ -59,14 +68,17 @@ export function computeCommissions(payments = []) {
 
   let totalCommission = 0;
   const out = (payments || []).map((p) => {
-    if (!p || !valid.includes(p)) return { ...p, rank: null, rate: 0, gstRate: 0, netAmount: 0, commission: 0 };
+    if (!p || !valid.includes(p)) return { ...p, rank: null, rate: 0, gstRate: 0, taxAmount: 0, netAmount: 0, commission: 0 };
     const rank = rankOf.get(memberKey(p));
     const rate = rank <= COMMISSION_TIER1_MAX_MEMBERS ? COMMISSION_TIER1_RATE : COMMISSION_TIER2_RATE;
-    const gstRate = gstRateFor(p);
+    const gstRate = taxRateFor(p, taxRates);
+    const paid = money(Number(p.amount) || 0);
     const net = (Number(p.amount) || 0) / (1 + gstRate / 100);
+    const netAmount = money(net);
     const commission = money(net * rate);
     totalCommission += commission;
-    return { ...p, rank, rate, gstRate, netAmount: money(net), commission };
+    // taxAmount = paid - net, so paid - tax = net exactly as displayed
+    return { ...p, rank, rate, gstRate, taxAmount: money(paid - netAmount), netAmount, commission };
   });
 
   const members = ranked.length;
@@ -85,3 +97,12 @@ export function computeCommissions(payments = []) {
 }
 
 export const formatRate = (rate) => `${Math.round(rate * 100)}%`;
+
+// One-line worked example built from a computed row, so it always matches the table:
+// "₹359 paid − ₹54.76 GST = ₹304.24 net × 30% = ₹91.27". Pass the row from computeCommissions.
+export const taxLabel = (countryCode) => (String(countryCode).toUpperCase() === 'IN' ? 'GST' : 'tax');
+export function commissionExample(row, symbol = '') {
+  const n = (v) => (Math.round(v * 100) / 100).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const m = (v) => `${symbol}${n(v)}`;
+  return `${m(row.amount || 0)} paid − ${m(row.taxAmount)} ${taxLabel(countryOf(row))} = ${m(row.netAmount)} net × ${formatRate(row.rate)} = ${m(row.commission)}`;
+}

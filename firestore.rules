@@ -94,13 +94,10 @@ service cloud.firestore {
     match /ambassadors/{ambassadorId} {
       allow read: if isAdmin() || (verifiedEmail() && resource.data.email == myEmail());
       // Ambassadors are invite-only: an admin creates the record (already approved, with its code).
-      allow create: if isAdmin();
-      // Legacy public applications (no longer offered): only for your own email, never pre-approved
-      allow create: if verifiedEmail()
-        && request.resource.data.email == myEmail()
-        && request.resource.data.isApproved == false
-        && request.resource.data.isActive == false
-        && !request.resource.data.keys().hasAny(['referralCode', 'approvedAt', 'approvedBy']);
+      allow create: if isAdmin()
+        && request.resource.data.get('codeVersion', 1) == 2
+        && request.resource.data.get('referralCode', '') is string
+        && request.resource.data.get('referralCode', '').size() > 0;
       // A referralCode change is only allowed while codeVersion is below the current version
       // (defaults to 1, i.e. never migrated). Once codeVersion reaches 2, referralCode is
       // locked for good - no further change, by anyone, through the client SDK.

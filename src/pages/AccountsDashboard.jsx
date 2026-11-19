@@ -815,6 +815,7 @@ function AccountsDashboard() {
               <p><strong>Ambassador:</strong> {selectedPayout.ambassadorName}</p>
               <p><strong>Referral Code:</strong> {selectedPayout.referralCode}</p>
               <p><strong>Period:</strong> {getMonthName(selectedPayout.month)} {selectedPayout.year}</p>
+              {selectedPayout.netAmount !== undefined && <p><strong>Tax removed / Net amount:</strong> {selectedPayout.currencySymbol}{selectedPayout.taxAmount} / {selectedPayout.currencySymbol}{selectedPayout.netAmount}</p>}
               <p><strong>Commission Amount (Net of GST):</strong> {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}</p>
               <p><strong>Bank Account:</strong> {selectedPayout.bankAccountNumber}</p>
               {selectedPayout.bankIFSC && <p><strong>IFSC:</strong> {selectedPayout.bankIFSC}</p>}

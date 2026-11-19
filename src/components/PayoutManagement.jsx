@@ -373,6 +373,12 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
                 <span className="info-value">{getMonthName(selectedPayout.month)} {selectedPayout.year}</span>
               </div>
               <div className="info-row">
+                <span className="info-label">Tax removed / Net amount:</span>
+                <span className="info-value">
+                  {selectedPayout.netAmount !== undefined ? `${selectedPayout.currencySymbol}${selectedPayout.taxAmount} / ${selectedPayout.currencySymbol}${selectedPayout.netAmount}` : '-'}
+                </span>
+              </div>
+              <div className="info-row">
                 <span className="info-label">Commission Amount (Net of GST):</span>
                 <span className="info-value" style={{color: '#28a745', fontWeight: 'bold', fontSize: '18px'}}>
                   {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}

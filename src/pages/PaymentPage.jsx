@@ -155,7 +155,7 @@ export default function PaymentPage() {
       const res = await fetch('/api/test-activate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ planType, amount, currency, referralCode: referralCode || null })
+        body: JSON.stringify({ planType, amount, currency, referralCode: referralCode || null, countryCode: userProfile?.countryCode || null })
       });
       if (!res.ok) throw new Error('Test payment was not accepted');
       setPaid(true);
@@ -195,6 +195,7 @@ export default function PaymentPage() {
         gateway,
         transactionId,
         referralCode: referralCode || null,
+        countryCode: userProfile?.countryCode || null,
         status: 'success',
         createdAt: new Date()
       });

@@ -50,3 +50,20 @@ export async function loadCountryPricing(countryCode) {
 export function discountedPrice(plan) {
   return Math.round(plan.price * (1 - plan.discountPercent / 100));
 }
+
+// { IN: 18, AE: 5, ... } from Admin -> Country Pricing `taxPercent`; countries without one fall back
+// to GST_RATE_BY_COUNTRY inside computeCommissions. Settings are readable by any signed-in user.
+export async function loadTaxRates() {
+  try {
+    const snapshot = await getDocs(collection(db, 'countrySettings'));
+    const rates = {};
+    snapshot.docs.forEach(d => {
+      const s = d.data();
+      if (s.countryCode && Number.isFinite(Number(s.taxPercent)) && s.taxPercent !== '' && s.taxPercent !== null) rates[s.countryCode] = Number(s.taxPercent);
+    });
+    return rates;
+  } catch (error) {
+    console.error('Error loading tax rates:', error);
+    return {};
+  }
+}

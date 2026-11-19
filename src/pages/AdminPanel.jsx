@@ -16,7 +16,7 @@ import {
 import { db, auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { COUNTRIES, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT, defaultPriceFor } from '../data/countries';
-import { readPlanSettings } from '../utils/pricing';
+import { readPlanSettings, loadTaxRates } from '../utils/pricing';
 import { computeCommissions } from '../utils/commission';
 import { reserveReferralCode, setReferralCodeActive, previewMigration, runMigration, ambassadorsNeedingMigration, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { 
@@ -136,6 +136,7 @@ export default function AdminPanel() {
     currency: 'USD',
     price: 12,
     referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
+    taxPercent: '',
     isActive: true
   });
 
@@ -538,6 +539,7 @@ export default function AdminPanel() {
   const loadAmbassadorPayouts = async () => {
     try {
       const paymentsSnapshot = await getDocs(collection(db, 'payments'));
+      const taxRates = await loadTaxRates();
       const byCode = {};
       paymentsSnapshot.forEach(d => {
         const payment = d.data();
@@ -548,7 +550,7 @@ export default function AdminPanel() {
 
       const payoutMap = {};
       Object.entries(byCode).forEach(([code, list]) => {
-        computeCommissions(list).payments.forEach(payment => {
+        computeCommissions(list, { taxRates }).payments.forEach(payment => {
           const paymentDate = payment.createdAt?.toDate();
           if (!paymentDate) return;
           if (payoutFilter.country !== 'all' && payment.countryCode !== payoutFilter.country) return;
@@ -561,10 +563,14 @@ export default function AdminPanel() {
             currency,
             currencySymbol: CURRENCY_SYMBOLS[currency] || currency + ' ',
             totalSales: 0,
+            totalTax: 0,
+            totalNet: 0,
             totalCommission: 0,
             count: 0
           };
           row.totalSales += payment.amount || 0;
+          row.totalTax += payment.taxAmount;
+          row.totalNet += payment.netAmount;
           row.totalCommission += payment.commission;
           row.count += 1;
         });
@@ -778,6 +784,7 @@ export default function AdminPanel() {
       currency: 'USD',
       price: defaultPriceFor('USD'),
       referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
+      taxPercent: '',
       isActive: true
     });
     setShowCountryModal(true);
@@ -792,6 +799,7 @@ export default function AdminPanel() {
       currency: plan.currency,
       price: plan.price,
       referralDiscount: plan.discountPercent,
+      taxPercent: country.taxPercent ?? '',
       isActive: country.isActive
     });
     setShowCountryModal(true);
@@ -830,6 +838,8 @@ export default function AdminPanel() {
         symbol: CURRENCY_SYMBOLS[currency] || countryInfo.symbol || '$',
         price: Number(countryFormData.price) || 0,
         referralDiscount: Number(countryFormData.referralDiscount) || 0,
+        // blank = not set, so commission falls back to GST_RATE_BY_COUNTRY (IN 18, others 0)
+        taxPercent: String(countryFormData.taxPercent).trim() === '' ? null : Math.max(0, Number(countryFormData.taxPercent) || 0),
         isActive: countryFormData.isActive,
         updatedAt: Timestamp.now(),
         updatedBy: currentAdmin.email

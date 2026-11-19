@@ -51,6 +51,7 @@ export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Bad request' }, 400); }
   const { planType, currency, referralCode } = body;
+  const countryCode = /^[A-Za-z]{2}$/.test(body.countryCode || '') ? body.countryCode.toUpperCase() : null;
   const amount = Number(body.amount);
   if (!PLANS.includes(planType) || !Number.isFinite(amount) || amount < 0) return json({ error: 'Bad plan' }, 400);
 
@@ -106,6 +107,7 @@ export async function onRequestPost({ request, env }) {
           gateway: { stringValue: 'test' },
           transactionId: { stringValue: `test_${Date.now()}` },
           referralCode: ref,
+          countryCode: countryCode ? { stringValue: countryCode } : { nullValue: null },
           status: { stringValue: 'success' },
           createdAt: ts(now)
         }

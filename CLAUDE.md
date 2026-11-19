@@ -1,3 +1,9 @@
+## Tax breakdown, per-country tax setting, new default prices - 19 November 2026
+
+- Country Pricing has "Tax included in price (%)" (`taxPercent`; blank = unset). computeCommissions(payments, { taxRates }) reads it per payment country (payment.countryCode; INR with no country = IN) and falls back to GST_RATE_BY_COUNTRY (IN 18, others 0). pricing.js `loadTaxRates()` supplies the map. Payment records now store countryCode (PaymentPage and test-activate).
+- computeCommissions rows carry taxAmount (= paid - net), netAmount, gstRate; `commissionExample(row, symbol)` builds the one-line example from the same row. My Followers table columns: Member, Paid, Tax removed, Net amount, Rate, Commission, with the example above it. Admin payout table/modal show Tax removed and Net amount; payout requests now store taxAmount/netAmount (Accounts and Payout Management show them when present).
+- Defaults by currency: INR 399, USD 25, EUR 25, AED 50 (admin settings override). The firestore.rules change (admin-only ambassador create with a codeVersion-2 referralCode, public application rule dropped) is committed; it was already published. After deploy, set Admin -> Country Pricing: IN 399 tax 18; AE 50 AED tax 5 (or 0 if not VAT-registered); US $25 tax 0; EU EUR 25 tax 0.
+
 ## Commission on amount net of GST - 19 November 2026
 
 - computeCommissions (src/utils/commission.js) now takes commission on amountPaid / (1 + GST), where amountPaid is what the member actually paid after the referral discount. GST_RATE_BY_COUNTRY = { IN: 18 }; every other country is 0 until a rate is supplied (no guessing VAT for US/EU/UAE). Country comes from payment.countryCode, or INR currency implies India for older records. India Rs 399 with 10% off = Rs 359 paid, Rs 304.24 net, Rs 91.27 at 30%, Rs 152.12 at 50%. Per-payment output also has gstRate and netAmount.

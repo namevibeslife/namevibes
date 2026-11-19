@@ -2,8 +2,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Users, TrendingUp, Calendar, Globe, MapPin } from 'lucide-react';
-import { computeCommissions, formatRate, COMMISSION_TIER1_MAX_MEMBERS, COMMISSION_TIER2_RATE } from '../utils/commission';
+import { computeCommissions, commissionExample, taxLabel, countryOf, formatRate, COMMISSION_TIER1_MAX_MEMBERS, COMMISSION_TIER2_RATE } from '../utils/commission';
 import { CURRENCY_SYMBOLS, COUNTRIES } from '../data/countries';
+import { loadTaxRates } from '../utils/pricing';
 import { maskEmail, maskName } from '../utils/ambassadorInvite';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -31,6 +32,7 @@ export default function AmbassadorFollowers({ ambassador }) {
   const [users, setUsers] = useState([]);
   const [payments, setPayments] = useState([]);
   const [payouts, setPayouts] = useState([]);
+  const [taxRates, setTaxRates] = useState({});
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
 
@@ -63,7 +65,8 @@ export default function AmbassadorFollowers({ ambassador }) {
         const payoutList = payoutSnap.docs.map(d => ({ id: d.id, ...d.data() }))
           .sort((a, b) => (b.year - a.year) || (b.month - a.month));
 
-        if (!cancelled) { setUsers(userList); setPayments(paymentList); setPayouts(payoutList); }
+        const rates = await loadTaxRates();
+        if (!cancelled) { setUsers(userList); setPayments(paymentList); setPayouts(payoutList); setTaxRates(rates); }
       } catch (error) {
         console.error('Error loading followers:', error);
         if (!cancelled) setNotice('Could not load your followers. Please refresh the page.');
@@ -80,14 +83,14 @@ export default function AmbassadorFollowers({ ambassador }) {
 
   const { rows, totals, byCurrency } = useMemo(() => {
     const usersById = new Map(users.map(u => [u.id, u]));
-    const result = computeCommissions(payments.map(p => ({ ...p, memberId: p.userId || p.userEmail })));
+    const result = computeCommissions(payments.map(p => ({ ...p, memberId: p.userId || p.userEmail })), { taxRates });
     const rows = result.payments
       .map(p => ({ ...p, user: usersById.get(p.userId), currency: p.currency || ownCurrency }))
       .sort((a, b) => (toDate(b.createdAt)?.getTime() || 0) - (toDate(a.createdAt)?.getTime() || 0));
     const byCurrency = {};
     rows.forEach(r => { byCurrency[r.currency] = (byCurrency[r.currency] || 0) + r.commission; });
     return { rows, totals: result.totals, byCurrency };
-  }, [payments, users, ownCurrency]);
+  }, [payments, users, ownCurrency, taxRates]);
 
   const earningLines = Object.entries(byCurrency).sort(([a], [b]) => (a === ownCurrency ? -1 : b === ownCurrency ? 1 : 0));
   const earningText = earningLines.length
@@ -152,31 +155,40 @@ export default function AmbassadorFollowers({ ambassador }) {
         {rows.length === 0 ? (
           <p className="text-gray-500 text-sm">No payments from your referrals yet. Share your code to get started.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b-2 border-gray-200 text-left text-xs font-medium text-gray-500 uppercase">
-                <tr>
-                  <th className="px-3 py-2">Member</th><th className="px-3 py-2">Plan</th><th className="px-3 py-2">Date</th>
-                  <th className="px-3 py-2 text-right">Paid</th><th className="px-3 py-2 text-right">Rate</th><th className="px-3 py-2 text-right">Commission <span className="normal-case font-normal">(net of GST)</span></th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {rows.map(r => (
-                  <tr key={r.id}>
-                    <td className="px-3 py-2 whitespace-nowrap">
-                      <span className="font-medium text-gray-800">{maskName(r.user?.fullName || r.user?.firstName)}</span>
-                      <span className="block text-xs text-gray-500">{maskEmail(r.user?.email || r.userEmail)}</span>
-                    </td>
-                    <td className="px-3 py-2 whitespace-nowrap">Annual Plan</td>
-                    <td className="px-3 py-2 whitespace-nowrap">{toDate(r.createdAt)?.toLocaleDateString() || '-'}</td>
-                    <td className="px-3 py-2 text-right whitespace-nowrap">{symbolFor(r.currency)}{fmt(r.amount || 0)}</td>
-                    <td className="px-3 py-2 text-right whitespace-nowrap">{formatRate(r.rate)}</td>
-                    <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{symbolFor(r.currency)}{fmt(r.commission)}</td>
+          <>
+            <p className="text-sm text-gray-700 bg-brand-50 border border-brand-200 rounded-lg p-3 mb-3 break-words" data-testid="commission-example">
+              Example: {commissionExample(rows[0], symbolFor(rows[0].currency))}
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 border-b-2 border-gray-200 text-left text-xs font-medium text-gray-500 uppercase">
+                  <tr>
+                    <th className="px-3 py-2">Member</th>
+                    <th className="px-3 py-2 text-right">Paid</th>
+                    <th className="px-3 py-2 text-right">Tax removed</th>
+                    <th className="px-3 py-2 text-right">Net amount</th>
+                    <th className="px-3 py-2 text-right">Rate</th>
+                    <th className="px-3 py-2 text-right">Commission</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {rows.map(r => (
+                    <tr key={r.id}>
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        <span className="font-medium text-gray-800">{maskName(r.user?.fullName || r.user?.firstName)}</span>
+                        <span className="block text-xs text-gray-500">{maskEmail(r.user?.email || r.userEmail)} · {toDate(r.createdAt)?.toLocaleDateString() || '-'}</span>
+                      </td>
+                      <td className="px-3 py-2 text-right whitespace-nowrap">{symbolFor(r.currency)}{fmt(r.amount || 0)}</td>
+                      <td className="px-3 py-2 text-right whitespace-nowrap" title={`${taxLabel(countryOf(r))} ${r.gstRate}%`}>{symbolFor(r.currency)}{fmt(r.taxAmount)}</td>
+                      <td className="px-3 py-2 text-right whitespace-nowrap">{symbolFor(r.currency)}{fmt(r.netAmount)}</td>
+                      <td className="px-3 py-2 text-right whitespace-nowrap">{formatRate(r.rate)}</td>
+                      <td className="px-3 py-2 text-right font-semibold whitespace-nowrap">{symbolFor(r.currency)}{fmt(r.commission)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 
