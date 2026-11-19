@@ -4,6 +4,7 @@ import { findSharedElements } from './commonElements';
 import { posterColorFor } from './posterPalette';
 import { textColorFor } from './elements';
 import { FAMILY_MAX_NAMES } from './plan';
+import { SITE_HOST } from '../config/site.js';
 
 // One image contains every member, their tiles, and the shared-element meanings.
 // Up to FAMILY_MAX_NAMES people get the larger 2x2 layout; older saved analyses with more people
@@ -100,7 +101,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
     y += 90 + el.lines.length * 30;
   });
   text('Different elements. A stronger us.', 540, logicalHeight - 95, '30px Georgia');
-  text('namevibes.life', 540, logicalHeight - 57, '18px Arial');
+  text(SITE_HOST, 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');
   return new File([blob], 'Namasutra_Family_Poster.png', { type: 'image/png' });
@@ -276,7 +277,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
   });
 
   text('Different elements. A stronger us.', 540, logicalHeight - 95, '30px Georgia');
-  text('namevibes.life', 540, logicalHeight - 57, '18px Arial');
+  text(SITE_HOST, 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');
   return new File([blob], 'Namasutra_Family_Poster.png', { type: 'image/png' });

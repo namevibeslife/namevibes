@@ -6,12 +6,13 @@ import { buildPosterPDF } from './posterReport';
 // Elements that appear in every member's name
 export { findCommonElements } from './commonElements';
 import { findCommonElements } from './commonElements';
+import { SITE_HOST } from '../config/site.js';
 
 // The full report as plain text, ready to paste into an AI chat
 export function buildAIPrompt(results, contextLabels = []) {
   const commonElements = findCommonElements(results);
   const lines = [
-    'I used Namasutra (namevibes.life), which maps the letters of a name to periodic table elements. Here is my family report:',
+    `I used Namasutra (${SITE_HOST}), which maps the letters of a name to periodic table elements. Here is my family report:`,
     ''
   ];
 

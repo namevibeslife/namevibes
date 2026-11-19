@@ -1,5 +1,6 @@
+import { SITE_URL } from '../config/site.js';
 // Invite-only ambassadors: the admin invites a Google email, which becomes the authorisation.
-export const AMBASSADOR_LOGIN_URL = 'https://namevibes.life/ambassador';
+export const AMBASSADOR_LOGIN_URL = `${SITE_URL}/ambassador`;
 export const INVITE_EMAIL_SUBJECT = 'You are invited to become a NAMASUTRA Ambassador';
 
 // Editable default invite text.

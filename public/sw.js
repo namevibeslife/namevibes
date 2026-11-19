@@ -2,7 +2,7 @@
 // - Pages: network first, falling back to the cached app shell when offline (so new deploys show up immediately)
 // - /assets/*: cache first (file names contain a content hash, so they never go stale)
 // - Everything cross-origin (Firebase, Google sign-in, payment gateways) is never cached
-const VERSION = 'v4';
+const VERSION = 'v5';
 const SHELL_CACHE = `namevibes-shell-${VERSION}`;
 const ASSET_CACHE = `namevibes-assets-${VERSION}`;
 const SHELL_URLS = ['/', '/manifest.webmanifest', '/brand/namasutra-app-icon.png', '/brand/namasutra-logo.png'];

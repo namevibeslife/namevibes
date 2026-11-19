@@ -5,6 +5,7 @@ import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 import { findSharedElements } from './commonElements';
 import { FAMILY_MAX_NAMES } from './plan';
+import { SITE_HOST } from '../config/site.js';
 
 // Loads the transparent logo as a data URL so it can be placed in the PDF
 export async function loadPosterLogo(theme) {
@@ -318,7 +319,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(7);
     pdf.text('DISCOVER  /  EXPLORE  /  BE YOU', 18, 286);
-    pdf.text(`namevibes.life  |  ${pdf.getNumberOfPages()}`, 192, 286, { align: 'right' });
+    pdf.text(`${SITE_HOST}  |  ${pdf.getNumberOfPages()}`, 192, 286, { align: 'right' });
     y = 73;
   }
   function personHeading(person, continued = false) {

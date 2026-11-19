@@ -4,6 +4,7 @@ import Logo from './Logo';
 import { textColorFor } from '../utils/elements';
 import { findSharedElements } from '../utils/commonElements';
 import { posterColorFor } from '../utils/posterPalette';
+import { SITE_HOST } from '../config/site.js';
 
 export function ElementTile({ element }) {
   const color = posterColorFor(element);
@@ -60,7 +61,7 @@ export default function ChemistryPoster({ people, family: requestedFamily = fals
     <footer className="poster-footer">
       <div className="poster-rule" aria-hidden="true">◇</div>
       <p>More than a name. A higher you.</p>
-      <small>DISCOVER · EXPLORE · BE YOU &nbsp; / &nbsp; namevibes.life</small>
+      <small>DISCOVER · EXPLORE · BE YOU &nbsp; / &nbsp; {SITE_HOST}</small>
     </footer>
   </article>;
 }

@@ -1,6 +1,7 @@
 import { drawPosterBackground, drawGemTile } from './posterArtwork';
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
+import { SITE_HOST } from '../config/site.js';
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -70,7 +71,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   });
   if (!elements.length) text('No periodic elements found in this name.', 700, 24, 'Arial');
   text('More than a name. A higher you.', canvas.height - 105, 30);
-  text('namevibes.life', canvas.height - 61, 18, 'Arial');
+  text(SITE_HOST, canvas.height - 61, 18, 'Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create image');
   return new File([blob], 'Namasutra_Poster.png', { type: 'image/png' });

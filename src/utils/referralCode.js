@@ -1,3 +1,4 @@
+import { SITE_URL } from '../config/site.js';
 // Ambassador referral codes: generation, formatting and link/message building.
 // Pure - no Firebase imports here, so this is safe to unit-test directly in Node.
 //
@@ -39,7 +40,7 @@ export function isWellFormedCode(code) {
 }
 
 export function buildShareLink(code) {
-  return `https://namevibes.life/?ref=${normalizeReferralCode(code)}`;
+  return `${SITE_URL}/?ref=${normalizeReferralCode(code)}`;
 }
 
 // Exact text, kept in one place so it's easy to edit. Emojis and line breaks are intentional.
