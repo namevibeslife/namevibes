@@ -31,10 +31,10 @@ export function FamilyPersonCards({ people }) {
         const lastOdd = odd && index === people.length - 1;
         return <article
           key={index}
-          className={`min-w-0 bg-paper border-2 border-brand-300 rounded-2xl shadow-md p-4 sm:p-5 md:p-6 ${lastOdd ? 'md:col-span-2 md:w-[calc(50%-0.75rem)] md:justify-self-center' : ''}`}
+          className={`min-w-0 bg-transparent p-4 sm:p-5 md:p-6 ${lastOdd ? 'md:col-span-2 md:w-[calc(50%-0.75rem)] md:justify-self-center' : ''}`}
         >
           <p className="text-sm md:text-base uppercase tracking-widest font-semibold text-brand-700 text-center">
-            {person.relation || 'Family member'}
+            {people.length > 1 ? person.relation || 'Family member' : ''}
           </p>
           <h3 className="text-2xl md:text-3xl font-bold text-gray-900 text-center break-words mt-1 mb-3">{person.fullName}</h3>
           <UnmatchedLetters name={person.fullName || ''} className="mb-3" />
@@ -64,8 +64,9 @@ export function FamilyPersonCards({ people }) {
 // Full-width card under the grid: the elements two or more members share, as large chips with
 // who shares them and what they mean. `children` holds the optional interpretation flow.
 export function FamilyHarmonyCard({ people, children }) {
+  if (people.length < 2) return null;
   const shared = findSharedElements(people);
-  return <section aria-label="The Harmony" className="mt-8 rounded-2xl border-2 border-brand-300 bg-gradient-to-br from-brand-50 to-ocean-50 p-6 md:p-8">
+  return <section aria-label="The Harmony" className="mt-8 bg-transparent p-6 md:p-8">
     <h2 className="text-3xl md:text-4xl font-bold text-brand-700 text-center">The Harmony</h2>
     <p className="text-center italic text-gray-700 text-lg mt-1 mb-6">
       {shared.length ? '"Elements shared by two or more family members"' : '"Each member brings a unique combination"'}

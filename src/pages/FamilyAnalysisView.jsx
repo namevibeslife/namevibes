@@ -70,20 +70,20 @@ export default function FamilyAnalysisView() {
     <div className="min-h-screen site-background">
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-paper rounded-2xl shadow-xl p-8">
+        <div className="bg-transparent p-4 sm:p-8">
           {/* Family Title */}
           <div className="mb-8">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Users className="w-10 h-10 text-brand-600" />
               <h1 className="text-4xl font-bold text-gray-800">
-                Family Chemistry Analysis
+                {results.length === 1 ? 'Name Chemistry' : 'Family Chemistry Analysis'}
               </h1>
             </div>
             <p className="text-center text-gray-600">
               Analyzed on {analysis.timestamp?.toDate().toLocaleDateString()}
             </p>
             <p className="text-center text-brand-600 font-semibold mt-2">
-              {analysis.count} Family Members
+              {results.length} {results.length === 1 ? 'Name' : 'Family Members'}
             </p>
           </div>
 

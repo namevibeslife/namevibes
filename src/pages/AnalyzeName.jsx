@@ -66,7 +66,7 @@ export default function AnalyzeName() {
       <div className="min-h-screen site-background">
 
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-2xl mx-auto bg-paper rounded-2xl shadow-xl p-8">
+          <div className="max-w-2xl mx-auto bg-transparent p-4 sm:p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Analyze Name</h1>
             <p className={`mb-6 ${remaining === 0 ? 'text-red-600 font-semibold' : 'text-gray-600'}`}>
               {remaining === null
@@ -121,7 +121,7 @@ export default function AnalyzeName() {
 
       <div className="p-4">
         <div className="max-w-6xl mx-auto">
-          <div className="bg-paper rounded-2xl shadow-2xl p-8">
+          <div className="bg-transparent p-4 sm:p-8">
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-gray-800 mb-4 text-center">
                 Chemistry of "{result.name.toUpperCase()}"

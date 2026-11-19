@@ -1,3 +1,4 @@
+import { buildPosterImage } from './posterImage';
 import { drawPosterBackground, drawGemTile } from './posterArtwork';
 import { findSharedElements } from './commonElements';
 import { posterColorFor } from './posterPalette';
@@ -8,6 +9,7 @@ import { FAMILY_MAX_NAMES } from './plan';
 // Up to FAMILY_MAX_NAMES people get the larger 2x2 layout; older saved analyses with more people
 // keep the original layout below so they still export.
 export async function buildFamilyPosterImage(people, theme = 'gold') {
+  if (people.length === 1) return buildPosterImage(people[0], false, theme);
   return people.length >= 1 && people.length <= FAMILY_MAX_NAMES
     ? buildCompactFamilyPosterImage(people, theme)
     : buildLegacyFamilyPosterImage(people, theme);
@@ -65,7 +67,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   rows.forEach(row => {
     row.cards.forEach((card, column) => {
       const x = row.cards.length === 1 ? 300 : 54 + column * 498;
-      ctx.strokeStyle = '#b88b36'; ctx.strokeRect(x, y, 474, row.height);
+
       let headingY = y + 30;
       card.relation.forEach(line => { text(line.toUpperCase(), x + 237, headingY, '18px Arial'); headingY += 24; });
       card.names.forEach(line => { text(line, x + 237, headingY + 20, '34px Georgia'); headingY += 42; });
@@ -227,7 +229,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
     const x0 = (W - rowW) / 2;
     row.blocks.forEach((block, k) => {
       const x = x0 + k * (blockW + 24);
-      ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(x, y, blockW, row.height);
+
       const cx = x + blockW / 2;
       text((block.person.relation || 'Family member').toUpperCase(), cx, y + pad + 20, '22px Arial');
       block.names.forEach((nameLine, i) => text(nameLine, cx, y + pad + 30 + (i + 0.85) * Math.round(block.nameFont * 1.2), `${block.nameFont}px Georgia`));
@@ -248,8 +250,8 @@ async function buildCompactFamilyPosterImage(people, theme) {
 
   y += 20;
   const bandX = (W - bandW) / 2;
-  ctx.fillStyle = theme === 'gold' ? '#fff9e8ed' : '#061b16ed'; ctx.fillRect(bandX, y, bandW, bandH);
-  ctx.strokeStyle = line; ctx.lineWidth = 2; ctx.strokeRect(bandX, y, bandW, bandH);
+
+
   text('The Harmony', 540, y + 36 + 34, '42px Georgia');
   bandSubtitleLines.forEach((subtitleLine, i) => text(subtitleLine, 540, y + 36 + 46 + 22 + i * 30, 'italic 22px Arial', ink));
   let by = y + bandHead;

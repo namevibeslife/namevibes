@@ -60,7 +60,7 @@ export default function AnalysisView() {
     <div className="min-h-screen site-background">
 
       <div className="max-w-6xl mx-auto px-4 py-8">
-        <div className="bg-paper rounded-2xl shadow-xl p-8">
+        <div className="bg-transparent p-4 sm:p-8">
           {/* Name Title */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2 text-center">

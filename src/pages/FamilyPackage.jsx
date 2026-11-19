@@ -117,7 +117,7 @@ export default function FamilyPackage() {
       <div className="min-h-screen site-background">
   
         <div className="container mx-auto max-w-6xl py-8 px-4">
-          <div className="bg-paper rounded-2xl shadow-2xl p-8">
+          <div className="bg-transparent p-4 sm:p-8">
             <div className="mb-8">
               <h2 className="text-4xl font-bold text-center mb-4">
                 {results.length === 1 ? 'Name Chemistry' : 'Family Chemistry Analysis'}
@@ -200,7 +200,7 @@ export default function FamilyPackage() {
     <div className="min-h-screen site-background">
   
         <div className="container mx-auto max-w-4xl py-8 px-4">
-          <div className="bg-paper rounded-2xl shadow-2xl p-8">
+          <div className="bg-transparent p-4 sm:p-8">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Family Package</h1>
             <p className="text-gray-600 mb-8">
               Analyze up to {FAMILY_MAX_NAMES} names together

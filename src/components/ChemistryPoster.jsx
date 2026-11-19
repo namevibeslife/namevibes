@@ -17,7 +17,8 @@ export function ElementTile({ element }) {
 }
 
 // Live text and real analysis data keep every poster personal, accessible and responsive.
-export default function ChemistryPoster({ people, family = false, theme = family ? 'gold' : 'dark', minimal = false }) {
+export default function ChemistryPoster({ people, family: requestedFamily = false, theme = requestedFamily ? 'gold' : 'dark', minimal = false }) {
+  const family = requestedFamily && people.length > 1;
   const elements = people.flatMap(person => person.elements || []);
   const unique = [...new Map(elements.map(el => [el.symbol, el])).values()];
   const common = family ? findSharedElements(people) : [];

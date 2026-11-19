@@ -12,7 +12,7 @@ export function loadGemTexture() {
 
 // Shared artwork for the on-screen, image and printable posters.
 export function artworkUrl(theme) {
-  return theme === 'gold' ? '/theme/poster-gold-reference.png' : '/theme/poster-dark-art.png';
+  return theme === 'gold' ? '/theme/poster-gold-elements.png' : '/theme/poster-dark-art.png';
 }
 
 export async function drawPosterBackground(ctx, width, height, theme) {

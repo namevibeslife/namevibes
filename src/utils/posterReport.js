@@ -197,7 +197,7 @@ function drawTile(pdf, el, x, y, w, h) {
 
 function drawPersonBlock(pdf, person, x, y, w, h, t, nameFont, gold) {
   pdf.setDrawColor(GOLD_LINE); pdf.setLineWidth(.35);
-  pdf.roundedRect(x, y, w, h, 2.5, 2.5, 'S');
+
   const cx = x + w / 2;
   pdf.setTextColor(gold);
   pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
@@ -227,8 +227,8 @@ function drawPersonBlock(pdf, person, x, y, w, h, t, nameFont, gold) {
 
 function drawBand(pdf, people, band, y0, { ink, gold }) {
   pdf.setDrawColor(GOLD_LINE); pdf.setLineWidth(.35);
-  pdf.setFillColor(ink === '#362a17' ? '#fff9e8' : '#061b16');
-  pdf.roundedRect(CONTENT_X, y0, CONTENT_W, band.height, 2.5, 2.5, 'FD');
+
+
   pdf.setTextColor(gold); pdf.setFont('times', 'bold'); pdf.setFontSize(15);
   pdf.text('The Harmony', 105, y0 + PAD + 4.8, { align: 'center' });
   pdf.setTextColor(ink); pdf.setFont('helvetica', 'italic'); pdf.setFontSize(8.5);
@@ -270,7 +270,7 @@ function drawCompactFamily(pdf, people, plan, colors) {
 // `family` defaults to 'more than one person' but a one-person Family analysis can pass true.
 export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'dark', logo = null, artwork = null, family: familyOption } = {}) {
   const pdf = new jsPDF('p', 'mm', 'a4');
-  const family = familyOption ?? people.length > 1;
+  const family = people.length > 1 && (familyOption ?? true);
   const ink = theme === 'gold' ? '#362a17' : '#f5ead1';
   const gold = theme === 'gold' ? '#815817' : '#ebc979';
   const background = theme === 'gold' ? '#fbf2da' : '#081716';

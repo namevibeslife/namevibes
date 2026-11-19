@@ -4,7 +4,7 @@ import { useAuthStore } from '../store/authStore';
 import { planFeatures } from '../utils/plan';
 import ChemistryPoster from './ChemistryPoster';
 
-export default function PosterDownload({ person, people, family = false, showPreparedPreview = false }) {
+export default function PosterDownload({ person, people, family: requestedFamily = false, showPreparedPreview = false }) {
   const profile = useAuthStore(state => state.profile);
   const features = planFeatures(profile);
   const [busy, setBusy] = useState(false);
@@ -14,6 +14,7 @@ export default function PosterDownload({ person, people, family = false, showPre
   const version = useRef(0);
   const readyPanel = useRef(null);
   const list = people || [person];
+  const family = requestedFamily && list.length > 1;
   const identity = JSON.stringify(list);
   useEffect(() => {
     version.current += 1; setPrepared(null); setMessage(''); setBusy(false);

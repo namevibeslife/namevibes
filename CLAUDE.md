@@ -1,3 +1,10 @@
+## Correct reference, unobstructed posters and one-name family behavior - 19 November 2026
+
+- Correct reference is the user's attached Namevibes_ Elements in My Name.png, not the Inspiring India poster. Added public/theme/poster-gold-elements.png: an edit removing only text, tiles and logo from that reference while retaining its molecular edges and flowing gold light trails. Gold poster/export/page artwork now uses this asset; dark artwork is preserved.
+- Removed filled panels, borders and shadows behind poster names, meanings and shared-element sections in both themes. Removed family PNG/PDF member boxes and Harmony backing, and opaque result-page/person-card wrappers. Crystal element tiles remain intact.
+- One-person family entries now use individual presentation and exports, with no shared-elements/Harmony heading or add-another-member message. Applies to new and saved results, download/share controls, the family PNG utility and PDF builder even when family:true is passed. Multi-person results retain shared elements and meanings.
+- Validation: npm run build passed. Playwright checked a newly entered single family name plus saved one/two-member results in Golden and Dark, exactly one poster, transparent/borderless/shadowless person panels and no mobile horizontal overflow; no page errors. Generated one/two-member PNG/PDF files in both themes. All PDFs fit one page; one-member PDFs contain no Harmony/Common elements/Add another copy, and two-member PDFs retain Harmony. QA output: artifacts/single-family-fix.
+
 ## Reference background, transparent dark logo, and global navigation - 19 November 2026
 
 - Replaced the gold poster background with public/theme/poster-gold-reference.png, extracted with imagegen from the supplied A Name Inspiring India poster. Preserves its ivory parchment, warm gold light and molecular edges, removing the portrait, text and example tiles for reuse with real user data. Used on gold previews, PNG/PDF exports and website page backgrounds. Dark background and crystal tiles remain available.
