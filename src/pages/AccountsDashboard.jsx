@@ -13,6 +13,7 @@ import {
   Timestamp
 } from 'firebase/firestore';
 import { CURRENCY_SYMBOLS } from '../data/countries';
+import { payoutCodeLabel } from '../utils/payoutLabel';
 import './AccountsDashboard.css';
 
 function AccountsDashboard() {
@@ -205,6 +206,7 @@ function AccountsDashboard() {
       'Month/Year',
       'Ambassador Name',
       'Referral Code',
+      'Referral Code – Ambassador',
       'Country',
       'State',
       'Sales Count',
@@ -223,8 +225,9 @@ function AccountsDashboard() {
 
     const rows = filteredPayouts.map(p => [
       `${getMonthName(p.month)} ${p.year}`,
-      p.ambassadorName,
+      p.ambassadorName || p.ambassadorEmail || '',
       p.referralCode,
+      payoutCodeLabel(p),
       p.country,
       p.state,
       p.salesCount,
@@ -414,6 +417,7 @@ function AccountsDashboard() {
         'Month/Year',
         'Ambassador Name',
         'Referral Code',
+      'Referral Code – Ambassador',
         'Country',
         'State',
         'Sales Count',
@@ -427,8 +431,9 @@ function AccountsDashboard() {
 
       const rows = filtered.map(p => [
         `${getMonthName(p.month)} ${p.year}`,
-        p.ambassadorName,
+        p.ambassadorName || p.ambassadorEmail || '',
         p.referralCode,
+        payoutCodeLabel(p),
         p.country,
         p.state,
         p.salesCount,
@@ -561,8 +566,7 @@ function AccountsDashboard() {
               <thead>
                 <tr>
                   <th>Month/Year</th>
-                  <th>Ambassador</th>
-                  <th>Referral Code</th>
+                  <th>Referral Code – Ambassador</th>
                   <th>Country</th>
                   <th>Sales</th>
                   <th>Total Sales</th>
@@ -580,8 +584,7 @@ function AccountsDashboard() {
                   filteredPayouts.map(payout => (
                     <tr key={payout.id}>
                       <td>{getMonthName(payout.month)} {payout.year}</td>
-                      <td>{payout.ambassadorName}</td>
-                      <td>{payout.referralCode}</td>
+                      <td>{payoutCodeLabel(payout)}</td>
                       <td>{payout.country}</td>
                       <td>{payout.salesCount}</td>
                       <td>{payout.currencySymbol}{payout.totalSales}</td>
@@ -812,8 +815,7 @@ function AccountsDashboard() {
             <h2>Mark Payout as Paid</h2>
             
             <div className="modal-info">
-              <p><strong>Ambassador:</strong> {selectedPayout.ambassadorName}</p>
-              <p><strong>Referral Code:</strong> {selectedPayout.referralCode}</p>
+              <p><strong>Referral Code – Ambassador:</strong> {payoutCodeLabel(selectedPayout)}</p>
               <p><strong>Period:</strong> {getMonthName(selectedPayout.month)} {selectedPayout.year}</p>
               {selectedPayout.netAmount !== undefined && <p><strong>Tax removed / Net amount:</strong> {selectedPayout.currencySymbol}{selectedPayout.taxAmount} / {selectedPayout.currencySymbol}{selectedPayout.netAmount}</p>}
               <p><strong>Commission Amount (Net of GST):</strong> {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}</p>

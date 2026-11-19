@@ -17,6 +17,7 @@ import { db, auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
 import { COUNTRIES, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT, defaultPriceFor } from '../data/countries';
 import { readPlanSettings, loadTaxRates } from '../utils/pricing';
+import { ambassadorLabel } from '../utils/payoutLabel';
 import { computeCommissions } from '../utils/commission';
 import { reserveReferralCode, setReferralCodeActive, setAmbassadorAccess, previewMigration, runMigration, ambassadorsNeedingMigration, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { 
@@ -412,6 +413,18 @@ export default function AdminPanel() {
         ambassadorsList.push({ id: doc.id, ...doc.data() });
       });
 
+      // Members = users who signed up with each ambassador's email
+      const memberCounts = {};
+      try {
+        (await getDocs(query(collection(db, 'users'), where('ambassadorEmail', '!=', null)))).forEach(u => {
+          const e = String(u.data().ambassadorEmail || '').toLowerCase();
+          memberCounts[e] = (memberCounts[e] || 0) + 1;
+        });
+      } catch (error) {
+        console.warn('Could not count members:', error.message);
+      }
+      ambassadorsList.forEach(a => { a.memberCount = memberCounts[String(a.email || '').toLowerCase()] || 0; });
+
       ambassadorsList = filterByAdminAccess(ambassadorsList, 'ambassador');
 
       // Apply ambassador filters
@@ -540,6 +553,13 @@ export default function AdminPanel() {
     try {
       const paymentsSnapshot = await getDocs(collection(db, 'payments'));
       const taxRates = await loadTaxRates();
+      // code -> ambassador name (full name, or email until they fill in their details). The
+      // unfiltered ambassadors list is used so a filter on the Ambassadors tab can't blank names.
+      const nameByCode = {};
+      (await getDocs(collection(db, 'ambassadors'))).forEach(d => {
+        const a = d.data();
+        [a.referralCode, a.legacyCode].filter(Boolean).forEach(c => { nameByCode[String(c).replace(/\s+/g, '').toUpperCase()] = ambassadorLabel(a); });
+      });
       const byCode = {};
       paymentsSnapshot.forEach(d => {
         const payment = d.data();
@@ -560,6 +580,7 @@ export default function AdminPanel() {
           const currency = payment.currency || 'INR';
           const row = payoutMap[code] = payoutMap[code] || {
             referralCode: payment.referralCode,
+            ambassadorName: nameByCode[code] || '',
             currency,
             currencySymbol: CURRENCY_SYMBOLS[currency] || currency + ' ',
             totalSales: 0,

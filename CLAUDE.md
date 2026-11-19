@@ -1,3 +1,9 @@
+## Admin ambassador tabs and ambassador names on payouts - 19 November 2026
+
+- Admin -> Ambassadors (AdminDashboard.jsx) has tabs with counts under the Invite form and the existing filters: Active (approved, active, lastLoginAt set; Name, Email, Referral code, Country, Signed in on, Members, Deactivate + Edit Bank), "Invited - not signed in" (no lastLoginAt; Invited on, badge, Resend invite, Deactivate), Deactivated (Reactivate), plus Pending applications only while any exist. A search box filters inside each tab; empty tabs show a short message. Members come from users.ambassadorEmail counts (loadAmbassadors in AdminPanel). An invited ambassador moves to Active when they first sign in at /ambassador.
+- Payout views show "CODE - Name" (src/utils/payoutLabel.js: full name, else email): admin payout table and share modal, Payout Management, Accounts (tables, detail, CSV gains a "Referral Code - Ambassador" column). The name is saved on each payout request when created (ambassadorName = full name or email); the request lookup now falls back to the full ambassadors collection (it previously failed with "Ambassador not found" when the Ambassadors tab hadn't loaded). Commission maths unchanged.
+- The admin dashboard layout now stacks the sidebar above the content under md and the payout table scrolls inside its card, so 360px has no sideways page overflow.
+
 ## Sign-in-only /ambassador, Home copy in Firestore - 19 November 2026
 
 - Signed-out /ambassador shows only the logo, "Ambassador sign-in", the Google button and the invitation-only line (no tabs, rates or copy, no hint whether an email is an ambassador). Signed in as anyone but an approved, active ambassador: only the "hasn't been invited" message and Sign out. Approved ambassadors get src/components/AmbassadorArea.jsx (Home/Register/My Followers), a lazy chunk fetched only after the check passes.

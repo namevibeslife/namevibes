@@ -3,6 +3,7 @@ import AmbassadorInvite from '../components/AmbassadorInvite';
 const AmbassadorContentAdmin = lazy(() => import('../components/AmbassadorContentAdmin'));
 import InviteMessageBox from '../components/InviteMessageBox';
 import { buildInviteMessage } from '../utils/ambassadorInvite';
+import { ambassadorLabel, codeWithName } from '../utils/payoutLabel';
 import PayoutManagement from '../components/PayoutManagement';
 import FilterPanel from '../components/FilterPanel';
 import {
@@ -27,7 +28,7 @@ import {
   FileText,
   Share2
 } from 'lucide-react';
-import { addDoc, collection, Timestamp } from 'firebase/firestore';
+import { addDoc, collection, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { readPlanSettings } from '../utils/pricing';
 import { CURRENCY_SYMBOLS } from '../data/countries';
@@ -109,6 +110,28 @@ export default function AdminDashboard(props) {
     setAmbassadorFilters
   } = props;
 
+  // Ambassadors tab: split the (already filtered) list by where each person is in the journey.
+  const [ambTab, setAmbTab] = useState('active');
+  const [ambSearch, setAmbSearch] = useState('');
+  const term = ambSearch.trim().toLowerCase();
+  const matchesSearch = (a) => !term || [a.fullName, a.email, a.referralCode].some(v => String(v || '').toLowerCase().includes(term));
+  const ambLists = {
+    active: ambassadors.filter(a => a.isApproved && a.isActive && a.lastLoginAt && matchesSearch(a)),
+    invited: ambassadors.filter(a => a.isApproved && a.isActive && !a.lastLoginAt && matchesSearch(a)),
+    deactivated: ambassadors.filter(a => a.isApproved && !a.isActive && matchesSearch(a)),
+    pending: ambassadors.filter(a => !a.isApproved && matchesSearch(a))
+  };
+  const ambTabs = [
+    ['active', 'Active'], ['invited', 'Invited – not signed in'], ['deactivated', 'Deactivated'],
+    ...(ambLists.pending.length ? [['pending', 'Pending applications']] : [])
+  ];
+  const ambEmpty = {
+    active: 'No active ambassadors yet',
+    invited: 'No invites waiting for a first sign-in',
+    deactivated: 'No deactivated ambassadors'
+  };
+  const asDate = (v) => (v?.toDate ? v.toDate() : v ? new Date(v) : null);
+
   // New state for Share with Accounts modals
   const [showSharePayoutModal, setShowSharePayoutModal] = React.useState(false);
   const [showShareRevenueModal, setShowShareRevenueModal] = React.useState(false);
@@ -127,7 +150,16 @@ export default function AdminDashboard(props) {
     setSharingLoading(true);
     try {
       // Find ambassador details
-      const ambassador = ambassadors.find(a => a.referralCode === selectedPayoutData.referralCode);
+      // The Ambassadors tab list is filtered (and may not be loaded yet), so fall back to the full collection.
+      const norm = (c) => String(c || '').replace(/\s+/g, '').toUpperCase();
+      const wanted = norm(selectedPayoutData.referralCode);
+      const matches = (a) => norm(a.referralCode) === wanted || norm(a.legacyCode) === wanted;
+      let ambassador = ambassadors.find(matches);
+      if (!ambassador) {
+        const all = await getDocs(collection(db, 'ambassadors'));
+        const hit = all.docs.find(d => matches(d.data()));
+        if (hit) ambassador = { id: hit.id, ...hit.data() };
+      }
       
       if (!ambassador) {
         alert('Ambassador not found!');
@@ -138,7 +170,8 @@ export default function AdminDashboard(props) {
       await addDoc(collection(db, 'payoutRequests'), {
         type: 'ambassador_payout',
         referralCode: selectedPayoutData.referralCode,
-        ambassadorName: ambassador.fullName,
+        // saved with the request so it still reads correctly if the ambassador record changes later
+        ambassadorName: ambassadorLabel(ambassador),
         ambassadorEmail: ambassador.email,
         month: payoutFilter.month,
         year: payoutFilter.year,
@@ -300,9 +333,9 @@ export default function AdminDashboard(props) {
         </div>
       </header>
 
-      <div className="flex">
+      <div className="flex flex-col md:flex-row">
         {/* Sidebar */}
-        <aside className="w-64 bg-paper border-r border-gray-200 min-h-screen p-4">
+        <aside className="w-full md:w-64 shrink-0 bg-paper border-b md:border-b-0 md:border-r border-gray-200 md:min-h-screen p-4">
           <nav className="space-y-2">
             <button
               onClick={() => setActiveTab('dashboard')}
@@ -420,7 +453,7 @@ export default function AdminDashboard(props) {
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 min-w-0 p-4 md:p-8">
           {/* DASHBOARD TAB */}
           {activeTab === 'dashboard' && (
             <div>
@@ -800,7 +833,89 @@ export default function AdminDashboard(props) {
                 years={years}
               />
 
-              {ambassadors.length === 0 ? (
+              <div className="flex flex-wrap items-center gap-2 mb-4" role="tablist" aria-label="Ambassador groups">
+                {ambTabs.map(([key, label]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    role="tab"
+                    aria-selected={ambTab === key}
+                    onClick={() => setAmbTab(key)}
+                    className={`px-4 py-2 min-h-[44px] rounded-lg text-sm font-semibold ${ambTab === key ? 'bg-brand-600 text-white' : 'bg-paper text-gray-700 border border-gray-300 hover:bg-gray-50'}`}
+                  >{label} ({ambLists[key].length})</button>
+                ))}
+                <input
+                  type="search"
+                  value={ambSearch}
+                  onChange={(e) => setAmbSearch(e.target.value)}
+                  placeholder="Search name, email or code"
+                  aria-label="Search ambassadors"
+                  className="sm:ml-auto w-full sm:w-64 px-3 py-2 border-2 border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+
+              {ambTab !== 'pending' ? (
+                ambLists[ambTab].length === 0 ? (
+                  <div className="bg-paper rounded-xl shadow-lg p-10 text-center">
+                    <UserCheck className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-gray-600">{ambEmpty[ambTab]}</p>
+                  </div>
+                ) : (
+                  <div className="bg-paper rounded-xl shadow-lg overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 border-b-2 border-gray-200 text-left text-xs font-medium text-gray-500 uppercase">
+                        <tr>
+                          <th className="px-4 py-3">Name</th>
+                          <th className="px-4 py-3">Email</th>
+                          <th className="px-4 py-3">Referral code</th>
+                          {ambTab === 'active' && <><th className="px-4 py-3">Country</th><th className="px-4 py-3">Signed in on</th><th className="px-4 py-3 text-right">Members</th></>}
+                          {ambTab === 'invited' && <><th className="px-4 py-3">Invited on</th><th className="px-4 py-3">Status</th></>}
+                          {ambTab === 'deactivated' && <th className="px-4 py-3">Country</th>}
+                          <th className="px-4 py-3">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {ambLists[ambTab].map(a => (
+                          <React.Fragment key={a.id}>
+                            <tr>
+                              <td className="px-4 py-3 font-medium text-gray-800">{a.fullName || '-'}</td>
+                              <td className="px-4 py-3 text-gray-700 break-all">{a.email}</td>
+                              <td className="px-4 py-3 font-mono font-bold text-brand-600 whitespace-nowrap">{a.referralCode || '-'}</td>
+                              {ambTab === 'active' && <>
+                                <td className="px-4 py-3 whitespace-nowrap">{a.countryName || a.countryCode || '-'}</td>
+                                <td className="px-4 py-3 whitespace-nowrap">{asDate(a.lastLoginAt)?.toLocaleDateString() || '-'}</td>
+                                <td className="px-4 py-3 text-right">{a.memberCount ?? 0}</td>
+                              </>}
+                              {ambTab === 'invited' && <>
+                                <td className="px-4 py-3 whitespace-nowrap">{(asDate(a.invitedAt) || asDate(a.createdAt))?.toLocaleDateString() || '-'}</td>
+                                <td className="px-4 py-3"><span className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-semibold rounded-full whitespace-nowrap">Invited – not signed in</span></td>
+                              </>}
+                              {ambTab === 'deactivated' && <td className="px-4 py-3 whitespace-nowrap">{a.countryName || a.countryCode || '-'}</td>}
+                              <td className="px-4 py-3">
+                                <div className="flex flex-wrap gap-2">
+                                  {ambTab === 'invited' && (
+                                    <button onClick={() => setResendFor(resendFor === a.id ? null : a.id)} className="px-3 py-2 min-h-[44px] rounded-lg text-sm bg-brand-100 text-brand-800 hover:bg-brand-200 whitespace-nowrap">Resend invite</button>
+                                  )}
+                                  <button
+                                    onClick={() => handleToggleActive(a)}
+                                    className={`px-3 py-2 min-h-[44px] rounded-lg text-sm whitespace-nowrap ${a.isActive ? 'bg-red-100 text-red-700 hover:bg-red-200' : 'bg-green-100 text-green-700 hover:bg-green-200'}`}
+                                  >{a.isActive ? 'Deactivate' : 'Reactivate'}</button>
+                                  {ambTab === 'active' && (
+                                    <button onClick={() => handleEditBankDetails(a)} className="px-3 py-2 min-h-[44px] rounded-lg text-sm bg-ocean-600 text-white hover:bg-ocean-700 whitespace-nowrap">Edit Bank</button>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
+                            {resendFor === a.id && (
+                              <tr><td colSpan={8} className="px-4 py-3 bg-gray-50"><InviteMessageBox message={buildInviteMessage(a.email)} onClose={() => setResendFor(null)} /></td></tr>
+                            )}
+                          </React.Fragment>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )
+              ) : ambLists.pending.length === 0 ? (
                 <div className="bg-paper rounded-xl shadow-lg p-12 text-center">
                   <UserCheck className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                   <p className="text-gray-600 text-lg">No ambassadors yet</p>
@@ -808,7 +923,7 @@ export default function AdminDashboard(props) {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {ambassadors.map(ambassador => (
+                  {ambLists.pending.map(ambassador => (
                     <div key={ambassador.id} className="bg-paper rounded-xl shadow-lg p-6">
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex-1">
@@ -1125,7 +1240,7 @@ export default function AdminDashboard(props) {
                 years={years}
               />
 
-              <div className="bg-paper rounded-xl shadow-lg overflow-hidden">
+              <div className="bg-paper rounded-xl shadow-lg overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b-2 border-gray-200">
                     <tr>
@@ -1144,7 +1259,7 @@ export default function AdminDashboard(props) {
                     {ambassadorPayouts.map((payout, idx) => (
                       <tr key={idx} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="font-mono font-bold text-brand-600">{payout.referralCode}</span>
+                          <span className="font-mono font-bold text-brand-600 break-words">{codeWithName(payout.referralCode, payout.ambassadorName)}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {payout.count}
@@ -1280,7 +1395,7 @@ export default function AdminDashboard(props) {
             <div className="space-y-3 mb-6">
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Referral Code:</span>
-                <span className="font-mono font-bold text-brand-600">{selectedPayoutData.referralCode}</span>
+                <span className="font-mono font-bold text-brand-600 text-right break-words">{codeWithName(selectedPayoutData.referralCode, selectedPayoutData.ambassadorName)}</span>
               </div>
               <div className="flex justify-between py-2 border-b">
                 <span className="text-gray-600">Period:</span>

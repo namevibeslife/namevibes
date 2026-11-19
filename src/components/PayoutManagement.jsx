@@ -1,3 +1,4 @@
+import { payoutCodeLabel } from '../utils/payoutLabel';
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../firebase';
 import { 
@@ -121,6 +122,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
       'Month/Year',
       'Ambassador Name',
       'Referral Code',
+      'Referral Code – Ambassador',
       'Country',
       'State',
       'Sales Count',
@@ -139,8 +141,9 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
 
     const rows = filteredPayouts.map(p => [
       `${getMonthName(p.month)} ${p.year}`,
-      p.ambassadorName,
+      p.ambassadorName || p.ambassadorEmail || '',
       p.referralCode,
+      payoutCodeLabel(p),
       p.country,
       p.state,
       p.salesCount,
@@ -244,8 +247,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
           <thead>
             <tr>
               <th>Month/Year</th>
-              <th>Ambassador</th>
-              <th>Referral Code</th>
+              <th>Referral Code – Ambassador</th>
               <th>Country</th>
               <th>Sales</th>
               <th>Total Sales</th>
@@ -267,11 +269,10 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
                 <tr key={payout.id}>
                   <td>{getMonthName(payout.month)} {payout.year}</td>
                   <td>
-                    <strong>{payout.ambassadorName}</strong>
+                    <strong>{payoutCodeLabel(payout)}</strong>
                     <br />
                     <small style={{color: '#666'}}>{payout.ambassadorEmail}</small>
                   </td>
-                  <td>{payout.referralCode}</td>
                   <td>
                     {payout.country}
                     <br />
@@ -362,11 +363,11 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
             <div className="payout-modal-info">
               <div className="info-row">
                 <span className="info-label">Ambassador:</span>
-                <span className="info-value">{selectedPayout.ambassadorName}</span>
+                <span className="info-value">{selectedPayout.ambassadorName || selectedPayout.ambassadorEmail}</span>
               </div>
               <div className="info-row">
                 <span className="info-label">Referral Code:</span>
-                <span className="info-value">{selectedPayout.referralCode}</span>
+                <span className="info-value">{payoutCodeLabel(selectedPayout)}</span>
               </div>
               <div className="info-row">
                 <span className="info-label">Period:</span>
