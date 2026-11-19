@@ -1,6 +1,6 @@
 {
-  "name": "NameVibes - Discover Your Name Chemistry",
-  "short_name": "NameVibes",
+  "name": "Namasutra - Your Elemental Identity",
+  "short_name": "Namasutra",
   "description": "Discover the hidden chemistry in your name through periodic elements, Chaldean numerology and Hindu astrology.",
   "id": "/",
   "start_url": "/dashboard",
@@ -9,15 +9,39 @@
   "orientation": "portrait-primary",
   "background_color": "#fcf8ed",
   "theme_color": "#89601c",
-  "categories": ["lifestyle", "education", "entertainment"],
+  "categories": [
+    "lifestyle",
+    "education",
+    "entertainment"
+  ],
   "icons": [
-    { "src": "/brand/icon-green-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "/brand/icon-green-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "/brand/maskable-green-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
-    { "src": "/brand/maskable-green-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/brand/namasutra-app-icon.png",
+      "sizes": "1254x1254",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ],
   "shortcuts": [
-    { "name": "Analyze a Name", "url": "/analyze", "icons": [{ "src": "/brand/icon-green-192.png", "sizes": "192x192" }] },
-    { "name": "Family Analysis", "url": "/family", "icons": [{ "src": "/brand/icon-green-192.png", "sizes": "192x192" }] }
+    {
+      "name": "Analyze a Name",
+      "url": "/analyze",
+      "icons": [
+        {
+          "src": "/brand/namasutra-app-icon.png",
+          "sizes": "1254x1254"
+        }
+      ]
+    },
+    {
+      "name": "Family Analysis",
+      "url": "/family",
+      "icons": [
+        {
+          "src": "/brand/namasutra-app-icon.png",
+          "sizes": "1254x1254"
+        }
+      ]
+    }
   ]
 }

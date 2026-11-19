@@ -58,8 +58,8 @@ export default function LandingPage() {
           <p>From the cradle to the grave, your name is your constant companion, defining your identity throughout life's journey.</p>
           <p>Every name carries a unique vibration, an energy that resonates with who you are.</p>
           <p>But have you ever wondered what lies within the letters of your name?</p>
-          <p><strong>NameVibes</strong> uncovers the fascinating connection between your name and the elements of the periodic table.</p>
-          <p className="font-semibold text-brand-700">Discover the elements. Explore the connections. Feel your NameVibes.</p>
+          <p><strong>Namasutra</strong> uncovers the fascinating connection between your name and the elements of the periodic table.</p>
+          <p className="font-semibold text-brand-700">Discover the elements. Explore the connections. Feel your Namasutra.</p>
         </div>
       </section>
       <section className="landing-showcase" aria-label="Vibes sample analysis">
@@ -117,7 +117,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 text-center text-gray-600">
-        <p>© {new Date().getFullYear()} NameVibes. All rights reserved.</p>
+        <p>© {new Date().getFullYear()} Namasutra. All rights reserved.</p>
       </footer>
     </div>
   );

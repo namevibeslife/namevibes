@@ -41,7 +41,7 @@ export default function UserNav() {
   }
   return <header className="site-navigation" ref={container}>
     <div className="site-navigation-bar">
-      <Link to="/" aria-label="NameVibes home" className="site-navigation-logo"><Logo /></Link>
+      <Link to="/" aria-label="Namasutra home" className="site-navigation-logo"><Logo /></Link>
       <nav aria-label="Primary navigation" className="site-navigation-actions">
         <NavLink to="/" end className="site-home-link"><Home size={18} aria-hidden="true" />Home</NavLink>
         <button ref={toggle} type="button" aria-expanded={open} aria-controls="site-navigation-menu" onClick={() => setOpen(value => !value)} className="site-menu-toggle">
@@ -49,7 +49,7 @@ export default function UserNav() {
         </button>
       </nav>
       {open && <nav id="site-navigation-menu" aria-label="All pages" className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>
-        {[['Explore NameVibes', explore], ['Your account', account], ['Partners', partners]].map(([title, links]) => <section key={title}>
+        {[['Explore Namasutra', explore], ['Your account', account], ['Partners', partners]].map(([title, links]) => <section key={title}>
           <h2>{title}</h2>
           <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{label}</NavLink>)}</div>
         </section>)}

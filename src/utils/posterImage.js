@@ -17,7 +17,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
   const elements = person.elements || [];
-  const logo = await loadImage('/brand/logo-green-hires.png').catch(() => null);
+  const logo = await loadImage('/brand/namasutra-logo.png').catch(() => null);
   ctx.font = '64px Georgia';
   const lines = [];
   let line = '';
@@ -49,10 +49,10 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   function text(value, y, size, font = 'Georgia', color = gold) {
     ctx.fillStyle = color; ctx.font = `${size}px ${font}`; ctx.textAlign = 'center'; ctx.fillText(value, 540, y);
   }
-  if (!logo) text('N A M E V I B E S', 205, 43);
+  if (!logo) text('N A M A S U T R A', 205, 43);
   text('EVERY NAME HAS A CHEMISTRY', 252, 19, 'Arial');
   ctx.beginPath(); ctx.moveTo(170, 290); ctx.lineTo(910, 290); ctx.stroke();
-  text(family && person.relation ? person.relation.toUpperCase() : 'THE CHEMISTRY OF YOUR NAME', 345, 21, 'Arial');
+  text('Your Elemental Identity, in Harmony with Nature.', 345, 32, 'Georgia');
   lines.forEach((nameLine, i) => text(nameLine, 420 + i * 78, 64));
   const gridY = Math.max(top, (canvas.height - rows * 220) / 2 + 80);
   elements.forEach((el, index) => {
@@ -73,5 +73,5 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   text('namevibes.life', canvas.height - 61, 18, 'Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create image');
-  return new File([blob], 'NameVibes_Poster.png', { type: 'image/png' });
+  return new File([blob], 'Namasutra_Poster.png', { type: 'image/png' });
 }

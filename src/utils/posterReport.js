@@ -8,7 +8,7 @@ import { FAMILY_MAX_NAMES } from './plan';
 
 // Loads the transparent logo as a data URL so it can be placed in the PDF
 export async function loadPosterLogo(theme) {
-  const response = await fetch('/brand/logo-green-hires.png');
+  const response = await fetch('/brand/namasutra-logo.png');
   if (!response.ok) throw new Error('Logo unavailable');
   const blob = await response.blob();
   return new Promise((resolve, reject) => {
@@ -302,14 +302,14 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
       pdf.circle(105, 21, 1, 'S');
       pdf.setFont('times', 'normal');
       pdf.setFontSize(23);
-      pdf.text('N A M E V I B E S', 105, 40, { align: 'center' });
+      pdf.text('N A M A S U T R A', 105, 40, { align: 'center' });
     }
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(8);
     pdf.text('E V E R Y  N A M E  H A S  A  C H E M I S T R Y', 105, logo ? 44 : 47, { align: 'center' });
     pdf.line(30, 53, 180, 53);
     pdf.setFont('times', 'normal');
-    pdf.setFontSize(16);
+    pdf.setFontSize(18);
     pdf.text(subtitle, 105, 63, { align: 'center' });
     pdf.line(30, 271, 180, 271);
     pdf.setFont('times', 'italic');
@@ -364,7 +364,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
   if (family && people.length >= 1 && people.length <= FAMILY_MAX_NAMES) {
     const plan = planCompactFamily(pdf, people);
     if (plan) {
-      frame('Our Family Chemistry');
+      frame('Your Elemental Identity, in Harmony with Nature.');
       drawCompactFamily(pdf, people, plan, { ink, gold });
       if (plan.harmonyPage) {
         frame('Common elements & their meaning');
@@ -375,7 +375,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
   }
 
   for (const person of people) {
-    frame(family ? 'Family Chemistry' : 'The Chemistry of Your Name');
+    frame('Your Elemental Identity, in Harmony with Nature.');
     y = 90;
     personHeading(person);
     y = Math.max(y + 15, 120);

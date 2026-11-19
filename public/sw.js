@@ -1,11 +1,11 @@
-// NameVibes service worker: makes the app installable and keeps it usable on flaky connections.
+// Namasutra service worker: makes the app installable and keeps it usable on flaky connections.
 // - Pages: network first, falling back to the cached app shell when offline (so new deploys show up immediately)
 // - /assets/*: cache first (file names contain a content hash, so they never go stale)
 // - Everything cross-origin (Firebase, Google sign-in, payment gateways) is never cached
-const VERSION = 'v3';
+const VERSION = 'v4';
 const SHELL_CACHE = `namevibes-shell-${VERSION}`;
 const ASSET_CACHE = `namevibes-assets-${VERSION}`;
-const SHELL_URLS = ['/', '/manifest.webmanifest', '/brand/icon-green-192.png', '/brand/icon-green-512.png'];
+const SHELL_URLS = ['/', '/manifest.webmanifest', '/brand/namasutra-app-icon.png', '/brand/namasutra-logo.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(SHELL_CACHE).then(cache => cache.addAll(SHELL_URLS)).then(() => self.skipWaiting()));

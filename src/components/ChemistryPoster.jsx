@@ -27,7 +27,7 @@ export default function ChemistryPoster({ people, family: requestedFamily = fals
       <Logo variant={theme === 'gold' ? 'light' : 'dark'} className="poster-logo" />
       <p className="poster-eyebrow">Every name has a chemistry</p>
       <div className="poster-rule" aria-hidden="true">◇</div>
-      <h2>{family ? 'Our Family Chemistry' : 'The Chemistry of Your Name'}</h2>
+      <h2 className="poster-identity-heading">Your Elemental Identity, in Harmony with Nature.</h2>
     </header>
     <div className={family ? 'poster-family-grid' : ''}>
       {people.map((person, index) => <section className="poster-person" key={index}>

@@ -71,7 +71,7 @@ export default function PaymentPage() {
               value: amount.toString(),
               currency_code: 'USD'
             },
-            description: `NameVibes ${planType} Plan - Yearly`
+            description: `Namasutra ${planType} Plan - Yearly`
           }]
         });
       },
@@ -123,7 +123,7 @@ export default function PaymentPage() {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: amount * 100,
         currency: 'INR',
-        name: 'NameVibes',
+        name: 'Namasutra',
         description: `${planType} Plan - Yearly`,
         handler: async function (response) {
           await savePaymentSuccess('razorpay', response.razorpay_payment_id);

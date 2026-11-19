@@ -50,9 +50,9 @@ function shareMessageLines(code) {
   const link = buildShareLink(code);
   return [
     'Your name is more than just an identity. What if it has a connection to the very elements of our universe? 🌌',
-    "I discovered something fascinating on NameVibes — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights.",
+    "I discovered something fascinating on Namasutra — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights.",
     'Every name has a story. Discover what yours reveals! ✨',
-    `🔗 Explore your NameVibes: ${link}`,
+    `🔗 Explore your Namasutra: ${link}`,
     `🎁 Try it with my referral code: ${c} this can give you a DISCOUNT`
   ];
 }
@@ -62,7 +62,7 @@ export function buildShareMessage(code) {
 }
 
 // Telegram's share URL carries the link separately via `url` (shown as a link preview), so
-// the text omits the "Explore your NameVibes" link line - otherwise the link would appear twice.
+// the text omits the "Explore your Namasutra" link line - otherwise the link would appear twice.
 export function buildTelegramMessage(code) {
   return shareMessageLines(code).filter((_, i) => i !== 3).join('\n');
 }

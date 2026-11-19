@@ -916,7 +916,7 @@ export default function AdminPanel() {
               <Settings className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800">Admin Panel</h1>
-            <p className="text-gray-600 mt-2">NameVibes Management System</p>
+            <p className="text-gray-600 mt-2">Namasutra Management System</p>
           </div>
 
           <div className="space-y-6">

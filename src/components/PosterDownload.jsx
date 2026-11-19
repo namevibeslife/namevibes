@@ -27,7 +27,7 @@ export default function PosterDownload({ person, people, family: requestedFamily
     try {
       const { buildPosterPDF, loadPosterLogo, loadPosterArtwork } = await import('../utils/posterReport');
       const [logo, artwork] = await Promise.all([loadPosterLogo(theme).catch(() => null), loadPosterArtwork(theme).catch(() => null)]);
-      buildPosterPDF(list, { theme, logo, artwork, family }).save(family ? 'NameVibes_Family_Posters.pdf' : 'NameVibes_Elemental_Profile.pdf');
+      buildPosterPDF(list, { theme, logo, artwork, family }).save(family ? 'Namasutra_Family_Posters.pdf' : 'Namasutra_Elemental_Profile.pdf');
     } catch { setMessage('The PDF could not be downloaded. Please try again.'); }
     finally { setBusy(false); }
   }
@@ -48,7 +48,7 @@ export default function PosterDownload({ person, people, family: requestedFamily
     setBusy(true); setMessage('');
     try {
       // The ready-file button preserves the user gesture required by mobile sharing.
-      await navigator.share({ files: [prepared.file], title: family ? 'Our Family NameVibes' : 'My NameVibes' });
+      await navigator.share({ files: [prepared.file], title: family ? 'Our Family Namasutra' : 'My Namasutra' });
     } catch (error) {
       if (error.name !== 'AbortError') setMessage('Sharing is unavailable. Use Save Image, then attach the poster in WhatsApp, Instagram or Facebook.');
     } finally { setBusy(false); }

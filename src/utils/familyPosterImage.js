@@ -55,14 +55,14 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   try {
     const logo = await new Promise((resolve, reject) => {
       const image = new Image(); image.onload = () => resolve(image); image.onerror = reject;
-      image.src = '/brand/logo-green-hires.png';
+      image.src = '/brand/namasutra-logo.png';
     });
     const height = Math.min(150, logo.height * 460 / logo.width);
     const width = height * logo.width / logo.height;
     ctx.drawImage(logo, (1080 - width) / 2, 50, width, height);
-  } catch { text('NAMEVIBES', 540, 155, '44px Georgia'); }
+  } catch { text('NAMASUTRA', 540, 155, '44px Georgia'); }
   text('EVERY NAME HAS A CHEMISTRY', 540, 237, '19px Arial');
-  text('Our Family Chemistry', 540, 300, '46px Georgia');
+  text('Your Elemental Identity, in Harmony with Nature.', 540, 300, '32px Georgia');
   let y = 340;
   rows.forEach(row => {
     row.cards.forEach((card, column) => {
@@ -103,7 +103,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   text('namevibes.life', 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');
-  return new File([blob], 'NameVibes_Family_Poster.png', { type: 'image/png' });
+  return new File([blob], 'Namasutra_Family_Poster.png', { type: 'image/png' });
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -204,14 +204,14 @@ async function buildCompactFamilyPosterImage(people, theme) {
   try {
     const logo = await new Promise((resolve, reject) => {
       const image = new Image(); image.onload = () => resolve(image); image.onerror = reject;
-      image.src = '/brand/logo-green-hires.png';
+      image.src = '/brand/namasutra-logo.png';
     });
     const height = Math.min(150, logo.height * 460 / logo.width);
     const width = height * logo.width / logo.height;
     ctx.drawImage(logo, (W - width) / 2, 50, width, height);
-  } catch { text('NAMEVIBES', 540, 155, '44px Georgia'); }
+  } catch { text('NAMASUTRA', 540, 155, '44px Georgia'); }
   text('EVERY NAME HAS A CHEMISTRY', 540, 237, '19px Arial');
-  text('Our Family Chemistry', 540, 300, '46px Georgia');
+  text('Your Elemental Identity, in Harmony with Nature.', 540, 300, '32px Georgia');
 
   function drawTile(el, x, y) {
     const color = posterColorFor(el);
@@ -279,5 +279,5 @@ async function buildCompactFamilyPosterImage(people, theme) {
   text('namevibes.life', 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');
-  return new File([blob], 'NameVibes_Family_Poster.png', { type: 'image/png' });
+  return new File([blob], 'Namasutra_Family_Poster.png', { type: 'image/png' });
 }

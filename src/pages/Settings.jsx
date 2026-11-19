@@ -128,7 +128,7 @@ export default function Settings() {
         <div className="bg-paper rounded-2xl shadow-xl p-8">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">About</h2>
           <div className="space-y-2 text-gray-600">
-            <p><strong>App:</strong> NameVibes</p>
+            <p><strong>App:</strong> Namasutra</p>
             <p><strong>Version:</strong> 1.0.0</p>
             <p><strong>Support:</strong> support@namevibes.life</p>
           </div>

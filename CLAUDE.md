@@ -1,3 +1,11 @@
+## Namasutra rebrand and elemental identity heading - 19 November 2026
+
+- Public brand renamed to Namasutra across pages, navigation, payment display names, sharing copy and exported filenames. Logo.jsx and all poster exports use public/brand/namasutra-logo.png, copied byte-for-byte from the supplied Namasutra Orbital Logo.png. Original is already RGBA transparent (2149x732); no removal or texture alteration was necessary.
+- Poster heading is now exactly "Your Elemental Identity, in Harmony with Nature." in larger readable type (responsive italic preview, 32px PNG, 18pt PDF). Applied to individual and family posters while retaining the single-member behavior and transparent panels.
+- Rebranded the existing Know More illustrated explainer, preserving the Vibes example and V/I/Be/S element data. Added a matching orbital app icon; updated browser title, app manifest, icons and social preview references. Service worker version bumped to v4 to retire cached old branding.
+- Domain cutover is pending the user's new domain. Current namevibes.life URLs, support email, Firebase authDomain/project/storage identifiers, payment configuration, local storage keys and repository remain unchanged. When the new domain is supplied, review Firebase authorized domains/auth redirect configuration, social metadata, referral links, poster footers and support address along with hosting DNS; do not guess a new domain.
+- Validation: production build passed; mock browser checked mobile heading, transparent logo sources/natural dimensions, explainer image, no legacy brand text on Know More and no horizontal overflow/page errors. One/two-member family results passed in both themes; generated PNG/PDF exports contain the new heading, with no off-page PDF text. Inspected family PDF and explainer. Local QA in artifacts/namasutra and artifacts/single-family-fix.
+
 ## Correct reference, unobstructed posters and one-name family behavior - 19 November 2026
 
 - Correct reference is the user's attached Namevibes_ Elements in My Name.png, not the Inspiring India poster. Added public/theme/poster-gold-elements.png: an edit removing only text, tiles and logo from that reference while retaining its molecular edges and flowing gold light trails. Gold poster/export/page artwork now uses this asset; dark artwork is preserved.

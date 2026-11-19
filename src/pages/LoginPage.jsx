@@ -218,7 +218,7 @@ export default function LoginPage() {
         <div className="mt-5 text-center text-sm text-gray-600">
           {mode === 'signin' && (
             <>
-              New to NameVibes?{' '}
+              New to Namasutra?{' '}
               <button onClick={() => switchMode('signup')} className="text-brand-600 hover:text-brand-700 font-medium">
                 Create an account
               </button>

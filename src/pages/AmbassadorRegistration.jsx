@@ -174,7 +174,7 @@ export default function AmbassadorRegistration() {
               <UserCheck className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-gray-800">Become an Ambassador</h1>
-            <p className="text-gray-600 mt-2">Join the NameVibes family and earn rewards</p>
+            <p className="text-gray-600 mt-2">Join the Namasutra family and earn rewards</p>
           </div>
 
           {authUser === undefined ? (

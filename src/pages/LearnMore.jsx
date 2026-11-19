@@ -45,18 +45,18 @@ export default function LearnMore() {
 
         {/* Content */}
         {mode === "explainer" ? (
-          <section aria-label="How NameVibes works" className="space-y-4 text-center">
-            <h2 className="text-2xl text-brand-700">The Chemistry of Your Name</h2>
-            <p>Explore the letters, discover the elements, and create your own NameVibes poster.</p>
-            <a href="/theme/vibes-sample.png" target="_blank" rel="noreferrer" className="block rounded-xl overflow-hidden border border-amber-200 shadow-lg">
-              <img src="/theme/vibes-sample.png" alt="NameVibes illustrated guide: Vibes becomes Vanadium (V), Iodine (I), Beryllium (Be), and Sulfur (S). Discover your name's elements and create a poster to save and share." className="w-full h-auto" />
+          <section aria-label="How Namasutra works" className="space-y-4 text-center">
+            <h2 className="text-2xl text-brand-700">Your Elemental Identity, in Harmony with Nature.</h2>
+            <p>Explore the letters, discover the elements, and create your own Namasutra poster.</p>
+            <a href="/theme/namasutra-explainer.png" target="_blank" rel="noreferrer" className="block rounded-xl overflow-hidden border border-amber-200 shadow-lg">
+              <img src="/theme/namasutra-explainer.png" alt="Namasutra illustrated guide: Vibes becomes Vanadium (V), Iodine (I), Beryllium (Be), and Sulfur (S). Discover your name's elements and create a poster to save and share." className="w-full h-auto" />
             </a>
-            <a href="/theme/vibes-sample.png" target="_blank" rel="noreferrer" className="inline-block underline text-brand-700 py-2">View the explainer full size</a>
+            <a href="/theme/namasutra-explainer.png" target="_blank" rel="noreferrer" className="inline-block underline text-brand-700 py-2">View the explainer full size</a>
           </section>
         ) : mode === "science" ? (
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
-              <strong>NameVibes</strong> explores how identity can be understood
+              <strong>Namasutra</strong> explores how identity can be understood
               through <strong>chemistry, structure, and vibration</strong>.
             </p>
 
@@ -88,7 +88,7 @@ export default function LearnMore() {
         ) : (
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
-              At <strong>NameVibes</strong>, we see the universe as energy in
+              At <strong>Namasutra</strong>, we see the universe as energy in
               motion — and sound as its first expression.
             </p>
 

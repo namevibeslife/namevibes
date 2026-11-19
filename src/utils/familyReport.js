@@ -11,7 +11,7 @@ import { findCommonElements } from './commonElements';
 export function buildAIPrompt(results, contextLabels = []) {
   const commonElements = findCommonElements(results);
   const lines = [
-    'I used NameVibes (namevibes.life), which maps the letters of a name to periodic table elements. Here is my family report:',
+    'I used Namasutra (namevibes.life), which maps the letters of a name to periodic table elements. Here is my family report:',
     ''
   ];
 

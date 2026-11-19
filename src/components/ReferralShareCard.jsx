@@ -119,7 +119,7 @@ export default function ReferralShareCard({ code }) {
     try {
       // No separate url - the message already contains the ?ref= link, so a separate url
       // field would show it twice in the share sheet.
-      await navigator.share({ title: 'NameVibes', text: message });
+      await navigator.share({ title: 'Namasutra', text: message });
     } catch (error) {
       if (error?.name !== 'AbortError') showToast('Sharing was cancelled.');
     }

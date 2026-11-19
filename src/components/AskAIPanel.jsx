@@ -42,10 +42,10 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
 
   const handleShareToAIApp = async () => {
     const prompt = buildAIPrompt(results, contextLabels);
-    const file = new File([buildFamilyPDF(results).output('blob')], 'NameVibes_Family_Report.pdf', { type: 'application/pdf' });
+    const file = new File([buildFamilyPDF(results).output('blob')], 'Namasutra_Family_Report.pdf', { type: 'application/pdf' });
 
     try {
-      await navigator.share({ files: [file], text: prompt, title: 'NameVibes Family Report' });
+      await navigator.share({ files: [file], text: prompt, title: 'Namasutra Family Report' });
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error('Share failed:', error);
@@ -120,7 +120,7 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
             into the chat or use the AI's attach (paperclip) button.
           </p>
           <p>
-            You'll need to be signed in to your AI account. NameVibes doesn't see your conversation.
+            You'll need to be signed in to your AI account. Namasutra doesn't see your conversation.
           </p>
         </div>
       )}

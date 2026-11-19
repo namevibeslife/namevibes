@@ -1,4 +1,4 @@
-// All 118 elements. Colors follow the common CPK/Jmol scheme; meanings are NameVibes' interpretations.
+// All 118 elements. Colors follow the common CPK/Jmol scheme; meanings are Namasutra' interpretations.
 export const ELEMENTS = {
   'H': { name: 'Hydrogen', number: 1, color: '#FFFFFF', meaning: 'Purity, new beginnings, clarity' },
   'He': { name: 'Helium', number: 2, color: '#D9FFFF', meaning: 'Lightness, joy, elevation' },

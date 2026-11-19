@@ -1,4 +1,4 @@
-// NameVibes Panchang engine - daily Hora & Muhurat timings.
+// Namasutra Panchang engine - daily Hora & Muhurat timings.
 // Pure JavaScript, no network calls and no third-party dependencies.
 // Sunrise/sunset use the NOAA solar position algorithm (accurate to about a minute).
 // Day = sunrise to the next sunrise (the Vedic day), in the selected location.
