@@ -1,3 +1,8 @@
+## Firebase authDomain moved to namasutra.life - 20 November 2026
+
+- src/firebase.js authDomain is now "namasutra.life" (project ID, storage bucket and the rest unchanged). Sign-in goes through the Cloudflare auth proxy functions/__/[[path]].js on the same domain. Service worker VERSION bumped to v6. Requires namasutra.life in Firebase Authorized domains and the Google OAuth client's authorized redirect URI https://namasutra.life/__/auth/handler; sign-in on namevibes.life will no longer work unless that domain is kept authorized with its own redirect URI (it is being retired).
+- Remaining: support@namevibes.life still lives on the old domain (Settings page); move it to the new domain with Cloudflare Email Routing before letting namevibes.life expire.
+
 ## Public domain moved to namasutra.life - 20 November 2026
 
 - One setting: `src/config/site.js` exports `SITE_URL = 'https://namasutra.life'` (and `SITE_HOST`). Used by buildShareLink (so every share channel's message), the ambassador invite link (`AMBASSADOR_LOGIN_URL`), PNG/PDF/family-poster footers, the on-screen poster footer, the AI family-report text, and index.html (canonical, og:url, og/twitter image; filled at build by a small Vite plugin replacing `__SITE_URL__` from site.js). Never hard-code the domain elsewhere. No sitemap/robots/README/manifest hits existed. Service worker VERSION bumped to v5.

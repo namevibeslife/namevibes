@@ -9,7 +9,7 @@ import { getStorage } from "firebase/storage";
 // ✅ Your Firebase configuration (direct values – OK for now)
 const firebaseConfig = {
   apiKey: "AIzaSyAkU1zvysoWojve9q9v-jDJWUITbFSnIdc",
-  authDomain: "www.namevibes.life",
+  authDomain: "namasutra.life",
   projectId: "namevibes-life",
   storageBucket: "namevibes-life.firebasestorage.app",
   messagingSenderId: "231158578994",
