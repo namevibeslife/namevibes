@@ -1125,7 +1125,7 @@ export default function AdminDashboard(props) {
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Referral Code</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Sales Count</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Sales</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Commission</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Total Commission (Net of GST)</th>
                       {currentAdmin?.role === 'super' && (
                         <th className="px-6 py-3 text-left text-xs font-medium text-white bg-ocean-600 uppercase">Action</th>
                       )}
@@ -1274,7 +1274,7 @@ export default function AdminDashboard(props) {
                 <span className="font-semibold">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalSales.toFixed(2)}</span>
               </div>
               <div className="flex justify-between py-2 border-b">
-                <span className="text-gray-600">Commission Amount:</span>
+                <span className="text-gray-600">Commission Amount (Net of GST):</span>
                 <span className="font-bold text-green-600 text-lg">{selectedPayoutData.currencySymbol}{selectedPayoutData.totalCommission.toFixed(2)}</span>
               </div>
             </div>
@@ -1567,7 +1567,7 @@ export default function AdminDashboard(props) {
               </div>
 
               <p className="text-xs text-gray-500">
-                Ambassador commission is the same everywhere: 30% for the first 300 members, 50% from the 301st.
+                Ambassador commission is the same everywhere: 30% for the first 300 members, 50% from the 301st. Commission is calculated on the amount paid, excluding GST.
               </p>
 
               <div className="flex items-center gap-2">

@@ -52,4 +52,30 @@ assert.equal(r.totals.members, 1);
 assert.equal(r.payments[0].commission, 0);
 assert.equal(r.payments[1].commission, 15);
 
+// India: Rs 399 with 10% off = Rs 359 paid; net of 18% GST = 304.24; 30% = 91.27, 50% = 152.12
+const inPay = (member, t, extra = {}) => ({ userId: member, amount: 359, currency: 'INR', countryCode: 'IN', createdAt: new Date(2026, 0, 1, 0, 0, t), status: 'success', ...extra });
+r = computeCommissions([inPay('a', 1)]);
+assert.equal(r.payments[0].gstRate, 18);
+assert.equal(r.payments[0].netAmount, 304.24);
+assert.equal(r.payments[0].commission, 91.27);
+assert.equal(r.totals.totalCommission, 91.27);
+
+// the 301st India member earns 50% of the net amount; renewals use the same rule and rate
+const india = Array.from({ length: 301 }, (_, i) => inPay('i' + String(i).padStart(4, '0'), i));
+r = computeCommissions([...india, inPay('i0000', 9000), inPay('i0300', 9001)]);
+assert.equal(r.payments[300].commission, 152.12);
+assert.equal(r.payments[299].commission, 91.27);
+assert.equal(r.payments[301].commission, 91.27);   // renewal of rank 1
+assert.equal(r.payments[302].commission, 152.12);  // renewal of rank 301
+
+// INR payment with no countryCode (older records) is still India
+r = computeCommissions([{ userId: 'x', amount: 359, currency: 'INR', createdAt: 1 }]);
+assert.equal(r.payments[0].commission, 91.27);
+
+// 0% GST (any other country): commission is on the full amount paid
+r = computeCommissions([{ userId: 'u', amount: 12, currency: 'USD', countryCode: 'US', createdAt: 1 }]);
+assert.equal(r.payments[0].gstRate, 0);
+assert.equal(r.payments[0].netAmount, 12);
+assert.equal(r.payments[0].commission, 3.6);
+
 console.log('commission tests passed');

@@ -4,10 +4,20 @@
 // Rule (all countries, all ambassadors): rank each referred paying member by the time of their
 // FIRST successful payment. Members ranked 1..300 earn the ambassador 30% on ALL of that member's
 // payments (first purchase and every renewal); members ranked 301 and later earn 50% on all of
-// theirs. A member's rate is fixed once they are ranked, so history never changes.
+// theirs. The commission base is the amount actually paid (after the referral discount) divided by
+// (1 + GST rate). A member's rate is fixed once they are ranked, so history never changes.
 export const COMMISSION_TIER1_RATE = 0.30;
 export const COMMISSION_TIER1_MAX_MEMBERS = 300;
 export const COMMISSION_TIER2_RATE = 0.50;
+
+// GST/VAT included in the price, by country (percent). Commission is worked out on the amount
+// paid EXCLUDING this tax. Only India is known; every other country is 0 until a rate is supplied
+// (do not guess VAT for the US, EU or UAE).
+export const GST_RATE_BY_COUNTRY = { IN: 18 };
+
+// Older payment records carry no countryCode; an INR payment is an India payment.
+const countryOf = (p) => String(p.countryCode || (p.currency === 'INR' ? 'IN' : '')).toUpperCase();
+export const gstRateFor = (p) => GST_RATE_BY_COUNTRY[countryOf(p)] || 0;
 
 const toMillis = (value) => {
   if (value == null) return 0;
@@ -49,12 +59,14 @@ export function computeCommissions(payments = []) {
 
   let totalCommission = 0;
   const out = (payments || []).map((p) => {
-    if (!p || !valid.includes(p)) return { ...p, rank: null, rate: 0, commission: 0 };
+    if (!p || !valid.includes(p)) return { ...p, rank: null, rate: 0, gstRate: 0, netAmount: 0, commission: 0 };
     const rank = rankOf.get(memberKey(p));
     const rate = rank <= COMMISSION_TIER1_MAX_MEMBERS ? COMMISSION_TIER1_RATE : COMMISSION_TIER2_RATE;
-    const commission = money((Number(p.amount) || 0) * rate);
+    const gstRate = gstRateFor(p);
+    const net = (Number(p.amount) || 0) / (1 + gstRate / 100);
+    const commission = money(net * rate);
     totalCommission += commission;
-    return { ...p, rank, rate, commission };
+    return { ...p, rank, rate, gstRate, netAmount: money(net), commission };
   });
 
   const members = ranked.length;

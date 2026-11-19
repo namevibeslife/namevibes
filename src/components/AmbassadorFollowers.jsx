@@ -130,14 +130,14 @@ export default function AmbassadorFollowers({ ambassador }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card icon={Users} label="Members" value={totals.members} border="border-ocean-500" />
         <Card icon={TrendingUp} label="Current tier" value={`${formatRate(totals.rate)} commission`} border="border-brand-500" />
-        <Card icon={TrendingUp} label="Total earnings" value={earningText} border="border-green-500" />
+        <Card icon={TrendingUp} label="Total earnings (net of GST)" value={earningText} border="border-green-500" />
         <Card icon={Calendar} label="Renewals due (30 days)" value={breakdown.renewals.length} border="border-orange-500" />
       </div>
 
       <section className="bg-paper rounded-xl shadow-lg p-5" aria-labelledby="tier-heading">
         <h3 id="tier-heading" className="text-lg font-bold text-gray-800 mb-1">Your commission tier</h3>
         <p className="text-sm text-gray-600 mb-3">
-          30% on every payment from your first {COMMISSION_TIER1_MAX_MEMBERS} members, then {formatRate(COMMISSION_TIER2_RATE)} from the 301st member onward.
+          30% on every payment from your first {COMMISSION_TIER1_MAX_MEMBERS} members, then {formatRate(COMMISSION_TIER2_RATE)} from the 301st member onward. Commission is calculated on the amount paid, excluding GST.
         </p>
         <div className="h-3 rounded-full bg-gray-200 overflow-hidden" role="progressbar" aria-valuemin={0} aria-valuemax={COMMISSION_TIER1_MAX_MEMBERS + 1} aria-valuenow={Math.min(totals.members, COMMISSION_TIER1_MAX_MEMBERS + 1)} aria-label="Progress to the 50% tier">
           <div className="h-full bg-gradient-to-r from-brand-600 to-ocean-600" style={{ width: `${progress}%` }} />
@@ -157,7 +157,7 @@ export default function AmbassadorFollowers({ ambassador }) {
               <thead className="bg-gray-50 border-b-2 border-gray-200 text-left text-xs font-medium text-gray-500 uppercase">
                 <tr>
                   <th className="px-3 py-2">Member</th><th className="px-3 py-2">Plan</th><th className="px-3 py-2">Date</th>
-                  <th className="px-3 py-2 text-right">Paid</th><th className="px-3 py-2 text-right">Rate</th><th className="px-3 py-2 text-right">Commission</th>
+                  <th className="px-3 py-2 text-right">Paid</th><th className="px-3 py-2 text-right">Rate</th><th className="px-3 py-2 text-right">Commission <span className="normal-case font-normal">(net of GST)</span></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">

@@ -209,7 +209,7 @@ function AccountsDashboard() {
       'State',
       'Sales Count',
       'Total Sales',
-      'Commission Amount',
+      'Commission Amount (Net of GST)',
       'Currency',
       'Bank Account',
       'IFSC/Bank Code',
@@ -418,7 +418,7 @@ function AccountsDashboard() {
         'State',
         'Sales Count',
         'Total Sales',
-        'Commission Amount',
+        'Commission Amount (Net of GST)',
         'Currency',
         'Status',
         'Paid Date',
@@ -566,7 +566,7 @@ function AccountsDashboard() {
                   <th>Country</th>
                   <th>Sales</th>
                   <th>Total Sales</th>
-                  <th>Commission</th>
+                  <th>Commission (Net of GST)</th>
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
@@ -815,7 +815,7 @@ function AccountsDashboard() {
               <p><strong>Ambassador:</strong> {selectedPayout.ambassadorName}</p>
               <p><strong>Referral Code:</strong> {selectedPayout.referralCode}</p>
               <p><strong>Period:</strong> {getMonthName(selectedPayout.month)} {selectedPayout.year}</p>
-              <p><strong>Commission Amount:</strong> {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}</p>
+              <p><strong>Commission Amount (Net of GST):</strong> {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}</p>
               <p><strong>Bank Account:</strong> {selectedPayout.bankAccountNumber}</p>
               {selectedPayout.bankIFSC && <p><strong>IFSC:</strong> {selectedPayout.bankIFSC}</p>}
             </div>

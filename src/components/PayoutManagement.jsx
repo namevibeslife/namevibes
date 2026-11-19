@@ -125,7 +125,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
       'State',
       'Sales Count',
       'Total Sales',
-      'Commission Amount',
+      'Commission Amount (Net of GST)',
       'Currency',
       'Bank Account',
       'IFSC/Bank Code',
@@ -249,7 +249,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
               <th>Country</th>
               <th>Sales</th>
               <th>Total Sales</th>
-              <th>Commission</th>
+              <th>Commission (Net of GST)</th>
               <th>Bank Details</th>
               <th>Status</th>
               <th>Action</th>
@@ -345,7 +345,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
             <p>{filteredPayouts.filter(p => p.status === 'paid').length}</p>
           </div>
           <div className="summary-card">
-            <h4>Total Commission (All)</h4>
+            <h4>Total Commission (All, Net of GST)</h4>
             <p>
               {filteredPayouts.reduce((sum, p) => sum + p.commissionAmount, 0).toFixed(2)}
             </p>
@@ -373,7 +373,7 @@ function PayoutManagement({ currentAdmin, onUpdate }) {
                 <span className="info-value">{getMonthName(selectedPayout.month)} {selectedPayout.year}</span>
               </div>
               <div className="info-row">
-                <span className="info-label">Commission Amount:</span>
+                <span className="info-label">Commission Amount (Net of GST):</span>
                 <span className="info-value" style={{color: '#28a745', fontWeight: 'bold', fontSize: '18px'}}>
                   {selectedPayout.currencySymbol}{selectedPayout.commissionAmount}
                 </span>

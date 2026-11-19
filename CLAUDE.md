@@ -1,3 +1,8 @@
+## Commission on amount net of GST - 19 November 2026
+
+- computeCommissions (src/utils/commission.js) now takes commission on amountPaid / (1 + GST), where amountPaid is what the member actually paid after the referral discount. GST_RATE_BY_COUNTRY = { IN: 18 }; every other country is 0 until a rate is supplied (no guessing VAT for US/EU/UAE). Country comes from payment.countryCode, or INR currency implies India for older records. India Rs 399 with 10% off = Rs 359 paid, Rs 304.24 net, Rs 91.27 at 30%, Rs 152.12 at 50%. Per-payment output also has gstRate and netAmount.
+- My Followers, the admin payout views and Country Pricing note, Accounts and Payout Management show "Net of GST"; the ambassador Home commission bullet adds "Commission is calculated on the amount paid, excluding GST." Payout requests store commissionAmount from computeCommissions; nothing else recomputes commission. Tests: node scripts/test-commission.mjs.
+
 ## One Annual Plan, tiered ambassador commission, invite-only ambassadors - 19 November 2026
 
 - One paid plan, "NAMASUTRA Annual Plan", stored as planType 'family' (all gates unchanged). UI no longer says Individual/Family plan; existing 'individual' users are grandfathered (plan.js untouched) and are offered the Annual Plan on renewal. test-activate only accepts 'family'. Country pricing is one price + one referral discount per country (new fields `price`/`referralDiscount`, read with fallback to old `familyPrice`/`familyDiscount` via readPlanSettings in utils/pricing.js; old docs are never overwritten). In-code defaults by currency: INR 399, USD 12, EUR 12, AED 25. Symbols come from the setting (INR/USD/EUR/AED); PayPal/Razorpay now use the plan currency.

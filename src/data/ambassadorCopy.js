@@ -32,7 +32,7 @@ export const AMBASSADOR_COPY = {
         'Become a NAMASUTRA Ambassador and offer your trusted followers an exciting additional service while building a recurring source of income.'
       ],
       bullets: [
-        'Earn 30% of every subscription fee paid by members who join using your unique Ambassador Code, and 50% for every member from your 301st onward.',
+        'Earn 30% of every subscription fee paid by members who join using your unique Ambassador Code, and 50% for every member from your 301st onward. Commission is calculated on the amount paid, excluding GST.',
         'Keep earning year after year! Whenever your referred members renew their subscriptions, you continue receiving your Ambassador commission.',
         ['Your own Ambassador Dashboard', 'Log in anytime to see how many members have joined using your code, track subscriptions, and monitor your earnings.'],
         ['No additional investment required', 'Simply share your code with your followers and introduce them to the fascinating world of NAMASUTRA.']
