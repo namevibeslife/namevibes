@@ -125,21 +125,25 @@ export default function AmbassadorHome() {
         {COPY.intro.map(p => <p key={p.slice(0, 24)}>{p}</p>)}
       </div>
 
-      <section className="mt-10" aria-labelledby="companion-heading">
-        <h2 id="companion-heading" className="font-serif text-2xl font-bold text-gray-900 mb-3">{COPY.companion.heading}</h2>
-        <p className="text-gray-800 leading-relaxed mb-3">{COPY.companion.lead}</p>
-        <ul className="list-disc pl-6 space-y-2 text-gray-800">
-          {COPY.companion.bullets.map(([label, text]) => <li key={label}><strong>{label}:</strong> {text}</li>)}
-        </ul>
-      </section>
-
       {COPY.sections.map(section => (
         <section key={section.heading} className="mt-10">
           <h2 className="font-serif text-2xl font-bold text-gray-900 mb-3">{section.heading}</h2>
-          {(section.paragraphs || []).map(p => <p key={p.slice(0, 24)} className="text-gray-800 leading-relaxed mb-3">{p}</p>)}
-          {section.bullets && <ul className="list-disc pl-6 space-y-2 text-gray-800">{section.bullets.map(b => <li key={b}>{b}</li>)}</ul>}
+          <div className="space-y-4 text-gray-800 leading-relaxed text-base sm:text-lg">
+            {(section.paragraphs || []).map(p => <p key={p.slice(0, 24)}>{p}</p>)}
+            {section.bullets && (
+              <ul className="list-disc pl-6 space-y-2">
+                {section.bullets.map(b => Array.isArray(b)
+                  ? <li key={b[0]}><strong>{b[0]}:</strong> {b[1]}</li>
+                  : <li key={b.slice(0, 24)}>{b}</li>)}
+              </ul>
+            )}
+            {section.callout && <p className="font-serif text-xl font-bold text-gray-900">{section.callout}</p>}
+            {(section.after || []).map(p => <p key={p.slice(0, 24)}>{p}</p>)}
+          </div>
         </section>
       ))}
+
+      <p className="mt-10 text-center font-serif italic text-lg text-brand-800">{COPY.tagline}</p>
 
       {!isAmbassador && <div className="mt-12">{gate()}</div>}
       {error && <p role="alert" className="mt-4 text-center text-sm text-red-700">{error}</p>}
