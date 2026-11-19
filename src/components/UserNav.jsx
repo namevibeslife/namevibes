@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Menu, X, Home } from 'lucide-react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
 
@@ -20,9 +22,20 @@ export default function UserNav() {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
+  const [isAmbassador, setIsAmbassador] = useState(false);
   const container = useRef(null);
   const toggle = useRef(null);
   useEffect(() => { setOpen(false); setError(''); }, [location.pathname]);
+  // Only a signed-in approved, active ambassador gets the "Ambassador area" label.
+  useEffect(() => {
+    let cancelled = false;
+    setIsAmbassador(false);
+    if (!user?.email) return undefined;
+    getDocs(query(collection(db, 'ambassadors'), where('email', '==', user.email.toLowerCase())))
+      .then(snap => { if (!cancelled) setIsAmbassador(snap.docs.some(d => d.data().isApproved && d.data().isActive)); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [user?.email]);
   useEffect(() => {
     if (!open) return;
     const outside = event => { if (!container.current?.contains(event.target)) setOpen(false); };
@@ -33,7 +46,8 @@ export default function UserNav() {
   }, [open]);
   const account = user ? [['Settings', '/settings'], ['My Profile', '/profile-complete']] : [['Sign In', '/login']];
   // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
-  const partners = [['Ambassador Login', '/ambassador']];
+  // One link to the ambassador sign-in page; it reads "Ambassador area" for a signed-in ambassador.
+  const partners = [[isAmbassador ? 'Ambassador area' : 'Ambassador Login', '/ambassador']];
   if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['Admin', '/admin'], ['Accounts', '/accounts']);
   async function signOut() {
     try { await logout(); setOpen(false); navigate('/'); }

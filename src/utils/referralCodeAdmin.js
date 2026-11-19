@@ -2,7 +2,7 @@
 // code, activating/deactivating an existing one, and the referral-code migration tool.
 // All of this runs from an authenticated admin's browser session, gated by firestore.rules
 // (isAdmin()/isSuperAdmin()) - there is no separate backend in this app.
-import { doc, runTransaction, updateDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, runTransaction, updateDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { generateCandidateCode, normalizeReferralCode } from './referralCode';
 
@@ -123,4 +123,15 @@ export async function runMigration(ambassadors, { onProgress } = {}) {
     }
   }
   return results;
+}
+
+// ambassadorAccess/{lowercase email} mirrors "approved and active" so firestore.rules can answer
+// isApprovedAmbassador() (rules can't query ambassadors by email). Keep it in step with every
+// invite, approval, activation and deactivation.
+export async function setAmbassadorAccess(email, ambassadorId, active) {
+  await setDoc(doc(db, 'ambassadorAccess', String(email).trim().toLowerCase()), {
+    ambassadorId,
+    active: !!active,
+    updatedAt: serverTimestamp()
+  });
 }

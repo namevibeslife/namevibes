@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { collection, doc, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { COUNTRIES, getActiveCountries } from '../data/countries';
-import { reserveReferralCode, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
+import { reserveReferralCode, setAmbassadorAccess, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { buildInviteMessage, normalizeEmail, isEmailLike } from '../utils/ambassadorInvite';
 import InviteMessageBox from './InviteMessageBox';
 
@@ -61,6 +61,7 @@ export default function AmbassadorInvite({ currentAdmin, ambassadors = [], count
         detailsCompleted: false,
         createdAt: Timestamp.now()
       });
+      await setAmbassadorAccess(email, ref.id, true);
       setInvited({ email, fullName, referralCode });
       setForm({ fullName: '', email: '', countryCode: '', mobileNumber: '' });
       onInvited?.();

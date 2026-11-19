@@ -18,7 +18,7 @@ import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from
 import { COUNTRIES, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT, defaultPriceFor } from '../data/countries';
 import { readPlanSettings, loadTaxRates } from '../utils/pricing';
 import { computeCommissions } from '../utils/commission';
-import { reserveReferralCode, setReferralCodeActive, previewMigration, runMigration, ambassadorsNeedingMigration, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
+import { reserveReferralCode, setReferralCodeActive, setAmbassadorAccess, previewMigration, runMigration, ambassadorsNeedingMigration, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { 
   Users, 
   CreditCard, 
@@ -627,6 +627,7 @@ export default function AdminPanel() {
         codeVersion: CURRENT_CODE_VERSION,
         payoutFrequency: approvalData.payoutFrequency
       });
+      await setAmbassadorAccess(selectedAmbassador.email, selectedAmbassador.id, true);
 
       alert(`Ambassador approved successfully! Referral code: ${referralCode}`);
       setShowApprovalModal(false);
@@ -726,6 +727,7 @@ export default function AdminPanel() {
         deactivatedBy: !ambassador.isActive ? null : currentAdmin.email
       });
       await syncReferralCode(ambassador, !ambassador.isActive);
+      await setAmbassadorAccess(ambassador.email, ambassador.id, !ambassador.isActive);
 
       alert(`Ambassador ${!ambassador.isActive ? 'activated' : 'deactivated'} successfully!`);
       loadAmbassadors();

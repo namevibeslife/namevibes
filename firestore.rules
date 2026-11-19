@@ -42,6 +42,15 @@ service cloud.firestore {
       return verifiedEmail() && data.ambassadorEmail == myEmail();
     }
 
+    // An approved, active ambassador. Rules can't query by email, so the admin keeps one document
+    // per ambassador at ambassadorAccess/{lowercase google email} ({ active: true|false }), written
+    // in the same step as the invite / approval / deactivation. The email must be verified.
+    function isApprovedAmbassador() {
+      return verifiedEmail()
+        && exists(/databases/$(database)/documents/ambassadorAccess/$(myEmail()))
+        && get(/databases/$(database)/documents/ambassadorAccess/$(myEmail())).data.get('active', false) == true;
+    }
+
     // Fields only the payment server may set
     function touchesPlanFields() {
       return request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys()
@@ -132,6 +141,17 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // Home-page text for the ambassador area: readable only by admins and approved ambassadors.
+    match /ambassadorContent/{docId} {
+      allow read: if isAdmin() || isApprovedAmbassador();
+      allow write: if isAdmin();
+    }
+
+    // Email-keyed mirror used by isApprovedAmbassador(). Admin only; never client-readable.
+    match /ambassadorAccess/{email} {
+      allow read, write: if isAdmin();
+    }
+
     match /payoutRequests/{requestId} {
       allow read: if isAdmin() || isAmbassadorFor(resource.data);
       allow write: if isAdmin();
@@ -155,7 +175,8 @@ service cloud.firestore {
     // on ambassadors/, and the create-only/never-delete lock on referralCodes/.
     function hasOwnRules(collection) {
       return collection in ['users', 'payments', 'admins', 'ambassadors', 'referralCodes',
-        'payoutRequests', 'countrySettings', 'revenueReports'];
+        'payoutRequests', 'countrySettings', 'revenueReports', 'ambassadorContent',
+        'ambassadorAccess'];
     }
     match /{collection}/{docId} {
       allow read, write: if isAdmin() && !hasOwnRules(collection);

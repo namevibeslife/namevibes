@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { Suspense, lazy, useState } from 'react';
 import AmbassadorInvite from '../components/AmbassadorInvite';
+const AmbassadorContentAdmin = lazy(() => import('../components/AmbassadorContentAdmin'));
 import InviteMessageBox from '../components/InviteMessageBox';
 import { buildInviteMessage } from '../utils/ambassadorInvite';
 import PayoutManagement from '../components/PayoutManagement';
@@ -698,6 +699,10 @@ export default function AdminDashboard(props) {
                 countrySettings={countrySettings}
                 onInvited={loadAmbassadors}
               />
+
+              <Suspense fallback={null}>
+                <AmbassadorContentAdmin currentAdmin={currentAdmin} />
+              </Suspense>
 
               {currentAdmin?.role === 'super' && (
                 <div className="bg-paper rounded-xl shadow-lg p-6 mb-6 border-2 border-brand-200">
