@@ -4,6 +4,8 @@ import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from
 import { auth, db } from '../firebase';
 import { GoogleButton } from '../components/AuthButtons';
 import Logo from '../components/Logo';
+import { ShieldCheck } from 'lucide-react';
+import './AmbassadorHome.css';
 import { normalizeEmail } from '../utils/ambassadorInvite';
 
 // Everything an approved ambassador sees is a separate chunk, fetched only after the account is
@@ -73,17 +75,29 @@ export default function AmbassadorHome() {
     body = <p className="text-center text-gray-600 py-16">Loading...</p>;
   } else if (!user) {
     body = (
-      <div className="max-w-sm mx-auto text-center space-y-5 py-10">
-        <Logo className="h-16 w-auto mx-auto" />
-        <h1 className="font-serif text-3xl font-bold text-gray-900">Ambassador sign-in</h1>
-        <GoogleButton onClick={signIn} disabled={signingIn}>{signingIn ? 'Signing in...' : 'Sign in with Google'}</GoogleButton>
-        <p className="text-sm text-gray-600">Invitation only. Sign in with the Google account your invitation was sent to.</p>
-        {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      <div className="amb-signin-shell">
+        <div className="amb-signin-intro">
+          <p className="amb-kicker">NAMASUTRA / AMBASSADORS</p>
+          <Logo className="amb-signin-logo" />
+          <h1>Welcome to your<br /><em>ambassador space.</em></h1>
+          <p className="amb-signin-tagline">Your Elemental Identity,<br />in Harmony with Nature.</p>
+          <div className="amb-gold-rule" aria-hidden="true" />
+        </div>
+        <section className="amb-auth-card" aria-labelledby="amb-signin-heading">
+          <span className="amb-icon-medallion"><ShieldCheck size={28} aria-hidden="true" /></span>
+          <p className="amb-kicker">INVITATION ONLY</p>
+          <h2 id="amb-signin-heading">Ambassador sign-in</h2>
+          <p>Welcome back. Continue with the Google account your invitation was sent to.</p>
+          <GoogleButton onClick={signIn} disabled={signingIn}>{signingIn ? 'Signing in...' : 'Sign in with Google'}</GoogleButton>
+          <p className="amb-auth-note">Need help accessing your account? Contact the person who invited you.</p>
+          {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+        </section>
       </div>
     );
   } else if (access !== 'ok') {
     body = (
-      <div role="alert" className="max-w-md mx-auto text-center space-y-4 py-16">
+      <div role="alert" className="amb-auth-card amb-access-message">
+        <h1 className="text-2xl font-serif">Check your invitation</h1>
         <p className="text-gray-800">This Google account hasn't been invited as an Ambassador. Please contact the person who invited you.</p>
         <button type="button" onClick={doSignOut} className="px-5 py-2 min-h-[44px] rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">Sign out</button>
         {error && <p className="text-sm text-red-700">{error}</p>}
@@ -97,5 +111,5 @@ export default function AmbassadorHome() {
     );
   }
 
-  return <main className="min-h-screen site-background px-4 py-8">{body}</main>;
+  return <main className="amb-page site-background">{body}</main>;
 }

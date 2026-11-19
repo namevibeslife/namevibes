@@ -4,7 +4,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import ReferralShareCard from './ReferralShareCard';
 import AmbassadorRegister from './AmbassadorRegister';
-import AmbassadorProfileView from './AmbassadorProfileView';
+import { ArrowUpRight, CheckCircle, UserCircle, Home, Users } from 'lucide-react';
 import AmbassadorFollowers from './AmbassadorFollowers';
 
 const TABS = [['home', 'Home'], ['register', 'Register'], ['followers', 'My Followers']];
@@ -16,22 +16,22 @@ function HomeContent({ content }) {
   const para = (list) => (list || []).map((p, i) => <p key={i}>{p}</p>);
   return (
     <>
-      <header className="text-center mb-10">
+      <header className="amb-editorial-heading">
         {content.brand && <p className="font-serif text-sm tracking-[0.3em] text-brand-700 mb-3">{content.brand}</p>}
-        {content.title && <h1 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{content.title}</h1>}
+        {content.title && <h2 className="font-serif text-3xl sm:text-4xl font-bold text-gray-900 leading-tight">{content.title}</h2>}
       </header>
-      <div className="space-y-4 text-gray-800 leading-relaxed text-base sm:text-lg">{para(content.intro)}</div>
+      <div className="amb-prose">{para(content.intro)}</div>
       {(content.sections || []).map((section, i) => (
-        <section key={i} className="mt-10">
-          {section.heading && <h2 className="font-serif text-2xl font-bold text-gray-900 mb-3">{section.heading}</h2>}
+        <section key={i} className="amb-content-section">
+          {section.heading && <h3 className="font-serif text-2xl font-bold text-gray-900 mb-3">{section.heading}</h3>}
           <div className="space-y-4 text-gray-800 leading-relaxed text-base sm:text-lg">
             {para(section.paragraphs)}
             {section.bullets?.length > 0 && (
-              <ul className="list-disc pl-6 space-y-2">
+              <ul className="amb-content-list">
                 {section.bullets.map((b, j) => <li key={j}>{b.label ? <><strong>{b.label}:</strong> </> : null}{b.text}</li>)}
               </ul>
             )}
-            {section.callout && <p className="font-serif text-xl font-bold text-gray-900">{section.callout}</p>}
+            {section.callout && <p className="amb-callout">{section.callout}</p>}
             {para(section.after)}
           </div>
         </section>
@@ -63,40 +63,38 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
   }, [ambassador.id]);
 
   return (
-    <div className="max-w-5xl mx-auto">
-      <nav aria-label="Ambassador sections" className="flex justify-center gap-1 sm:gap-2 mb-8 border-b border-brand-200">
-        {TABS.map(([key, label]) => (
-          <button
-            key={key}
-            type="button"
-            onClick={() => goto(key)}
-            aria-current={tab === key ? 'page' : undefined}
-            className={`px-3 sm:px-5 py-3 min-h-[44px] text-sm sm:text-base font-semibold border-b-2 -mb-px ${tab === key ? 'border-brand-600 text-brand-700' : 'border-transparent text-gray-600 hover:text-gray-900'}`}
-          >{label}</button>
-        ))}
+    <div className="amb-workspace">
+      <header className="amb-workspace-header">
+        <div><p className="amb-kicker">YOUR AMBASSADOR SPACE</p><h1>Welcome, {ambassador.firstName || ambassador.fullName || user.displayName || 'Ambassador'}.</h1><p>Everything you need, in one place.</p></div>
+        <span className="amb-status"><CheckCircle size={16} aria-hidden="true" /> Active ambassador</span>
+      </header>
+      <nav aria-label="Ambassador sections" className="amb-tabs">
+        {TABS.map(([key, label], index) => {
+          const Icon = [Home, UserCircle, Users][index];
+          return <button key={key} type="button" onClick={() => goto(key)} aria-current={tab === key ? 'page' : undefined}>
+            <Icon size={18} aria-hidden="true" /><span>{label}</span>
+          </button>;
+        })}
       </nav>
-
       {tab === 'home' && (
-        <article className="max-w-3xl mx-auto">
-          <div className="mb-8 space-y-4">
-            {!ambassador.detailsCompleted && (
-              <div role="status" className="rounded-xl border-2 border-amber-300 bg-amber-50 p-4 flex flex-wrap items-center justify-between gap-3">
-                <p className="text-amber-900 font-medium">Complete your details to receive payouts.</p>
-                <button type="button" onClick={() => goto('register')} className="px-4 py-2 min-h-[44px] rounded-lg bg-amber-600 text-white font-semibold hover:bg-amber-700">Complete details</button>
-              </div>
-            )}
-            <ReferralShareCard code={ambassador.referralCode} />
-            {ambassador.detailsCompleted && (
-              <section aria-labelledby="saved-details-heading">
-                <h2 id="saved-details-heading" className="font-serif text-2xl font-bold text-gray-900 mb-3">Your saved details</h2>
-                <AmbassadorProfileView ambassador={ambassador} />
-                <p className="mt-2 text-sm text-gray-600">Need to change something? Open the Register tab and choose Edit.</p>
-              </section>
-            )}
-          </div>
-          {content === null ? <p className="text-center text-gray-600">Loading...</p> : <HomeContent content={content} />}
-          {contentError && <p role="status" className="mt-4 text-center text-sm text-gray-500">The welcome text could not be loaded right now.</p>}
-        </article>
+        <div className="amb-home-grid">
+          <article className="amb-welcome-card">
+            {content === null ? <p role="status" className="amb-prose">Loading your welcome...</p> : <HomeContent content={content} />}
+            {content !== null && !content.title && !content.intro?.length && !content.sections?.length && <div className="amb-empty-welcome"><p className="amb-kicker">WELCOME TO NAMASUTRA</p><h2>Your ambassador home</h2><p>Your account is ready. Use the tabs above to manage your profile and view your followers.</p></div>}
+            {contentError && <p role="status" className="mt-4 text-sm text-gray-600">The welcome text could not be loaded right now.</p>}
+          </article>
+          <aside className="amb-tools" aria-label="Your ambassador tools">
+            <section className="amb-profile-summary">
+              <span className="amb-icon-medallion"><UserCircle size={25} aria-hidden="true" /></span>
+              <div><p className="amb-kicker">YOUR PROFILE</p><h2>{ambassador.detailsCompleted ? 'Details saved' : 'Make yourself at home'}</h2></div>
+              <p>{ambassador.detailsCompleted ? 'Your registration details are saved. Review or update them whenever you need.' : 'Complete your details to receive payouts.'}</p>
+              <button type="button" className="amb-primary-action" onClick={() => goto('register')}>
+                {ambassador.detailsCompleted ? 'View your profile' : 'Complete details'} <ArrowUpRight size={18} aria-hidden="true" />
+              </button>
+            </section>
+            <div className="amb-share-panel"><ReferralShareCard code={ambassador.referralCode} /></div>
+          </aside>
+        </div>
       )}
 
       {tab === 'register' && (
@@ -112,7 +110,7 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
 
       {toast && <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[90vw] rounded-lg bg-gray-900 text-white px-4 py-3 text-sm shadow-lg">{toast}</div>}
 
-      <div className="mt-10 text-center">
+      <div className="amb-account-footer">
         <p className="text-xs text-gray-500 mb-2">Signed in as {ambassador.email}</p>
         <button type="button" onClick={onSignOut} className="px-4 py-2 min-h-[44px] rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">Sign out</button>
       </div>

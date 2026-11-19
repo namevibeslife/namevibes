@@ -1,0 +1,75 @@
+.amb-page { min-height: calc(100vh - var(--site-nav-height)); padding: clamp(24px, 4vw, 56px) 20px; background-size: auto, cover; }
+.amb-page .amb-kicker { color: #896522; font: 700 11px/1.6 Arial, sans-serif; letter-spacing: .18em; margin: 0 0 12px; }
+.amb-signin-shell { max-width: 1040px; min-height: min(680px, calc(100vh - 184px)); margin: auto; display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: clamp(32px, 6vw, 90px); }
+.amb-signin-intro { padding: 28px 0; }
+.amb-signin-logo { width: min(340px, 90%); height: auto; display: block; margin: 28px 0 36px; }
+.amb-signin-intro h1 { font-size: clamp(36px, 4vw, 52px); color: #263b30; line-height: 1.15; font-weight: 500; }
+.amb-signin-intro h1 em { color: #88601f; font-weight: 400; }
+.amb-signin-tagline { color: #655945; line-height: 1.8; margin-top: 24px; font-size: 17px; }
+.amb-gold-rule { width: 120px; height: 1px; background: linear-gradient(90deg, #ad802b, transparent); margin-top: 32px; }
+.amb-auth-card { background: #fffdf7f5; border: 1px solid #d8be84; border-radius: 24px; padding: clamp(28px, 4vw, 44px); box-shadow: 0 22px 65px #523b171c, inset 0 0 0 5px #f4e9d14a; }
+.amb-icon-medallion { display: inline-flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; color: #846020; background: linear-gradient(145deg, #fff9e6, #eddbaf); border: 1px solid #dbc48c; flex-shrink: 0; }
+.amb-auth-card > .amb-kicker { margin: 24px 0 10px; }
+.amb-auth-card h2 { color: #273a30; font-size: 30px; margin: 0 0 16px; }
+.amb-auth-card > p { color: #6a6051; line-height: 1.8; margin-bottom: 24px; }
+.amb-auth-card > button { margin: 26px 0 20px; min-height: 52px; border-color: #d4c7ac; border-radius: 10px; }
+.amb-auth-card .amb-auth-note { margin: 0; font-size: 13px; border-top: 1px solid #ece2cd; padding-top: 20px; }
+.amb-access-message { max-width: 500px; margin: 8vh auto; text-align: center; }
+.amb-workspace { max-width: 1200px; margin: auto; }
+.amb-workspace-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 0 30px; }
+.amb-workspace-header h1 { font-size: clamp(30px, 3.5vw, 42px); color: #253b30; overflow-wrap: anywhere; margin-bottom: 10px; }
+.amb-workspace-header > div > p:last-child { color: #6a6051; font-size: 15px; }
+.amb-status { display: inline-flex; align-items: center; gap: 8px; padding: 9px 14px; border: 1px solid #bcccac; border-radius: 30px; color: #365640; background: #f5f8ee; font-size: 12px; white-space: nowrap; }
+.amb-tabs { display: flex; gap: 6px; padding: 6px; border: 1px solid #dfcda4; background: #fffaf0e8; border-radius: 14px; width: fit-content; max-width: 100%; margin-bottom: 32px; }
+.amb-tabs button { display: flex; align-items: center; justify-content: center; gap: 9px; padding: 12px 24px; min-height: 46px; border-radius: 9px; font-size: 14px; font-weight: 600; color: #665b49; }
+.amb-tabs button:hover { background: #f2e8cf; }
+.amb-tabs button[aria-current="page"] { color: #fff8e8; background: #284b3e; box-shadow: 0 3px 8px #284b3e20; }
+.amb-home-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; align-items: start; }
+.amb-welcome-card { min-width: 0; padding: clamp(24px, 4vw, 44px); background: #fffdf6f2; border: 1px solid #ddc99b; border-radius: 20px; box-shadow: 0 12px 40px #5d42100a; }
+.amb-editorial-heading { padding-bottom: 25px; margin-bottom: 25px; border-bottom: 1px solid #e4d4af; }
+.amb-editorial-heading h2 { font-size: clamp(27px, 2.8vw, 36px); color: #283e32; }
+.amb-prose { color: #514c41; font-size: 16px; line-height: 1.9; }
+.amb-prose > * + * { margin-top: 16px; }
+.amb-content-section { margin-top: 32px; padding-top: 28px; border-top: 1px solid #ede1c8; }
+.amb-content-section h3 { color: #72531e; font-size: 24px; font-weight: 500; }
+.amb-content-list { list-style: none; padding: 0; display: grid; gap: 12px; }
+.amb-content-list li { position: relative; padding-left: 22px; }
+.amb-content-list li::before { content: ''; position: absolute; left: 1px; top: 11px; width: 6px; height: 6px; background: #af873a; transform: rotate(45deg); }
+.amb-callout { padding: 16px 20px; border-left: 2px solid #b28b3c; color: #3a4c38; background: #f6efdf; font-family: Georgia, serif; font-size: 20px; }
+.amb-tools { display: grid; gap: 22px; min-width: 0; }
+.amb-profile-summary { padding: 25px; background: #fffdf7f2; border: 1px solid #ddc99b; border-radius: 20px; display: grid; grid-template-columns: 54px minmax(0, 1fr); align-items: center; gap: 16px; }
+.amb-profile-summary .amb-kicker { margin-bottom: 4px; font-size: 10px; }
+.amb-profile-summary h2 { font-size: 22px; color: #293e32; }
+.amb-profile-summary > p, .amb-primary-action { grid-column: 1 / -1; }
+.amb-profile-summary > p { font-size: 14px; color: #6a6051; line-height: 1.7; }
+.amb-primary-action { display: flex; justify-content: space-between; align-items: center; min-height: 46px; padding: 11px 16px; background: #284b3e; color: #fff9e8; border-radius: 9px; font-size: 14px; font-weight: 600; }
+.amb-primary-action:hover { background: #193d30; }
+.amb-share-panel .bg-gradient-to-r { background: linear-gradient(145deg, #1e4034, #315b48); border: 1px solid #ae9053; padding: 24px; border-radius: 20px; box-shadow: 0 10px 32px #193e3017; }
+.amb-share-panel h2 { font-size: 25px; color: #fff4d5; }
+.amb-share-panel .text-3xl { font-size: 23px; overflow-wrap: anywhere; }
+.amb-share-panel .text-brand-100 { color: #ede4cd; }
+.amb-share-panel .grid { gap: 8px; }
+.amb-share-panel button { overflow-wrap: anywhere; }
+.amb-account-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 36px; padding-top: 20px; border-top: 1px solid #dbc99e; }
+.amb-account-footer p { overflow-wrap: anywhere; }
+.amb-empty-welcome h2 { font-size: 32px; color: #283e32; margin: 16px 0; }
+.amb-empty-welcome > p:last-child { color: #655b4b; line-height: 1.8; }
+@media (max-width: 900px) { .amb-home-grid { grid-template-columns: 1fr; } .amb-tools { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+@media (max-width: 700px) {
+  .amb-signin-shell { grid-template-columns: 1fr; gap: 16px; min-height: auto; max-width: 460px; }
+  .amb-signin-intro { text-align: center; padding: 0 0 12px; }
+  .amb-signin-logo { width: 230px; margin: 16px auto 24px; }
+  .amb-signin-intro h1 { font-size: 34px; }
+  .amb-signin-tagline { margin-top: 16px; font-size: 15px; }
+  .amb-gold-rule { display: none; }
+  .amb-workspace-header { align-items: flex-start; flex-direction: column; gap: 16px; }
+  .amb-tools { grid-template-columns: 1fr; }
+  .amb-tabs { width: 100%; }
+  .amb-tabs button { flex: 1; padding: 11px 8px; gap: 6px; font-size: 13px; white-space: nowrap; }
+  .amb-page { padding: 24px 16px 36px; }
+  .amb-account-footer { align-items: flex-start; }
+  .amb-account-footer button { flex-shrink: 0; }
+}
+
+.amb-share-panel .font-mono { font-size: 22px; letter-spacing: .04em; overflow-wrap: anywhere; }
+.amb-share-panel { overflow-wrap: anywhere; }
