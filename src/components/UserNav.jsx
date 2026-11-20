@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
 import LanguagePicker from './LanguagePicker';
+import LanguageButton from './LanguageButton';
 import { isPlanActive } from '../utils/plan';
 import { useTranslation } from 'react-i18next';
 
@@ -66,6 +67,7 @@ export default function UserNav() {
       <Link to="/" aria-label={t('nav.homeAria')} className="site-navigation-logo"><Logo /></Link>
       <nav aria-label={t('nav.primary')} className="site-navigation-actions">
         <NavLink to="/" end className="site-home-link"><Home size={18} aria-hidden="true" />{t('nav.home')}</NavLink>
+        <LanguageButton onOpen={() => setOpen(false)} />
         <button ref={toggle} type="button" aria-expanded={open} aria-controls="site-navigation-menu" onClick={() => setOpen(value => !value)} className="site-menu-toggle">
           {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />} {t('nav.menu')}
         </button>
