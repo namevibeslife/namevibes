@@ -55,8 +55,8 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   await drawPosterBackground(ctx, 1080, logicalHeight, theme);
   ctx.strokeStyle = '#b88b36'; ctx.lineWidth = 2;
   ctx.strokeRect(24, 24, 1032, logicalHeight - 48); ctx.strokeRect(32, 32, 1016, logicalHeight - 64);
-  function text(value, x, y, font, color = gold, align = 'center') {
-    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(value, x, y);
+  function text(value, x, y, font, color = gold, align = 'center', maxW) {
+    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; if (maxW) ctx.fillText(value, x, y, maxW); else ctx.fillText(value, x, y);
   }
   try {
     const logo = await new Promise((resolve, reject) => {
@@ -68,7 +68,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
     ctx.drawImage(logo, (1080 - width) / 2, 50, width, height);
   } catch { text('NAMASUTRA', 540, 155, '44px Georgia'); }
   text(i18n.t('poster.eyebrow').toUpperCase(), 540, 237, '19px Arial');
-  text(i18n.t('poster.heading'), 540, 300, '32px Georgia');
+  text(i18n.t('poster.heading'), 540, 300, '32px Georgia', gold, 'center', 940);
   let y = 340;
   rows.forEach(row => {
     row.cards.forEach((card, column) => {
@@ -96,16 +96,16 @@ async function buildLegacyFamilyPosterImage(people, theme) {
     y += row.height + 24;
   });
   y += 40;
-  text(i18n.t('poster.commonTitle'), 540, y, '34px Georgia'); y += 40;
+  text(i18n.t('poster.commonTitle'), 540, y, '34px Georgia', gold, 'center', 940); y += 40;
   if (!shared.length) {
     text(people.length < 2 ? i18n.t('poster.addMemberShort') : i18n.t('poster.noShared'), 540, y + 20, '23px Arial', ink);
   } else shared.forEach(el => {
     text(`${el.symbol} / ${el.name}`, 70, y + 15, 'bold 27px Georgia', gold, 'left');
-    text(sharedLabel(el.memberCount, people.length), 70, y + 48, '20px Arial', ink, 'left');
+    text(sharedLabel(el.memberCount, people.length), 70, y + 48, '20px Arial', ink, 'left', 940);
     el.lines.forEach((line, i) => text(line, 70, y + 80 + i * 30, '23px Arial', ink, 'left'));
     y += 90 + el.lines.length * 30;
   });
-  text(i18n.t('poster.footerFamily'), 540, logicalHeight - 95, '30px Georgia');
+  text(i18n.t('poster.footerFamily'), 540, logicalHeight - 95, '30px Georgia', gold, 'center', 940);
   text(SITE_HOST, 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');
@@ -144,8 +144,8 @@ async function buildCompactFamilyPosterImage(people, theme) {
     if (current) lines.push(current);
     return lines;
   }
-  function text(value, x, y, font, color = gold, align = 'center') {
-    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; ctx.fillText(value, x, y);
+  function text(value, x, y, font, color = gold, align = 'center', maxW) {
+    ctx.font = font; ctx.fillStyle = color; ctx.textAlign = align; if (maxW) ctx.fillText(value, x, y, maxW); else ctx.fillText(value, x, y);
   }
   // shrink a single line of text until it fits the width
   function fitFont(value, width, size, family, weight = '') {
@@ -218,7 +218,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
     ctx.drawImage(logo, (W - width) / 2, 50, width, height);
   } catch { text('NAMASUTRA', 540, 155, '44px Georgia'); }
   text(i18n.t('poster.eyebrow').toUpperCase(), 540, 237, '19px Arial');
-  text(i18n.t('poster.heading'), 540, 300, '32px Georgia');
+  text(i18n.t('poster.heading'), 540, 300, '32px Georgia', gold, 'center', 940);
 
   function drawTile(el, x, y) {
     const color = posterColorFor(el);
@@ -238,7 +238,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
       const x = x0 + k * (blockW + 24);
 
       const cx = x + blockW / 2;
-      text((block.relationLabel(person.relation)).toUpperCase(), cx, y + pad + 20, '22px Arial');
+      text(relationLabel(block.person.relation).toUpperCase(), cx, y + pad + 20, '22px Arial');
       block.names.forEach((nameLine, i) => text(nameLine, cx, y + pad + 30 + (i + 0.85) * Math.round(block.nameFont * 1.2), `${block.nameFont}px Georgia`));
       const tilesTop = y + block.headH + (row.height - block.headH - pad - block.tilesH) / 2;
       if (!block.elements.length) {
@@ -259,8 +259,8 @@ async function buildCompactFamilyPosterImage(people, theme) {
   const bandX = (W - bandW) / 2;
 
 
-  text(i18n.t('poster.harmony'), 540, y + 36 + 34, '42px Georgia');
-  bandSubtitleLines.forEach((subtitleLine, i) => text(subtitleLine, 540, y + 36 + 46 + 22 + i * 30, 'italic 22px Arial', ink));
+  text(i18n.t('poster.harmony'), 540, y + 36 + 34, '42px Georgia', gold, 'center', bandW - 80);
+  bandSubtitleLines.forEach((subtitleLine, i) => text(subtitleLine, 540, y + 36 + 46 + 22 + i * 30, 'italic 22px Arial', ink, 'center', bandW - 80));
   let by = y + bandHead;
   bandRows.forEach(row => {
     row.group.forEach((el, c) => {
@@ -276,13 +276,13 @@ async function buildCompactFamilyPosterImage(people, theme) {
       text(el.name, ex + chip / 2, by + chip - 10, fitFont(el.name, chip - 10, 14, 'Arial'), foreground);
       const tx = ex + chip + 22;
       text(`${el.name} (${el.symbol})`, tx, by + 26, fitFont(`${el.name} (${el.symbol})`, entryColW - chip - 22, 28, 'Georgia', 'bold'), gold, 'left');
-      text(sharedLabel(el.memberCount, people.length), tx, by + 54, 'italic 20px Arial', ink, 'left');
+      text(sharedLabel(el.memberCount, people.length), tx, by + 54, 'italic 20px Arial', ink, 'left', entryColW - chip - 22);
       el.meaningLines.forEach((meaningLine, i) => text(meaningLine, tx, by + 82 + i * 27, '21px Arial', ink, 'left'));
     });
     by += row.height + 22;
   });
 
-  text(i18n.t('poster.footerFamily'), 540, logicalHeight - 95, '30px Georgia');
+  text(i18n.t('poster.footerFamily'), 540, logicalHeight - 95, '30px Georgia', gold, 'center', 940);
   text(SITE_HOST, 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');

@@ -50,13 +50,13 @@ export async function buildPosterImage(person, family = false, theme = family ? 
     }
     ctx.restore();
   }
-  function text(value, y, size, font = 'Georgia', color = gold) {
-    ctx.fillStyle = color; ctx.font = `${size}px ${font}`; ctx.textAlign = 'center'; ctx.fillText(value, 540, y);
+  function text(value, y, size, font = 'Georgia', color = gold, maxW) {
+    ctx.fillStyle = color; ctx.font = `${size}px ${font}`; ctx.textAlign = 'center'; if (maxW) ctx.fillText(value, 540, y, maxW); else ctx.fillText(value, 540, y);
   }
   if (!logo) text('N A M A S U T R A', 205, 43);
   text(i18n.t('poster.eyebrow').toUpperCase(), 252, 19, 'Arial');
   ctx.beginPath(); ctx.moveTo(170, 290); ctx.lineTo(910, 290); ctx.stroke();
-  text(i18n.t('poster.heading'), 345, 32, 'Georgia');
+  text(i18n.t('poster.heading'), 345, 32, 'Georgia', gold, 940);
   lines.forEach((nameLine, i) => text(nameLine, 420 + i * 78, 64));
   const gridY = Math.max(top, (canvas.height - rows * 220) / 2 + 80);
   elements.forEach((el, index) => {
@@ -73,7 +73,7 @@ export async function buildPosterImage(person, family = false, theme = family ? 
     ctx.font = 'bold 18px Georgia'; ctx.fillText(el.name, x + 87, y + 177);
   });
   if (!elements.length) text(i18n.t('poster.noElements'), 700, 24, 'Arial');
-  text(i18n.t('poster.footerSingle'), canvas.height - 105, 30);
+  text(i18n.t('poster.footerSingle'), canvas.height - 105, 30, 'Georgia', gold, 940);
   text(SITE_HOST, canvas.height - 61, 18, 'Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create image');

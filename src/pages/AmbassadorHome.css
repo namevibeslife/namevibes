@@ -65,7 +65,8 @@
   .amb-workspace-header { align-items: flex-start; flex-direction: column; gap: 16px; }
   .amb-tools { grid-template-columns: 1fr; }
   .amb-tabs { width: 100%; }
-  .amb-tabs button { flex: 1; padding: 11px 8px; gap: 6px; font-size: 13px; white-space: nowrap; }
+  .amb-tabs button { flex: 1 1 0; min-width: 0; padding: 11px 6px; gap: 6px; font-size: 13px; white-space: normal; text-align: center; overflow-wrap: anywhere; }
+  .amb-tabs button svg { flex-shrink: 0; }
   .amb-page { padding: 24px 16px 36px; }
   .amb-account-footer { align-items: flex-start; }
   .amb-account-footer button { flex-shrink: 0; }
