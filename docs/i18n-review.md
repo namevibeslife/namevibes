@@ -1710,7 +1710,7 @@ Languages: hi, kn, ml, ta, te
 
 | Key | English | ml |
 |---|---|---|
-| `numerology.interpretation.1` | Leadership, independence, innovation. You are a natural pioneer. | നേതൃത്വം, സ്വാതന്ത്ര്യം, നവീനത. നിങ്ങൾ സ്വാഭാവിക മുൻഗാമിയാണ്. |
+| `numerology.interpretation.1` | Leadership, independence, innovation. You are a natural pioneer. | നേതൃത്വം, സ്വാതന്ത്ര്യം, നവീനത. നിങ്ങൾ സ്വാഭാവിക മുൻനിരക്കാരനാണ്. |
 | `numerology.interpretation.2` | Harmony, cooperation, balance. You excel in partnerships. | ഇണക്കം, സഹകരണം, സന്തുലിതാവസ്ഥ. പങ്കാളിത്തങ്ങളിൽ നിങ്ങൾ മികച്ചുനിൽക്കുന്നു. |
 | `numerology.interpretation.3` | Creativity, expression, joy. You bring light and inspiration. | സർഗാത്മകത, ആവിഷ്കാരം, സന്തോഷം. നിങ്ങൾ വെളിച്ചവും പ്രചോദനവും നൽകുന്നു. |
 | `numerology.interpretation.4` | Stability, hard work, foundation. You build lasting structures. | സ്ഥിരത, കഠിനാധ്വാനം, അടിത്തറ. നിങ്ങൾ നിലനിൽക്കുന്ന ഘടനകൾ പണിയുന്നു. |
@@ -2030,7 +2030,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n028` | ⚛️ Noble Gases (Group 18) - The Independent Souls | ⚛️ ഉൽകൃഷ്ട വാതകങ്ങൾ (ഗ്രൂപ്പ് 18) - സ്വതന്ത്ര ആത്മാക്കൾ |
 | `insights.n029` | Element | മൂലകം |
 | `insights.n030` | Symbol | ചിഹ്നം |
-| `insights.n031` | Atomic Number | അറ്റോമിക സംഖ്യ |
+| `insights.n031` | Atomic Number | ആറ്റോമിക സംഖ്യ |
 | `insights.n032` | Key Traits | പ്രധാന ഗുണങ്ങൾ |
 | `insights.n035` | Light, uplifting, carefree nature | ലഘുവായ, ഉന്മേഷം നൽകുന്ന, ആശങ്കയില്ലാത്ത പ്രകൃതം |
 | `insights.n038` | Bright, attention-grabbing, vibrant | തിളക്കമുള്ള, ശ്രദ്ധ ആകർഷിക്കുന്ന, ഊർജസ്വലമായ |
@@ -2323,7 +2323,7 @@ Languages: hi, kn, ml, ta, te
 | `learn.scienceItem2` | Atomic properties and elemental color frequencies | ആറ്റോമിക ഗുണങ്ങളും മൂലകങ്ങളുടെ വർണ ആവൃത്തികളും |
 | `learn.scienceItem3` | Sound-based vibrational patterns | ശബ്ദാധിഷ്ഠിത സ്പന്ദന രീതികൾ |
 | `learn.example` | Example: | ഉദാഹരണം: |
-| `learn.science3` | These elements together form a <b>Name Chemistry Signature</b>, offering insight into personality traits, emotional balance, and compatibility. | ഈ മൂലകങ്ങൾ ചേർന്ന് ഒരു <b>പേര് രസതന്ത്ര ഒപ്പ്</b> രൂപപ്പെടുത്തുന്നു; ഇത് സ്വഭാവ സവിശേഷതകൾ, വൈകാരിക സന്തുലിതാവസ്ഥ, പൊരുത്തം എന്നിവയെക്കുറിച്ച് ഉൾക്കാഴ്ച നൽകുന്നു. |
+| `learn.science3` | These elements together form a <b>Name Chemistry Signature</b>, offering insight into personality traits, emotional balance, and compatibility. | ഈ മൂലകങ്ങൾ ചേർന്ന് ഒരു <b>പേരിന്റെ രസതന്ത്ര ഒപ്പ്</b> രൂപപ്പെടുത്തുന്നു; ഇത് സ്വഭാവ സവിശേഷതകൾ, വൈകാരിക സന്തുലിതാവസ്ഥ, പൊരുത്തം എന്നിവയെക്കുറിച്ച് ഉൾക്കാഴ്ച നൽകുന്നു. |
 | `learn.science4` | Right vibrations create better alignment. | ശരിയായ സ്പന്ദനങ്ങൾ മികച്ച ഇണക്കം സൃഷ്ടിക്കുന്നു. |
 | `learn.spiritual1` | At <b>Namasutra</b>, we see the universe as energy in motion — and sound as its first expression. | <b>Namasutra</b>-യിൽ ഞങ്ങൾ പ്രപഞ്ചത്തെ ചലനത്തിലുള്ള ഊർജമായും ശബ്ദത്തെ അതിന്റെ ആദ്യ ആവിഷ്കാരമായും കാണുന്നു. |
 | `learn.spiritual2a` | A name carries sound. | പേര് ശബ്ദം വഹിക്കുന്നു. |
@@ -2359,7 +2359,7 @@ Languages: hi, kn, ml, ta, te
 | `ai.help3` | <b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button. | <b>PDF-ഉം ചേർക്കണോ?</b> മുകളിലെ <i>PDF ഡൗൺലോഡ്</i> ഉപയോഗിക്കൂ, എന്നിട്ട് ഫയൽ ചാറ്റിലേക്ക് വലിച്ചിടുകയോ AI-യുടെ അറ്റാച്ച് (പേപ്പർക്ലിപ്പ്) ബട്ടൺ ഉപയോഗിക്കുകയോ ചെയ്യൂ. |
 | `ai.help4` | You'll need to be signed in to your AI account. Namasutra doesn't see your conversation. | നിങ്ങളുടെ AI അക്കൗണ്ടിൽ സൈൻ ഇൻ ചെയ്തിരിക്കണം. Namasutra നിങ്ങളുടെ സംഭാഷണം കാണുന്നില്ല. |
 | `ai.promptIntro` | I used Namasutra ({{host}}), which maps the letters of a name to periodic table elements. Here is my family report: | ഞാൻ Namasutra ({{host}}) ഉപയോഗിച്ചു; അത് പേരിലെ അക്ഷരങ്ങളെ ആവർത്തനപ്പട്ടികയിലെ മൂലകങ്ങളുമായി ബന്ധിപ്പിക്കുന്നു. ഇതാണ് എന്റെ കുടുംബ റിപ്പോർട്ട്: |
-| `ai.promptElement` |   - {{name}} ({{symbol}}, atomic number {{number}}): {{meaning}} | - {{name}} ({{symbol}}, അറ്റോമിക സംഖ്യ {{number}}): {{meaning}} |
+| `ai.promptElement` |   - {{name}} ({{symbol}}, atomic number {{number}}): {{meaning}} | - {{name}} ({{symbol}}, ആറ്റോമിക സംഖ്യ {{number}}): {{meaning}} |
 | `ai.promptHarmony` | Harmony elements shared by everyone: {{elements}} | എല്ലാവരിലും പൊതുവായ ഇണക്ക മൂലകങ്ങൾ: {{elements}} |
 | `ai.promptWhy` | Why I'm exploring this: {{reasons}} | ഞാൻ ഇത് എന്തിനാണ് അറിയാൻ ആഗ്രഹിക്കുന്നത്: {{reasons}} |
 | `ai.promptQuestion` | Can you help me understand what these elements and the harmony between our names might signify, and how they connect us as a family? | ഈ മൂലകങ്ങളും ഞങ്ങളുടെ പേരുകൾ തമ്മിലുള്ള ഇണക്കവും എന്തിനെ സൂചിപ്പിക്കാം, അവ ഞങ്ങളെ ഒരു കുടുംബമായി എങ്ങനെ ബന്ധിപ്പിക്കുന്നു എന്ന് മനസ്സിലാക്കാൻ നിങ്ങൾക്ക് സഹായിക്കാമോ? |
@@ -3204,7 +3204,7 @@ Languages: hi, kn, ml, ta, te
 | `elements.Rh` | Rarity, brilliance, luxury | అరుదైనది, ప్రకాశం, విలాసం |
 | `elements.Pd` | Purity, cleansing, catalyst | స్వచ్ఛత, శుభ్రపరచడం, ఉత్ప్రేరకం |
 | `elements.Ag` | Clarity, intuition, reflection | స్పష్టత, అంతర్ దృష్టి, ప్రతిబింబం |
-| `elements.Cd` | Vivid color, energy, caution | ముదురు రంగు, శక్తి, జాగ్రత్త |
+| `elements.Cd` | Vivid color, energy, caution | ప్రకాశవంతమైన రంగు, శక్తి, జాగ్రత్త |
 | `elements.In` | Softness, flexibility, rarity | మృదుత్వం, వంగే గుణం, అరుదైనది |
 | `elements.Sn` | Preservation, flexibility, protection | సంరక్షణ, వంగే గుణం, రక్షణ |
 | `elements.Sb` | Ancient wisdom, beauty, transformation | ప్రాచీన జ్ఞానం, అందం, పరివర్తన |
@@ -3226,7 +3226,7 @@ Languages: hi, kn, ml, ta, te
 | `elements.Ho` | Strongest attraction, focus, home | అత్యంత బలమైన ఆకర్షణ, దృష్టి, ఇల్లు |
 | `elements.Er` | Fiber optics, pink, amplification | ఆప్టికల్ ఫైబర్, గులాబీ, విస్తరణ |
 | `elements.Tm` | X-ray, portable, medical | ఎక్స్-రే, తీసుకెళ్లగలిగేది, వైద్యం |
-| `elements.Yb` | Precision, steadiness, accuracy | ఖచ్చితత్వం, స్థిరత, కచ్చితమైన |
+| `elements.Yb` | Precision, steadiness, accuracy | ఖచ్చితత్వం, స్థిరత, యథార్థత |
 | `elements.Lu` | Completion, density, refinement | పూర్తి, సాంద్రత, సంస్కారం |
 | `elements.Hf` | Control, resilience, harbor | నియంత్రణ, తట్టుకునే శక్తి, ఓడరేవు |
 | `elements.Ta` | Patience, endurance, incorruptibility | ఓర్పు, సహనశక్తి, అవినీతి లేకపోవడం |
@@ -3280,7 +3280,7 @@ Languages: hi, kn, ml, ta, te
 
 | Key | English | te |
 |---|---|---|
-| `numerology.interpretation.1` | Leadership, independence, innovation. You are a natural pioneer. | నాయకత్వం, స్వతంత్రత, నవీనత. మీరు సహజ మార్గదర్శకులు. |
+| `numerology.interpretation.1` | Leadership, independence, innovation. You are a natural pioneer. | నాయకత్వం, స్వతంత్రత, నవీనత. మీరు సహజ అగ్రగాములు. |
 | `numerology.interpretation.2` | Harmony, cooperation, balance. You excel in partnerships. | సామరస్యం, సహకారం, సమతుల్యత. భాగస్వామ్యాల్లో మీరు రాణిస్తారు. |
 | `numerology.interpretation.3` | Creativity, expression, joy. You bring light and inspiration. | సృజనాత్మకత, వ్యక్తీకరణ, ఆనందం. మీరు వెలుగును, ప్రేరణను తెస్తారు. |
 | `numerology.interpretation.4` | Stability, hard work, foundation. You build lasting structures. | స్థిరత్వం, కష్టపడే తత్వం, పునాది. మీరు శాశ్వత నిర్మాణాలను నిర్మిస్తారు. |
