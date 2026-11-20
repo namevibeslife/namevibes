@@ -176,8 +176,17 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 .site-navigation-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; }
 .site-navigation-links a { padding: 10px; min-height: 44px; border-radius: 7px; color: #302c23; line-height: 1.5; }
 .site-navigation-links a:hover, .site-navigation-links a[aria-current="page"] { background: #f1e6ca; color: #624515; }
+/* Globe button + language list in the top bar */
+.site-language { position: relative; }
+.site-language-toggle { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 9px; border: 1px solid #c9a95a; background: #fffaf0; color: #624515; }
+.site-language-toggle:hover, .site-language-toggle[aria-expanded="true"] { background: #f1e6ca; }
+.site-language-menu { position: absolute; right: 0; top: calc(100% + 12px); width: 240px; max-height: calc(100dvh - 96px); overflow-y: auto; overscroll-behavior: contain; background: #fffdf7; padding: 6px; border: 1px solid #d9c28c; border-radius: 14px; box-shadow: 0 16px 48px #241d1740; z-index: 41; }
+.site-language-menu button { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 44px; padding: 8px 12px; border-radius: 8px; text-align: start; color: #302c23; font-size: 16px; }
+.site-language-menu button:hover, .site-language-menu button:focus-visible { background: #f1e6ca; color: #624515; }
+.site-language-menu button[aria-current="true"] { font-weight: 700; color: #624515; }
+@media (max-width: 640px) { .site-language { position: static; } .site-language-menu { left: 8px; right: 8px; width: auto; top: calc(100% + 8px); } }
 .site-signout { padding: 10px; min-height: 44px; color: #9b2828; margin-top: 10px; }
-@media (max-width: 420px) { .site-navigation-logo img { width: 122px; } .site-navigation-bar { gap: 6px; padding: 0 12px; } .site-home-link, .site-menu-toggle { padding: 8px; } .site-navigation-links { grid-template-columns: 1fr; } }
+@media (max-width: 420px) { .site-navigation-actions { gap: 4px; } .site-navigation-logo img { width: 112px; } .site-navigation-bar { gap: 6px; padding: 0 12px; } .site-home-link, .site-menu-toggle { padding: 8px; } .site-navigation-links { grid-template-columns: 1fr; } }
 @media print { .site-navigation { display: none; } }
 
 .site-background, .element-insights-page { background-color: #fcf3df; background-image: linear-gradient(#fffaf044, #fffaf044), url('/theme/poster-gold-elements.png'); background-size: auto, 100% auto; background-position: center top; background-repeat: repeat-y; }
