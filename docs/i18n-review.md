@@ -443,7 +443,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n011` | Higher % = Stronger influence on your personality | अधिक % = आपके व्यक्तित्व पर अधिक प्रभाव |
 | `insights.n012` | Nakshatra Ruling Planet: | नक्षत्र का स्वामी ग्रह: |
 | `insights.n013` | Each Nakshatra is governed by a planet that influences your cosmic energy | हर नक्षत्र का एक स्वामी ग्रह होता है जो आपकी ब्रह्मांडीय ऊर्जा को प्रभावित करता है |
-| `insights.n014` | Name Chemistry: | नाम की रसायन-विद्या: |
+| `insights.n014` | Name Chemistry: | नाम का रसायन: |
 | `insights.n015` | The unique blend of elements in your name creates your personal "cosmic signature" | आपके नाम के तत्वों का अनोखा मेल आपका निजी "ब्रह्मांडीय हस्ताक्षर" बनाता है |
 | `insights.n016` | 🔬 The Science Behind Name Analysis | 🔬 नाम विश्लेषण के पीछे का विज्ञान |
 | `insights.n017` | Periodic Table Elements: | आवर्त सारणी के तत्व: |
@@ -663,7 +663,7 @@ Languages: hi, kn, ml, ta, te
 | `pricing.referralDiscount` | {{percent}}% referral discount applied | {{percent}}% रेफ़रल छूट लागू की गई |
 | `pricing.featureFamily` | Family Package: analyze up to {{max}} names together | पारिवारिक पैकेज: एक साथ {{max}} तक नामों का विश्लेषण |
 | `pricing.title` | NAMASUTRA Annual Plan | NAMASUTRA वार्षिक प्लान |
-| `pricing.subtitle` | Unlock the chemistry in names | नामों की रसायन-विद्या को खोलें |
+| `pricing.subtitle` | Unlock the chemistry in names | नामों के रसायन को खोलें |
 | `pricing.badge` | EVERYTHING INCLUDED | सब कुछ शामिल |
 | `pricing.feature1` | 8 name analyses per month | हर महीने 8 नाम विश्लेषण |
 | `pricing.feature2` | Family harmony analysis | पारिवारिक सामंजस्य विश्लेषण |
@@ -723,8 +723,8 @@ Languages: hi, kn, ml, ta, te
 
 | Key | English | hi |
 |---|---|---|
-| `landing.headingLine1` | Discover Your Name's | अपने नाम की |
-| `landing.headingLine2` | Hidden Chemistry | छिपी हुई रसायन-विद्या खोजें |
+| `landing.headingLine1` | Discover Your Name's | अपने नाम का |
+| `landing.headingLine2` | Hidden Chemistry | छिपा हुआ रसायन खोजें |
 | `landing.about4` | <b>Namasutra</b> uncovers the fascinating connection between your name and the elements of the periodic table. | <b>Namasutra</b> आपके नाम और आवर्त सारणी के तत्वों के बीच के रोचक संबंध को सामने लाता है। |
 | `landing.copyright` | © {{year}} Namasutra. All rights reserved. | © {{year}} Namasutra. सर्वाधिकार सुरक्षित। |
 | `landing.kicker` | Your name is energy. Discover how it connects you to the universe. | आपका नाम एक ऊर्जा है। जानिए यह आपको ब्रह्मांड से कैसे जोड़ता है। |
@@ -2280,7 +2280,7 @@ Languages: hi, kn, ml, ta, te
 | `share.line1` | Your name is more than just an identity. What if it has a connection to the very elements of our universe? 🌌 | നിങ്ങളുടെ പേര് വെറുമൊരു തിരിച്ചറിയൽ മാത്രമല്ല. അതിന് നമ്മുടെ പ്രപഞ്ചത്തിലെ മൂലകങ്ങളുമായി ബന്ധമുണ്ടെങ്കിലോ? 🌌 |
 | `share.line2` | I discovered something fascinating on Namasutra — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights. | ഞാൻ Namasutra-യിൽ രസകരമായ ഒരു കാര്യം കണ്ടെത്തി — നമ്മുടെ പേരുകളിലെ അക്ഷരങ്ങളെ രാസമൂലകങ്ങളുമായി ബന്ധിപ്പിക്കുന്ന സവിശേഷമായ ഒരു പ്ലാറ്റ്ഫോം; സംഖ്യാശാസ്ത്രം, ജ്യോതിഷം, നക്ഷത്ര ഉൾക്കാഴ്ചകളും ഇതിലുണ്ട്. |
 | `share.line3` | Every name has a story. Discover what yours reveals! ✨ | ഓരോ പേരിനും ഒരു കഥയുണ്ട്. നിങ്ങളുടേത് എന്താണ് പറയുന്നതെന്ന് അറിയൂ! ✨ |
-| `share.line4` | 🔗 Explore your Namasutra: {{link}} | 🔗 നിങ്ങളുടെ Namasutra അന്വേഷിക്കൂ: {{link}} |
+| `share.line4` | 🔗 Explore your Namasutra: {{link}} | 🔗 നിങ്ങളുടെ Namasutra കണ്ടെത്തൂ: {{link}} |
 | `share.line5` | 🎁 Try it with my referral code: {{code}} this can give you a DISCOUNT | 🎁 എന്റെ റഫറൽ കോഡ് ഉപയോഗിച്ച് നോക്കൂ: {{code}} ഇതുവഴി നിങ്ങൾക്ക് കിഴിവ് ലഭിച്ചേക്കാം |
 | `share.emailSubject` | Discover the hidden elements in your name | നിങ്ങളുടെ പേരിൽ ഒളിഞ്ഞിരിക്കുന്ന മൂലകങ്ങൾ അറിയൂ |
 | `invite.subject` | You are invited to become a NAMASUTRA Ambassador | NAMASUTRA അംബാസഡറാകാൻ നിങ്ങൾക്ക് ക്ഷണം |
@@ -2301,7 +2301,7 @@ Languages: hi, kn, ml, ta, te
 | `landing.subheading` | Decode the hidden elements in your identity through periodic table science, Chaldean numerology, and Hindu astrology | ആവർത്തനപ്പട്ടിക ശാസ്ത്രം, കാൽഡിയൻ സംഖ്യാശാസ്ത്രം, ഹിന്ദു ജ്യോതിഷം എന്നിവയിലൂടെ നിങ്ങളുടെ വ്യക്തിത്വത്തിൽ ഒളിഞ്ഞിരിക്കുന്ന മൂലകങ്ങൾ മനസ്സിലാക്കൂ |
 | `landing.getStarted` | Get Started | തുടങ്ങാം |
 | `landing.learnMore` | Learn More | കൂടുതൽ അറിയാം |
-| `landing.aboutHeading` | A lifelong companion. A world within. | ജീവിതകാലം മുഴുവൻ ഒരു കൂട്ടുകാരൻ. ഉള്ളിൽ ഒരു ലോകം. |
+| `landing.aboutHeading` | A lifelong companion. A world within. | ജീവിതകാലം മുഴുവൻ ഒരു കൂട്ടാളി. ഉള്ളിൽ ഒരു ലോകം. |
 | `landing.about1` | From the cradle to the grave, your name is your constant companion, defining your identity throughout life's journey. | ജനനം മുതൽ അവസാനം വരെ നിങ്ങളുടെ പേര് നിങ്ങളുടെ സ്ഥിരം കൂട്ടാണ്; ജീവിതയാത്രയിലുടനീളം നിങ്ങളുടെ വ്യക്തിത്വത്തെ രൂപപ്പെടുത്തുന്നു. |
 | `landing.about2` | Every name carries a unique vibration, an energy that resonates with who you are. | ഓരോ പേരിനും സവിശേഷമായ ഒരു സ്പന്ദനമുണ്ട്; നിങ്ങൾ ആരാണെന്നതുമായി ചേർന്നുപോകുന്ന ഒരു ഊർജം. |
 | `landing.about3` | But have you ever wondered what lies within the letters of your name? | നിങ്ങളുടെ പേരിലെ അക്ഷരങ്ങൾക്കുള്ളിൽ എന്താണെന്ന് എപ്പോഴെങ്കിലും ആലോചിച്ചിട്ടുണ്ടോ? |
@@ -3851,11 +3851,11 @@ Languages: hi, kn, ml, ta, te
 | `share.line2` | I discovered something fascinating on Namasutra — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights. | నేను Namasutraలో ఒక ఆసక్తికరమైన విషయం కనుగొన్నాను — మన పేర్లలోని అక్షరాలను రసాయన మూలకాలతో కలిపే ప్రత్యేకమైన వేదిక; సంఖ్యాశాస్త్రం, జ్యోతిష్యం, నక్షత్ర అంతర్దృష్టులను కూడా అందిస్తుంది. |
 | `share.line3` | Every name has a story. Discover what yours reveals! ✨ | ప్రతి పేరుకూ ఒక కథ ఉంది. మీ పేరు ఏం చెబుతుందో తెలుసుకోండి! ✨ |
 | `share.line4` | 🔗 Explore your Namasutra: {{link}} | 🔗 మీ Namasutraను అన్వేషించండి: {{link}} |
-| `share.line5` | 🎁 Try it with my referral code: {{code}} this can give you a DISCOUNT | 🎁 నా రెఫరల్ కోడ్‌తో ప్రయత్నించండి: {{code}} దీనివల్ల మీకు డిస్కౌంట్ రావచ్చు |
+| `share.line5` | 🎁 Try it with my referral code: {{code}} this can give you a DISCOUNT | 🎁 నా రెఫరల్ కోడ్‌తో ప్రయత్నించండి: {{code}} దీనివల్ల మీకు తగ్గింపు రావచ్చు |
 | `share.emailSubject` | Discover the hidden elements in your name | మీ పేరులో దాగిన మూలకాలను తెలుసుకోండి |
 | `invite.subject` | You are invited to become a NAMASUTRA Ambassador | NAMASUTRA అంబాసిడర్‌గా మీకు ఆహ్వానం |
 | `invite.line1` | You're invited to become a NAMASUTRA Ambassador 🌟 | NAMASUTRA అంబాసిడర్‌గా మీకు ఆహ్వానం 🌟 |
-| `invite.line2` | Sign in with your Google account ({{email}}) here: {{url}} | మీ Google ఖాతా ({{email}}) తో ఇక్కడ సైన్ ఇన్ చేయండి: {{url}} |
+| `invite.line2` | Sign in with your Google account ({{email}}) here: {{url}} | మీ Google ఖాతా ({{email}})తో ఇక్కడ సైన్ ఇన్ చేయండి: {{url}} |
 | `invite.line3` | Your unique Ambassador Code is already waiting for you in your dashboard. | మీ ప్రత్యేక అంబాసిడర్ కోడ్ మీ డాష్‌బోర్డ్‌లో మీ కోసం ఎదురుచూస్తోంది. |
 | `invite.member` | Member | సభ్యుడు |
 
@@ -3916,17 +3916,17 @@ Languages: hi, kn, ml, ta, te
 |---|---|---|
 | `ai.yourApp` | your AI app | మీ AI యాప్ |
 | `ai.reportTitle` | Namasutra Family Report | Namasutra కుటుంబ నివేదిక |
-| `ai.title` | Deepen Your Understanding with AI (Free) | AI తో మీ అవగాహనను మరింత లోతుగా చేసుకోండి (ఉచితం) |
+| `ai.title` | Deepen Your Understanding with AI (Free) | AIతో మీ అవగాహనను మరింత లోతుగా చేసుకోండి (ఉచితం) |
 | `ai.subtitle` | Uses your own AI account. Your full report is sent along. | మీ సొంత AI ఖాతాను ఉపయోగిస్తుంది. మీ పూర్తి నివేదిక కూడా పంపబడుతుంది. |
 | `ai.subtitleReasons` | Uses your own AI account. Your full report is sent along, including the reasons you selected. | మీ సొంత AI ఖాతాను ఉపయోగిస్తుంది. మీరు ఎంచుకున్న కారణాలతో సహా మీ పూర్తి నివేదిక పంపబడుతుంది. |
-| `ai.sendPdf` | Send PDF to my AI app | PDF ను నా AI యాప్‌కు పంపండి |
+| `ai.sendPdf` | Send PDF to my AI app | PDFను నా AI యాప్‌కు పంపండి |
 | `ai.ask` | Ask {{name}} | {{name}} ను అడగండి |
 | `ai.copied` | ✅ Your report has been copied. If it isn't already in the {{app}} chat box, paste it in (<b>Ctrl+V</b> on a computer, or <b>long-press → Paste</b> on a phone) and send. | ✅ మీ నివేదిక కాపీ అయింది. అది ఇప్పటికే {{app}} చాట్ బాక్స్‌లో లేకపోతే, దాన్ని పేస్ట్ చేసి (కంప్యూటర్‌లో <b>Ctrl+V</b>, ఫోన్‌లో <b>ఎక్కువసేపు నొక్కి → పేస్ట్</b>) పంపండి. |
 | `ai.hideHelp` | Hide help | సహాయాన్ని దాచండి |
 | `ai.howWorks` | How does this work? | ఇది ఎలా పనిచేస్తుంది? |
-| `ai.help1` | <b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send. | <b>PDF ను నా AI యాప్‌కు పంపండి:</b> PDF నివేదిక జతచేయబడిన మీ ఫోన్ షేర్ మెనూ తెరుచుకుంటుంది. Claude, ChatGPT లేదా Gemini ఎంచుకోండి; నివేదిక పంపడానికి సిద్ధంగా చేరుతుంది. |
-| `ai.help2` | <b>Ask Claude / ChatGPT / Gemini:</b> opens the AI in a new tab with your full report (names, elements, meanings and harmony) already written as a question. It's also copied, so you can paste it if the box is empty. Gemini always needs a paste. | <b>Claude / ChatGPT / Gemini ను అడగండి:</b> AI కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది; మీ పూర్తి నివేదిక (పేర్లు, మూలకాలు, అర్థాలు, సామరస్యం) ఇప్పటికే ఒక ప్రశ్నగా రాయబడి ఉంటుంది. అది కాపీ కూడా అవుతుంది, కాబట్టి బాక్స్ ఖాళీగా ఉంటే పేస్ట్ చేయవచ్చు. Gemini కి ఎప్పుడూ పేస్ట్ అవసరం. |
-| `ai.help3` | <b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button. | <b>PDF ను కూడా జతచేయాలా?</b> పైన ఉన్న <i>PDF డౌన్‌లోడ్</i> ఉపయోగించి, ఆపై ఫైల్‌ను చాట్‌లోకి లాగండి లేదా AI యొక్క అటాచ్ (పేపర్‌క్లిప్) బటన్ ఉపయోగించండి. |
+| `ai.help1` | <b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send. | <b>PDFను నా AI యాప్‌కు పంపండి:</b> PDF నివేదిక జతచేయబడిన మీ ఫోన్ షేర్ మెనూ తెరుచుకుంటుంది. Claude, ChatGPT లేదా Gemini ఎంచుకోండి; నివేదిక పంపడానికి సిద్ధంగా చేరుతుంది. |
+| `ai.help2` | <b>Ask Claude / ChatGPT / Gemini:</b> opens the AI in a new tab with your full report (names, elements, meanings and harmony) already written as a question. It's also copied, so you can paste it if the box is empty. Gemini always needs a paste. | <b>Claude / ChatGPT / Geminiను అడగండి:</b> AI కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది; మీ పూర్తి నివేదిక (పేర్లు, మూలకాలు, అర్థాలు, సామరస్యం) ఇప్పటికే ఒక ప్రశ్నగా రాయబడి ఉంటుంది. అది కాపీ కూడా అవుతుంది, కాబట్టి బాక్స్ ఖాళీగా ఉంటే పేస్ట్ చేయవచ్చు. Geminiకి ఎప్పుడూ పేస్ట్ అవసరం. |
+| `ai.help3` | <b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button. | <b>PDFను కూడా జతచేయాలా?</b> పైన ఉన్న <i>PDF డౌన్‌లోడ్</i> ఉపయోగించి, ఆపై ఫైల్‌ను చాట్‌లోకి లాగండి లేదా AI యొక్క అటాచ్ (పేపర్‌క్లిప్) బటన్ ఉపయోగించండి. |
 | `ai.help4` | You'll need to be signed in to your AI account. Namasutra doesn't see your conversation. | మీరు మీ AI ఖాతాలో సైన్ ఇన్ అయి ఉండాలి. Namasutra మీ సంభాషణను చూడదు. |
 | `ai.promptIntro` | I used Namasutra ({{host}}), which maps the letters of a name to periodic table elements. Here is my family report: | నేను Namasutra ({{host}}) ఉపయోగించాను; అది పేరులోని అక్షరాలను ఆవర్తన పట్టిక మూలకాలతో అనుసంధానిస్తుంది. ఇది నా కుటుంబ నివేదిక: |
 | `ai.promptElement` |   - {{name}} ({{symbol}}, atomic number {{number}}): {{meaning}} | - {{name}} ({{symbol}}, పరమాణు సంఖ్య {{number}}): {{meaning}} |
