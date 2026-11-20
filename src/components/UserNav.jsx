@@ -5,19 +5,22 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
+import LanguagePicker from './LanguagePicker';
 import { isPlanActive } from '../utils/plan';
+import { useTranslation } from 'react-i18next';
 
 const explore = [
-  ['Home', '/'], ['Know More', '/learn-more'], ['Dashboard', '/dashboard'],
-  ['Analyze Name', '/analyze'], ['Family Analysis', '/family'],
-  ['Element & Nakshatra Insights', '/element-insights'],
-  ['Numerology Calculator', '/numerology-calculator'],
-  ['Zodiac Name Guide', '/zodiac-syllables'], ['Hora & Muhurat', '/hora-muhurat'],
-  ['Plans & Pricing', '/pricing'],
+  ['nav.home', '/'], ['nav.knowMore', '/learn-more'], ['nav.dashboard', '/dashboard'],
+  ['nav.analyze', '/analyze'], ['nav.family', '/family'],
+  ['nav.insights', '/element-insights'],
+  ['nav.numerology', '/numerology-calculator'],
+  ['nav.zodiac', '/zodiac-syllables'], ['nav.hora', '/hora-muhurat'],
+  ['nav.pricing', '/pricing'],
 ];
 
 // One shared navigation bar on every route, including public and error pages.
 export default function UserNav() {
+  const { t } = useTranslation();
   const { user, profile, logout } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
@@ -49,30 +52,31 @@ export default function UserNav() {
   // (and the dashboard that leads to them) stay hidden rather than bouncing to the payment card.
   const planless = user && isAmbassador && !isPlanActive(profile);
   const exploreLinks = planless ? explore.filter(([, to]) => ['/', '/learn-more'].includes(to) || (to === '/pricing' && profile?.profileComplete)) : explore;
-  const account = user ? [['Settings', '/settings'], ['My Profile', '/profile']] : [['Sign In', '/login']];
+  const account = user ? [['nav.settings', '/settings'], ['nav.profile', '/profile']] : [['nav.signIn', '/login']];
   // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
   // One link to the ambassador sign-in page; it reads "Ambassador area" for a signed-in ambassador.
-  const partners = [[isAmbassador ? 'Ambassador area' : 'Ambassador Login', '/ambassador']];
-  if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['Admin', '/admin'], ['Accounts', '/accounts']);
+  const partners = [[isAmbassador ? 'nav.ambassadorArea' : 'nav.ambassadorLogin', '/ambassador']];
+  if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['nav.admin', '/admin'], ['nav.accounts', '/accounts']);
   async function signOut() {
     try { await logout(); setOpen(false); navigate('/'); }
-    catch { setError('Could not sign out. Please try again.'); }
+    catch { setError(t('errors.signOut')); }
   }
   return <header className="site-navigation" ref={container}>
     <div className="site-navigation-bar">
-      <Link to="/" aria-label="Namasutra home" className="site-navigation-logo"><Logo /></Link>
-      <nav aria-label="Primary navigation" className="site-navigation-actions">
-        <NavLink to="/" end className="site-home-link"><Home size={18} aria-hidden="true" />Home</NavLink>
+      <Link to="/" aria-label={t('nav.homeAria')} className="site-navigation-logo"><Logo /></Link>
+      <nav aria-label={t('nav.primary')} className="site-navigation-actions">
+        <NavLink to="/" end className="site-home-link"><Home size={18} aria-hidden="true" />{t('nav.home')}</NavLink>
         <button ref={toggle} type="button" aria-expanded={open} aria-controls="site-navigation-menu" onClick={() => setOpen(value => !value)} className="site-menu-toggle">
-          {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />} Menu
+          {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />} {t('nav.menu')}
         </button>
       </nav>
-      {open && <nav id="site-navigation-menu" aria-label="All pages" className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>
-        {[['Explore Namasutra', exploreLinks], ['Your account', account], ['Ambassadors', partners]].map(([title, links]) => <section key={title}>
-          <h2>{title}</h2>
-          <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{label}</NavLink>)}</div>
+      {open && <nav id="site-navigation-menu" aria-label={t('nav.allPages')} className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>
+        {[['nav.explore', exploreLinks], ['nav.account', account], ['nav.ambassadors', partners]].map(([title, links]) => <section key={title}>
+          <h2>{t(title)}</h2>
+          <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{t(label)}</NavLink>)}</div>
         </section>)}
-        {user && <button type="button" onClick={signOut} className="site-signout">Sign Out</button>}
+        <div className="site-navigation-language"><LanguagePicker /></div>
+        {user && <button type="button" onClick={signOut} className="site-signout">{t('nav.signOut')}</button>}
         {error && <p role="alert">{error}</p>}
       </nav>}
     </div>

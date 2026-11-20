@@ -5,6 +5,10 @@ import { posterColorFor } from './posterPalette';
 import { textColorFor } from './elements';
 import { FAMILY_MAX_NAMES } from './plan';
 import { SITE_HOST } from '../config/site.js';
+import i18n from 'i18next';
+import { preparePosterFonts } from '../i18n/posterFont.js';
+import { elementMeaning } from '../i18n/elements.js';
+import { relationLabel, sharedLabel } from '../i18n/poster.js';
 
 // One image contains every member, their tiles, and the shared-element meanings.
 // Up to FAMILY_MAX_NAMES people get the larger 2x2 layout; older saved analyses with more people
@@ -20,6 +24,7 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
+  await preparePosterFonts(ctx);
   function wrap(value, width, font) {
     ctx.font = font;
     const lines = []; let line = '';
@@ -32,12 +37,12 @@ async function buildLegacyFamilyPosterImage(people, theme) {
   }
   const cards = people.map(person => {
     const names = wrap(person.fullName, 420, '34px Georgia');
-    const relation = wrap(person.relation || 'Family member', 420, '18px Arial');
+    const relation = wrap(relationLabel(person.relation), 420, '18px Arial');
     return { person, names, relation, height: 68 + names.length * 42 + relation.length * 24 + Math.max(1, Math.ceil((person.elements || []).length / 4)) * 118 };
   });
   const rows = [];
   for (let i = 0; i < cards.length; i += 2) rows.push({ cards: cards.slice(i, i + 2), height: Math.max(...cards.slice(i, i + 2).map(card => card.height)) });
-  const shared = findSharedElements(people).map(el => ({ ...el, lines: wrap(el.meaning, 900, '23px Arial') }));
+  const shared = findSharedElements(people).map(el => ({ ...el, lines: wrap(elementMeaning(el), 900, '23px Arial') }));
   const memberHeight = rows.reduce((height, row) => height + row.height + 24, 0);
   const sharedHeight = shared.length ? shared.reduce((height, el) => height + 90 + el.lines.length * 30, 0) : 105;
   const logicalHeight = Math.max(1350, 420 + memberHeight + sharedHeight + 180);
@@ -62,8 +67,8 @@ async function buildLegacyFamilyPosterImage(people, theme) {
     const width = height * logo.width / logo.height;
     ctx.drawImage(logo, (1080 - width) / 2, 50, width, height);
   } catch { text('NAMASUTRA', 540, 155, '44px Georgia'); }
-  text('EVERY NAME HAS A CHEMISTRY', 540, 237, '19px Arial');
-  text('Your Elemental Identity, in Harmony with Nature.', 540, 300, '32px Georgia');
+  text(i18n.t('poster.eyebrow').toUpperCase(), 540, 237, '19px Arial');
+  text(i18n.t('poster.heading'), 540, 300, '32px Georgia');
   let y = 340;
   rows.forEach(row => {
     row.cards.forEach((card, column) => {
@@ -86,21 +91,21 @@ async function buildLegacyFamilyPosterImage(people, theme) {
         text(el.symbol, tx + 50, ty + 65, 'bold 42px Georgia', foreground);
         text(el.name, tx + 50, ty + 88, '12px Arial', foreground);
       });
-      if (!elements.length) text('No periodic elements found.', x + 237, tileY + 40, '20px Arial', ink);
+      if (!elements.length) text(i18n.t('poster.noElementsShort'), x + 237, tileY + 40, '20px Arial', ink);
     });
     y += row.height + 24;
   });
   y += 40;
-  text('Common elements & their meaning', 540, y, '34px Georgia'); y += 40;
+  text(i18n.t('poster.commonTitle'), 540, y, '34px Georgia'); y += 40;
   if (!shared.length) {
-    text(people.length < 2 ? 'Add another member to discover shared elements.' : 'No elements are shared between these names.', 540, y + 20, '23px Arial', ink);
+    text(people.length < 2 ? i18n.t('poster.addMemberShort') : i18n.t('poster.noShared'), 540, y + 20, '23px Arial', ink);
   } else shared.forEach(el => {
     text(`${el.symbol} / ${el.name}`, 70, y + 15, 'bold 27px Georgia', gold, 'left');
-    text(el.memberCount === people.length ? `Shared by all ${people.length} members` : `Shared by ${el.memberCount} of ${people.length} members`, 70, y + 48, '20px Arial', ink, 'left');
+    text(sharedLabel(el.memberCount, people.length), 70, y + 48, '20px Arial', ink, 'left');
     el.lines.forEach((line, i) => text(line, 70, y + 80 + i * 30, '23px Arial', ink, 'left'));
     y += 90 + el.lines.length * 30;
   });
-  text('Different elements. A stronger us.', 540, logicalHeight - 95, '30px Georgia');
+  text(i18n.t('poster.footerFamily'), 540, logicalHeight - 95, '30px Georgia');
   text(SITE_HOST, 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');
@@ -116,6 +121,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
+  await preparePosterFonts(ctx);
   const W = 1080;
   const gold = theme === 'gold' ? '#815817' : '#ebc979';
   const ink = theme === 'gold' ? '#362a17' : '#f5ead1';
@@ -179,7 +185,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
   const personsH = rows.reduce((sum, row) => sum + row.height, 0) + (rows.length - 1) * 24;
 
   // ---- harmony band ----
-  const shared = findSharedElements(people).map(el => ({ ...el, meaningLines: wrap(el.meaning, 300, '21px Arial') }));
+  const shared = findSharedElements(people).map(el => ({ ...el, meaningLines: wrap(elementMeaning(el), 300, '21px Arial') }));
   const bandW = 972;
   const entryColW = (bandW - 2 * 28 - 28) / 2;
   const bandRows = [];
@@ -188,8 +194,8 @@ async function buildCompactFamilyPosterImage(people, theme) {
     bandRows.push({ group, height: Math.max(...group.map(el => Math.max(112, 60 + el.meaningLines.length * 27))) });
   }
   const bandSubtitle = people.length < 2
-    ? 'Add another family member to discover shared elements.'
-    : shared.length ? 'Elements shared by two or more family members' : 'No elements are shared between these names. Each member brings a unique elemental combination.';
+    ? i18n.t('poster.addMember')
+    : shared.length ? i18n.t('poster.sharedSubtitle') : i18n.t('poster.noSharedLong');
   const bandSubtitleLines = wrap(bandSubtitle, bandW - 80, '22px Arial');
   const bandHead = 36 + 46 + bandSubtitleLines.length * 30 + 14;
   const bandH = bandHead + bandRows.reduce((sum, row) => sum + row.height + 22, 0) + 18;
@@ -211,8 +217,8 @@ async function buildCompactFamilyPosterImage(people, theme) {
     const width = height * logo.width / logo.height;
     ctx.drawImage(logo, (W - width) / 2, 50, width, height);
   } catch { text('NAMASUTRA', 540, 155, '44px Georgia'); }
-  text('EVERY NAME HAS A CHEMISTRY', 540, 237, '19px Arial');
-  text('Your Elemental Identity, in Harmony with Nature.', 540, 300, '32px Georgia');
+  text(i18n.t('poster.eyebrow').toUpperCase(), 540, 237, '19px Arial');
+  text(i18n.t('poster.heading'), 540, 300, '32px Georgia');
 
   function drawTile(el, x, y) {
     const color = posterColorFor(el);
@@ -232,11 +238,11 @@ async function buildCompactFamilyPosterImage(people, theme) {
       const x = x0 + k * (blockW + 24);
 
       const cx = x + blockW / 2;
-      text((block.person.relation || 'Family member').toUpperCase(), cx, y + pad + 20, '22px Arial');
+      text((block.relationLabel(person.relation)).toUpperCase(), cx, y + pad + 20, '22px Arial');
       block.names.forEach((nameLine, i) => text(nameLine, cx, y + pad + 30 + (i + 0.85) * Math.round(block.nameFont * 1.2), `${block.nameFont}px Georgia`));
       const tilesTop = y + block.headH + (row.height - block.headH - pad - block.tilesH) / 2;
       if (!block.elements.length) {
-        text('No periodic elements found.', cx, tilesTop + 36, '22px Arial', ink);
+        text(i18n.t('poster.noElementsShort'), cx, tilesTop + 36, '22px Arial', ink);
         return;
       }
       block.elements.forEach((el, index) => {
@@ -253,7 +259,7 @@ async function buildCompactFamilyPosterImage(people, theme) {
   const bandX = (W - bandW) / 2;
 
 
-  text('The Harmony', 540, y + 36 + 34, '42px Georgia');
+  text(i18n.t('poster.harmony'), 540, y + 36 + 34, '42px Georgia');
   bandSubtitleLines.forEach((subtitleLine, i) => text(subtitleLine, 540, y + 36 + 46 + 22 + i * 30, 'italic 22px Arial', ink));
   let by = y + bandHead;
   bandRows.forEach(row => {
@@ -270,13 +276,13 @@ async function buildCompactFamilyPosterImage(people, theme) {
       text(el.name, ex + chip / 2, by + chip - 10, fitFont(el.name, chip - 10, 14, 'Arial'), foreground);
       const tx = ex + chip + 22;
       text(`${el.name} (${el.symbol})`, tx, by + 26, fitFont(`${el.name} (${el.symbol})`, entryColW - chip - 22, 28, 'Georgia', 'bold'), gold, 'left');
-      text(el.memberCount === people.length ? `Shared by all ${people.length} members` : `Shared by ${el.memberCount} of ${people.length} members`, tx, by + 54, 'italic 20px Arial', ink, 'left');
+      text(sharedLabel(el.memberCount, people.length), tx, by + 54, 'italic 20px Arial', ink, 'left');
       el.meaningLines.forEach((meaningLine, i) => text(meaningLine, tx, by + 82 + i * 27, '21px Arial', ink, 'left'));
     });
     by += row.height + 22;
   });
 
-  text('Different elements. A stronger us.', 540, logicalHeight - 95, '30px Georgia');
+  text(i18n.t('poster.footerFamily'), 540, logicalHeight - 95, '30px Georgia');
   text(SITE_HOST, 540, logicalHeight - 57, '18px Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create family poster');

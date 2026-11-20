@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 // Official four-colour Google "G"
 function GoogleLogo() {
@@ -26,7 +27,8 @@ const base =
   'transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-600 ' +
   'disabled:opacity-60 disabled:cursor-not-allowed';
 
-export function GoogleButton({ onClick, disabled, children = 'Continue with Google' }) {
+export function GoogleButton({ onClick, disabled, children }) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -35,12 +37,13 @@ export function GoogleButton({ onClick, disabled, children = 'Continue with Goog
       className={`${base} bg-white text-[#1f1f1f] border border-[#747775] hover:bg-[#f8f9fa] hover:shadow-sm active:bg-[#f1f3f4]`}
     >
       <GoogleLogo />
-      <span>{children}</span>
+      <span>{children ?? t('auth.continueGoogle')}</span>
     </button>
   );
 }
 
-export function AppleButton({ onClick, disabled, children = 'Continue with Apple' }) {
+export function AppleButton({ onClick, disabled, children }) {
+  const { t } = useTranslation();
   return (
     <button
       type="button"
@@ -49,7 +52,7 @@ export function AppleButton({ onClick, disabled, children = 'Continue with Apple
       className={`${base} bg-black text-white border border-black hover:bg-[#1a1a1a] hover:shadow-sm active:bg-[#2b2b2b]`}
     >
       <AppleLogo />
-      <span>{children}</span>
+      <span>{children ?? t('auth.continueApple')}</span>
     </button>
   );
 }

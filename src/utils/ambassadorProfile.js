@@ -1,5 +1,7 @@
 import { Timestamp } from 'firebase/firestore';
+import i18n from 'i18next';
 import { COUNTRIES } from '../data/countries';
+import { countryLabel } from '../i18n/format.js';
 
 // Profile / payout details an ambassador fills in on the Register tab.
 // Each field: [name, label, type, required, extras]
@@ -46,6 +48,12 @@ export const VIEW_SECTIONS = [
 ];
 
 export const FIELD_LABELS = Object.fromEntries(FORM_SECTIONS.flatMap(([, fields]) => fields.map(f => [f[0], f[1]])));
+const slug = (v) => String(v).toLowerCase().replace(/[^a-z0-9]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''));
+// Labels live in the language files (ambassador.field.*, .section.*, .option.*); English is the fallback
+export const fieldLabel = (name) => i18n.t(`ambassador.field.${name}`, { defaultValue: FIELD_LABELS[name] || name });
+export const sectionLabel = (title) => i18n.t(`ambassador.section.${slug(title)}`, { defaultValue: title });
+export const optionLabel = (option) => i18n.t(`ambassador.option.${slug(option)}`, { defaultValue: option });
+export const hintLabel = (text) => (text ? i18n.t(`ambassador.hint.${slug(text)}`, { defaultValue: text }) : text);
 export const FIELD_NAMES = Object.keys(FIELD_LABELS).filter(n => n !== 'email');
 const EMPTY = Object.fromEntries(Object.keys(FIELD_LABELS).map(n => [n, '']));
 
@@ -63,12 +71,12 @@ export function maskValue(field, value) {
 
 // Human-readable (and masked where sensitive) value for a form field
 export function displayValue(field, value, data = {}) {
-  if (field === 'countryCode') return value ? (COUNTRIES[value]?.name || value) : '—';
+  if (field === 'countryCode') return value ? countryLabel(value, COUNTRIES[value]?.name || value) : '—';
   if (field === 'stateCode') {
     const state = COUNTRIES[data.countryCode]?.states?.find(s => s.code === value);
     return value ? (state?.name || value) : '—';
   }
-  if (field === 'accountType') return value === 'current' ? 'Current' : value === 'savings' ? 'Savings' : maskValue(field, value);
+  if (field === 'accountType') return value === 'current' ? optionLabel('Current') : value === 'savings' ? optionLabel('Savings') : maskValue(field, value);
   return maskValue(field, value);
 }
 

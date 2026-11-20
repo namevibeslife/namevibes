@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
+import { initI18n } from './i18n'
 
 // Only loaded in mock mode, so production bundles never include the mock layer
 const MockBadge = import.meta.env.MODE === 'mock'
@@ -15,7 +16,8 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   })
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+// Language file is loaded before first paint so nothing flashes in the wrong language
+initI18n().catch(error => console.error('i18n init failed:', error)).finally(() => ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
     {MockBadge && (
@@ -24,4 +26,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </React.Suspense>
     )}
   </React.StrictMode>,
-)
+))

@@ -1,3 +1,4 @@
+import i18n from 'i18next';
 // Simplified Nakshatra calculation based on birth date
 // Note: Full calculation requires exact birth time and location
 const NAKSHATRAS = [
@@ -66,7 +67,7 @@ export function getHinduAstrologyAnalysis(firstName, dob) {
     nameMatchesSyllable: syllableMatch.matches,
     matchingSyllable: syllableMatch.syllable,
     message: syllableMatch.matches 
-      ? `✅ "${firstName}" starts with "${syllableMatch.syllable}" - Perfect alignment with your Nakshatra!`
-      : `ℹ️ For your birth date, names starting with ${nakshatra.syllables.join(', ')} are considered auspicious.`
+      ? i18n.t('astrology.match', { name: firstName, syllable: syllableMatch.syllable })
+      : i18n.t('astrology.noMatch', { syllables: nakshatra.syllables.join(', ') })
   };
 }

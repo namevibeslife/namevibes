@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Check, Mail, Link as LinkIcon } from 'lucide-react';
 import { WhatsAppIcon, isMobileDevice, copyToClipboard } from './ReferralShareCard';
-import { INVITE_EMAIL_SUBJECT, AMBASSADOR_LOGIN_URL } from '../utils/ambassadorInvite';
+import { inviteEmailSubject, AMBASSADOR_LOGIN_URL } from '../utils/ambassadorInvite';
 
 // Shows the invite message for an ambassador with Copy / WhatsApp / Email / Copy-link buttons.
 export default function InviteMessageBox({ message, onClose }) {
@@ -12,7 +12,7 @@ export default function InviteMessageBox({ message, onClose }) {
   const copy = async (value, label) => { await copyToClipboard(value).catch(() => {}); flash(label); };
   const whatsapp = () => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
   const email = () => {
-    const subject = encodeURIComponent(INVITE_EMAIL_SUBJECT);
+    const subject = encodeURIComponent(inviteEmailSubject());
     const body = encodeURIComponent(text);
     copyToClipboard(text).catch(() => {});
     if (isMobileDevice()) window.location.href = `mailto:?subject=${subject}&body=${body}`;

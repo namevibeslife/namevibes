@@ -6,6 +6,9 @@ import { posterColorFor } from './posterPalette';
 import { findSharedElements } from './commonElements';
 import { FAMILY_MAX_NAMES } from './plan';
 import { SITE_HOST } from '../config/site.js';
+import i18n from 'i18next';
+import { elementMeaning } from '../i18n/elements.js';
+import { relationLabel, sharedLabel } from '../i18n/poster.js';
 
 // Loads the transparent logo as a data URL so it can be placed in the PDF
 export async function loadPosterLogo(theme) {
@@ -61,7 +64,7 @@ function fitSize(pdf, text, font, style, width, size, minSize) {
 
 // Biggest name size that keeps the name to two lines with no single word wider than the block
 function chooseNameFont(pdf, name, width) {
-  const label = name || 'Your name';
+  const label = name || i18n.t('poster.nameFallback');
   let chosen = null;
   for (const size of [20, 18, 16, 14, 12, 10]) {
     const lines = wrapText(pdf, label, 'times', 'bold', size, width);
@@ -85,7 +88,7 @@ function blockHeight(person, blockW, t, nameFont) {
 }
 
 function shareLabel(el, total) {
-  return el.memberCount === total ? `Shared by all ${total} members` : `Shared by ${el.memberCount} of ${total} members`;
+  return sharedLabel(el.memberCount, total);
 }
 
 // Positions everything in the harmony band relative to the band's top-left corner.
@@ -95,10 +98,10 @@ function layoutBand(pdf, people, shared, mode) {
   const innerW = CONTENT_W - 2 * PAD;
   const total = people.length;
   let subtitle;
-  if (total < 2) subtitle = 'Add another family member to discover shared elements.';
-  else if (!shared.length) subtitle = 'No elements are shared between these names. Each member brings a unique elemental combination.';
-  else if (mode === 'chips') subtitle = 'Elements shared by two or more family members. Their meanings follow on page 2.';
-  else subtitle = 'Elements shared by two or more family members';
+  if (total < 2) subtitle = i18n.t('poster.addMember');
+  else if (!shared.length) subtitle = i18n.t('poster.noSharedLong');
+  else if (mode === 'chips') subtitle = i18n.t('poster.sharedSubtitlePage2');
+  else subtitle = i18n.t('poster.sharedSubtitle');
   const subtitleLines = wrapText(pdf, subtitle, 'helvetica', 'italic', 8.5, innerW);
   const headH = PAD + 6.5 + subtitleLines.length * 3.8 + 2;
   const items = [];
@@ -108,7 +111,7 @@ function layoutBand(pdf, people, shared, mode) {
     const textW = colW - 14 - 3;
     for (let i = 0; i < shared.length; i += 2) {
       const row = shared.slice(i, i + 2).map((el, c) => {
-        const meaning = wrapText(pdf, el.meaning || '', 'helvetica', 'normal', 7.5, textW);
+        const meaning = wrapText(pdf, elementMeaning(el) || '', 'helvetica', 'normal', 7.5, textW);
         return { el, meaning, c, h: Math.max(14, 3.9 + 3.5 + meaning.length * 3.1 + 1.5) };
       });
       const rowH = Math.max(...row.map(item => item.h));
@@ -139,7 +142,7 @@ function planCompactFamily(pdf, people) {
   const nameSize = Math.min(...fitted.map(font => font.size));
   const nameFonts = people.map(person => ({
     size: nameSize,
-    lines: wrapText(pdf, person.fullName || 'Your name', 'times', 'bold', nameSize, blockW - 2 * PAD),
+    lines: wrapText(pdf, person.fullName || i18n.t('poster.nameFallback'), 'times', 'bold', nameSize, blockW - 2 * PAD),
     lineH: nameSize * PT * 1.18,
   }));
   const shared = findSharedElements(people);
@@ -202,7 +205,7 @@ function drawPersonBlock(pdf, person, x, y, w, h, t, nameFont, gold) {
   const cx = x + w / 2;
   pdf.setTextColor(gold);
   pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
-  pdf.text((person.relation || 'Family member').toUpperCase(), cx, y + PAD + 2.8, { align: 'center' });
+  pdf.text(relationLabel(person.relation).toUpperCase(), cx, y + PAD + 2.8, { align: 'center' });
   pdf.setFont('times', 'bold'); pdf.setFontSize(nameFont.size);
   nameFont.lines.forEach((line, i) => pdf.text(line, cx, y + PAD + REL_H + (i + 0.8) * nameFont.lineH, { align: 'center' }));
   const headerH = PAD + REL_H + nameFont.lines.length * nameFont.lineH + 3;
@@ -215,7 +218,7 @@ function drawPersonBlock(pdf, person, x, y, w, h, t, nameFont, gold) {
   const top = y + headerH + (h - headerH - PAD - tilesH) / 2; // centre the tiles in the space left
   if (!elements.length) {
     pdf.setTextColor(gold); pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9);
-    pdf.text('No periodic elements found in this name.', cx, top + 5, { align: 'center' });
+    pdf.text(i18n.t('poster.noElements'), cx, top + 5, { align: 'center' });
     return;
   }
   elements.forEach((el, index) => {
@@ -231,7 +234,7 @@ function drawBand(pdf, people, band, y0, { ink, gold }) {
 
 
   pdf.setTextColor(gold); pdf.setFont('times', 'bold'); pdf.setFontSize(15);
-  pdf.text('The Harmony', 105, y0 + PAD + 4.8, { align: 'center' });
+  pdf.text(i18n.t('poster.harmony'), 105, y0 + PAD + 4.8, { align: 'center' });
   pdf.setTextColor(ink); pdf.setFont('helvetica', 'italic'); pdf.setFontSize(8.5);
   band.subtitleLines.forEach((line, i) => pdf.text(line, 105, y0 + PAD + 9.4 + i * 3.8, { align: 'center' }));
   band.items.forEach(item => {
@@ -248,7 +251,7 @@ function drawBand(pdf, people, band, y0, { ink, gold }) {
       item.meaning.forEach((line, i) => pdf.text(line, tx, y + 3.9 + 3.5 + (i + 1) * 3.1));
     } else {
       drawTile(pdf, item.el, x, y, item.chipW, 16.5);
-      const caption = item.el.memberCount === people.length ? `All ${people.length}` : `${item.el.memberCount} of ${people.length}`;
+      const caption = item.el.memberCount === people.length ? i18n.t('poster.pdfAll', { count: people.length }) : i18n.t('poster.pdfNOf', { n: item.el.memberCount, count: people.length });
       pdf.setTextColor(ink); pdf.setFont('helvetica', 'normal'); pdf.setFontSize(6.5);
       pdf.text(caption, x + item.chipW / 2, y + 16.5 + 3.2, { align: 'center' });
     }
@@ -307,7 +310,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     }
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(8);
-    pdf.text('E V E R Y  N A M E  H A S  A  C H E M I S T R Y', 105, logo ? 44 : 47, { align: 'center' });
+    pdf.text(i18n.t('poster.eyebrow').toUpperCase().split('').join(' ').replace(/  /g, '  '), 105, logo ? 44 : 47, { align: 'center' });
     pdf.line(30, 53, 180, 53);
     pdf.setFont('times', 'normal');
     pdf.setFontSize(18);
@@ -315,7 +318,7 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     pdf.line(30, 271, 180, 271);
     pdf.setFont('times', 'italic');
     pdf.setFontSize(15);
-    pdf.text(family ? 'Different elements. A stronger us.' : 'More than a name. A higher you.', 105, 280, { align: 'center' });
+    pdf.text(family ? i18n.t('poster.footerFamily') : i18n.t('poster.footerSingle'), 105, 280, { align: 'center' });
     pdf.setFont('helvetica', 'normal');
     pdf.setFontSize(7);
     pdf.text('DISCOVER  /  EXPLORE  /  BE YOU', 18, 286);
@@ -329,32 +332,32 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     if (person.relation) { pdf.text(person.relation.toUpperCase(), 105, y, { align: 'center' }); y += 8; }
     pdf.setFont('times', 'bold');
     pdf.setFontSize(25);
-    const lines = pdf.splitTextToSize(person.fullName || 'Your name', 170);
+    const lines = pdf.splitTextToSize(person.fullName || i18n.t('poster.nameFallback'), 170);
     for (const line of lines) {
-      if (y > 245) frame('Your elemental profile / continued');
+      if (y > 245) frame(i18n.t('poster.frameProfileContinued'));
       pdf.setTextColor(gold); pdf.setFont('times', 'bold'); pdf.setFontSize(25);
       pdf.text(line, 105, y, { align: 'center' }); y += 10;
     }
     pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
-    pdf.text(continued ? 'YOUR ELEMENTS / CONTINUED' : 'YOUR ELEMENTAL PROFILE', 105, y, { align: 'center' });
+    pdf.text((continued ? i18n.t('poster.pdfContinued') : i18n.t('poster.pdfProfile')).toUpperCase(), 105, y, { align: 'center' });
     y += 10;
   }
   function sharedMeaningPages() {
-    frame('Common elements & their meaning');
+    frame(i18n.t('poster.commonTitle'));
     const shared = findSharedElements(people);
     if (!shared.length) {
       pdf.setTextColor(ink); pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11);
-      pdf.text('No elements are shared between these names.', 105, y + 12, { align: 'center' });
+      pdf.text(i18n.t('poster.noShared'), 105, y + 12, { align: 'center' });
     }
     shared.forEach(el => {
       pdf.setFont('helvetica', 'normal'); pdf.setFontSize(11);
-      const meaning = pdf.splitTextToSize(el.meaning || '', 160);
+      const meaning = pdf.splitTextToSize(elementMeaning(el) || '', 160);
       const height = 24 + meaning.length * 5;
-      if (y + height > 258) frame('Common elements / continued');
+      if (y + height > 258) frame(i18n.t('poster.frameCommonContinued'));
       pdf.setTextColor(gold); pdf.setFont('times', 'bold'); pdf.setFontSize(16);
       pdf.text(`${el.symbol} / ${el.name}`, 22, y + 8);
       pdf.setTextColor(ink); pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
-      pdf.text(`Shared by ${el.memberCount} of ${people.length} members`, 22, y + 16);
+      pdf.text(sharedLabel(el.memberCount, people.length), 22, y + 16);
       pdf.setFontSize(11); pdf.text(meaning, 22, y + 23);
       y += height + 8;
     });
@@ -365,10 +368,10 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
   if (family && people.length >= 1 && people.length <= FAMILY_MAX_NAMES) {
     const plan = planCompactFamily(pdf, people);
     if (plan) {
-      frame('Your Elemental Identity, in Harmony with Nature.');
+      frame(i18n.t('poster.heading'));
       drawCompactFamily(pdf, people, plan, { ink, gold });
       if (plan.harmonyPage) {
-        frame('Common elements & their meaning');
+        frame(i18n.t('poster.commonTitle'));
         drawBand(pdf, people, plan.harmonyPage, CONTENT_TOP, { ink, gold });
       }
       return pdf;
@@ -376,13 +379,13 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
   }
 
   for (const person of people) {
-    frame('Your Elemental Identity, in Harmony with Nature.');
+    frame(i18n.t('poster.heading'));
     y = 90;
     personHeading(person);
     y = Math.max(y + 15, 120);
     const elements = person.elements || [];
     for (let start = 0; start < elements.length; start += 5) {
-      if (y + 34 > 258) { frame('Your elemental profile / continued'); }
+      if (y + 34 > 258) { frame(i18n.t('poster.frameProfileContinued')); }
       const row = elements.slice(start, start + 5);
       const left = (210 - (row.length * 32 + (row.length - 1) * 3)) / 2;
       row.forEach((el, i) => {
@@ -404,10 +407,10 @@ export function buildPosterPDF(people, { theme = people.length > 1 ? 'gold' : 'd
     }
     if (!elements.length) {
       pdf.setTextColor(ink); pdf.setFontSize(11);
-      pdf.text('No periodic elements found in this name.', 105, y, { align: 'center' }); y += 12;
+      pdf.text(i18n.t('poster.noElements'), 105, y, { align: 'center' }); y += 12;
     }
   }
   if (family) sharedMeaningPages();
-  if (firstPage) frame('Your Name Chemistry');
+  if (firstPage) frame(i18n.t('poster.pdfTitle'));
   return pdf;
 }

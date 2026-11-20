@@ -1,8 +1,10 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './ElementInsightsPage.css';
+import { useTranslation } from 'react-i18next';
 
 export default function ElementInsightsPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const scrollToSection = (sectionId) => {
@@ -18,13 +20,13 @@ export default function ElementInsightsPage() {
       {/* Quick Navigation */}
       <nav className="insights-nav-menu">
         <div className="insights-nav-container">
-          <h2 className="insights-nav-title">Element & Nakshatra Insights</h2>
+          <h2 className="insights-nav-title">{t('insights.n001')}</h2>
           <ul className="insights-nav-links">
-            <li><button onClick={() => scrollToSection('periodic-table')}>Periodic Table</button></li>
-            <li><button onClick={() => scrollToSection('elements-guide')}>Elements Guide</button></li>
-            <li><button onClick={() => scrollToSection('nakshatras')}>Nakshatras</button></li>
-            <li><button onClick={() => scrollToSection('practical-guide')}>Practical Guide</button></li>
-            <li><button onClick={() => navigate('/dashboard')}>Back to Dashboard</button></li>
+            <li><button onClick={() => scrollToSection('periodic-table')}>{t('insights.n002')}</button></li>
+            <li><button onClick={() => scrollToSection('elements-guide')}>{t('insights.n003')}</button></li>
+            <li><button onClick={() => scrollToSection('nakshatras')}>{t('insights.n004')}</button></li>
+            <li><button onClick={() => scrollToSection('practical-guide')}>{t('insights.n005')}</button></li>
+            <li><button onClick={() => navigate('/dashboard')}>{t('insights.n006')}</button></li>
           </ul>
         </div>
       </nav>
@@ -32,290 +34,283 @@ export default function ElementInsightsPage() {
       <div className="insights-container">
         {/* Hero Section */}
         <section className="insights-hero">
-          <h1>🌟 Unlock the Cosmic Secrets of Your Name 🌟</h1>
-          <p className="hero-subtitle">
-            Discover how the periodic table elements and ancient Nakshatras shape your identity, personality, and destiny
-          </p>
+          <h1>{t('insights.n007')}</h1>
+          <p className="hero-subtitle">{t('insights.n008')}</p>
         </section>
 
         {/* Reading Guide */}
         <div className="reading-guide">
-          <h3>📖 How to Read Your Analysis</h3>
-          <p><strong>Element Percentage:</strong> Higher % = Stronger influence on your personality</p>
-          <p><strong>Nakshatra Ruling Planet:</strong> Each Nakshatra is governed by a planet that influences your cosmic energy</p>
-          <p><strong>Name Chemistry:</strong> The unique blend of elements in your name creates your personal "cosmic signature"</p>
+          <h3>{t('insights.n009')}</h3>
+          <p><strong>{t('insights.n010')}</strong>{" "}{t('insights.n011')}</p>
+          <p><strong>{t('insights.n012')}</strong>{" "}{t('insights.n013')}</p>
+          <p><strong>{t('insights.n014')}</strong>{" "}{t('insights.n015')}</p>
         </div>
 
         {/* Science Truth Box */}
         <div className="science-truth">
-          <h3>🔬 The Science Behind Name Analysis</h3>
+          <h3>{t('insights.n016')}</h3>
           <ul>
-            <li><strong>Periodic Table Elements:</strong> Every letter maps to specific elements (like Hydrogen, Carbon, Oxygen) based on vibrational patterns</li>
-            <li><strong>Element Properties:</strong> Each element carries unique traits (stability, reactivity, energy) that influence personality</li>
-            <li><strong>Nakshatras:</strong> Ancient Vedic star constellations linked to planetary energies</li>
-            <li><strong>Syllable Science:</strong> Sound vibrations of name syllables resonate with cosmic frequencies</li>
+            <li><strong>{t('insights.n017')}</strong>{" "}{t('insights.n018')}</li>
+            <li><strong>{t('insights.n019')}</strong>{" "}{t('insights.n020')}</li>
+            <li><strong>{t('insights.n021')}</strong>{" "}{t('insights.n022')}</li>
+            <li><strong>{t('insights.n023')}</strong>{" "}{t('insights.n024')}</li>
           </ul>
-          <p className="highlight">
-            ✨ Your name isn't just letters—it's a unique chemical and cosmic formula that shapes your energy field!
-          </p>
+          <p className="highlight">{t('insights.n025')}</p>
         </div>
 
         {/* Periodic Table Section */}
         <section id="periodic-table" className="content-section">
-          <h2>🧪 The Periodic Table of Elements</h2>
-          <p className="section-intro">
-            Understanding the building blocks of matter helps us decode the vibrational essence of your name. 
-            Each element carries specific energetic properties that influence personality traits.
-          </p>
+          <h2>{t('insights.n026')}</h2>
+          <p className="section-intro">{t('insights.n027')}</p>
 
           <div className="element-category">
-            <h3>⚛️ Noble Gases (Group 18) - The Independent Souls</h3>
+            <h3>{t('insights.n028')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Element</th>
-                  <th>Symbol</th>
-                  <th>Atomic Number</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n029')}</th>
+                  <th>{t('insights.n030')}</th>
+                  <th>{t('insights.n031')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Helium</td>
-                  <td>He</td>
+                  <td>{t('insights.n033')}</td>
+                  <td>{t('insights.n034')}</td>
                   <td>2</td>
-                  <td>Light, uplifting, carefree nature</td>
+                  <td>{t('insights.n035')}</td>
                 </tr>
                 <tr>
-                  <td>Neon</td>
-                  <td>Ne</td>
+                  <td>{t('insights.n036')}</td>
+                  <td>{t('insights.n037')}</td>
                   <td>10</td>
-                  <td>Bright, attention-grabbing, vibrant</td>
+                  <td>{t('insights.n038')}</td>
                 </tr>
                 <tr>
-                  <td>Argon</td>
-                  <td>Ar</td>
+                  <td>{t('insights.n039')}</td>
+                  <td>{t('insights.n040')}</td>
                   <td>18</td>
-                  <td>Calm, non-reactive, peaceful</td>
+                  <td>{t('insights.n041')}</td>
                 </tr>
                 <tr>
-                  <td>Krypton</td>
-                  <td>Kr</td>
+                  <td>{t('insights.n042')}</td>
+                  <td>{t('insights.n043')}</td>
                   <td>36</td>
-                  <td>Mysterious, hidden strength</td>
+                  <td>{t('insights.n044')}</td>
                 </tr>
                 <tr>
-                  <td>Xenon</td>
-                  <td>Xe</td>
+                  <td>{t('insights.n045')}</td>
+                  <td>{t('insights.n046')}</td>
                   <td>54</td>
-                  <td>Unique, exotic, rare qualities</td>
+                  <td>{t('insights.n047')}</td>
                 </tr>
                 <tr>
-                  <td>Radon</td>
-                  <td>Rn</td>
+                  <td>{t('insights.n048')}</td>
+                  <td>{t('insights.n049')}</td>
                   <td>86</td>
-                  <td>Powerful but invisible influence</td>
+                  <td>{t('insights.n050')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="element-category">
-            <h3>🔥 Alkali Metals (Group 1) - The Reactive Leaders</h3>
+            <h3>{t('insights.n051')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Element</th>
-                  <th>Symbol</th>
-                  <th>Atomic Number</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n029')}</th>
+                  <th>{t('insights.n030')}</th>
+                  <th>{t('insights.n031')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Lithium</td>
-                  <td>Li</td>
+                  <td>{t('insights.n052')}</td>
+                  <td>{t('insights.n053')}</td>
                   <td>3</td>
-                  <td>Energetic, mood-balancing, dynamic</td>
+                  <td>{t('insights.n054')}</td>
                 </tr>
                 <tr>
-                  <td>Sodium</td>
-                  <td>Na</td>
+                  <td>{t('insights.n055')}</td>
+                  <td>{t('insights.n056')}</td>
                   <td>11</td>
-                  <td>Essential, social, highly reactive</td>
+                  <td>{t('insights.n057')}</td>
                 </tr>
                 <tr>
-                  <td>Potassium</td>
+                  <td>{t('insights.n058')}</td>
                   <td>K</td>
                   <td>19</td>
-                  <td>Vital, nerve-conducting, quick</td>
+                  <td>{t('insights.n059')}</td>
                 </tr>
                 <tr>
-                  <td>Rubidium</td>
-                  <td>Rb</td>
+                  <td>{t('insights.n060')}</td>
+                  <td>{t('insights.n061')}</td>
                   <td>37</td>
-                  <td>Explosive potential, rare talent</td>
+                  <td>{t('insights.n062')}</td>
                 </tr>
                 <tr>
-                  <td>Cesium</td>
-                  <td>Cs</td>
+                  <td>{t('insights.n063')}</td>
+                  <td>{t('insights.n064')}</td>
                   <td>55</td>
-                  <td>Extremely reactive, time-precise</td>
+                  <td>{t('insights.n065')}</td>
                 </tr>
                 <tr>
-                  <td>Francium</td>
-                  <td>Fr</td>
+                  <td>{t('insights.n066')}</td>
+                  <td>{t('insights.n067')}</td>
                   <td>87</td>
-                  <td>Rarest, most reactive, unstable genius</td>
+                  <td>{t('insights.n068')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="element-category">
-            <h3>💪 Alkaline Earth Metals (Group 2) - The Stable Supporters</h3>
+            <h3>{t('insights.n069')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Element</th>
-                  <th>Symbol</th>
-                  <th>Atomic Number</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n029')}</th>
+                  <th>{t('insights.n030')}</th>
+                  <th>{t('insights.n031')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Beryllium</td>
-                  <td>Be</td>
+                  <td>{t('insights.n070')}</td>
+                  <td>{t('insights.n071')}</td>
                   <td>4</td>
-                  <td>Strong yet lightweight, resilient</td>
+                  <td>{t('insights.n072')}</td>
                 </tr>
                 <tr>
-                  <td>Magnesium</td>
-                  <td>Mg</td>
+                  <td>{t('insights.n073')}</td>
+                  <td>{t('insights.n074')}</td>
                   <td>12</td>
-                  <td>Vital for energy, bright burning</td>
+                  <td>{t('insights.n075')}</td>
                 </tr>
                 <tr>
-                  <td>Calcium</td>
-                  <td>Ca</td>
+                  <td>{t('insights.n076')}</td>
+                  <td>{t('insights.n077')}</td>
                   <td>20</td>
-                  <td>Structural support, bone of operations</td>
+                  <td>{t('insights.n078')}</td>
                 </tr>
                 <tr>
-                  <td>Strontium</td>
-                  <td>Sr</td>
+                  <td>{t('insights.n079')}</td>
+                  <td>{t('insights.n080')}</td>
                   <td>38</td>
-                  <td>Firework-like brilliance, flashy</td>
+                  <td>{t('insights.n081')}</td>
                 </tr>
                 <tr>
-                  <td>Barium</td>
-                  <td>Ba</td>
+                  <td>{t('insights.n082')}</td>
+                  <td>{t('insights.n083')}</td>
                   <td>56</td>
-                  <td>Heavy, grounding, medical healing</td>
+                  <td>{t('insights.n084')}</td>
                 </tr>
                 <tr>
-                  <td>Radium</td>
-                  <td>Ra</td>
+                  <td>{t('insights.n085')}</td>
+                  <td>{t('insights.n086')}</td>
                   <td>88</td>
-                  <td>Radioactive glow, dangerous beauty</td>
+                  <td>{t('insights.n087')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="element-category">
-            <h3>⚙️ Transition Metals (Groups 3-12) - The Versatile Achievers</h3>
-            <p><em>Key metals include: Iron (Fe), Copper (Cu), Silver (Ag), Gold (Au), Platinum (Pt)</em></p>
-            <p>Traits: Strength, conductivity, versatility, value, beauty, durability</p>
+            <h3>{t('insights.n088')}</h3>
+            <p><em>{t('insights.n089')}</em></p>
+            <p>{t('insights.n090')}</p>
           </div>
 
           <div className="element-category">
-            <h3>🌍 Lanthanides & Actinides - The Rare & Powerful</h3>
-            <p><em>Rare earth elements and radioactive elements</em></p>
-            <p>Traits: Magnetic properties, hidden power, transformative energy, technological advancement</p>
+            <h3>{t('insights.n091')}</h3>
+            <p><em>{t('insights.n092')}</em></p>
+            <p>{t('insights.n093')}</p>
           </div>
 
           <div className="element-category">
-            <h3>🧬 Non-metals - The Life Essentials</h3>
+            <h3>{t('insights.n094')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Element</th>
-                  <th>Symbol</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n029')}</th>
+                  <th>{t('insights.n030')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Hydrogen</td>
+                  <td>{t('insights.n095')}</td>
                   <td>H</td>
-                  <td>Most abundant, foundation of stars, light</td>
+                  <td>{t('insights.n096')}</td>
                 </tr>
                 <tr>
-                  <td>Carbon</td>
+                  <td>{t('insights.n097')}</td>
                   <td>C</td>
-                  <td>Basis of all life, versatile bonding</td>
+                  <td>{t('insights.n098')}</td>
                 </tr>
                 <tr>
-                  <td>Nitrogen</td>
+                  <td>{t('insights.n099')}</td>
                   <td>N</td>
-                  <td>Essential for growth, atmospheric calm</td>
+                  <td>{t('insights.n100')}</td>
                 </tr>
                 <tr>
-                  <td>Oxygen</td>
+                  <td>{t('insights.n101')}</td>
                   <td>O</td>
-                  <td>Life-giving breath, energy burning</td>
+                  <td>{t('insights.n102')}</td>
                 </tr>
                 <tr>
-                  <td>Phosphorus</td>
+                  <td>{t('insights.n103')}</td>
                   <td>P</td>
-                  <td>Energy transfer (ATP), glowing potential</td>
+                  <td>{t('insights.n104')}</td>
                 </tr>
                 <tr>
-                  <td>Sulfur</td>
+                  <td>{t('insights.n105')}</td>
                   <td>S</td>
-                  <td>Transformative, purifying, volcanic</td>
+                  <td>{t('insights.n106')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="element-category">
-            <h3>⚡ Halogens (Group 17) - The Intense Reactors</h3>
+            <h3>{t('insights.n107')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Element</th>
-                  <th>Symbol</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n029')}</th>
+                  <th>{t('insights.n030')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Fluorine</td>
+                  <td>{t('insights.n108')}</td>
                   <td>F</td>
-                  <td>Most reactive, protective, sharp</td>
+                  <td>{t('insights.n109')}</td>
                 </tr>
                 <tr>
-                  <td>Chlorine</td>
-                  <td>Cl</td>
-                  <td>Purifying, cleansing, essential</td>
+                  <td>{t('insights.n110')}</td>
+                  <td>{t('insights.n111')}</td>
+                  <td>{t('insights.n112')}</td>
                 </tr>
                 <tr>
-                  <td>Bromine</td>
-                  <td>Br</td>
-                  <td>Liquid intensity, sedative calm</td>
+                  <td>{t('insights.n113')}</td>
+                  <td>{t('insights.n114')}</td>
+                  <td>{t('insights.n115')}</td>
                 </tr>
                 <tr>
-                  <td>Iodine</td>
+                  <td>{t('insights.n116')}</td>
                   <td>I</td>
-                  <td>Thyroid regulator, purple mystery</td>
+                  <td>{t('insights.n117')}</td>
                 </tr>
                 <tr>
-                  <td>Astatine</td>
-                  <td>At</td>
-                  <td>Rarest natural, fleeting presence</td>
+                  <td>{t('insights.n118')}</td>
+                  <td>{t('insights.n119')}</td>
+                  <td>{t('insights.n120')}</td>
                 </tr>
               </tbody>
             </table></div>
@@ -324,293 +319,287 @@ export default function ElementInsightsPage() {
 
         {/* Elements Guide */}
         <section id="elements-guide" className="content-section">
-          <h2>🎯 What Each Element Means in Your Name</h2>
+          <h2>{t('insights.n121')}</h2>
           
           <div className="why-matters">
-            <h3>Why Element Percentages Matter</h3>
-            <p>The elements in your name create your unique "energetic signature"</p>
-            <p><strong>High % Element = Dominant Trait</strong></p>
-            <p><strong>Balanced Elements = Harmonious Personality</strong></p>
-            <p><strong>Rare Elements = Unique Gifts</strong></p>
+            <h3>{t('insights.n122')}</h3>
+            <p>{t('insights.n123')}</p>
+            <p><strong>{t('insights.n124')}</strong></p>
+            <p><strong>{t('insights.n125')}</strong></p>
+            <p><strong>{t('insights.n126')}</strong></p>
           </div>
         </section>
 
         {/* Nakshatras Section */}
         <section id="nakshatras" className="content-section">
-          <h2>⭐ The 27 Nakshatras - Cosmic Star Constellations</h2>
-          <p className="section-intro">
-            Nakshatras are the 27 lunar mansions used in Vedic astrology. Each syllable of your name 
-            resonates with specific Nakshatra energies, influencing your personality and destiny.
-          </p>
+          <h2>{t('insights.n127')}</h2>
+          <p className="section-intro">{t('insights.n128')}</p>
 
           <div className="nakshatra-group">
-            <h3>🔥 Fire Nakshatras (Ruled by Sun, Mars, Ketu)</h3>
+            <h3>{t('insights.n129')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Nakshatra</th>
-                  <th>Ruling Planet</th>
-                  <th>Pada Syllables</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n130')}</th>
+                  <th>{t('insights.n131')}</th>
+                  <th>{t('insights.n132')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Ashwini</td>
-                  <td>Ketu</td>
-                  <td>Chu, Che, Cho, La</td>
-                  <td>Swift action, healing, pioneering</td>
+                  <td>{t('insights.n133')}</td>
+                  <td>{t('insights.n134')}</td>
+                  <td>{t('insights.n135')}</td>
+                  <td>{t('insights.n136')}</td>
                 </tr>
                 <tr>
-                  <td>Bharani</td>
-                  <td>Venus</td>
-                  <td>Li, Lu, Le, Lo</td>
-                  <td>Nurturing, creative, transformative</td>
+                  <td>{t('insights.n137')}</td>
+                  <td>{t('insights.n138')}</td>
+                  <td>{t('insights.n139')}</td>
+                  <td>{t('insights.n140')}</td>
                 </tr>
                 <tr>
-                  <td>Krittika</td>
-                  <td>Sun</td>
-                  <td>A, I, U, E</td>
-                  <td>Sharp intellect, purifying, fiery</td>
+                  <td>{t('insights.n141')}</td>
+                  <td>{t('insights.n142')}</td>
+                  <td>{t('insights.n143')}</td>
+                  <td>{t('insights.n144')}</td>
                 </tr>
                 <tr>
-                  <td>Magha</td>
-                  <td>Ketu</td>
-                  <td>Ma, Mi, Mu, Me</td>
-                  <td>Royal authority, ancestral pride</td>
+                  <td>{t('insights.n145')}</td>
+                  <td>{t('insights.n134')}</td>
+                  <td>{t('insights.n146')}</td>
+                  <td>{t('insights.n147')}</td>
                 </tr>
                 <tr>
-                  <td>Purva Phalguni</td>
-                  <td>Venus</td>
-                  <td>Mo, Ta, Ti, Tu</td>
-                  <td>Artistic, pleasure-loving, generous</td>
+                  <td>{t('insights.n148')}</td>
+                  <td>{t('insights.n138')}</td>
+                  <td>{t('insights.n149')}</td>
+                  <td>{t('insights.n150')}</td>
                 </tr>
                 <tr>
-                  <td>Uttara Phalguni</td>
-                  <td>Sun</td>
-                  <td>Te, To, Pa, Pi</td>
-                  <td>Leadership, friendship, helpful</td>
+                  <td>{t('insights.n151')}</td>
+                  <td>{t('insights.n142')}</td>
+                  <td>{t('insights.n152')}</td>
+                  <td>{t('insights.n153')}</td>
                 </tr>
                 <tr>
-                  <td>Purva Ashadha</td>
-                  <td>Venus</td>
-                  <td>Bhu, Dha, Pha, Dha</td>
-                  <td>Invincible energy, optimistic</td>
+                  <td>{t('insights.n154')}</td>
+                  <td>{t('insights.n138')}</td>
+                  <td>{t('insights.n155')}</td>
+                  <td>{t('insights.n156')}</td>
                 </tr>
                 <tr>
-                  <td>Uttara Ashadha</td>
-                  <td>Sun</td>
-                  <td>Bhe, Bho, Ja, Ji</td>
-                  <td>Victory, lasting success</td>
+                  <td>{t('insights.n157')}</td>
+                  <td>{t('insights.n142')}</td>
+                  <td>{t('insights.n158')}</td>
+                  <td>{t('insights.n159')}</td>
                 </tr>
                 <tr>
-                  <td>Mula</td>
-                  <td>Ketu</td>
-                  <td>Ye, Yo, Bha, Bhi</td>
-                  <td>Root investigation, spiritual depth</td>
+                  <td>{t('insights.n160')}</td>
+                  <td>{t('insights.n134')}</td>
+                  <td>{t('insights.n161')}</td>
+                  <td>{t('insights.n162')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="nakshatra-group">
-            <h3>🌊 Water Nakshatras (Ruled by Moon, Mercury)</h3>
+            <h3>{t('insights.n163')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Nakshatra</th>
-                  <th>Ruling Planet</th>
-                  <th>Pada Syllables</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n130')}</th>
+                  <th>{t('insights.n131')}</th>
+                  <th>{t('insights.n132')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Rohini</td>
-                  <td>Moon</td>
-                  <td>O, Va, Vi, Vu</td>
-                  <td>Growth, beauty, materialistic</td>
+                  <td>{t('insights.n164')}</td>
+                  <td>{t('insights.n165')}</td>
+                  <td>{t('insights.n166')}</td>
+                  <td>{t('insights.n167')}</td>
                 </tr>
                 <tr>
-                  <td>Hasta</td>
-                  <td>Moon</td>
-                  <td>Pu, Sha, Na, Tha</td>
-                  <td>Skillful hands, clever, dexterous</td>
+                  <td>{t('insights.n168')}</td>
+                  <td>{t('insights.n165')}</td>
+                  <td>{t('insights.n169')}</td>
+                  <td>{t('insights.n170')}</td>
                 </tr>
                 <tr>
-                  <td>Shravana</td>
-                  <td>Moon</td>
-                  <td>Ju, Je, Jo, Kha</td>
-                  <td>Listening, learning, wisdom</td>
+                  <td>{t('insights.n171')}</td>
+                  <td>{t('insights.n165')}</td>
+                  <td>{t('insights.n172')}</td>
+                  <td>{t('insights.n173')}</td>
                 </tr>
                 <tr>
-                  <td>Ashlesha</td>
-                  <td>Mercury</td>
-                  <td>Di, Du, De, Do</td>
-                  <td>Mystical, serpent wisdom, cunning</td>
+                  <td>{t('insights.n174')}</td>
+                  <td>{t('insights.n175')}</td>
+                  <td>{t('insights.n176')}</td>
+                  <td>{t('insights.n177')}</td>
                 </tr>
                 <tr>
-                  <td>Jyeshtha</td>
-                  <td>Mercury</td>
-                  <td>No, Ya, Yi, Yu</td>
-                  <td>Elder authority, protective</td>
+                  <td>{t('insights.n178')}</td>
+                  <td>{t('insights.n175')}</td>
+                  <td>{t('insights.n179')}</td>
+                  <td>{t('insights.n180')}</td>
                 </tr>
                 <tr>
-                  <td>Revati</td>
-                  <td>Mercury</td>
-                  <td>De, Do, Cha, Chi</td>
-                  <td>Journey completion, nourishing</td>
+                  <td>{t('insights.n181')}</td>
+                  <td>{t('insights.n175')}</td>
+                  <td>{t('insights.n182')}</td>
+                  <td>{t('insights.n183')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="nakshatra-group">
-            <h3>🌍 Earth Nakshatras (Ruled by Mars, Rahu, Saturn)</h3>
+            <h3>{t('insights.n184')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Nakshatra</th>
-                  <th>Ruling Planet</th>
-                  <th>Pada Syllables</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n130')}</th>
+                  <th>{t('insights.n131')}</th>
+                  <th>{t('insights.n132')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Mrigashira</td>
-                  <td>Mars</td>
-                  <td>Ve, Vo, Ka, Ki</td>
-                  <td>Searching, gentle, curious</td>
+                  <td>{t('insights.n185')}</td>
+                  <td>{t('insights.n186')}</td>
+                  <td>{t('insights.n187')}</td>
+                  <td>{t('insights.n188')}</td>
                 </tr>
                 <tr>
-                  <td>Chitra</td>
-                  <td>Mars</td>
-                  <td>Pe, Po, Ra, Ri</td>
-                  <td>Artistic brilliance, craftsmanship</td>
+                  <td>{t('insights.n189')}</td>
+                  <td>{t('insights.n186')}</td>
+                  <td>{t('insights.n190')}</td>
+                  <td>{t('insights.n191')}</td>
                 </tr>
                 <tr>
-                  <td>Dhanishta</td>
-                  <td>Mars</td>
-                  <td>Ga, Gi, Gu, Ge</td>
-                  <td>Wealthy, musical, rhythmic</td>
+                  <td>{t('insights.n192')}</td>
+                  <td>{t('insights.n186')}</td>
+                  <td>{t('insights.n193')}</td>
+                  <td>{t('insights.n194')}</td>
                 </tr>
                 <tr>
-                  <td>Ardra</td>
-                  <td>Rahu</td>
-                  <td>Ku, Gha, Nga, Chha</td>
-                  <td>Storm energy, transformative tears</td>
+                  <td>{t('insights.n195')}</td>
+                  <td>{t('insights.n196')}</td>
+                  <td>{t('insights.n197')}</td>
+                  <td>{t('insights.n198')}</td>
                 </tr>
                 <tr>
-                  <td>Swati</td>
-                  <td>Rahu</td>
-                  <td>Ru, Re, Ro, Ta</td>
-                  <td>Independent wind, freedom-loving</td>
+                  <td>{t('insights.n199')}</td>
+                  <td>{t('insights.n196')}</td>
+                  <td>{t('insights.n200')}</td>
+                  <td>{t('insights.n201')}</td>
                 </tr>
                 <tr>
-                  <td>Shatabhisha</td>
-                  <td>Rahu</td>
-                  <td>Go, Sa, Si, Su</td>
-                  <td>Healing, mysterious, secretive</td>
+                  <td>{t('insights.n202')}</td>
+                  <td>{t('insights.n196')}</td>
+                  <td>{t('insights.n203')}</td>
+                  <td>{t('insights.n204')}</td>
                 </tr>
                 <tr>
-                  <td>Pushya</td>
-                  <td>Saturn</td>
-                  <td>Hu, He, Ho, Da</td>
-                  <td>Nourishing, spiritual, disciplined</td>
+                  <td>{t('insights.n205')}</td>
+                  <td>{t('insights.n206')}</td>
+                  <td>{t('insights.n207')}</td>
+                  <td>{t('insights.n208')}</td>
                 </tr>
                 <tr>
-                  <td>Anuradha</td>
-                  <td>Saturn</td>
-                  <td>Na, Ni, Nu, Ne</td>
-                  <td>Devotional, friendship, balance</td>
+                  <td>{t('insights.n209')}</td>
+                  <td>{t('insights.n206')}</td>
+                  <td>{t('insights.n210')}</td>
+                  <td>{t('insights.n211')}</td>
                 </tr>
                 <tr>
-                  <td>Uttara Bhadrapada</td>
-                  <td>Saturn</td>
-                  <td>Du, Tha, Jha, Tra</td>
-                  <td>Deep wisdom, serpent power</td>
+                  <td>{t('insights.n212')}</td>
+                  <td>{t('insights.n206')}</td>
+                  <td>{t('insights.n213')}</td>
+                  <td>{t('insights.n214')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="nakshatra-group">
-            <h3>💨 Air Nakshatras (Ruled by Jupiter)</h3>
+            <h3>{t('insights.n215')}</h3>
             <div className="overflow-x-auto"><table>
               <thead>
                 <tr>
-                  <th>Nakshatra</th>
-                  <th>Ruling Planet</th>
-                  <th>Pada Syllables</th>
-                  <th>Key Traits</th>
+                  <th>{t('insights.n130')}</th>
+                  <th>{t('insights.n131')}</th>
+                  <th>{t('insights.n132')}</th>
+                  <th>{t('insights.n032')}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
-                  <td>Punarvasu</td>
-                  <td>Jupiter</td>
-                  <td>Ke, Ko, Ha, Hi</td>
-                  <td>Renewal, return, optimistic</td>
+                  <td>{t('insights.n216')}</td>
+                  <td>{t('insights.n217')}</td>
+                  <td>{t('insights.n218')}</td>
+                  <td>{t('insights.n219')}</td>
                 </tr>
                 <tr>
-                  <td>Vishakha</td>
-                  <td>Jupiter</td>
-                  <td>Ti, Tu, Te, To</td>
-                  <td>Goal-oriented, determined, forked</td>
+                  <td>{t('insights.n220')}</td>
+                  <td>{t('insights.n217')}</td>
+                  <td>{t('insights.n221')}</td>
+                  <td>{t('insights.n222')}</td>
                 </tr>
                 <tr>
-                  <td>Purva Bhadrapada</td>
-                  <td>Jupiter</td>
-                  <td>Se, So, Da, Di</td>
-                  <td>Intense transformation, dual nature</td>
+                  <td>{t('insights.n223')}</td>
+                  <td>{t('insights.n217')}</td>
+                  <td>{t('insights.n224')}</td>
+                  <td>{t('insights.n225')}</td>
                 </tr>
               </tbody>
             </table></div>
           </div>
 
           <div className="correction">
-            <strong>⚠️ Important Correction:</strong> While traditional texts group Nakshatras by element, 
-            modern astrology recognizes that planetary rulers have more influence than elemental classification. 
-            Focus on the ruling planet's energy for accurate interpretation.
-          </div>
+            <strong>{t('insights.n226')}</strong>{" "}{t('insights.n227')}</div>
         </section>
 
         {/* Practical Guide */}
         <section id="practical-guide" className="content-section">
           <div className="practical-guide">
-            <h3>📋 How to Use Your Name Analysis</h3>
+            <h3>{t('insights.n228')}</h3>
             <ol>
               <li>
-                <strong>Identify Your Dominant Elements</strong>
+                <strong>{t('insights.n229')}</strong>
                 <ul>
-                  <li>Check which elements have the highest percentage in your name</li>
-                  <li>These represent your core personality traits</li>
-                  <li>Example: High Carbon (C) = Strong life force, adaptable</li>
+                  <li>{t('insights.n230')}</li>
+                  <li>{t('insights.n231')}</li>
+                  <li>{t('insights.n232')}</li>
                 </ul>
               </li>
               <li>
-                <strong>Find Your Nakshatra Connections</strong>
+                <strong>{t('insights.n233')}</strong>
                 <ul>
-                  <li>Look up each syllable of your name in the Nakshatra tables</li>
-                  <li>Note the ruling planets for those Nakshatras</li>
-                  <li>Planets appearing multiple times have stronger influence</li>
+                  <li>{t('insights.n234')}</li>
+                  <li>{t('insights.n235')}</li>
+                  <li>{t('insights.n236')}</li>
                 </ul>
               </li>
               <li>
-                <strong>Understand Element Interactions</strong>
+                <strong>{t('insights.n237')}</strong>
                 <ul>
-                  <li>Metals + Non-metals = Balance of strength and flexibility</li>
-                  <li>Noble gases = Independent, self-sufficient nature</li>
-                  <li>Multiple reactive elements = Dynamic, energetic personality</li>
+                  <li>{t('insights.n238')}</li>
+                  <li>{t('insights.n239')}</li>
+                  <li>{t('insights.n240')}</li>
                 </ul>
               </li>
               <li>
-                <strong>Apply to Life Decisions</strong>
+                <strong>{t('insights.n241')}</strong>
                 <ul>
-                  <li>Career: Match your dominant elements with suitable professions</li>
-                  <li>Relationships: Understand compatibility through elemental balance</li>
-                  <li>Personal Growth: Strengthen weak elements through conscious effort</li>
+                  <li>{t('insights.n242')}</li>
+                  <li>{t('insights.n243')}</li>
+                  <li>{t('insights.n244')}</li>
                 </ul>
               </li>
             </ol>
@@ -619,14 +608,12 @@ export default function ElementInsightsPage() {
 
         {/* Final CTA */}
         <div className="why-matters">
-          <h3>🚀 Ready to Discover Your Cosmic Blueprint?</h3>
-          <p>Analyze your name now and unlock the secrets written in the stars!</p>
+          <h3>{t('insights.n245')}</h3>
+          <p>{t('insights.n246')}</p>
           <button 
             onClick={() => navigate('/analyze')}
             className="cta-button"
-          >
-            Analyze Your Name Now
-          </button>
+          >{t('insights.n247')}</button>
         </div>
       </div>
     </div>

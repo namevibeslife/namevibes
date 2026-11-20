@@ -1,4 +1,5 @@
 // Chaldean Numerology System
+import i18n from 'i18next';
 const CHALDEAN_VALUES = {
   A: 1, B: 2, C: 3, D: 4, E: 5, F: 8, G: 3, H: 5, I: 1,
   J: 1, K: 2, L: 3, M: 4, N: 5, O: 7, P: 8, Q: 1, R: 2,
@@ -41,22 +42,7 @@ export function calculateDestinyNumber(lifePathNumber, nameNumber) {
 }
 
 export function getNumerologyInterpretation(number) {
-  const interpretations = {
-    1: "Leadership, independence, innovation. You are a natural pioneer.",
-    2: "Harmony, cooperation, balance. You excel in partnerships.",
-    3: "Creativity, expression, joy. You bring light and inspiration.",
-    4: "Stability, hard work, foundation. You build lasting structures.",
-    5: "Freedom, adventure, change. You thrive on variety and exploration.",
-    6: "Nurturing, responsibility, harmony. You care for others naturally.",
-    7: "Wisdom, introspection, spirituality. You seek deeper truths.",
-    8: "Power, abundance, achievement. You manifest material success.",
-    9: "Compassion, completion, humanitarianism. You serve the greater good.",
-    11: "Intuition, enlightenment, inspiration. Master number of spiritual insight.",
-    22: "Master builder, vision, manifestation. You turn dreams into reality.",
-    33: "Master teacher, compassion, blessing. You uplift and heal others."
-  };
-  
-  return interpretations[number] || "Unique energy pattern";
+  return i18n.t(`numerology.interpretation.${number}`, { defaultValue: i18n.t('numerology.interpretation.default') });
 }
 
 export function getFullNumerology(firstName, middleName, lastName, dob) {

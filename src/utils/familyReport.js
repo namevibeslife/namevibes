@@ -1,4 +1,6 @@
+import i18n from 'i18next';
 import { buildPosterPDF } from './posterReport';
+import { elementMeaning } from '../i18n/elements';
 
 // Shared by the Family Package page and saved family analyses.
 // `results` is a list of { relation, fullName, elements }.
@@ -7,34 +9,35 @@ import { buildPosterPDF } from './posterReport';
 export { findCommonElements } from './commonElements';
 import { findCommonElements } from './commonElements';
 import { SITE_HOST } from '../config/site.js';
+import { relationLabel } from '../i18n/poster.js';
 
 // The full report as plain text, ready to paste into an AI chat
 export function buildAIPrompt(results, contextLabels = []) {
   const commonElements = findCommonElements(results);
   const lines = [
-    `I used Namasutra (${SITE_HOST}), which maps the letters of a name to periodic table elements. Here is my family report:`,
+    i18n.t('ai.promptIntro', { host: SITE_HOST }),
     ''
   ];
 
   results.forEach(person => {
-    lines.push(`${person.relation}: ${person.fullName}`);
+    lines.push(`${relationLabel(person.relation)}: ${person.fullName}`);
     person.elements.forEach(el => {
-      lines.push(`  - ${el.name} (${el.symbol}, atomic number ${el.number}): ${el.meaning}`);
+      lines.push(i18n.t('ai.promptElement', { name: el.name, symbol: el.symbol, number: el.number, meaning: elementMeaning(el) }));
     });
     lines.push('');
   });
 
   if (commonElements.length > 0) {
-    lines.push(`Harmony elements shared by everyone: ${commonElements.map(e => `${e.name} (${e.symbol})`).join(', ')}`);
+    lines.push(i18n.t('ai.promptHarmony', { elements: commonElements.map(e => `${e.name} (${e.symbol})`).join(', ') }));
     lines.push('');
   }
 
   if (contextLabels.length > 0) {
-    lines.push(`Why I'm exploring this: ${contextLabels.join('; ')}`);
+    lines.push(i18n.t('ai.promptWhy', { reasons: contextLabels.join('; ') }));
     lines.push('');
   }
 
-  lines.push('Can you help me understand what these elements and the harmony between our names might signify, and how they connect us as a family?');
+  lines.push(i18n.t('ai.promptQuestion'));
   return lines.join('\n');
 }
 

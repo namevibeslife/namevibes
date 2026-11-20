@@ -1,6 +1,8 @@
 import PosterDownload from '../components/PosterDownload';
 import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import React, { useState } from 'react';
+import { Trans } from 'react-i18next';
+import { relationLabel } from '../i18n/poster';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
 import { signOut } from 'firebase/auth';
@@ -10,6 +12,7 @@ import { Plus, X } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import { findCommonElements } from '../utils/familyReport';
 import { FAMILY_MAX_NAMES } from '../utils/plan';
+import { useTranslation } from 'react-i18next';
 
 const RELATIONS = [
   'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister',
@@ -26,6 +29,7 @@ const contextOptions = [
 ];
 
 export default function FamilyPackage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [names, setNames] = useState([
     { id: 1, firstName: '', middleName: '', lastName: '', relation: 'Father' }
@@ -86,7 +90,7 @@ export default function FamilyPackage() {
     const validNames = names.filter(n => n.firstName.trim() && n.lastName.trim());
     
     if (validNames.length === 0) {
-      alert('Please enter at least one complete name (First and Last name required)');
+      alert(t('family.needName'));
       return;
     }
 
@@ -120,11 +124,11 @@ export default function FamilyPackage() {
           <div className="bg-transparent p-4 sm:p-8">
             <div className="mb-8">
               <h2 className="text-4xl font-bold text-center mb-4">
-                {results.length === 1 ? 'Name Chemistry' : 'Family Chemistry Analysis'}
+                {results.length === 1 ? t('family.resultTitleSingle') : t('family.resultTitleFamily')}
               </h2>
 
               <p className="text-center text-lg text-gray-600 italic font-medium">
-                "Elements of the Universe Found in Your Names"
+                {t('family.resultTagline')}
               </p>
             </div>
 
@@ -135,24 +139,24 @@ export default function FamilyPackage() {
               <FamilyHarmonyCard people={results}>
                 {commonElements.length > 0 && (<>
                 <p className="text-gray-600 mb-4 text-center text-lg italic">
-                  "Common Elements Across All Family Members"
+                  {t('family.commonAcross')}
                 </p>
                 {harmonyStep === 'results' && (
                   <button
                     onClick={() => setHarmonyStep('context')}
                     className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-xl font-bold text-lg hover:from-brand-700 hover:to-ocean-700 transition"
                   >
-                    Know Your Harmony - Press to Know More
+                    {t('family.knowHarmony')}
                   </button>
                 )}
 
                 {harmonyStep === 'context' && (
                   <div className="bg-ocean-50 rounded-xl p-6 border-2 border-ocean-200 mt-6">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                      Why are you exploring this? (Optional)
+                      {t('family.whyExploring')}
                     </h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      This helps us give you a more meaningful interpretation.
+                      {t('family.whyHelp')}
                     </p>
                     <div className="space-y-3 mb-6">
                       {contextOptions.map(option => (
@@ -163,7 +167,7 @@ export default function FamilyPackage() {
                             onChange={() => toggleContext(option.id)}
                             className="w-5 h-5 text-brand-600 rounded focus:ring-2 focus:ring-brand-500"
                           />
-                          <span className="text-gray-700">{option.label}</span>
+                          <span className="text-gray-700">{t(`family.context.${option.id}`)}</span>
                         </label>
                       ))}
                     </div>
@@ -171,7 +175,7 @@ export default function FamilyPackage() {
                       onClick={() => setHarmonyStep('interpretation')}
                       className="w-full bg-gradient-to-r from-ocean-600 to-brand-600 text-white py-3 rounded-lg font-semibold hover:from-ocean-700 hover:to-brand-700 transition"
                     >
-                      Get Interpretation
+                      {t('family.getInterpretation')}
                     </button>
                   </div>
                 )}
@@ -179,11 +183,11 @@ export default function FamilyPackage() {
                 {harmonyStep === 'interpretation' && (
                  <div className="mt-6 bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-8 border-2 border-brand-300">
                   <p className="text-xl text-brand-900 text-center font-semibold mb-4">
-                    Your harmony elements <span className="font-bold">{commonElements.map(e => e.name).join(', ')}</span> represent shared connection and energy across all names.
+                    <Trans i18nKey="family.harmonyIntro" values={{ elements: commonElements.map(e => e.name).join(', ') }} components={{ b: <span className="font-bold" /> }} />
                   </p>
                     <AskAIPanel
                       results={results}
-                      contextLabels={contextOptions.filter(o => selectedContext.includes(o.id)).map(o => o.label)}
+                      contextLabels={contextOptions.filter(o => selectedContext.includes(o.id)).map(o => t(`family.context.${o.id}`))}
                     />
                   </div>
                 )}
@@ -201,9 +205,9 @@ export default function FamilyPackage() {
   
         <div className="container mx-auto max-w-4xl py-8 px-4">
           <div className="bg-transparent p-4 sm:p-8">
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Family Package</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-2">{t('family.title')}</h1>
             <p className="text-gray-600 mb-8">
-              Analyze up to {FAMILY_MAX_NAMES} names together
+              {t('family.subtitle', { max: FAMILY_MAX_NAMES })}
             </p>
 
             <div className="space-y-6">
@@ -223,7 +227,7 @@ export default function FamilyPackage() {
                   <div className="grid md:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        First Name *
+                        {t('family.firstName')}
                       </label>
                       <input
                         type="text"
@@ -234,7 +238,7 @@ export default function FamilyPackage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Middle Name
+                        {t('family.middleName')}
                       </label>
                       <input
                         type="text"
@@ -245,7 +249,7 @@ export default function FamilyPackage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Last Name *
+                        {t('family.lastName')}
                       </label>
                       <input
                         type="text"
@@ -256,7 +260,7 @@ export default function FamilyPackage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Relation
+                        {t('family.relation')}
                       </label>
                       <select
                         value={nameData.relation}
@@ -264,7 +268,7 @@ export default function FamilyPackage() {
                         className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
                       >
                         {RELATIONS.map(rel => (
-                          <option key={rel} value={rel}>{rel}</option>
+                          <option key={rel} value={rel}>{relationLabel(rel, t)}</option>
                         ))}
                       </select>
                     </div>
@@ -278,11 +282,11 @@ export default function FamilyPackage() {
                 className="w-full flex items-center justify-center gap-2 py-3 bg-brand-100 text-brand-700 rounded-lg hover:bg-brand-200 transition disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
               >
                 <Plus size={20} />
-                Add Another Name ({names.length}/{FAMILY_MAX_NAMES})
+                {t('family.addName', { n: names.length, max: FAMILY_MAX_NAMES })}
               </button>
               {names.length >= FAMILY_MAX_NAMES && (
                 <p role="note" className="text-center text-sm text-gray-600">
-                  You can compare up to {FAMILY_MAX_NAMES} names at a time. Run another analysis for more family members.
+                  {t('family.limitNote', { max: FAMILY_MAX_NAMES })}
                 </p>
               )}
             </div>
@@ -292,7 +296,7 @@ export default function FamilyPackage() {
                 onClick={handleAnalyzeAll}
                 className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-xl font-semibold hover:from-brand-700 hover:to-ocean-700 transition"
               >
-                Analyze All Names
+                {t('family.analyzeAll')}
               </button>
           </div>
         </div>

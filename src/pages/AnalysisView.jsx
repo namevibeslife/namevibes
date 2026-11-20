@@ -1,12 +1,15 @@
 import PosterDownload from '../components/PosterDownload';
 import ElementMeanings from '../components/ElementMeanings';
+import { formatDate } from '../i18n/format';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { parseNameToElements } from '../utils/elements';
+import { useTranslation } from 'react-i18next';
 
 export default function AnalysisView() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { analysisId } = useParams();
   const [analysis, setAnalysis] = useState(null);
@@ -29,12 +32,12 @@ export default function AnalysisView() {
       if (analysisDoc.exists()) {
         setAnalysis({ id: analysisDoc.id, ...analysisDoc.data() });
       } else {
-        alert('Analysis not found');
+        alert(t('errors.analysisNotFound'));
         navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error loading analysis:', error);
-      alert('Error loading analysis');
+      alert(t('errors.analysisLoad'));
       navigate('/dashboard');
     } finally {
       setLoading(false);
@@ -46,7 +49,7 @@ export default function AnalysisView() {
       <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading analysis...</p>
+          <p className="text-gray-600">{t('results.loadingAnalysis')}</p>
         </div>
       </div>
     );
@@ -64,10 +67,10 @@ export default function AnalysisView() {
           {/* Name Title */}
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-gray-800 mb-2 text-center">
-              Chemistry of "{analysis.fullName?.toUpperCase()}"
+              {t('analyze.chemistryOf', { name: analysis.fullName?.toUpperCase() })}
             </h1>
             <p className="text-center text-gray-600">
-              Analyzed on {analysis.timestamp?.toDate().toLocaleDateString()}
+              {t('results.analyzedOn', { date: formatDate(analysis.timestamp) })}
             </p>
           </div>
 
@@ -79,7 +82,7 @@ export default function AnalysisView() {
               onClick={() => navigate('/analyze')}
               className="px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition font-semibold"
             >
-              Analyze Another Name
+              {t('results.analyzeAnother')}
             </button>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import i18n from 'i18next';
 import { SITE_URL } from '../config/site.js';
 // Ambassador referral codes: generation, formatting and link/message building.
 // Pure - no Firebase imports here, so this is safe to unit-test directly in Node.
@@ -50,11 +51,11 @@ function shareMessageLines(code) {
   const c = normalizeReferralCode(code);
   const link = buildShareLink(code);
   return [
-    'Your name is more than just an identity. What if it has a connection to the very elements of our universe? 🌌',
-    "I discovered something fascinating on Namasutra — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights.",
-    'Every name has a story. Discover what yours reveals! ✨',
-    `🔗 Explore your Namasutra: ${link}`,
-    `🎁 Try it with my referral code: ${c} this can give you a DISCOUNT`
+    i18n.t('share.line1'),
+    i18n.t('share.line2'),
+    i18n.t('share.line3'),
+    i18n.t('share.line4', { link }),
+    i18n.t('share.line5', { code: c })
   ];
 }
 

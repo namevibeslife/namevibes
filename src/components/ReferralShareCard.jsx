@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Copy, Check, Share2, Mail } from 'lucide-react';
 import { buildShareLink, buildShareMessage, buildTelegramMessage } from '../utils/referralCode';
 
@@ -43,7 +44,6 @@ const MessengerIcon = (props) => (
 
 const TAP = 'min-w-[44px] min-h-[44px] w-full flex flex-col items-center justify-center gap-1.5 rounded-xl border border-brand-200/70 bg-paper hover:bg-brand-50 transition px-2 py-3 text-center leading-tight';
 
-const EMAIL_SUBJECT = 'Discover the hidden elements in your name';
 
 // Native share sheets only list a useful set of apps on phones and tablets; on desktop the OS
 // list is tiny (Windows especially), so desktop relies on the explicit buttons instead. Mobile =
@@ -70,6 +70,7 @@ export function copyToClipboard(text) {
 }
 
 export default function ReferralShareCard({ code }) {
+  const { t } = useTranslation();
   const [toast, setToast] = useState('');
   const [copied, setCopied] = useState(false);
   const [messageCopied, setMessageCopied] = useState(false);
@@ -91,14 +92,14 @@ export default function ReferralShareCard({ code }) {
   const handleCopyCode = async () => {
     await copyToClipboard(code).catch(() => {});
     setCopied(true);
-    showToast('Copied!');
+    showToast(t('share.copiedBang'));
     window.setTimeout(() => setCopied(false), 1800);
   };
 
   const handleCopyMessage = async () => {
     await copyToClipboard(message).catch(() => {});
     setMessageCopied(true);
-    showToast('Message copied!');
+    showToast(t('share.messageCopiedBang'));
     window.setTimeout(() => setMessageCopied(false), 1800);
   };
 
@@ -121,7 +122,7 @@ export default function ReferralShareCard({ code }) {
       // field would show it twice in the share sheet.
       await navigator.share({ title: 'Namasutra', text: message });
     } catch (error) {
-      if (error?.name !== 'AbortError') showToast('Sharing was cancelled.');
+      if (error?.name !== 'AbortError') showToast(t('share.cancelled'));
     }
   };
 
@@ -133,44 +134,44 @@ export default function ReferralShareCard({ code }) {
   // web compose in a new tab by default; phones keep mailto: (opens the phone's mail app).
   // Outlook and the default mail app are offered as alternatives under the buttons.
   const openEmail = (provider = isMobile ? 'mailto' : 'gmail') => {
-    const subject = encodeURIComponent(EMAIL_SUBJECT);
+    const subject = encodeURIComponent(t('share.emailSubject'));
     const body = encodeURIComponent(message);
     if (provider === 'mailto') {
       const copying = copyToClipboard(message).catch(() => {});
       window.location.href = `mailto:?subject=${subject}&body=${body}`;
-      copying.then(() => showToast('Message copied'));
+      copying.then(() => showToast(t('share.messageCopied')));
       return;
     }
     const url = provider === 'outlook'
       ? `https://outlook.live.com/mail/0/deeplink/compose?subject=${subject}&body=${body}`
       : `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`;
-    copyAndOpen(url, 'Message copied');
+    copyAndOpen(url, t('share.messageCopied'));
   };
 
   const openMessenger = () => {
     // No reliable Messenger share URL - copy the message and open Messenger to paste it.
-    copyAndOpen('https://www.messenger.com/', 'Message copied. Paste it in Messenger.');
+    copyAndOpen('https://www.messenger.com/', t('share.pasteMessenger'));
   };
 
   const openLinkedIn = () => {
     // LinkedIn's share dialog only takes the link, so the message is copied to paste into the post.
     copyAndOpen(
       `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(link)}`,
-      'Message copied. Paste it into your LinkedIn post.'
+      t('share.pasteLinkedIn')
     );
   };
 
   const openFacebook = async () => {
     // Facebook's share dialog ignores pre-filled text, so copy the message first.
     await copyToClipboard(message).catch(() => {});
-    showToast('Message copied. Paste it after sharing on Facebook.');
+    showToast(t('share.pasteFacebook'));
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`, '_blank', 'noopener,noreferrer');
   };
 
   const openInstagram = async () => {
     // No Instagram web share intent - copy the message and send them to paste it themselves.
     await copyToClipboard(message).catch(() => {});
-    showToast('Message copied. Paste it in Instagram.');
+    showToast(t('share.pasteInstagram'));
     window.open('https://instagram.com', '_blank', 'noopener,noreferrer');
   };
 
@@ -188,7 +189,7 @@ export default function ReferralShareCard({ code }) {
   return (
     <div className="relative">
       <div className="bg-gradient-to-r from-brand-600 to-ocean-600 rounded-2xl shadow-lg p-6 sm:p-8 text-white">
-        <h2 className="text-2xl font-bold mb-2">Your Referral Code</h2>
+        <h2 className="text-2xl font-bold mb-2">{t('share.title')}</h2>
 
         <div className="flex flex-wrap items-center gap-3 mb-2">
           <div className="text-4xl sm:text-5xl font-bold tracking-wider font-mono">{code}</div>
@@ -196,61 +197,61 @@ export default function ReferralShareCard({ code }) {
             type="button"
             onClick={handleCopyCode}
             className="min-w-[44px] min-h-[44px] flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 transition font-semibold"
-            aria-label="Copy referral code"
+            aria-label={t('share.copyCodeAria')}
           >
             {copied ? <Check size={18} /> : <Copy size={18} />}
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? t('share.copied') : t('share.copy')}
           </button>
         </div>
-        <p className="text-brand-100 text-sm mb-6">Share this code with your network to earn commissions!</p>
+        <p className="text-brand-100 text-sm mb-6">{t('share.subtitle')}</p>
 
         <div className="grid grid-cols-3 gap-3 max-w-xl">
           {canNativeShare && (
-            <button type="button" onClick={handleNativeShare} className={`${TAP} bg-white text-brand-700 border-transparent hover:bg-brand-50 col-span-3`} aria-label="Share">
+            <button type="button" onClick={handleNativeShare} className={`${TAP} bg-white text-brand-700 border-transparent hover:bg-brand-50 col-span-3`} aria-label={t('share.share')}>
               <Share2 size={20} />
-              <span className="text-xs font-semibold">Share</span>
+              <span className="text-xs font-semibold">{t('share.share')}</span>
             </button>
           )}
-          <button type="button" onClick={openWhatsApp} className={`${TAP} bg-white/95 text-[#25D366]`} aria-label="Share on WhatsApp">
+          <button type="button" onClick={openWhatsApp} className={`${TAP} bg-white/95 text-[#25D366]`} aria-label={t('share.onApp', { app: 'WhatsApp' })}>
             <WhatsAppIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">WhatsApp</span>
           </button>
-          <button type="button" onClick={() => openEmail()} className={`${TAP} bg-white/95 text-brand-600`} aria-label="Share by email">
+          <button type="button" onClick={() => openEmail()} className={`${TAP} bg-white/95 text-brand-600`} aria-label={t('share.byEmail')}>
             <Mail size={22} />
-            <span className="text-xs font-semibold text-gray-700">Email</span>
+            <span className="text-xs font-semibold text-gray-700">{t('share.email')}</span>
           </button>
-          <button type="button" onClick={openFacebook} className={`${TAP} bg-white/95 text-[#1877F2]`} aria-label="Share on Facebook">
+          <button type="button" onClick={openFacebook} className={`${TAP} bg-white/95 text-[#1877F2]`} aria-label={t('share.onApp', { app: 'Facebook' })}>
             <FacebookIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">Facebook</span>
           </button>
-          <button type="button" onClick={openInstagram} className={`${TAP} bg-white/95 text-[#C13584]`} aria-label="Share on Instagram">
+          <button type="button" onClick={openInstagram} className={`${TAP} bg-white/95 text-[#C13584]`} aria-label={t('share.onApp', { app: 'Instagram' })}>
             <InstagramIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">Instagram</span>
           </button>
-          <button type="button" onClick={openTelegram} className={`${TAP} bg-white/95 text-[#26A5E4]`} aria-label="Share on Telegram">
+          <button type="button" onClick={openTelegram} className={`${TAP} bg-white/95 text-[#26A5E4]`} aria-label={t('share.onApp', { app: 'Telegram' })}>
             <TelegramIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">Telegram</span>
           </button>
-          <button type="button" onClick={openX} className={`${TAP} bg-white/95 text-gray-900`} aria-label="Share on X">
+          <button type="button" onClick={openX} className={`${TAP} bg-white/95 text-gray-900`} aria-label={t('share.onApp', { app: 'X' })}>
             <XIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">X</span>
           </button>
-          <button type="button" onClick={openLinkedIn} className={`${TAP} bg-white/95 text-[#0A66C2]`} aria-label="Share on LinkedIn">
+          <button type="button" onClick={openLinkedIn} className={`${TAP} bg-white/95 text-[#0A66C2]`} aria-label={t('share.onApp', { app: 'LinkedIn' })}>
             <LinkedInIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">LinkedIn</span>
           </button>
-          <button type="button" onClick={openMessenger} className={`${TAP} bg-white/95 text-[#0084FF]`} aria-label="Share on Messenger">
+          <button type="button" onClick={openMessenger} className={`${TAP} bg-white/95 text-[#0084FF]`} aria-label={t('share.onApp', { app: 'Messenger' })}>
             <MessengerIcon className="w-6 h-6" />
             <span className="text-xs font-semibold text-gray-700">Messenger</span>
           </button>
-          <button type="button" onClick={handleCopyMessage} className={`${TAP} bg-white/95 text-brand-600`} aria-label="Copy message to clipboard">
+          <button type="button" onClick={handleCopyMessage} className={`${TAP} bg-white/95 text-brand-600`} aria-label={t('share.copyMessageAria')}>
             {messageCopied ? <Check size={22} /> : <Copy size={22} />}
-            <span className="text-xs font-semibold text-gray-700">{messageCopied ? 'Copied' : 'Copy message'}</span>
+            <span className="text-xs font-semibold text-gray-700">{messageCopied ? t('share.copied') : t('share.copyMessage')}</span>
           </button>
         </div>
 
         <div className="mt-2 flex flex-wrap items-center text-xs text-brand-100">
-          <span>Email with:</span>
+          <span>{t('share.emailWith')}</span>
           <button
             type="button"
             onClick={() => openEmail('outlook')}
@@ -264,21 +265,21 @@ export default function ReferralShareCard({ code }) {
             onClick={() => openEmail('mailto')}
             className="min-h-[44px] px-2 underline underline-offset-2 hover:text-white"
           >
-            Default mail app
+            {t('share.defaultMail')}
           </button>
         </div>
 
         <div className="mt-6 max-w-xl">
           <div className="flex items-center justify-between gap-3 mb-2">
-            <span className="text-sm font-semibold text-brand-100">Message that will be sent</span>
+            <span className="text-sm font-semibold text-brand-100">{t('share.messagePreview')}</span>
             <button
               type="button"
               onClick={handleCopyMessage}
               className="min-w-[44px] min-h-[44px] flex items-center gap-2 px-4 py-2 rounded-lg bg-white/15 hover:bg-white/25 transition font-semibold text-sm"
-              aria-label="Copy message"
+              aria-label={t('share.copyMessage')}
             >
               {messageCopied ? <Check size={16} /> : <Copy size={16} />}
-              {messageCopied ? 'Copied' : 'Copy message'}
+              {messageCopied ? t('share.copied') : t('share.copyMessage')}
             </button>
           </div>
           <div

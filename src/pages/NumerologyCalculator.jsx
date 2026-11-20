@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calculator } from 'lucide-react';
+import i18n from 'i18next';
+import { relationLabel } from '../i18n/poster';
+import { useTranslation } from 'react-i18next';
 
 const RELATIONS = [
   'Self', 'Father', 'Mother', 'Son', 'Daughter', 'Brother', 'Sister',
@@ -36,6 +39,7 @@ const pythagoreanValues = {
 const vowels = ['A', 'E', 'I', 'O', 'U'];
 
 export default function NumerologyCalculator() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
@@ -114,100 +118,11 @@ export default function NumerologyCalculator() {
     return reduceToSingle(sum);
   };
 
-  const getNumberMeaning = (number, type) => {
-    const meanings = {
-      1: {
-        destiny: 'Natural leader, independent, ambitious. You\'re meant to pioneer new paths.',
-        soulUrge: 'Deep desire for independence and leadership. You crave recognition.',
-        personality: 'Others see you as confident, assertive, and self-reliant.',
-        lifePath: 'Your journey is about developing leadership and independence.',
-        expression: 'You express yourself through innovation and individuality.'
-      },
-      2: {
-        destiny: 'Peacemaker, diplomat, cooperative. You bring harmony to situations.',
-        soulUrge: 'You desire peace, partnership, and emotional connections.',
-        personality: 'Others perceive you as gentle, diplomatic, and supportive.',
-        lifePath: 'Your path involves cooperation, relationships, and balance.',
-        expression: 'You express through empathy, mediation, and partnerships.'
-      },
-      3: {
-        destiny: 'Creative communicator, artist, entertainer. You inspire through expression.',
-        soulUrge: 'You crave creative expression and joyful connections.',
-        personality: 'Others see you as charming, creative, and expressive.',
-        lifePath: 'Your journey centers on creativity and self-expression.',
-        expression: 'You express through art, words, and creative pursuits.'
-      },
-      4: {
-        destiny: 'Builder, organizer, practical. You create stable foundations.',
-        soulUrge: 'You desire security, order, and tangible achievements.',
-        personality: 'Others view you as reliable, hardworking, and grounded.',
-        lifePath: 'Your path involves building lasting structures and systems.',
-        expression: 'You express through practical work and organization.'
-      },
-      5: {
-        destiny: 'Freedom seeker, adventurer, change agent. You thrive on variety.',
-        soulUrge: 'You crave freedom, adventure, and new experiences.',
-        personality: 'Others see you as dynamic, adventurous, and unpredictable.',
-        lifePath: 'Your journey is about embracing change and freedom.',
-        expression: 'You express through exploration and adaptability.'
-      },
-      6: {
-        destiny: 'Nurturer, caregiver, teacher. You create harmony and beauty.',
-        soulUrge: 'You desire to nurture, love, and create beautiful environments.',
-        personality: 'Others perceive you as caring, responsible, and supportive.',
-        lifePath: 'Your path involves service, family, and community.',
-        expression: 'You express through caring, teaching, and healing.'
-      },
-      7: {
-        destiny: 'Seeker, analyst, mystic. You search for deeper truths.',
-        soulUrge: 'You crave knowledge, solitude, and spiritual understanding.',
-        personality: 'Others see you as mysterious, intellectual, and reserved.',
-        lifePath: 'Your journey involves spiritual growth and inner wisdom.',
-        expression: 'You express through analysis, research, and spirituality.'
-      },
-      8: {
-        destiny: 'Powerhouse, executive, manifester. You achieve material success.',
-        soulUrge: 'You desire power, success, and material accomplishment.',
-        personality: 'Others view you as powerful, ambitious, and authoritative.',
-        lifePath: 'Your path involves mastering material world and leadership.',
-        expression: 'You express through business, management, and achievement.'
-      },
-      9: {
-        destiny: 'Humanitarian, teacher, healer. You serve humanity.',
-        soulUrge: 'You desire to help humanity and create positive change.',
-        personality: 'Others see you as compassionate, wise, and selfless.',
-        lifePath: 'Your journey is about service, compassion, and completion.',
-        expression: 'You express through humanitarian work and universal love.'
-      },
-      11: {
-        destiny: 'Master teacher, spiritual messenger. You inspire and enlighten.',
-        soulUrge: 'You desire spiritual illumination and to inspire others.',
-        personality: 'Others see you as inspirational and spiritually gifted.',
-        lifePath: 'Your path is spiritual leadership and enlightenment.',
-        expression: 'You express through intuition and spiritual teaching.'
-      },
-      22: {
-        destiny: 'Master builder. You manifest dreams into reality on large scale.',
-        soulUrge: 'You desire to build something lasting and significant.',
-        personality: 'Others view you as capable of achieving the impossible.',
-        lifePath: 'Your path involves manifesting grand visions into reality.',
-        expression: 'You express through building systems that serve many.'
-      },
-      33: {
-        destiny: 'Master teacher, healer of healers. You uplift humanity.',
-        soulUrge: 'You desire to nurture and heal on a universal scale.',
-        personality: 'Others see you as a beacon of unconditional love.',
-        lifePath: 'Your path is about selfless service and universal love.',
-        expression: 'You express through compassionate service to all.'
-      }
-    };
-
-    return meanings[number]?.[type] || 'Unique energy with special significance.';
-  };
+  const getNumberMeaning = (number, type) => i18n.t(`numerology.meaning.${number}.${type}`, { defaultValue: i18n.t('numerology.meaning.default') });
 
   const handleCalculate = () => {
     if (!firstName || !lastName) {
-      alert('Please enter at least first and last name');
+      alert(t('numerologyPage.needName'));
       return;
     }
 
@@ -238,11 +153,9 @@ export default function NumerologyCalculator() {
           {/* Header Card */}
           <div className="bg-paper rounded-xl shadow-lg p-6 mb-6">
             <div className="text-center">
-              <div className="text-sm text-brand-600 font-semibold mb-1">{results.relation}</div>
+              <div className="text-sm text-brand-600 font-semibold mb-1">{relationLabel(results.relation, t)}</div>
               <h2 className="text-3xl font-bold text-gray-800 mb-2">{results.fullName}</h2>
-              <p className="text-gray-600 text-sm italic">
-                "Every number carries a unique vibration and meaning"
-              </p>
+              <p className="text-gray-600 text-sm italic">{t('numerologyPage.n001')}</p>
             </div>
           </div>
 
@@ -255,8 +168,8 @@ export default function NumerologyCalculator() {
                   <span className="text-3xl font-bold text-white">{results.destinyNumber}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Destiny Number</h3>
-                  <p className="text-xs text-gray-600">Your life's purpose and path</p>
+                  <h3 className="text-xl font-bold text-gray-800">{t('numerologyPage.n002')}</h3>
+                  <p className="text-xs text-gray-600">{t('numerologyPage.n003')}</p>
                 </div>
               </div>
               <p className="text-gray-700 leading-relaxed">
@@ -272,8 +185,8 @@ export default function NumerologyCalculator() {
                     <span className="text-3xl font-bold text-white">{results.lifePathNumber}</span>
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-gray-800">Life Path Number</h3>
-                    <p className="text-xs text-gray-600">Your journey and lessons</p>
+                    <h3 className="text-xl font-bold text-gray-800">{t('numerologyPage.n004')}</h3>
+                    <p className="text-xs text-gray-600">{t('numerologyPage.n005')}</p>
                   </div>
                 </div>
                 <p className="text-gray-700 leading-relaxed">
@@ -289,8 +202,8 @@ export default function NumerologyCalculator() {
                   <span className="text-3xl font-bold text-white">{results.soulUrgeNumber}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Soul Urge Number</h3>
-                  <p className="text-xs text-gray-600">Your heart's deepest desires</p>
+                  <h3 className="text-xl font-bold text-gray-800">{t('numerologyPage.n006')}</h3>
+                  <p className="text-xs text-gray-600">{t('numerologyPage.n007')}</p>
                 </div>
               </div>
               <p className="text-gray-700 leading-relaxed">
@@ -305,8 +218,8 @@ export default function NumerologyCalculator() {
                   <span className="text-3xl font-bold text-white">{results.personalityNumber}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Personality Number</h3>
-                  <p className="text-xs text-gray-600">How others see you</p>
+                  <h3 className="text-xl font-bold text-gray-800">{t('numerologyPage.n008')}</h3>
+                  <p className="text-xs text-gray-600">{t('numerologyPage.n009')}</p>
                 </div>
               </div>
               <p className="text-gray-700 leading-relaxed">
@@ -321,8 +234,8 @@ export default function NumerologyCalculator() {
                   <span className="text-3xl font-bold text-white">{results.expressionNumber}</span>
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Expression Number</h3>
-                  <p className="text-xs text-gray-600">Your natural talents</p>
+                  <h3 className="text-xl font-bold text-gray-800">{t('numerologyPage.n010')}</h3>
+                  <p className="text-xs text-gray-600">{t('numerologyPage.n011')}</p>
                 </div>
               </div>
               <p className="text-gray-700 leading-relaxed">
@@ -333,11 +246,8 @@ export default function NumerologyCalculator() {
 
           {/* Info Box */}
           <div className="mt-6 bg-gradient-to-r from-brand-50 to-ocean-50 rounded-xl p-5 border-2 border-brand-200">
-            <h4 className="text-lg font-bold text-brand-800 mb-2">✨ Understanding Your Numbers</h4>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              These numbers reveal different aspects of your personality and life path. 
-              Use them as guidance to understand your strengths, challenges, and life purpose.
-            </p>
+            <h4 className="text-lg font-bold text-brand-800 mb-2">{t('numerologyPage.n012')}</h4>
+            <p className="text-sm text-gray-700 leading-relaxed">{t('numerologyPage.n013')}</p>
           </div>
         </div>
       </div>
@@ -351,78 +261,64 @@ export default function NumerologyCalculator() {
         <div className="bg-paper rounded-xl shadow-lg p-6">
           <div className="text-center mb-6">
             <Calculator className="w-16 h-16 mx-auto mb-3 text-brand-600" />
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              Discover Your Numbers
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Enter details below to calculate your numerology profile
-            </p>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">{t('numerologyPage.n014')}</h2>
+            <p className="text-gray-600 text-sm">{t('numerologyPage.n015')}</p>
           </div>
 
           <div className="space-y-4">
             {/* Relation */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                This is for:
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('numerologyPage.n016')}</label>
               <select
                 value={relation}
                 onChange={(e) => setRelation(e.target.value)}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               >
                 {RELATIONS.map(rel => (
-                  <option key={rel} value={rel}>{rel}</option>
+                  <option key={rel} value={rel}>{relationLabel(rel, t)}</option>
                 ))}
               </select>
             </div>
 
             {/* First Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                First Name *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('numerologyPage.n017')}</label>
               <input
                 type="text"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Enter first name"
+                placeholder={t('numerologyPage.n032')}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
             {/* Middle Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Middle Name (Optional)
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('numerologyPage.n018')}</label>
               <input
                 type="text"
                 value={middleName}
                 onChange={(e) => setMiddleName(e.target.value)}
-                placeholder="Enter middle name"
+                placeholder={t('numerologyPage.n033')}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
             {/* Last Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Last Name *
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('numerologyPage.n019')}</label>
               <input
                 type="text"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
-                placeholder="Enter last name"
+                placeholder={t('numerologyPage.n034')}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 focus:outline-none"
               />
             </div>
 
             {/* Birth Date */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Birth Date (Optional - for Life Path Number)
-              </label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">{t('numerologyPage.n020')}</label>
               <input
                 type="date"
                 value={birthDate}
@@ -435,35 +331,33 @@ export default function NumerologyCalculator() {
             <button
               onClick={handleCalculate}
               className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-xl font-bold text-lg hover:from-brand-700 hover:to-ocean-700 transition transform active:scale-95"
-            >
-              Calculate My Numbers
-            </button>
+            >{t('numerologyPage.n021')}</button>
           </div>
         </div>
 
         {/* Info */}
         <div className="mt-6 bg-paper rounded-xl shadow-lg p-5">
-          <h3 className="text-lg font-bold text-gray-800 mb-3">📖 What You'll Discover</h3>
+          <h3 className="text-lg font-bold text-gray-800 mb-3">{t('numerologyPage.n022')}</h3>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">•</span>
-              <span><strong>Destiny Number:</strong> Your life purpose and mission</span>
+              <span><strong>{t('numerologyPage.n023')}</strong>{" "}{t('numerologyPage.n024')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">•</span>
-              <span><strong>Life Path Number:</strong> Your journey and key lessons</span>
+              <span><strong>{t('numerologyPage.n025')}</strong>{" "}{t('numerologyPage.n026')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">•</span>
-              <span><strong>Soul Urge Number:</strong> Your deepest desires</span>
+              <span><strong>{t('numerologyPage.n027')}</strong>{" "}{t('numerologyPage.n028')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">•</span>
-              <span><strong>Personality Number:</strong> How others perceive you</span>
+              <span><strong>{t('numerologyPage.n029')}</strong>{" "}{t('numerologyPage.n030')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">•</span>
-              <span><strong>Expression Number:</strong> Your natural talents</span>
+              <span><strong>{t('numerologyPage.n031')}</strong>{" "}{t('numerologyPage.n011')}</span>
             </li>
           </ul>
         </div>

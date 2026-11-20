@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { Trans } from 'react-i18next';
+import { formatMoney } from '../i18n/format';
 import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { loadTaxRates } from '../utils/pricing';
 import { GST_RATE_BY_COUNTRY } from '../utils/commission';
+import { useTranslation } from 'react-i18next';
 
 // In mock mode (npm run dev:mock) no gateway scripts load; payments are simulated
 const IS_MOCK = import.meta.env.MODE === 'mock';
@@ -20,6 +23,7 @@ const loadScript = (src) => new Promise((resolve, reject) => {
 });
 
 export default function PaymentPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const refreshProfile = useAuthStore(state => state.refreshProfile);
   const location = useLocation();
@@ -96,7 +100,7 @@ export default function PaymentPage() {
       },
       onError: (err) => {
         console.error('PayPal error:', err);
-        alert('Payment failed. Please try again.');
+        alert(t('errors.paymentFailed'));
       }
     }).render('#paypal-button-container');
   };
@@ -155,7 +159,7 @@ export default function PaymentPage() {
       rzp.open();
     } catch (error) {
       console.error('Razorpay error:', error);
-      alert('Payment failed. Please try again.');
+      alert(t('errors.paymentFailed'));
     } finally {
       setLoading(false);
     }
@@ -177,7 +181,7 @@ export default function PaymentPage() {
       setTimeout(() => navigate('/dashboard'), 2200);
     } catch (error) {
       console.error('Test payment error:', error);
-      alert('Test payment failed. Please try again.');
+      alert(t('errors.testPaymentFailed'));
       setLoading(false);
     }
   };
@@ -218,7 +222,7 @@ export default function PaymentPage() {
       navigate('/dashboard');
     } catch (error) {
       console.error('Error saving payment:', error);
-      alert('Payment recorded but profile update failed. Please contact support.');
+      alert(t('errors.paymentRecorded'));
     }
   };
 
@@ -231,9 +235,9 @@ export default function PaymentPage() {
       <div className="min-h-screen site-background flex items-center justify-center px-4">
         <div className="bg-paper rounded-2xl shadow-xl p-10 max-w-md w-full text-center">
           <CheckCircle size={72} className="text-green-600 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-gray-800 mb-2">Payment successful</h2>
-          <p className="text-gray-600 mb-1">Your plan is now active.</p>
-          <p className="text-gray-500 text-sm">Taking you to your dashboard...</p>
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">{t('payment.success')}</h2>
+          <p className="text-gray-600 mb-1">{t('payment.active')}</p>
+          <p className="text-gray-500 text-sm">{t('payment.taking')}</p>
         </div>
       </div>
     );
@@ -250,14 +254,14 @@ export default function PaymentPage() {
             className="flex items-center gap-2 text-brand-600 hover:text-brand-700 mb-6 font-medium"
           >
             <ArrowLeft size={20} />
-            Back to Pricing
+            {t('payment.backToPricing')}
           </button>
 
           <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
-            Complete Payment
+            {t('payment.title')}
           </h2>
           <p className="text-center text-gray-600 mb-8">
-            Secure payment for your NAMASUTRA Annual Plan
+            {t('payment.subtitle')}
           </p>
 
           {/* Plan Summary */}
@@ -265,56 +269,56 @@ export default function PaymentPage() {
             {discountAmount > 0 ? (
               <>
                 <div className="flex justify-between items-center mb-2 text-gray-700">
-                  <span>NAMASUTRA Annual Plan (1 year)</span>
-                  <span>{symbol}{listPrice}</span>
+                  <span>{t('payment.planLine')}</span>
+                  <span>{formatMoney(listPrice, currency)}</span>
                 </div>
                 <div className="flex justify-between items-center mb-3 text-green-700">
-                  <span>Referral code <span className="font-mono font-semibold">{referralCode}</span> ({discountPercent}% off)</span>
-                  <span>&minus;{symbol}{discountAmount}</span>
+                  <span><Trans i18nKey="payment.referralLine" values={{ code: referralCode, percent: discountPercent }} components={{ code: <span className="font-mono font-semibold" /> }} /></span>
+                  <span>&minus;{formatMoney(discountAmount, currency)}</span>
                 </div>
               </>
             ) : (
               <div className="flex justify-between items-center mb-3 text-gray-700">
-                <span>NAMASUTRA Annual Plan (1 year)</span>
-                <span>{symbol}{amount}</span>
+                <span>{t('payment.planLine')}</span>
+                <span>{formatMoney(amount, currency)}</span>
               </div>
             )}
             <div className="flex justify-between items-center border-t border-brand-300 pt-3">
-              <span className="text-lg font-semibold text-gray-800">Total</span>
-              <span className="text-3xl font-bold text-brand-600">{symbol}{amount}</span>
+              <span className="text-lg font-semibold text-gray-800">{t('payment.total')}</span>
+              <span className="text-3xl font-bold text-brand-600">{formatMoney(amount, currency)}</span>
             </div>
-            {taxRate > 0 && <p className="text-sm text-gray-600 mt-1 text-right">Includes {taxRate}% {userProfile?.countryCode === 'IN' ? 'GST' : 'tax'}</p>}
+            {taxRate > 0 && <p className="text-sm text-gray-600 mt-1 text-right">{userProfile?.countryCode === 'IN' ? t('payment.includesGst', { percent: taxRate }) : t('payment.includesTax', { percent: taxRate })}</p>}
           </div>
 
           {/* Payment Method */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">Select Payment Method</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('payment.selectMethod')}</h3>
 
             {paymentMethod === 'mock' ? (
               <div className="border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg p-4 space-y-3">
-                <p className="text-sm text-amber-800 font-semibold">Mock mode: no real payment gateway is used.</p>
+                <p className="text-sm text-amber-800 font-semibold">{t('payment.mockNote')}</p>
                 <button
                   onClick={() => savePaymentSuccess('mock', `mock_${Date.now()}`)}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
                 >
-                  Simulate successful payment
+                  {t('payment.simulateOk')}
                 </button>
                 <button
-                  onClick={() => alert('Payment failed. Please try again.')}
+                  onClick={() => alert(t('errors.paymentFailed'))}
                   className="w-full bg-red-100 hover:bg-red-200 text-red-700 py-3 rounded-lg font-semibold transition"
                 >
-                  Simulate failed payment
+                  {t('payment.simulateFail')}
                 </button>
               </div>
             ) : paymentMethod === 'test' ? (
               <div className="border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg p-4 space-y-3">
-                <p className="text-sm text-amber-800 font-semibold">Test mode: no card needed. Click below to simulate a successful payment.</p>
+                <p className="text-sm text-amber-800 font-semibold">{t('payment.testNote')}</p>
                 <button
                   onClick={handleTestPayment}
                   disabled={loading}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-lg font-semibold text-lg transition disabled:opacity-50"
                 >
-                  {loading ? 'Processing...' : `Pay ${symbol}${amount} (test)`}
+                  {loading ? t('payment.processing') : t('payment.payTest', { amount: formatMoney(amount, currency) })}
                 </button>
               </div>
             ) : paymentMethod === 'razorpay' ? (
@@ -324,7 +328,7 @@ export default function PaymentPage() {
                 className="w-full bg-gradient-to-r from-ocean-600 to-ocean-700 text-white py-4 rounded-lg font-semibold text-lg hover:from-ocean-700 hover:to-ocean-800 transition disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 <CreditCard size={24} />
-                {loading ? 'Processing...' : 'Pay with Razorpay'}
+                {loading ? t('payment.processing') : t('payment.payRazorpay')}
               </button>
             ) : (
               <div>
@@ -332,7 +336,7 @@ export default function PaymentPage() {
                 {!paypalLoaded && (
                   <div className="text-center py-4">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-ocean-600 mx-auto"></div>
-                    <p className="text-gray-600 mt-2">Loading PayPal...</p>
+                    <p className="text-gray-600 mt-2">{t('payment.loadingPaypal')}</p>
                   </div>
                 )}
               </div>
@@ -343,13 +347,13 @@ export default function PaymentPage() {
               onClick={() => navigate('/pricing')}
               className="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-300 transition"
             >
-              Cancel Payment
+              {t('payment.cancel')}
             </button>
           </div>
 
           {/* Security Notice */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            🔒 Secure payment powered by {paymentMethod === 'mock' ? 'nothing (mock mode)' : paymentMethod === 'test' ? 'nothing (test mode)' : paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal'}
+            {paymentMethod === 'mock' ? t('payment.poweredMock') : paymentMethod === 'test' ? t('payment.poweredTest') : t('payment.securePowered', { gateway: paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal' })}
           </div>
         </div>
       </div>

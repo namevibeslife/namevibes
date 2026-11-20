@@ -1,5 +1,6 @@
 import PosterDownload from '../components/PosterDownload';
 import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
+import { formatDate } from '../i18n/format';
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
@@ -7,8 +8,10 @@ import { db, auth } from '../firebase';
 import { Users } from 'lucide-react';
 import AskAIPanel from '../components/AskAIPanel';
 import { findCommonElements } from '../utils/familyReport';
+import { useTranslation } from 'react-i18next';
 
 export default function FamilyAnalysisView() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { analysisId } = useParams();
   const [analysis, setAnalysis] = useState(null);
@@ -31,12 +34,12 @@ export default function FamilyAnalysisView() {
       if (analysisDoc.exists()) {
         setAnalysis({ id: analysisDoc.id, ...analysisDoc.data() });
       } else {
-        alert('Analysis not found');
+        alert(t('errors.analysisNotFound'));
         navigate('/dashboard');
       }
     } catch (error) {
       console.error('Error loading analysis:', error);
-      alert('Error loading analysis');
+      alert(t('errors.analysisLoad'));
       navigate('/dashboard');
     } finally {
       setLoading(false);
@@ -48,7 +51,7 @@ export default function FamilyAnalysisView() {
       <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading family analysis...</p>
+          <p className="text-gray-600">{t('results.loadingFamily')}</p>
         </div>
       </div>
     );
@@ -76,14 +79,14 @@ export default function FamilyAnalysisView() {
             <div className="flex items-center justify-center gap-3 mb-4">
               <Users className="w-10 h-10 text-brand-600" />
               <h1 className="text-4xl font-bold text-gray-800">
-                {results.length === 1 ? 'Name Chemistry' : 'Family Chemistry Analysis'}
+                {results.length === 1 ? t('family.resultTitleSingle') : t('family.resultTitleFamily')}
               </h1>
             </div>
             <p className="text-center text-gray-600">
-              Analyzed on {analysis.timestamp?.toDate().toLocaleDateString()}
+              {t('results.analyzedOn', { date: formatDate(analysis.timestamp) })}
             </p>
             <p className="text-center text-brand-600 font-semibold mt-2">
-              {results.length} {results.length === 1 ? 'Name' : 'Family Members'}
+              {t('results.memberCount', { count: results.length })}
             </p>
           </div>
 
@@ -93,7 +96,7 @@ export default function FamilyAnalysisView() {
           {results.length > 1 && (
             <FamilyHarmonyCard people={results}>
               {commonElements.length > 0 && (<>
-                <p className="text-gray-600 mb-4 text-center text-lg italic">"Common Elements Across All Family Members"</p>
+                <p className="text-gray-600 mb-4 text-center text-lg italic">{t('family.commonAcross')}</p>
                 <div className="bg-gradient-to-br from-brand-100 to-ocean-100 rounded-xl p-6 border-2 border-brand-300">
                   <AskAIPanel results={results} />
                 </div>
@@ -106,7 +109,7 @@ export default function FamilyAnalysisView() {
               onClick={() => navigate('/family')}
               className="px-6 py-3 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition font-semibold"
             >
-              Analyze Another Family
+              {t('results.analyzeAnotherFamily')}
             </button>
           </div>
         </div>

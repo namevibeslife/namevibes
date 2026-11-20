@@ -1,11 +1,14 @@
+import { formatDate } from '../i18n/format';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, getDoc, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Sparkles, Users, Calendar, Settings, ArrowRight } from 'lucide-react';
 import { countAnalysesThisMonth, isPlanActive, planFeatures, FAMILY_MAX_NAMES } from '../utils/plan';
+import { useTranslation } from 'react-i18next';
 
 export default function Dashboard() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -72,14 +75,14 @@ export default function Dashboard() {
       <div className="min-h-screen site-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-brand-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <p className="text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
   };
 
   const renewalDate = userProfile?.renewalDate?.toDate();
-  const formattedRenewalDate = renewalDate ? renewalDate.toLocaleDateString() : 'N/A';
+  const formattedRenewalDate = renewalDate ? formatDate(renewalDate) : t('common.notAvailable');
   const planActive = isPlanActive(userProfile);
 
   return (
@@ -90,19 +93,19 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="bg-transparent rounded-2xl p-8 mb-8">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
-            👋 Welcome, {userProfile?.fullName}!
+            {t('dashboard.welcome', { name: userProfile?.fullName })}
           </h2>
           {userProfile?.planType && (
             <div className="space-y-2">
               <p className="text-gray-600">
-                <strong>Plan:</strong> Annual Plan
+                <strong>{t('dashboard.plan')}</strong> {t('dashboard.annualPlan')}
                 {planActive
-                  ? <span className="ml-2 text-green-600">(Renews: {formattedRenewalDate})</span>
-                  : <span className="ml-2 text-red-600">(Expired {formattedRenewalDate})</span>}
+                  ? <span className="ml-2 text-green-600">{t('dashboard.renews', { date: formattedRenewalDate })}</span>
+                  : <span className="ml-2 text-red-600">{t('dashboard.expired', { date: formattedRenewalDate })}</span>}
               </p>
               {planActive && (
                 <p className="text-gray-600">
-                  <strong>Analyses Used:</strong> {analysesUsed}/{planFeatures(userProfile).monthlyAnalyses} this month
+                  <strong>{t('dashboard.analysesUsed')}</strong> {t('dashboard.usedOf', { used: analysesUsed, total: planFeatures(userProfile).monthlyAnalyses })}
                 </p>
               )}
             </div>
@@ -117,8 +120,8 @@ export default function Dashboard() {
               className="bg-gradient-to-br from-brand-500 to-brand-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
             >
               <Sparkles className="w-12 h-12 mb-4" />
-              <h3 className="text-xl font-bold mb-2">Analyze New Name</h3>
-              <p className="text-brand-100 text-sm">Discover the chemistry in any name</p>
+              <h3 className="text-xl font-bold mb-2">{t('dashboard.analyzeNew')}</h3>
+              <p className="text-brand-100 text-sm">{t('dashboard.analyzeHint')}</p>
             </button>
           )}
 
@@ -128,8 +131,8 @@ export default function Dashboard() {
               className="bg-gradient-to-br from-ocean-500 to-ocean-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
             >
               <Users className="w-12 h-12 mb-4" />
-              <h3 className="text-xl font-bold mb-2">Family Package</h3>
-              <p className="text-ocean-100 text-sm">Analyze up to {FAMILY_MAX_NAMES} names together</p>
+              <h3 className="text-xl font-bold mb-2">{t('family.title')}</h3>
+              <p className="text-ocean-100 text-sm">{t('family.subtitle', { max: FAMILY_MAX_NAMES })}</p>
             </button>
           )}
 
@@ -140,12 +143,12 @@ export default function Dashboard() {
             >
               <Calendar className="w-12 h-12 mb-4" />
               <h3 className="text-xl font-bold mb-2">
-                {!userProfile?.planType ? 'Choose a Plan' : !planActive ? 'Renew Your Plan' : 'Get the Annual Plan'}
+                {!userProfile?.planType ? t('dashboard.choosePlan') : !planActive ? t('dashboard.renewPlan') : t('pricing.cta')}
               </h3>
               <p className="text-green-100 text-sm">
                 {userProfile?.planType === 'individual' && planActive
-                  ? `Family harmony, ${FAMILY_MAX_NAMES} names, PDF reports & more`
-                  : 'Unlock name analyses and insights'}
+                  ? t('dashboard.upgradeHint', { max: FAMILY_MAX_NAMES })
+                  : t('pricing.subtitle2')}
               </p>
             </button>
           )}
@@ -156,14 +159,14 @@ export default function Dashboard() {
             className="bg-gradient-to-br from-gray-500 to-gray-600 text-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition transform hover:scale-105"
           >
             <Settings className="w-12 h-12 mb-4" />
-            <h3 className="text-xl font-bold mb-2">Settings</h3>
-            <p className="text-gray-100 text-sm">Account & app settings</p>
+            <h3 className="text-xl font-bold mb-2">{t('nav.settings')}</h3>
+            <p className="text-gray-100 text-sm">{t('dashboard.settingsHint')}</p>
           </button>
         </div>
 
         {/* Knowledge Base Cards */}
         <div className="mb-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Knowledge Base</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">{t('dashboard.knowledgeBase')}</h3>
           <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
             {/* Zodiac Name Guide */}
             <div
@@ -172,14 +175,14 @@ export default function Dashboard() {
             >
               <div className="text-5xl mb-4 text-center">♈</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
-                Zodiac Name Guide
+                {t('dashboard.zodiacTitle')}
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                Discover which starting letters and sounds are traditionally considered lucky for your name, based on your zodiac sign and birth details.
+                {t('dashboard.zodiacText')}
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  Explore Name Guide <ArrowRight size={18} />
+                  {t('dashboard.zodiacCta')} <ArrowRight size={18} />
                 </span>
               </div>
             </div>
@@ -191,14 +194,14 @@ export default function Dashboard() {
             >
               <div className="text-5xl mb-4 text-center">🔢</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
-                Numerology Calculator
+                {t('dashboard.numerologyTitle')}
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                Discover what the numbers in your name and date of birth traditionally reveal about your personality, natural strengths, and life journey.
+                {t('dashboard.numerologyText')}
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  Discover Your Numbers <ArrowRight size={18} />
+                  {t('dashboard.numerologyCta')} <ArrowRight size={18} />
                 </span>
               </div>
             </div>
@@ -210,14 +213,14 @@ export default function Dashboard() {
             >
               <div className="text-5xl mb-4 text-center">⚛️</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
-                Element & Nakshatra Guide
+                {t('dashboard.elementTitle')}
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                Explore the chemical elements hidden in the letters of your name and discover how your birth star connects with traditional Vedic beliefs.
+                {t('dashboard.elementText')}
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  Explore Your Connections <ArrowRight size={18} />
+                  {t('dashboard.elementCta')} <ArrowRight size={18} />
                 </span>
               </div>
             </div>
@@ -229,14 +232,14 @@ export default function Dashboard() {
             >
               <div className="text-5xl mb-4 text-center">🕉️</div>
               <h3 className="text-2xl font-bold text-gray-800 mb-3 text-center">
-                Today's Hora &amp; Muhurat
+                {t('dashboard.horaTitle')}
               </h3>
               <p className="text-gray-600 text-center mb-4">
-                See the planetary hora for every hour of the day, plus auspicious and avoid timings for your city.
+                {t('dashboard.horaText')}
               </p>
               <div className="flex justify-center">
                 <span className="text-brand-600 font-semibold flex items-center gap-2">
-                  View Today's Timings <ArrowRight size={18} />
+                  {t('dashboard.horaCta')} <ArrowRight size={18} />
                 </span>
               </div>
             </div>
@@ -245,7 +248,7 @@ export default function Dashboard() {
 
         {/* Recent Analyses */}
         <div className="bg-paper rounded-2xl shadow-xl p-8">
-          <h3 className="text-2xl font-bold text-gray-800 mb-4">Recent Analyses</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-4">{t('dashboard.recent')}</h3>
           {recentAnalyses.length > 0 ? (
             <div className="space-y-3">
               {recentAnalyses.map((analysis) => (
@@ -258,11 +261,11 @@ export default function Dashboard() {
                     <div className="font-semibold text-gray-800">
                       {analysis.type === 'individual' 
                         ? analysis.fullName 
-                        : `Family (${analysis.count} names)`
+                        : t('dashboard.familyEntry', { count: analysis.count })
                       }
                     </div>
                     <div className="text-sm text-gray-500">
-                      {analysis.timestamp?.toDate().toLocaleDateString()}
+                      {formatDate(analysis.timestamp)}
                     </div>
                   </div>
                   <ArrowRight className="text-brand-600" size={20} />
@@ -271,7 +274,7 @@ export default function Dashboard() {
             </div>
           ) : (
             <div className="text-center py-12 text-gray-500">
-              <p>No analyses yet. Start by analyzing a name!</p>
+              <p>{t('dashboard.noAnalyses')}</p>
             </div>
           )}
         </div>

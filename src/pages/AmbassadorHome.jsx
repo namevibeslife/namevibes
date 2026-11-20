@@ -7,6 +7,7 @@ import Logo from '../components/Logo';
 import { ShieldCheck } from 'lucide-react';
 import './AmbassadorHome.css';
 import { normalizeEmail } from '../utils/ambassadorInvite';
+import { useTranslation } from 'react-i18next';
 
 // Everything an approved ambassador sees is a separate chunk, fetched only after the account is
 // confirmed. Nothing about commissions or the program ships in this public page.
@@ -16,6 +17,7 @@ const AmbassadorArea = lazy(() => import('../components/AmbassadorArea'));
 // Google email must match an approved, active ambassadors document; nothing is ever created for
 // anyone else, and the page never says whether an email is or isn't an ambassador before sign-in.
 export default function AmbassadorHome() {
+  const { t } = useTranslation();
   const [user, setUser] = useState(undefined);
   // 'checking' | 'ok' | 'denied'
   const [access, setAccess] = useState('checking');
@@ -62,34 +64,34 @@ export default function AmbassadorHome() {
       provider.setCustomParameters({ prompt: 'select_account' });
       await signInWithPopup(auth, provider);
     } catch (e) {
-      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') setError('Sign-in failed: ' + e.message);
+      if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') setError(t('ambassador.signInFailed', { message: e.message }));
     } finally {
       setSigningIn(false);
     }
   }
 
-  const doSignOut = async () => { try { await signOut(auth); } catch { setError('Could not sign out. Please try again.'); } };
+  const doSignOut = async () => { try { await signOut(auth); } catch { setError(t('errors.signOut')); } };
 
   let body;
   if (user === undefined || (user && access === 'checking')) {
-    body = <p className="text-center text-gray-600 py-16">Loading...</p>;
+    body = <p className="text-center text-gray-600 py-16">{t('common.loading')}</p>;
   } else if (!user) {
     body = (
       <div className="amb-signin-shell">
         <div className="amb-signin-intro">
-          <p className="amb-kicker">NAMASUTRA / AMBASSADORS</p>
+          <p className="amb-kicker">{t('ambassador.kicker')}</p>
           <Logo className="amb-signin-logo" />
-          <h1>Welcome to your<br /><em>ambassador space.</em></h1>
-          <p className="amb-signin-tagline">Your Elemental Identity,<br />in Harmony with Nature.</p>
+          <h1>{t('ambassador.welcomeLine1')}<br /><em>{t('ambassador.welcomeLine2')}</em></h1>
+          <p className="amb-signin-tagline">{t('ambassador.tagline1')}<br />{t('ambassador.tagline2')}</p>
           <div className="amb-gold-rule" aria-hidden="true" />
         </div>
         <section className="amb-auth-card" aria-labelledby="amb-signin-heading">
           <span className="amb-icon-medallion"><ShieldCheck size={28} aria-hidden="true" /></span>
-          <p className="amb-kicker">INVITATION ONLY</p>
-          <h2 id="amb-signin-heading">Ambassador sign-in</h2>
-          <p>Welcome back. Continue with the Google account your invitation was sent to.</p>
-          <GoogleButton onClick={signIn} disabled={signingIn}>{signingIn ? 'Signing in...' : 'Sign in with Google'}</GoogleButton>
-          <p className="amb-auth-note">Need help accessing your account? Contact the person who invited you.</p>
+          <p className="amb-kicker">{t('ambassador.invitationOnly')}</p>
+          <h2 id="amb-signin-heading">{t('ambassador.signInTitle')}</h2>
+          <p>{t('ambassador.signInText')}</p>
+          <GoogleButton onClick={signIn} disabled={signingIn}>{signingIn ? t('ambassador.signingIn') : t('ambassador.signInGoogle')}</GoogleButton>
+          <p className="amb-auth-note">{t('ambassador.helpNote')}</p>
           {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
         </section>
       </div>
@@ -97,15 +99,15 @@ export default function AmbassadorHome() {
   } else if (access !== 'ok') {
     body = (
       <div role="alert" className="amb-auth-card amb-access-message">
-        <h1 className="text-2xl font-serif">Check your invitation</h1>
-        <p className="text-gray-800">This Google account hasn't been invited as an Ambassador. Please contact the person who invited you.</p>
-        <button type="button" onClick={doSignOut} className="px-5 py-2 min-h-[44px] rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">Sign out</button>
+        <h1 className="text-2xl font-serif">{t('ambassador.checkInvitation')}</h1>
+        <p className="text-gray-800">{t('ambassador.notInvited')}</p>
+        <button type="button" onClick={doSignOut} className="px-5 py-2 min-h-[44px] rounded-lg bg-red-600 text-white font-semibold hover:bg-red-700">{t('ambassador.signOut')}</button>
         {error && <p className="text-sm text-red-700">{error}</p>}
       </div>
     );
   } else {
     body = (
-      <Suspense fallback={<p className="text-center text-gray-600 py-16">Loading...</p>}>
+      <Suspense fallback={<p className="text-center text-gray-600 py-16">{t('common.loading')}</p>}>
         <AmbassadorArea ambassador={ambassador} user={user} onAmbassadorChange={setAmbassador} onSignOut={doSignOut} />
       </Suspense>
     );

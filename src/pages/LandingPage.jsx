@@ -2,11 +2,15 @@ import ChemistryPoster from '../components/ChemistryPoster';
 import { parseNameToElements } from '../utils/elements';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
+import LanguagePicker from '../components/LanguagePicker';
+import { hasChosenLanguage } from '../i18n';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { captureReferralFromUrl } from '../utils/referralCode';
 
 export default function LandingPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
@@ -22,16 +26,16 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="landing-hero container mx-auto px-4 py-20 text-center">
-        <p className="hero-kicker">Your name is energy. Discover how it connects you to the universe.</p>
+        {!hasChosenLanguage() && <div className="mb-8"><LanguagePicker prominent /></div>}
+        <p className="hero-kicker">{t('landing.kicker')}</p>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-          Discover Your Name's<br />
+          {t('landing.headingLine1')}<br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-ocean-600">
-            Hidden Chemistry
+            {t('landing.headingLine2')}
           </span>
         </h1>
         <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-          Decode the hidden elements in your identity through periodic table science,
-          Chaldean numerology, and Hindu astrology
+          {t('landing.subheading')}
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -40,30 +44,30 @@ export default function LandingPage() {
             className="px-8 py-4 bg-gradient-to-r from-brand-600 to-ocean-600 text-white text-lg font-semibold rounded-xl hover:from-brand-700 hover:to-ocean-700 transform hover:scale-105 transition shadow-lg"
           >
             <Sparkles className="inline mr-2" size={20} />
-            Get Started
+            {t('landing.getStarted')}
           </button>
           <button
             onClick={() => navigate('/learn-more')}
             className="px-8 py-4 bg-paper text-brand-600 text-lg font-semibold rounded-xl hover:bg-gray-50 transition shadow-lg border-2 border-brand-200"
           >
             <BookOpen className="inline mr-2" size={20} />
-            Learn More
+            {t('landing.learnMore')}
           </button>
         </div>
       </section>
 
       <section className="max-w-3xl mx-auto px-6 pb-14 text-center" aria-labelledby="about-namevibes">
-        <h2 id="about-namevibes" className="text-3xl text-brand-800 mb-6">A lifelong companion. A world within.</h2>
+        <h2 id="about-namevibes" className="text-3xl text-brand-800 mb-6">{t('landing.aboutHeading')}</h2>
         <div className="space-y-4 text-gray-700 text-lg">
-          <p>From the cradle to the grave, your name is your constant companion, defining your identity throughout life's journey.</p>
-          <p>Every name carries a unique vibration, an energy that resonates with who you are.</p>
-          <p>But have you ever wondered what lies within the letters of your name?</p>
-          <p><strong>Namasutra</strong> uncovers the fascinating connection between your name and the elements of the periodic table.</p>
-          <p className="font-semibold text-brand-700">Discover the elements. Explore the connections. Feel your Namasutra.</p>
+          <p>{t('landing.about1')}</p>
+          <p>{t('landing.about2')}</p>
+          <p>{t('landing.about3')}</p>
+          <p><Trans i18nKey="landing.about4" components={{ b: <strong /> }} /></p>
+          <p className="font-semibold text-brand-700">{t('landing.about5')}</p>
         </div>
       </section>
-      <section className="landing-showcase" aria-label="Vibes sample analysis">
-        <p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">See how it works / Vibes sample analysis</p>
+      <section className="landing-showcase" aria-label={t('landing.sampleAria')}>
+        <p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">{t('landing.sampleLabel')}</p>
         <ChemistryPoster people={[{ fullName: 'Vibes', elements: parseNameToElements('Vibes') }]} theme="gold" />
       </section>
       {/* Features */}
@@ -73,9 +77,9 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mb-4">
               <Atom className="w-8 h-8 text-brand-600" />
             </div>
-            <h3 className="text-2xl font-bold mb-3">Periodic Elements</h3>
+            <h3 className="text-2xl font-bold mb-3">{t('landing.feature1Title')}</h3>
             <p className="text-gray-600">
-              Break down your name into chemical elements and discover their unique properties and meanings
+              {t('landing.feature1Text')}
             </p>
           </div>
 
@@ -83,9 +87,9 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-ocean-100 rounded-full flex items-center justify-center mb-4">
               <span className="text-3xl font-bold text-ocean-600">9</span>
             </div>
-            <h3 className="text-2xl font-bold mb-3">Chaldean Numerology</h3>
+            <h3 className="text-2xl font-bold mb-3">{t('landing.feature2Title')}</h3>
             <p className="text-gray-600">
-              Uncover your life path number, name number, and destiny through ancient wisdom
+              {t('landing.feature2Text')}
             </p>
           </div>
 
@@ -93,9 +97,9 @@ export default function LandingPage() {
             <div className="w-16 h-16 bg-brand-100 rounded-full flex items-center justify-center mb-4">
               <span className="text-2xl font-bold text-brand-600">ॐ</span>
             </div>
-            <h3 className="text-2xl font-bold mb-3">Hindu Astrology</h3>
+            <h3 className="text-2xl font-bold mb-3">{t('landing.feature3Title')}</h3>
             <p className="text-gray-600">
-              Learn which syllables are auspicious for you based on your birth date and nakshatra
+              {t('landing.feature3Text')}
             </p>
           </div>
         </div>
@@ -104,20 +108,20 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="bg-gradient-to-r from-brand-600 to-ocean-600 rounded-3xl p-12 text-white">
-          <h2 className="text-4xl font-bold mb-4">Ready to Discover Your Vibes?</h2>
-          <p className="text-xl mb-8 opacity-90">See which elements of the universe live in your name</p>
+          <h2 className="text-4xl font-bold mb-4">{t('landing.ctaHeading')}</h2>
+          <p className="text-xl mb-8 opacity-90">{t('landing.ctaText')}</p>
           <button
             onClick={() => navigate('/login')}
             className="px-10 py-4 bg-paper text-brand-600 text-lg font-semibold rounded-xl hover:bg-gray-100 transition shadow-xl"
           >
-            Start Your Journey
+            {t('landing.ctaButton')}
           </button>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="container mx-auto px-4 py-8 text-center text-gray-600">
-        <p>© {new Date().getFullYear()} Namasutra. All rights reserved.</p>
+        <p>{t('landing.copyright', { year: new Date().getFullYear() })}</p>
       </footer>
     </div>
   );

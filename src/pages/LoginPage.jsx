@@ -13,39 +13,42 @@ import { Eye, EyeOff } from 'lucide-react';
 import { auth } from '../firebase';
 import { GoogleButton, AppleButton } from '../components/AuthButtons';
 import Logo from '../components/Logo';
+import LanguagePicker from '../components/LanguagePicker';
+import { useTranslation } from 'react-i18next';
 
 const QUIET_CODES = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
 
 function friendlyError(error, provider) {
   switch (error.code) {
     case 'auth/invalid-email':
-      return 'That email address does not look right.';
+      return 'errors.auth.invalidEmail';
     case 'auth/invalid-credential':
     case 'auth/wrong-password':
     case 'auth/user-not-found':
-      return 'Incorrect email or password. If you signed up with Google or Apple, use that button instead.';
+      return 'errors.auth.badCredentials';
     case 'auth/email-already-in-use':
-      return 'An account with this email already exists. Try signing in instead.';
+      return 'errors.auth.emailInUse';
     case 'auth/weak-password':
-      return 'Please choose a password with at least 6 characters.';
+      return 'errors.auth.weakPassword';
     case 'auth/too-many-requests':
-      return 'Too many attempts. Please wait a few minutes and try again.';
+      return 'errors.auth.tooMany';
     case 'auth/network-request-failed':
-      return 'Network problem. Check your connection and try again.';
+      return 'errors.auth.network';
     case 'auth/popup-blocked':
-      return 'Your browser blocked the sign-in window. Please allow pop-ups and try again.';
+      return 'errors.auth.popupBlocked';
     case 'auth/account-exists-with-different-credential':
-      return 'This email is already registered with a different sign-in method. Try Google or email instead.';
+      return 'errors.auth.differentMethod';
     case 'auth/operation-not-allowed':
       return provider === 'apple'
-        ? 'Sign in with Apple is not available yet. Please use Google or email.'
-        : 'This sign-in method is not available right now.';
+        ? 'errors.auth.appleUnavailable'
+        : 'errors.auth.methodUnavailable';
     default:
-      return 'Sign-in failed. Please try again.';
+      return 'errors.auth.failed';
   }
 }
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [mode, setMode] = useState('signin'); // 'signin' | 'signup' | 'reset'
   const [email, setEmail] = useState('');
@@ -95,7 +98,7 @@ export default function LoginPage() {
     try {
       if (mode === 'reset') {
         await sendPasswordResetEmail(auth, cleanEmail);
-        setNotice('If an account exists for that email, a reset link is on its way. Check your inbox and spam folder.');
+        setNotice('auth.resetSent');
         setLoading(false);
         return;
       }
@@ -116,8 +119,8 @@ export default function LoginPage() {
     }
   };
 
-  const title = mode === 'signup' ? 'Create your account' : mode === 'reset' ? 'Reset your password' : 'Welcome back';
-  const submitLabel = mode === 'signup' ? 'Create account' : mode === 'reset' ? 'Send reset link' : 'Sign in';
+  const title = mode === 'signup' ? t('auth.titleSignup') : mode === 'reset' ? t('auth.titleReset') : t('auth.titleSignin');
+  const submitLabel = mode === 'signup' ? t('auth.submitSignup') : mode === 'reset' ? t('auth.submitReset') : t('auth.submitSignin');
 
   return (
     <div className="min-h-screen site-midnight flex items-center justify-center p-4">
@@ -126,9 +129,10 @@ export default function LoginPage() {
           <h1 className="mb-2">
             <Logo className="h-20 w-auto mx-auto" />
           </h1>
-          <p className="text-gray-600">Discover the chemistry in your name</p>
+          <p className="text-gray-600">{t('auth.tagline')}</p>
         </div>
 
+        <div className="flex justify-center mb-4"><LanguagePicker prominent /></div>
         <h2 className="text-xl font-semibold text-gray-800 text-center mb-5">{title}</h2>
 
         {mode !== 'reset' && (
@@ -138,9 +142,9 @@ export default function LoginPage() {
               <AppleButton onClick={handleApple} disabled={loading} />
             </div>
 
-            <div className="flex items-center gap-3 my-6" role="separator" aria-label="or">
+            <div className="flex items-center gap-3 my-6" role="separator" aria-label={t('auth.or')}>
               <div className="flex-1 h-px bg-gray-300" />
-              <span className="text-xs uppercase tracking-wider text-gray-500">or use email</span>
+              <span className="text-xs uppercase tracking-wider text-gray-500">{t('auth.orUseEmail')}</span>
               <div className="flex-1 h-px bg-gray-300" />
             </div>
           </>
@@ -148,7 +152,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4" noValidate={false}>
           <div>
-            <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label htmlFor="auth-email" className="block text-sm font-medium text-gray-700 mb-1">{t('auth.email')}</label>
             <input
               id="auth-email"
               type="email"
@@ -164,10 +168,10 @@ export default function LoginPage() {
           {mode !== 'reset' && (
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700">Password</label>
+                <label htmlFor="auth-password" className="block text-sm font-medium text-gray-700">{t('auth.password')}</label>
                 {mode === 'signin' && (
                   <button type="button" onClick={() => switchMode('reset')} className="text-sm text-brand-600 hover:text-brand-700">
-                    Forgot password?
+                    {t('auth.forgot')}
                   </button>
                 )}
               </div>
@@ -181,12 +185,12 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full h-12 px-3 pr-12 rounded-lg border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-brand-600 focus:border-brand-600"
-                  placeholder={mode === 'signup' ? 'At least 6 characters' : 'Your password'}
+                  placeholder={mode === 'signup' ? t('auth.passwordPlaceholderNew') : t('auth.passwordPlaceholder')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}
                   className="absolute inset-y-0 right-0 px-3 text-gray-500 hover:text-gray-700"
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -197,12 +201,12 @@ export default function LoginPage() {
 
           {error && (
             <div role="alert" className="bg-red-50 border border-red-200 rounded-lg p-3 text-red-700 text-sm">
-              {error}
+              {t(error)}
             </div>
           )}
           {notice && (
             <div role="status" className="bg-green-50 border border-green-200 rounded-lg p-3 text-green-800 text-sm">
-              {notice}
+              {t(notice)}
             </div>
           )}
 
@@ -211,37 +215,37 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full h-12 rounded-lg bg-brand-600 hover:bg-brand-700 text-white font-semibold transition disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-brand-600"
           >
-            {loading ? 'Please wait...' : submitLabel}
+            {loading ? t('common.pleaseWait') : submitLabel}
           </button>
         </form>
 
         <div className="mt-5 text-center text-sm text-gray-600">
           {mode === 'signin' && (
             <>
-              New to Namasutra?{' '}
+              {t('auth.newHere')}{' '}
               <button onClick={() => switchMode('signup')} className="text-brand-600 hover:text-brand-700 font-medium">
-                Create an account
+                {t('auth.createAccountLink')}
               </button>
             </>
           )}
           {mode === 'signup' && (
             <>
-              Already have an account?{' '}
+              {t('auth.haveAccount')}{' '}
               <button onClick={() => switchMode('signin')} className="text-brand-600 hover:text-brand-700 font-medium">
-                Sign in
+                {t('auth.signInLink')}
               </button>
             </>
           )}
           {mode === 'reset' && (
             <button onClick={() => switchMode('signin')} className="text-brand-600 hover:text-brand-700 font-medium">
-              ← Back to sign in
+              {t('auth.backToSignin')}
             </button>
           )}
         </div>
 
         <div className="mt-6 text-center">
           <button onClick={() => navigate('/')} className="text-brand-600 hover:text-brand-700 text-sm font-medium">
-            ← Back to Home
+            {t('common.backToHome')}
           </button>
         </div>
       </div>

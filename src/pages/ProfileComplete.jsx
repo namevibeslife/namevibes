@@ -6,8 +6,10 @@ import { COUNTRIES, getActiveCountries } from '../data/countries';
 import { detectBrowserCountry } from '../utils/countryDetect';
 import { normalizeReferralCode, isWellFormedCode, getStoredReferralCode, clearStoredReferralCode } from '../utils/referralCode';
 import { useAuthStore } from '../store/authStore';
+import { useTranslation } from 'react-i18next';
 
 export default function ProfileComplete() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const refreshProfile = useAuthStore(state => state.refreshProfile);
   const [loading, setLoading] = useState(false);
@@ -138,7 +140,7 @@ export default function ProfileComplete() {
     try {
       const user = auth.currentUser;
       if (!user) {
-        alert('Please sign in first');
+        alert(t('errors.signInFirst'));
         navigate('/login');
         return;
       }
@@ -150,13 +152,13 @@ export default function ProfileComplete() {
       if (formData.referralCode) {
         cleaned = normalizeReferralCode(formData.referralCode);
         if (!isWellFormedCode(cleaned)) {
-          alert('Referral code format should be a 2-letter country code followed by 6 digits (e.g. IN482913).');
+          alert(t('errors.referralFormat'));
           setLoading(false);
           return;
         }
         const codeDoc = await getDoc(doc(db, 'referralCodes', cleaned));
         if (!codeDoc.exists() || !codeDoc.data().active) {
-          alert('This referral code is not valid. Please check it, or leave it empty to continue without one.');
+          alert(t('errors.referralInvalid'));
           setLoading(false);
           return;
         }
@@ -178,7 +180,7 @@ export default function ProfileComplete() {
       navigate('/pricing');
     } catch (error) {
       console.error('Error saving profile:', error);
-      alert('Error saving profile. Please try again.');
+      alert(t('errors.profileSave'));
     } finally {
       setLoading(false);
     }
@@ -189,17 +191,17 @@ export default function ProfileComplete() {
       <div className="max-w-2xl mx-auto">
         <div className="bg-paper rounded-2xl shadow-xl p-8">
           <h2 className="text-3xl font-bold text-center mb-2 bg-gradient-to-r from-brand-600 to-ocean-600 bg-clip-text text-transparent">
-            Complete Your Profile
+            {t('profileComplete.title')}
           </h2>
           <p className="text-center text-gray-600 mb-8">
-            Tell us a bit about yourself
+            {t('profileComplete.subtitle')}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Full Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Full Name *
+                {t('profileComplete.fullName')}
               </label>
               <input
                 type="text"
@@ -207,14 +209,14 @@ export default function ProfileComplete() {
                 value={formData.fullName}
                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                placeholder="Enter your full name"
+                placeholder={t('profileComplete.fullNamePlaceholder')}
               />
             </div>
 
             {/* Date of Birth */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date of Birth *
+                {t('profileComplete.dob')}
               </label>
               <input
                 type="date"
@@ -228,7 +230,7 @@ export default function ProfileComplete() {
             {/* Gender */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Gender *
+                {t('profileComplete.gender')}
               </label>
               <select
                 required
@@ -236,17 +238,17 @@ export default function ProfileComplete() {
                 onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
               >
-                <option value="">Select gender</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
+                <option value="">{t('profileComplete.selectGender')}</option>
+                <option value="male">{t('profileComplete.male')}</option>
+                <option value="female">{t('profileComplete.female')}</option>
+                <option value="other">{t('profileComplete.other')}</option>
               </select>
             </div>
 
             {/* Country - Searchable */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Country *
+                {t('profileComplete.country')}
               </label>
               <input
                 type="text"
@@ -258,7 +260,7 @@ export default function ProfileComplete() {
                 }}
                 onFocus={() => setShowCountryDropdown(true)}
                 className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                placeholder="Type to search country..."
+                placeholder={t('profileComplete.countryPlaceholder')}
                 autoComplete="off"
               />
               
@@ -278,14 +280,14 @@ export default function ProfileComplete() {
                     ))
                   ) : (
                     <div className="px-4 py-3 text-gray-500 text-center">
-                      No countries found
+                      {t('profileComplete.noCountries')}
                     </div>
                   )}
                 </div>
               )}
               {autoDetected && (
                 <p className="text-xs text-brand-600 mt-1">
-                  Detected automatically based on your location — change it if this isn't right.
+                  {t('profileComplete.detected')}
                 </p>
               )}
             </div>
@@ -294,7 +296,7 @@ export default function ProfileComplete() {
             {formData.countryCode && (
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  State/Province *
+                  {t('profileComplete.state')}
                 </label>
                 <input
                   type="text"
@@ -306,7 +308,7 @@ export default function ProfileComplete() {
                   }}
                   onFocus={() => setShowStateDropdown(true)}
                   className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
-                  placeholder="Type to search state..."
+                  placeholder={t('profileComplete.statePlaceholder')}
                   autoComplete="off"
                 />
                 
@@ -326,7 +328,7 @@ export default function ProfileComplete() {
                       ))
                     ) : (
                       <div className="px-4 py-3 text-gray-500 text-center">
-                        No states found
+                        {t('profileComplete.noStates')}
                       </div>
                     )}
                   </div>
@@ -337,7 +339,7 @@ export default function ProfileComplete() {
             {/* Referral Code */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Referral Code (Optional)
+                {t('profileComplete.referral')}
               </label>
               <input
                 type="text"
@@ -349,11 +351,11 @@ export default function ProfileComplete() {
               />
               {referralFromLink && formData.referralCode ? (
                 <p className="text-xs text-brand-600 mt-1">
-                  Applied from your invite link - change or clear it if this isn't right.
+                  {t('profileComplete.referralFromLink')}
                 </p>
               ) : (
                 <p className="text-xs text-gray-500 mt-1">
-                  Format: country code + 6 digits (e.g., IN482913)
+                  {t('profileComplete.referralFormat')}
                 </p>
               )}
             </div>
@@ -364,7 +366,7 @@ export default function ProfileComplete() {
               disabled={loading}
               className="w-full bg-gradient-to-r from-brand-600 to-ocean-600 text-white py-4 rounded-lg font-semibold text-lg hover:from-brand-700 hover:to-ocean-700 transition disabled:opacity-50"
             >
-              {loading ? 'Saving...' : 'Continue to Pricing'}
+              {loading ? t('profileComplete.saving') : t('profileComplete.continue')}
             </button>
           </form>
         </div>

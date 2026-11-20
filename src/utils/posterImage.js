@@ -2,6 +2,8 @@ import { drawPosterBackground, drawGemTile } from './posterArtwork';
 import { textColorFor } from './elements';
 import { posterColorFor } from './posterPalette';
 import { SITE_HOST } from '../config/site.js';
+import i18n from 'i18next';
+import { preparePosterFonts } from '../i18n/posterFont.js';
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -17,12 +19,13 @@ export async function buildPosterImage(person, family = false, theme = family ? 
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Image export unavailable');
+  await preparePosterFonts(ctx);
   const elements = person.elements || [];
   const logo = await loadImage('/brand/namasutra-logo.png').catch(() => null);
   ctx.font = '64px Georgia';
   const lines = [];
   let line = '';
-  for (const character of person.fullName || 'Your name') {
+  for (const character of person.fullName || i18n.t('poster.nameFallback')) {
     if (ctx.measureText(line + character).width > 880 && line) { lines.push(line.trim()); line = ''; }
     line += character;
   }
@@ -51,9 +54,9 @@ export async function buildPosterImage(person, family = false, theme = family ? 
     ctx.fillStyle = color; ctx.font = `${size}px ${font}`; ctx.textAlign = 'center'; ctx.fillText(value, 540, y);
   }
   if (!logo) text('N A M A S U T R A', 205, 43);
-  text('EVERY NAME HAS A CHEMISTRY', 252, 19, 'Arial');
+  text(i18n.t('poster.eyebrow').toUpperCase(), 252, 19, 'Arial');
   ctx.beginPath(); ctx.moveTo(170, 290); ctx.lineTo(910, 290); ctx.stroke();
-  text('Your Elemental Identity, in Harmony with Nature.', 345, 32, 'Georgia');
+  text(i18n.t('poster.heading'), 345, 32, 'Georgia');
   lines.forEach((nameLine, i) => text(nameLine, 420 + i * 78, 64));
   const gridY = Math.max(top, (canvas.height - rows * 220) / 2 + 80);
   elements.forEach((el, index) => {
@@ -69,8 +72,8 @@ export async function buildPosterImage(person, family = false, theme = family ? 
     ctx.textAlign = 'center'; ctx.font = 'bold 75px Georgia'; ctx.fillText(el.symbol, x + 87, y + 125);
     ctx.font = 'bold 18px Georgia'; ctx.fillText(el.name, x + 87, y + 177);
   });
-  if (!elements.length) text('No periodic elements found in this name.', 700, 24, 'Arial');
-  text('More than a name. A higher you.', canvas.height - 105, 30);
+  if (!elements.length) text(i18n.t('poster.noElements'), 700, 24, 'Arial');
+  text(i18n.t('poster.footerSingle'), canvas.height - 105, 30);
   text(SITE_HOST, canvas.height - 61, 18, 'Arial');
   const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
   if (!blob) throw new Error('Could not create image');

@@ -1,14 +1,15 @@
+import i18n from 'i18next';
 import { SITE_URL } from '../config/site.js';
 // Invite-only ambassadors: the admin invites a Google email, which becomes the authorisation.
 export const AMBASSADOR_LOGIN_URL = `${SITE_URL}/ambassador`;
-export const INVITE_EMAIL_SUBJECT = 'You are invited to become a NAMASUTRA Ambassador';
+export const inviteEmailSubject = () => i18n.t('invite.subject');
 
 // Editable default invite text.
 export function buildInviteMessage(email) {
   return [
-    "You're invited to become a NAMASUTRA Ambassador 🌟",
-    `Sign in with your Google account (${email}) here: ${AMBASSADOR_LOGIN_URL}`,
-    'Your unique Ambassador Code is already waiting for you in your dashboard.'
+    i18n.t('invite.line1'),
+    i18n.t('invite.line2', { email, url: AMBASSADOR_LOGIN_URL }),
+    i18n.t('invite.line3')
   ].join('\n');
 }
 
@@ -24,6 +25,6 @@ export function maskEmail(email) {
 // "Asha K."
 export function maskName(name) {
   const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
-  if (!parts.length) return 'Member';
+  if (!parts.length) return i18n.t('invite.member');
   return parts.length === 1 ? parts[0] : `${parts[0]} ${parts[parts.length - 1][0]}.`;
 }

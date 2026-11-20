@@ -1,30 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-const INTRO = {
-  western: {
-    heading: "Discover a Name That Resonates with Your Zodiac Sign",
-    paragraphs: [
-      "In Western astrology, every zodiac sign is traditionally associated with distinct qualities, energies and personality traits.",
-      "Whether you're naming a newborn, starting a business or beginning something new, explore names and starting syllables traditionally associated with your zodiac sign.",
-      "According to astrological beliefs, choosing a name aligned with these qualities is thought to create a symbolic harmony between the name, the individual's identity and the universal energies represented by the zodiac."
-    ]
-  },
-  vedic: {
-    heading: "Discover a Name That Resonates with Your Birth Star",
-    paragraphs: [
-      "In Vedic astrology, the moment of birth determines a child's Nakshatra (birth star) and Pada (quarter). Each of the 27 Nakshatras is traditionally associated with specific sounds and syllables believed to carry distinct cosmic vibrations.",
-      "For generations, families have used these auspicious syllables when naming newborns, believing that a name beginning with the recommended sound creates harmony with the cosmic energies associated with the child's birth star.",
-      "This traditional practice can also inspire the naming of businesses, ventures and new beginnings, with the belief that a thoughtfully chosen name symbolises harmony, positivity and auspicious beginnings."
-    ]
-  }
-};
+const slug = (v) => String(v).toLowerCase().replace(/[^a-z0-9]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ''));
+
+const INTRO_PARAS = { western: 3, vedic: 3 };
 
 export default function ZodiacSyllableTable() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [selectedSign, setSelectedSign] = useState(null);
   const [system, setSystem] = useState('western'); // 'western' or 'vedic'
+  const zf = (z, f) => t(`zodiac.${system}.${slug(z.sign)}.${f}`);
 
   const westernZodiac = [
     {
@@ -362,8 +350,8 @@ export default function ZodiacSyllableTable() {
               }}
               className="appearance-none bg-gradient-to-r from-brand-600 to-ocean-600 text-white px-4 py-2 pr-10 rounded-lg font-semibold text-sm cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-400"
             >
-              <option value="western" style={{ backgroundColor: '#fffdf7', color: '#392b1a' }}>Western Zodiac</option>
-              <option value="vedic" style={{ backgroundColor: '#fffdf7', color: '#392b1a' }}>Vedic Astrology</option>
+              <option value="western" style={{ backgroundColor: '#fffdf7', color: '#392b1a' }}>{t('zodiac.optWestern')}</option>
+              <option value="vedic" style={{ backgroundColor: '#fffdf7', color: '#392b1a' }}>{t('zodiac.optVedic')}</option>
             </select>
             <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white pointer-events-none" size={16} />
           </div>
@@ -371,13 +359,13 @@ export default function ZodiacSyllableTable() {
         {/* Title */}
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold text-gray-800 mb-2">
-            {system === 'western' ? '🌟 Western Zodiac' : '🕉️ Vedic Astrology'}
+            {system === 'western' ? t('zodiac.titleWestern') : t('zodiac.titleVedic')}
           </h2>
           <div className="max-w-3xl mx-auto mt-4">
-            <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-3">{INTRO[system].heading}</h3>
+            <h3 className="text-xl md:text-2xl font-bold text-gray-800 mb-3">{t(`zodiac.intro.${system}.heading`)}</h3>
             <div className="space-y-3">
-              {INTRO[system].paragraphs.map((text, i) => (
-                <p key={i} className="text-gray-700 text-sm md:text-base leading-relaxed text-left md:text-center">{text}</p>
+              {Array.from({ length: INTRO_PARAS[system] }, (_, i) => (
+                <p key={i} className="text-gray-700 text-sm md:text-base leading-relaxed text-left md:text-center">{t(`zodiac.intro.${system}.p${i + 1}`)}</p>
               ))}
             </div>
           </div>
@@ -399,8 +387,8 @@ export default function ZodiacSyllableTable() {
                   <div className="flex items-center gap-3">
                     <span className="text-4xl">{zodiac.symbol}</span>
                     <div>
-                      <h3 className="text-lg font-bold text-gray-800">{zodiac.sign}</h3>
-                      <p className="text-xs text-gray-600">{zodiac.dates}</p>
+                      <h3 className="text-lg font-bold text-gray-800">{zf(zodiac, 'sign')}</h3>
+                      <p className="text-xs text-gray-600">{zf(zodiac, 'dates')}</p>
                     </div>
                   </div>
                   <div className="text-right">
@@ -409,7 +397,7 @@ export default function ZodiacSyllableTable() {
                       zodiac.element === 'Earth' ? 'bg-green-600' :
                       zodiac.element === 'Air' ? 'bg-ocean-400' : 'bg-ocean-600'
                     }`}>
-                      {zodiac.element}
+                      {zf(zodiac, 'element')}
                     </span>
                   </div>
                 </div>
@@ -417,9 +405,9 @@ export default function ZodiacSyllableTable() {
                 {/* Syllables - Always Visible */}
                 <div className="mt-3 bg-brand-100/20 rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <p className="text-xs text-gray-600 font-semibold">✨ Auspicious Syllables:</p>
+                    <p className="text-xs text-gray-600 font-semibold">{t('zodiacPage.n001')}</p>
                     <span className="flex items-center gap-2 text-xs font-semibold text-[#105717]">
-                      {selectedSign === zodiac.sign ? 'Tap to hide details' : 'Tap to see more'}
+                      {selectedSign === zodiac.sign ? t('zodiac.hide') : t('zodiac.more')}
                       <span className="expand-arrow" aria-hidden="true">
                         <ChevronDown
                           size={22}
@@ -446,28 +434,28 @@ export default function ZodiacSyllableTable() {
               {selectedSign === zodiac.sign && (
                 <div className="px-4 pb-4 space-y-3 border-t border-brand-200/40 pt-3">
                   <div className="bg-brand-100/20 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">📝 Example Names:</p>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">{t('zodiacPage.n002')}</p>
                     <p className="text-sm text-gray-800">{zodiac.nameExamples}</p>
                   </div>
                   
                   <div className="bg-brand-100/20 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">🎲 Lucky Numbers:</p>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">{t('zodiacPage.n003')}</p>
                     <p className="text-sm text-gray-800">{zodiac.luckyNumbers}</p>
                   </div>
 
                   <div className="bg-brand-100/20 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">🎨 Lucky Colors:</p>
-                    <p className="text-sm text-gray-800">{zodiac.colors}</p>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">{t('zodiacPage.n004')}</p>
+                    <p className="text-sm text-gray-800">{zf(zodiac, 'colors')}</p>
                   </div>
 
                   <div className="bg-brand-100/20 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">✨ Personality:</p>
-                    <p className="text-sm text-gray-800">{zodiac.traits}</p>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">{t('zodiacPage.n005')}</p>
+                    <p className="text-sm text-gray-800">{zf(zodiac, 'traits')}</p>
                   </div>
 
                   <div className="bg-brand-100/20 rounded-lg p-3">
-                    <p className="text-xs font-semibold text-gray-700 mb-1">💼 Best Career:</p>
-                    <p className="text-sm text-gray-800">{zodiac.bestFor}</p>
+                    <p className="text-xs font-semibold text-gray-700 mb-1">{t('zodiacPage.n006')}</p>
+                    <p className="text-sm text-gray-800">{zf(zodiac, 'bestFor')}</p>
                   </div>
                 </div>
               )}
@@ -477,23 +465,23 @@ export default function ZodiacSyllableTable() {
 
         {/* How to Use Guide */}
         <div className="mt-6 bg-transparent rounded-xl shadow-none p-5 border border-brand-200/50 glow-outline">
-          <h4 className="text-lg font-bold text-brand-800 mb-3">💡 How to Use</h4>
+          <h4 className="text-lg font-bold text-brand-800 mb-3">{t('zodiacPage.n007')}</h4>
           <ul className="space-y-2 text-sm text-gray-700">
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">1.</span>
-              <span>Find your zodiac sign based on birth date</span>
+              <span>{t('zodiacPage.n008')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">2.</span>
-              <span>Choose names starting with the auspicious syllables</span>
+              <span>{t('zodiacPage.n009')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">3.</span>
-              <span>Tap any card to see more details and examples</span>
+              <span>{t('zodiacPage.n010')}</span>
             </li>
             <li className="flex gap-2">
               <span className="text-brand-600 font-bold">4.</span>
-              <span>Switch between Western and Vedic systems using dropdown above</span>
+              <span>{t('zodiacPage.n011')}</span>
             </li>
           </ul>
         </div>

@@ -1,8 +1,11 @@
 import React, { useState } from "react";
+import { Trans } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authStore";
+import { useTranslation } from 'react-i18next';
 
 export default function LearnMore() {
+  const { t } = useTranslation();
   const [mode, setMode] = useState("science");
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -12,7 +15,7 @@ export default function LearnMore() {
       <div className="max-w-4xl mx-auto bg-paper rounded-2xl shadow-lg p-8">
         
         <h1 className="text-3xl font-bold text-gray-800 mb-4 text-center">
-          Learn More
+          {t('landing.learnMore')}
         </h1>
 
         {/* Navigation */}
@@ -21,7 +24,7 @@ export default function LearnMore() {
             onClick={() => navigate("/")}
             className="text-brand-600 font-semibold hover:underline"
           >
-            Home
+            {t('nav.home')}
           </button>
 
           {user && (
@@ -29,13 +32,13 @@ export default function LearnMore() {
               onClick={() => navigate("/dashboard")}
               className="text-brand-600 font-semibold hover:underline"
             >
-              Dashboard
+              {t('nav.dashboard')}
             </button>
           )}
         </div>
 
-        <div className="flex flex-wrap justify-center gap-3 mb-8" aria-label="Learn more topics">
-          {[["science", "Science"], ["spiritual", "Spiritual"], ["explainer", "How It Works"]].map(([key, label]) => (
+        <div className="flex flex-wrap justify-center gap-3 mb-8" aria-label={t('learn.topicsAria')}>
+          {[["science", t('learn.tabScience')], ["spiritual", t('learn.tabSpiritual')], ["explainer", t('learn.tabExplainer')]].map(([key, label]) => (
             <button key={key} onClick={() => setMode(key)} aria-pressed={mode === key}
               className={`px-5 py-3 rounded-full font-semibold transition ${mode === key ? "bg-brand-600 text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
               {label}
@@ -45,75 +48,57 @@ export default function LearnMore() {
 
         {/* Content */}
         {mode === "explainer" ? (
-          <section aria-label="How Namasutra works" className="space-y-4 text-center">
-            <h2 className="text-2xl text-brand-700">Your Elemental Identity, in Harmony with Nature.</h2>
-            <p>Explore the letters, discover the elements, and create your own Namasutra poster.</p>
+          <section aria-label={t('learn.explainerAria')} className="space-y-4 text-center">
+            <h2 className="text-2xl text-brand-700">{t('poster.heading')}</h2>
+            <p>{t('learn.explainerText')}</p>
             <a href="/theme/namasutra-explainer.png" target="_blank" rel="noreferrer" className="block rounded-xl overflow-hidden border border-amber-200 shadow-lg">
-              <img src="/theme/namasutra-explainer.png" alt="Namasutra illustrated guide: Vibes becomes Vanadium (V), Iodine (I), Beryllium (Be), and Sulfur (S). Discover your name's elements and create a poster to save and share." className="w-full h-auto" />
+              <img src="/theme/namasutra-explainer.png" alt={t('learn.explainerAlt')} className="w-full h-auto" />
             </a>
-            <a href="/theme/namasutra-explainer.png" target="_blank" rel="noreferrer" className="inline-block underline text-brand-700 py-2">View the explainer full size</a>
+            <a href="/theme/namasutra-explainer.png" target="_blank" rel="noreferrer" className="inline-block underline text-brand-700 py-2">{t('learn.explainerFull')}</a>
           </section>
         ) : mode === "science" ? (
           <div className="space-y-4 text-gray-700 leading-relaxed">
-            <p>
-              <strong>Namasutra</strong> explores how identity can be understood
-              through <strong>chemistry, structure, and vibration</strong>.
-            </p>
+            <p><Trans i18nKey="learn.science1" components={{ b: <strong /> }} /></p>
 
-            <p>Every name can be mapped to:</p>
+            <p>{t('learn.science2')}</p>
 
             <ul className="list-disc list-inside pl-4">
-              <li>Chemical elements from the Periodic Table</li>
-              <li>Atomic properties and elemental color frequencies</li>
-              <li>Sound-based vibrational patterns</li>
+              <li>{t('learn.scienceItem1')}</li>
+              <li>{t('learn.scienceItem2')}</li>
+              <li>{t('learn.scienceItem3')}</li>
             </ul>
 
             <div className="bg-brand-50 border border-brand-200 rounded-lg p-4">
-              <p className="font-semibold">Example:</p>
+              <p className="font-semibold">{t('learn.example')}</p>
               <p className="font-mono">
                 BLESSINGS → B – Li – Es – S – In – G – S
               </p>
             </div>
 
-            <p>
-              These elements together form a{" "}
-              <strong>Name Chemistry Signature</strong>, offering insight into
-              personality traits, emotional balance, and compatibility.
-            </p>
+            <p><Trans i18nKey="learn.science3" components={{ b: <strong /> }} /></p>
 
-            <p className="font-semibold text-brand-600">
-              Right vibrations create better alignment.
-            </p>
+            <p className="font-semibold text-brand-600">{t('learn.science4')}</p>
           </div>
         ) : (
           <div className="space-y-4 text-gray-700 leading-relaxed">
-            <p>
-              At <strong>Namasutra</strong>, we see the universe as energy in
-              motion — and sound as its first expression.
-            </p>
+            <p><Trans i18nKey="learn.spiritual1" components={{ b: <strong /> }} /></p>
 
             <p className="italic">
-              A name carries sound.<br />
-              Sound carries vibration.<br />
-              Vibration shapes experience.
+              {t('learn.spiritual2a')}<br />
+              {t('learn.spiritual2b')}<br />
+              {t('learn.spiritual2c')}
             </p>
 
             <div className="bg-ocean-50 border border-ocean-200 rounded-lg p-4">
-              <p className="font-semibold">Example:</p>
+              <p className="font-semibold">{t('learn.example')}</p>
               <p className="font-mono">
                 BLESSINGS → B – Li – Es – S – In – G – S
               </p>
             </div>
 
-            <p>
-              Each sound resonates with an element, a color, and a cosmic
-              frequency — forming your unique{" "}
-              <strong>energetic signature</strong>.
-            </p>
+            <p><Trans i18nKey="learn.spiritual3" components={{ b: <strong /> }} /></p>
 
-            <p className="font-semibold text-brand-600">
-              Right vibes matter — whether it’s a name, a child, or a brand.
-            </p>
+            <p className="font-semibold text-brand-600">{t('learn.spiritual4')}</p>
           </div>
         )}
       </div>

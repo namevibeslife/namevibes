@@ -20,6 +20,7 @@ const FamilyPackage = lazy(() => import('./pages/FamilyPackage'));
 const AnalysisView = lazy(() => import('./pages/AnalysisView'));
 const FamilyAnalysisView = lazy(() => import('./pages/FamilyAnalysisView'));
 const Pricing = lazy(() => import('./pages/Pricing'));
+import LanguageSync from './components/LanguageSync';
 const Settings = lazy(() => import('./pages/Settings'));
 const MyProfile = lazy(() => import('./pages/MyProfile'));
 const AmbassadorHome = lazy(() => import('./pages/AmbassadorHome'));
@@ -77,6 +78,7 @@ function ProtectedRoute({ children, requiresAuth = true, requiresProfile, requir
 function App() {
   return (
     <BrowserRouter>
+      <LanguageSync />
       <UserNav />
       <Suspense fallback={<Spinner />}>
         <Routes>

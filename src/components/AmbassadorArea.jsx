@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -7,7 +8,7 @@ import AmbassadorRegister from './AmbassadorRegister';
 import { ArrowUpRight, CheckCircle, UserCircle, Home, Users } from 'lucide-react';
 import AmbassadorFollowers from './AmbassadorFollowers';
 
-const TABS = [['home', 'Home'], ['register', 'Register'], ['followers', 'My Followers']];
+const TABS = [['home', 'ambassador.tabHome'], ['register', 'ambassador.tabRegister'], ['followers', 'ambassador.tabFollowers']];
 
 // Home text lives in Firestore (ambassadorContent/home), readable only by admins and approved
 // ambassadors, so none of it ships in a public bundle. Sections are plain structured data:
@@ -44,6 +45,7 @@ function HomeContent({ content }) {
 // Everything an approved ambassador sees. Loaded as its own chunk only after the account has been
 // confirmed as an approved, active ambassador.
 export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, onSignOut }) {
+  const { t } = useTranslation();
   const [params, setParams] = useSearchParams();
   const tab = TABS.some(([key]) => key === params.get('tab')) ? params.get('tab') : 'home';
   const goto = (key) => setParams(key === 'home' ? {} : { tab: key });
@@ -65,31 +67,31 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
   return (
     <div className="amb-workspace">
       <header className="amb-workspace-header">
-        <div><p className="amb-kicker">YOUR AMBASSADOR SPACE</p><h1>Welcome, {ambassador.firstName || ambassador.fullName || user.displayName || 'Ambassador'}.</h1><p>Everything you need, in one place.</p></div>
-        <span className="amb-status"><CheckCircle size={16} aria-hidden="true" /> Active ambassador</span>
+        <div><p className="amb-kicker">{t('ambassador.yourSpace')}</p><h1>{t('ambassador.welcome', { name: ambassador.firstName || ambassador.fullName || user.displayName || t('ambassador.fallbackName') })}</h1><p>{t('ambassador.everything')}</p></div>
+        <span className="amb-status"><CheckCircle size={16} aria-hidden="true" /> {t('ambassador.active')}</span>
       </header>
-      <nav aria-label="Ambassador sections" className="amb-tabs">
+      <nav aria-label={t('ambassador.sectionsAria')} className="amb-tabs">
         {TABS.map(([key, label], index) => {
           const Icon = [Home, UserCircle, Users][index];
           return <button key={key} type="button" onClick={() => goto(key)} aria-current={tab === key ? 'page' : undefined}>
-            <Icon size={18} aria-hidden="true" /><span>{label}</span>
+            <Icon size={18} aria-hidden="true" /><span>{t(label)}</span>
           </button>;
         })}
       </nav>
       {tab === 'home' && (
         <div className="amb-home-grid">
           <article className="amb-welcome-card">
-            {content === null ? <p role="status" className="amb-prose">Loading your welcome...</p> : <HomeContent content={content} />}
-            {content !== null && !content.title && !content.intro?.length && !content.sections?.length && <div className="amb-empty-welcome"><p className="amb-kicker">WELCOME TO NAMASUTRA</p><h2>Your ambassador home</h2><p>Your account is ready. Use the tabs above to manage your profile and view your followers.</p></div>}
-            {contentError && <p role="status" className="mt-4 text-sm text-gray-600">The welcome text could not be loaded right now.</p>}
+            {content === null ? <p role="status" className="amb-prose">{t('ambassador.loadingWelcome')}</p> : <HomeContent content={content} />}
+            {content !== null && !content.title && !content.intro?.length && !content.sections?.length && <div className="amb-empty-welcome"><p className="amb-kicker">{t('ambassador.emptyKicker')}</p><h2>{t('ambassador.emptyTitle')}</h2><p>{t('ambassador.emptyText')}</p></div>}
+            {contentError && <p role="status" className="mt-4 text-sm text-gray-600">{t('ambassador.welcomeFailed')}</p>}
           </article>
-          <aside className="amb-tools" aria-label="Your ambassador tools">
+          <aside className="amb-tools" aria-label={t('ambassador.toolsAria')}>
             <section className="amb-profile-summary">
               <span className="amb-icon-medallion"><UserCircle size={25} aria-hidden="true" /></span>
-              <div><p className="amb-kicker">YOUR PROFILE</p><h2>{ambassador.detailsCompleted ? 'Details saved' : 'Make yourself at home'}</h2></div>
-              <p>{ambassador.detailsCompleted ? 'Your registration details are saved. Review or update them whenever you need.' : 'Complete your details to receive payouts.'}</p>
+              <div><p className="amb-kicker">{t('ambassador.yourProfile')}</p><h2>{ambassador.detailsCompleted ? t('ambassador.detailsSavedTitle') : t('ambassador.makeHome')}</h2></div>
+              <p>{ambassador.detailsCompleted ? t('ambassador.profileSavedText') : t('ambassador.profileCompleteText')}</p>
               <button type="button" className="amb-primary-action" onClick={() => goto('register')}>
-                {ambassador.detailsCompleted ? 'View your profile' : 'Complete details'} <ArrowUpRight size={18} aria-hidden="true" />
+                {ambassador.detailsCompleted ? t('ambassador.viewProfile') : t('ambassador.completeDetails')} <ArrowUpRight size={18} aria-hidden="true" />
               </button>
             </section>
             <div className="amb-share-panel"><ReferralShareCard code={ambassador.referralCode} /></div>
@@ -103,7 +105,7 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
 
       {tab === 'followers' && (
         <section aria-labelledby="followers-heading">
-          <h2 id="followers-heading" className="font-serif text-3xl font-bold text-gray-900 text-center mb-6">My Followers</h2>
+          <h2 id="followers-heading" className="font-serif text-3xl font-bold text-gray-900 text-center mb-6">{t('ambassador.tabFollowers')}</h2>
           <AmbassadorFollowers ambassador={ambassador} />
         </section>
       )}
@@ -111,8 +113,8 @@ export default function AmbassadorArea({ ambassador, user, onAmbassadorChange, o
       {toast && <div role="status" aria-live="polite" className="pointer-events-none fixed bottom-4 left-1/2 -translate-x-1/2 z-50 max-w-[90vw] rounded-lg bg-gray-900 text-white px-4 py-3 text-sm shadow-lg">{toast}</div>}
 
       <div className="amb-account-footer">
-        <p className="text-xs text-gray-500 mb-2">Signed in as {ambassador.email}</p>
-        <button type="button" onClick={onSignOut} className="px-4 py-2 min-h-[44px] rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">Sign out</button>
+        <p className="text-xs text-gray-500 mb-2">{t('ambassador.signedInAs', { email: ambassador.email })}</p>
+        <button type="button" onClick={onSignOut} className="px-4 py-2 min-h-[44px] rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 text-sm">{t('ambassador.signOut')}</button>
       </div>
     </div>
   );

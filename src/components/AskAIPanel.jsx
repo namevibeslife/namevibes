@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Share2, ExternalLink, HelpCircle } from 'lucide-react';
 import { buildAIPrompt, buildFamilyPDF } from '../utils/familyReport';
+import { isComplexLanguage } from '../i18n/posterFont';
 
 // Gemini doesn't accept a prefilled prompt in the URL, so it relies on the clipboard copy
 const AI_PROVIDERS = [
@@ -24,6 +26,7 @@ const canShareFiles = () => {
  * results: [{ relation, fullName, elements }]; contextLabels: reasons the user ticked (optional).
  */
 export default function AskAIPanel({ results, contextLabels = [] }) {
+  const { t } = useTranslation();
   const [aiNotice, setAiNotice] = useState(null);
   const [showHelp, setShowHelp] = useState(false);
   const shareFiles = canShareFiles();
@@ -42,15 +45,18 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
 
   const handleShareToAIApp = async () => {
     const prompt = buildAIPrompt(results, contextLabels);
-    const file = new File([buildFamilyPDF(results).output('blob')], 'Namasutra_Family_Report.pdf', { type: 'application/pdf' });
+    const pdf = isComplexLanguage()
+      ? await (await import('../utils/posterPdfImage')).buildPosterImagePDF(results, { family: true })
+      : buildFamilyPDF(results);
+    const file = new File([pdf.output('blob')], 'Namasutra_Family_Report.pdf', { type: 'application/pdf' });
 
     try {
-      await navigator.share({ files: [file], text: prompt, title: 'Namasutra Family Report' });
+      await navigator.share({ files: [file], text: prompt, title: t('ai.reportTitle') });
     } catch (error) {
       if (error.name !== 'AbortError') {
         console.error('Share failed:', error);
         navigator.clipboard?.writeText(prompt).catch(() => {});
-        setAiNotice('your AI app');
+        setAiNotice(t('ai.yourApp'));
       }
     }
   };
@@ -58,10 +64,10 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
   return (
     <div>
       <h4 className="text-lg font-bold text-gray-800 text-center mb-1">
-        Deepen Your Understanding with AI (Free)
+        {t('ai.title')}
       </h4>
       <p className="text-sm text-gray-600 text-center mb-4">
-        Uses your own AI account. Your full report is sent along{contextLabels.length > 0 ? ', including the reasons you selected' : ''}.
+        {contextLabels.length > 0 ? t('ai.subtitleReasons') : t('ai.subtitle')}
       </p>
 
       {shareFiles && (
@@ -70,7 +76,7 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
           className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-brand-600 to-brand-600 text-white py-3 rounded-lg font-semibold hover:from-brand-700 hover:to-brand-700 transition mb-3"
         >
           <Share2 size={20} />
-          Send PDF to my AI app
+          {t('ai.sendPdf')}
         </button>
       )}
 
@@ -82,15 +88,14 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
             className="flex items-center justify-center gap-2 bg-paper text-brand-700 border-2 border-brand-300 py-3 rounded-lg font-semibold hover:bg-brand-50 transition"
           >
             <ExternalLink size={18} />
-            Ask {provider.name}
+            {t('ai.ask', { name: provider.name })}
           </button>
         ))}
       </div>
 
       {aiNotice && (
         <div className="mt-4 bg-green-50 border border-green-300 text-green-800 rounded-lg p-3 text-sm">
-          ✅ Your report has been copied. If it isn't already in the {aiNotice} chat box, paste it in
-          (<strong>Ctrl+V</strong> on a computer, or <strong>long-press → Paste</strong> on a phone) and send.
+          <Trans i18nKey="ai.copied" values={{ app: aiNotice }} components={{ b: <strong /> }} />
         </div>
       )}
 
@@ -99,28 +104,24 @@ export default function AskAIPanel({ results, contextLabels = [] }) {
         className="mt-4 flex items-center gap-1 text-sm text-brand-700 font-semibold mx-auto hover:underline"
       >
         <HelpCircle size={16} />
-        {showHelp ? 'Hide help' : 'How does this work?'}
+        {showHelp ? t('ai.hideHelp') : t('ai.howWorks')}
       </button>
 
       {showHelp && (
         <div className="mt-3 bg-paper rounded-lg p-4 text-sm text-gray-700 space-y-2 border border-brand-200">
           {shareFiles && (
             <p>
-              <strong>Send PDF to my AI app:</strong> opens your phone's share menu with the PDF report attached.
-              Choose Claude, ChatGPT or Gemini and the report arrives ready to send.
+              <Trans i18nKey="ai.help1" components={{ b: <strong /> }} />
             </p>
           )}
           <p>
-            <strong>Ask Claude / ChatGPT / Gemini:</strong> opens the AI in a new tab with your full report
-            (names, elements, meanings and harmony) already written as a question. It's also copied, so you
-            can paste it if the box is empty. Gemini always needs a paste.
+            <Trans i18nKey="ai.help2" components={{ b: <strong /> }} />
           </p>
           <p>
-            <strong>Want to attach the PDF too?</strong> Use <em>Download PDF</em> at the top, then drag the file
-            into the chat or use the AI's attach (paperclip) button.
+            <Trans i18nKey="ai.help3" components={{ b: <strong />, i: <em /> }} />
           </p>
           <p>
-            You'll need to be signed in to your AI account. Namasutra doesn't see your conversation.
+            {t('ai.help4')}
           </p>
         </div>
       )}

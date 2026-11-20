@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { gemTileData, loadGemTexture } from '../utils/posterArtwork';
 import Logo from './Logo';
+import { elementMeaning } from '../i18n/elements';
+import { relationLabel, sharedLabel } from '../i18n/poster';
 import { textColorFor } from '../utils/elements';
 import { findSharedElements } from '../utils/commonElements';
 import { posterColorFor } from '../utils/posterPalette';
 import { SITE_HOST } from '../config/site.js';
+import { useTranslation } from 'react-i18next';
 
 export function ElementTile({ element }) {
   const color = posterColorFor(element);
@@ -19,49 +22,50 @@ export function ElementTile({ element }) {
 
 // Live text and real analysis data keep every poster personal, accessible and responsive.
 export default function ChemistryPoster({ people, family: requestedFamily = false, theme = requestedFamily ? 'gold' : 'dark', minimal = false }) {
+  const { t } = useTranslation();
   const family = requestedFamily && people.length > 1;
   const elements = people.flatMap(person => person.elements || []);
   const unique = [...new Map(elements.map(el => [el.symbol, el])).values()];
   const common = family ? findSharedElements(people) : [];
-  return <article className={`chemistry-poster ${theme === 'gold' ? 'poster-ivory' : 'poster-midnight'}`} aria-label={family ? 'Family chemistry poster' : 'Personal chemistry poster'}>
+  return <article className={`chemistry-poster ${theme === 'gold' ? 'poster-ivory' : 'poster-midnight'}`} aria-label={family ? t('poster.ariaFamily') : t('poster.ariaSingle')}>
     <header className="poster-heading">
       <Logo variant={theme === 'gold' ? 'light' : 'dark'} className="poster-logo" />
-      <p className="poster-eyebrow">Every name has a chemistry</p>
+      <p className="poster-eyebrow">{t('poster.eyebrow')}</p>
       <div className="poster-rule" aria-hidden="true">◇</div>
-      <h2 className="poster-identity-heading">Your Elemental Identity, in Harmony with Nature.</h2>
+      <h2 className="poster-identity-heading">{t('poster.heading')}</h2>
     </header>
     <div className={family ? 'poster-family-grid' : ''}>
       {people.map((person, index) => <section className="poster-person" key={index}>
-        {family && <p className="poster-eyebrow">{person.relation || 'Family member'}</p>}
+        {family && <p className="poster-eyebrow">{relationLabel(person.relation, t)}</p>}
         <h3>{person.fullName}</h3>
-        <p className="poster-eyebrow">{family ? 'Elements in our names' : 'Your elemental profile'}</p>
+        <p className="poster-eyebrow">{family ? t('poster.elementsInNames') : t('poster.yourProfile')}</p>
         <div className="poster-elements">
           {(person.elements || []).map((el, i) => <ElementTile element={el} key={i} />)}
         </div>
-        {!person.elements?.length && <p>No periodic elements found in this name.</p>}
+        {!person.elements?.length && <p>{t('poster.noElements')}</p>}
       </section>)}
     </div>
     {!minimal && <div className="poster-stats">
-      <span><strong>{elements.length}</strong> Total elements</span>
-      <span><strong>{unique.length}</strong> Unique elements</span>
-      {family && <span><strong>{people.length}</strong> Connected names</span>}
+      <span><strong>{elements.length}</strong> {t('poster.totalElements')}</span>
+      <span><strong>{unique.length}</strong> {t('poster.uniqueElements')}</span>
+      {family && <span><strong>{people.length}</strong> {t('poster.connectedNames')}</span>}
     </div>}
     {family ? <section className="poster-harmony poster-meanings mt-6">
-      <h3>Common elements &amp; their meaning</h3>
-      <p className="mb-4">{people.length < 2 ? 'Add another family member to discover your shared elements.' : common.length ? 'Elements shared by two or more family members. Counts show how many names contain each element.' : 'No elements are shared between these names. Each member brings their own unique elemental combination.'}</p>
+      <h3>{t('poster.commonTitle')}</h3>
+      <p className="mb-4">{people.length < 2 ? t('poster.addMember') : common.length ? t('poster.sharedSubtitleCounts') : t('poster.noSharedTop')}</p>
       <div>{common.map(el => <p key={el.symbol}>
         <strong>{el.symbol} · {el.name}</strong>
-        <span className="block mb-2">{el.memberCount === people.length ? `Shared by all ${people.length} members` : `Shared by ${el.memberCount} of ${people.length} members`}</span>
-        <span>{el.meaning}</span>
+        <span className="block mb-2">{sharedLabel(el.memberCount, people.length, t)}</span>
+        <span>{elementMeaning(el)}</span>
       </p>)}</div>
     </section> : !minimal && unique.length > 0 && <section className="poster-meanings">
-      <h3>The elements that make your name</h3>
-      <div>{unique.map(el => <p key={el.symbol}><strong>{el.symbol} · {el.name}</strong><span>{el.meaning}</span></p>)}</div>
+      <h3>{t('poster.elementsThatMake')}</h3>
+      <div>{unique.map(el => <p key={el.symbol}><strong>{el.symbol} · {el.name}</strong><span>{elementMeaning(el)}</span></p>)}</div>
     </section>}
     <footer className="poster-footer">
       <div className="poster-rule" aria-hidden="true">◇</div>
-      <p>More than a name. A higher you.</p>
-      <small>DISCOVER · EXPLORE · BE YOU &nbsp; / &nbsp; {SITE_HOST}</small>
+      <p>{t('poster.footerSingle')}</p>
+      <small>{t('poster.footerTagline')} &nbsp; / &nbsp; {SITE_HOST}</small>
     </footer>
   </article>;
 }

@@ -2,35 +2,37 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { isPlanActive } from '../utils/plan';
+import { formatDate } from '../i18n/format';
+import { useTranslation } from 'react-i18next';
 
 const toDate = (v) => (v?.toDate ? v.toDate() : v ? new Date(v) : null);
-const fmt = (d) => (d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: 'numeric' }) : null);
 
 // Open to every signed-in user (plan member, ambassador or admin). Read-only and never asks for
 // payment: the plan line is information plus a plain link.
 export default function MyProfile() {
+  const { t } = useTranslation();
   const { user, profile } = useAuthStore();
   const complete = Boolean(profile?.profileComplete);
   const active = isPlanActive(profile);
-  const expiry = fmt(toDate(profile?.planExpiry));
+  const expiry = toDate(profile?.planExpiry) ? formatDate(profile.planExpiry) : null;
   const place = [profile?.stateName, profile?.countryName].filter(Boolean).join(', ');
   const rows = [
-    ['Name', profile?.fullName || user?.displayName],
-    ['Email', user?.email],
+    [t('profile.name'), profile?.fullName || user?.displayName],
+    [t('settings.email'), user?.email],
     ...(complete ? [
-      ['Date of birth', profile?.dob],
-      ['Gender', profile?.gender],
-      ['Location', place],
-      ['Referral code used', profile?.referralCode],
+      [t('profile.dob'), profile?.dob ? formatDate(profile.dob) : null],
+      [t('profile.gender'), profile?.gender ? t(`profileComplete.${profile.gender}`, { defaultValue: profile.gender }) : null],
+      [t('profile.location'), place],
+      [t('profile.referralUsed'), profile?.referralCode],
     ] : []),
-    ['Plan', active ? `NAMASUTRA Annual Plan${expiry ? ` - active until ${expiry}` : ' - active'}` : 'No active plan'],
+    [t('profile.plan'), active ? (expiry ? t('profile.planActiveUntil', { date: expiry }) : t('profile.planActive')) : t('profile.noPlan')],
   ].filter(([, v]) => v);
 
   return (
     <div className="min-h-screen site-background">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
         <div className="bg-paper rounded-2xl shadow-xl p-6 sm:p-8">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">My Profile</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-6">{t('profile.title')}</h1>
           <dl className="divide-y divide-gray-200">
             {rows.map(([label, value]) => (
               <div key={label} className="py-3 sm:flex sm:gap-6">
@@ -40,9 +42,9 @@ export default function MyProfile() {
             ))}
           </dl>
           <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            {!complete && <Link to="/profile-complete" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg bg-brand-600 text-white font-semibold">Complete your profile</Link>}
-            <Link to="/settings" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 text-gray-700">Account settings</Link>
-            {!active && complete && <Link to="/pricing" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 text-gray-700">Plans &amp; pricing</Link>}
+            {!complete && <Link to="/profile-complete" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg bg-brand-600 text-white font-semibold">{t('profile.complete')}</Link>}
+            <Link to="/settings" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 text-gray-700">{t('profile.settings')}</Link>
+            {!active && complete && <Link to="/pricing" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 text-gray-700">{t('profile.pricing')}</Link>}
           </div>
         </div>
       </div>

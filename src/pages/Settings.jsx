@@ -2,14 +2,17 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
+import LanguagePicker from '../components/LanguagePicker';
 import { Trash2, AlertTriangle, LogOut } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export default function Settings() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [clearing, setClearing] = useState(false);
 
   const handleSignOutAllDevices = async () => {
-    if (!confirm('This will sign you out from all devices. Continue?')) {
+    if (!confirm(t('settings.confirmSignOutAll'))) {
       return;
     }
 
@@ -42,13 +45,13 @@ export default function Settings() {
       
       await signOut(auth);
       
-      alert('✅ Signed out from all devices successfully!');
+      alert(t('settings.signedOutAll'));
       
       window.location.href = '/';
       
     } catch (error) {
       console.error('Clear error:', error);
-      alert('Error clearing cache. Please try again.');
+      alert(t('errors.clearCache'));
     } finally {
       setClearing(false);
     }
@@ -69,46 +72,48 @@ export default function Settings() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
         <div className="bg-paper rounded-2xl shadow-xl p-8 mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Account Settings</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('settings.title')}</h2>
           
           <div className="space-y-4">
             <div className="border-b border-gray-200 pb-4">
-              <p className="text-sm text-gray-600 mb-1">Email</p>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('nav.language')}</h3>
+              <LanguagePicker />
+            </div>
+            <div className="border-b border-gray-200 pb-4">
+              <p className="text-sm text-gray-600 mb-1">{t('settings.email')}</p>
               <p className="text-lg font-semibold text-gray-800">{auth.currentUser?.email}</p>
             </div>
 
             <div className="border-b border-gray-200 pb-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Sign Out</h3>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('settings.signOut')}</h3>
               <p className="text-sm text-gray-600 mb-3">
-                Sign out from this device only.
+                {t('settings.signOutDeviceHint')}
               </p>
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition font-medium"
               >
                 <LogOut size={18} />
-                Sign Out This Device
+                {t('settings.signOutDevice')}
               </button>
             </div>
 
             <div className="border-b border-gray-200 pb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Sign Out & Clear This Device
+                {t('settings.clearTitle')}
               </h3>
               <p className="text-sm text-gray-600 mb-3">
-                Clear all cached data and sign out from all devices where you're logged in. 
-                You'll need to sign in again on all devices.
+                {t('settings.clearHint')}
               </p>
               <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-4 mb-4">
                 <div className="flex items-start gap-3">
                   <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-semibold text-yellow-800 mb-1">
-                      Warning: This action cannot be undone
+                      {t('settings.warning')}
                     </p>
                     <p className="text-sm text-yellow-700">
-                      This will clear all browser data, cookies, and cache. 
-                      You'll be signed out immediately.
+                      {t('settings.warningText')}
                     </p>
                   </div>
                 </div>
@@ -119,18 +124,18 @@ export default function Settings() {
                 className="flex items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Trash2 size={18} />
-                {clearing ? 'Clearing...' : 'Sign Out & Clear This Device'}
+                {clearing ? t('settings.clearing') : t('settings.clearTitle')}
               </button>
             </div>
           </div>
         </div>
 
         <div className="bg-paper rounded-2xl shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">About</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('settings.about')}</h2>
           <div className="space-y-2 text-gray-600">
-            <p><strong>App:</strong> Namasutra</p>
-            <p><strong>Version:</strong> 1.0.0</p>
-            <p><strong>Support:</strong> support@namevibes.life</p>
+            <p><strong>{t('settings.app')}</strong> Namasutra</p>
+            <p><strong>{t('settings.version')}</strong> 1.0.0</p>
+            <p><strong>{t('settings.support')}</strong> support@namevibes.life</p>
           </div>
         </div>
       </div>
