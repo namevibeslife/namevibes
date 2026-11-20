@@ -1,3 +1,8 @@
+## Gateway routing: Razorpay first, PayPal fallback - 20 November 2026
+
+- Branch `gateway-routing` (off the merged i18n + country-picker result). `src/data/gatewayCurrencies.js` `resolveGateway`: INR always Razorpay; other currencies use Razorpay only when admin switch "Razorpay: International payments enabled" is ON (Firestore `paymentSettings/razorpay.internationalEnabled`, default off, rules block added to firestore.rules and NOT published by me) and Razorpay lists the currency; otherwise PayPal if it lists it; otherwise no gateway and Pricing/Payment show "payments not available" and block checkout. Per-country override `gatewayOverride` ('auto' default, 'razorpay', 'paypal') on the countrySettings doc via the Payment gateway selector. With the switch off, AED (PayPal does not list it) is blocked until the switch is on.
+- Razorpay checkout amount is now `toSubunits(amount, currency)` (Intl ISO exponent: 2 normally, 0 JPY/KRW, 3 KWD/BHD); PayPal value is `toGatewayAmount`. There is no server-side order creation, verification or webhook in this repo (payments are recorded from the browser callback); that is unchanged.
+
 ## Multi-language support (branch i18n, NOT pushed or deployed) - 20 November 2026
 
 - Languages: en (source), hi, ta, te, kn, ml. i18next + react-i18next; one file per language in src/locales/<code>.json (UI, keys like nav.home, pricing.perYear) plus src/locales/content/<code>.json (118 element meanings). Adding a language = adding those two files (meta.code/name/script inside); the picker and loader pick it up by glob. English is bundled; other languages and their Noto Sans fonts (@fontsource) load on demand.

@@ -6,7 +6,8 @@ import { Trans } from 'react-i18next';
 import { formatMoney } from '../i18n/format';
 import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
-import { loadTaxRates } from '../utils/pricing';
+import { loadTaxRates, loadGatewayChoice } from '../utils/pricing';
+import { toSubunits, toGatewayAmount } from '../data/gatewayCurrencies';
 import { GST_RATE_BY_COUNTRY } from '../utils/commission';
 import { useTranslation } from 'react-i18next';
 
@@ -32,6 +33,7 @@ export default function PaymentPage() {
   const [userProfile, setUserProfile] = useState(null);
   const [paypalLoaded, setPaypalLoaded] = useState(false);
   const [paid, setPaid] = useState(false);
+  const [chosenGateway, setChosenGateway] = useState(null);
 
   const { planType, amount, currency, symbol, referralCode, listPrice, discountPercent } = location.state || {};
   const [taxRate, setTaxRate] = useState(null);
@@ -86,7 +88,7 @@ export default function PaymentPage() {
         return actions.order.create({
           purchase_units: [{
             amount: {
-              value: amount.toString(),
+              value: toGatewayAmount(amount, currency || 'USD'),
               currency_code: currency || 'USD'
             },
             description: 'NAMASUTRA Annual Plan'
@@ -126,7 +128,10 @@ export default function PaymentPage() {
             // no test mode: normal checkout
           }
         }
-        setPaymentMethod(IS_MOCK ? 'mock' : testMode ? 'test' : data.countryCode === 'IN' ? 'razorpay' : 'paypal');
+        // Razorpay wherever it supports the currency, PayPal as fallback, otherwise no checkout
+        const choice = await loadGatewayChoice(data.countryCode);
+        setPaymentMethod(testMode ? 'test' : choice.gateway === null ? 'unavailable' : IS_MOCK ? 'mock' : choice.gateway);
+        setChosenGateway(choice.gateway);
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -139,7 +144,8 @@ export default function PaymentPage() {
       await loadScript('https://checkout.razorpay.com/v1/checkout.js');
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: amount * 100,
+        // smallest unit of the currency: 100 per rupee/dollar, 1 per yen, 1000 per dinar
+        amount: toSubunits(amount, currency || 'INR'),
         currency: currency || 'INR',
         name: 'Namasutra',
         description: 'NAMASUTRA Annual Plan',
@@ -294,9 +300,14 @@ export default function PaymentPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('payment.selectMethod')}</h3>
 
-            {paymentMethod === 'mock' ? (
+            {paymentMethod === 'unavailable' ? (
+              <div role="alert" className="border-2 border-amber-300 bg-amber-50 rounded-lg p-4 text-amber-900 font-medium">
+                {t('payment.unavailable')}
+              </div>
+            ) : paymentMethod === 'mock' ? (
               <div className="border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg p-4 space-y-3">
                 <p className="text-sm text-amber-800 font-semibold">{t('payment.mockNote')}</p>
+                <p className="text-xs text-amber-800" data-testid="mock-gateway">{t('payment.mockGateway', { gateway: chosenGateway === 'razorpay' ? 'Razorpay' : 'PayPal' })}</p>
                 <button
                   onClick={() => savePaymentSuccess('mock', `mock_${Date.now()}`)}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
@@ -353,7 +364,7 @@ export default function PaymentPage() {
 
           {/* Security Notice */}
           <div className="mt-8 text-center text-sm text-gray-500">
-            {paymentMethod === 'mock' ? t('payment.poweredMock') : paymentMethod === 'test' ? t('payment.poweredTest') : t('payment.securePowered', { gateway: paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal' })}
+            {paymentMethod === 'unavailable' ? '' : paymentMethod === 'mock' ? t('payment.poweredMock') : paymentMethod === 'test' ? t('payment.poweredTest') : t('payment.securePowered', { gateway: paymentMethod === 'razorpay' ? 'Razorpay' : 'PayPal' })}
           </div>
         </div>
       </div>

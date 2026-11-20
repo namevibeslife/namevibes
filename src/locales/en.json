@@ -289,6 +289,8 @@
   },
   "payment": {
     "securePowered": "🔒 Secure payment powered by {{gateway}}",
+    "unavailable": "Payments are not available for your country yet. Please contact support and we will let you know when they open.",
+    "mockGateway": "Gateway that would be used: {{gateway}}",
     "planLine": "NAMASUTRA Annual Plan (1 year)",
     "referralLine": "Referral code <code>{{code}}</code> ({{percent}}% off)",
     "includesGst": "Includes {{percent}}% GST",

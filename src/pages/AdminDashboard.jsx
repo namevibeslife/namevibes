@@ -36,7 +36,7 @@ import { addDoc, collection, getDocs, Timestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { readPlanSettings } from '../utils/pricing';
 import { CURRENCY_SYMBOLS, allCurrencies, currencySymbol, suggestedCurrency } from '../data/countries';
-import { gatewayWarnings } from '../data/gatewayCurrencies';
+import { gatewayWarnings, resolveGateway, GATEWAY_NAMES } from '../data/gatewayCurrencies';
 import CountryCombobox from '../components/CountryCombobox';
 
 export default function AdminDashboard(props) {
@@ -110,6 +110,8 @@ export default function AdminDashboard(props) {
     countryFormData,
     setCountryFormData,
     handleSaveCountry,
+    internationalEnabled,
+    handleToggleInternational,
     userFilters,
     setUserFilters,
     ambassadorFilters,
@@ -1373,6 +1375,23 @@ export default function AdminDashboard(props) {
                 </button>
               </div>
 
+              <label className="flex items-start gap-3 bg-paper rounded-xl shadow p-4 mb-6 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={internationalEnabled}
+                  onChange={(e) => handleToggleInternational(e.target.checked)}
+                  className="mt-1 w-5 h-5"
+                />
+                <span>
+                  <span className="block font-semibold text-gray-800">Razorpay: International payments enabled</span>
+                  <span className="block text-sm text-gray-600">
+                    Off (default): countries outside India are charged through PayPal where PayPal supports their currency.
+                    On: every country whose currency Razorpay supports uses Razorpay, and PayPal is only the fallback.
+                    Switch it on only after Razorpay has approved International Payments on your account. INR (India) always uses Razorpay.
+                  </span>
+                </span>
+              </label>
+
               {countrySettings.length === 0 ? (
                 <div className="bg-paper rounded-xl shadow-lg p-12 text-center">
                   <Globe className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -1420,6 +1439,16 @@ export default function AdminDashboard(props) {
                           <span className="text-sm text-gray-600">Tax included in price</span>
                           <span className="text-sm font-semibold text-gray-800">
                             {Number.isFinite(Number(country.taxPercent)) && country.taxPercent !== null && country.taxPercent !== '' ? `${country.taxPercent}%` : country.countryCode === 'IN' ? '18% (default)' : '0% (default)'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center py-2 border-b">
+                          <span className="text-sm text-gray-600">Payment gateway</span>
+                          <span className="text-sm font-semibold text-gray-800">
+                            {(() => {
+                              const r = resolveGateway({ currency: readPlanSettings(country).currency, override: country.gatewayOverride, internationalEnabled });
+                              const label = r.gateway ? GATEWAY_NAMES[r.gateway] : 'None (checkout blocked)';
+                              return r.via === 'forced' ? `${label} (forced)` : `${label} (auto)`;
+                            })()}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-2">
@@ -1757,7 +1786,7 @@ export default function AdminDashboard(props) {
                 <p className="text-xs text-gray-500 mt-1">
                   Filled in from the country (euro countries get EUR). You can change it. Symbol: {countryFormData.currency ? currencySymbol(countryFormData.currency).trim() : '-'}
                 </p>
-                {gatewayWarnings(countryFormData.countryCode, countryFormData.currency, countryFormData.price).map((w, i) => (
+                {gatewayWarnings(countryFormData.countryCode, countryFormData.currency, countryFormData.price, { override: countryFormData.gatewayOverride, internationalEnabled }).map((w, i) => (
                   <div key={i} role="alert" className={`mt-2 rounded-lg border px-3 py-2 text-sm ${w.level === 'warn' ? 'border-amber-300 bg-amber-50 text-amber-900' : 'border-blue-200 bg-blue-50 text-blue-900'}`}>
                     {w.level === 'warn' ? '⚠ ' : 'ℹ '}{w.text}
                   </div>
@@ -1792,6 +1821,20 @@ export default function AdminDashboard(props) {
                     placeholder="10"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Payment gateway</label>
+                <select
+                  value={countryFormData.gatewayOverride || 'auto'}
+                  onChange={(e) => setCountryFormData({...countryFormData, gatewayOverride: e.target.value})}
+                  className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg"
+                >
+                  <option value="auto">Auto (Razorpay where it supports the currency, otherwise PayPal)</option>
+                  <option value="razorpay">Razorpay (force)</option>
+                  <option value="paypal">PayPal (force)</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Leave on Auto. Force a gateway only if the automatic one is failing for this country.</p>
               </div>
 
               <div>

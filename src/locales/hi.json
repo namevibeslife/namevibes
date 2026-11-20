@@ -289,6 +289,8 @@
   },
   "payment": {
     "securePowered": "🔒 सुरक्षित भुगतान {{gateway}} द्वारा",
+    "unavailable": "आपके देश के लिए भुगतान अभी उपलब्ध नहीं हैं। कृपया सहायता से संपर्क करें; शुरू होने पर हम आपको बताएँगे।",
+    "mockGateway": "उपयोग होने वाला गेटवे: {{gateway}}",
     "planLine": "NAMASUTRA वार्षिक प्लान (1 वर्ष)",
     "referralLine": "रेफ़रल कोड <code>{{code}}</code> ({{percent}}% छूट)",
     "includesGst": "{{percent}}% GST सहित",

@@ -1,6 +1,7 @@
-import { collection, query, where, getDocs } from 'firebase/firestore';
+import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { COUNTRIES, getCountry, getPricing, defaultPriceFor, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT } from '../data/countries';
+import { GATEWAY_OVERRIDES, resolveGateway } from '../data/gatewayCurrencies';
 
 const positive = (n) => Number.isFinite(n) && n > 0;
 const nonNegative = (n) => Number.isFinite(n) && n >= 0;
@@ -40,7 +41,8 @@ export async function loadCountryPricing(countryCode) {
     const settings = snapshot.docs.map(d => d.data()).find(s => s.isActive);
     if (!settings) return fallback;
     const plan = readPlanSettings(settings, country.currency);
-    return { currency: plan.currency, symbol: plan.symbol, plan: { price: plan.price, discountPercent: plan.discountPercent } };
+    const override = GATEWAY_OVERRIDES.includes(settings.gatewayOverride) ? settings.gatewayOverride : 'auto';
+    return { currency: plan.currency, symbol: plan.symbol, plan: { price: plan.price, discountPercent: plan.discountPercent }, gatewayOverride: override };
   } catch (error) {
     console.error('Error loading country pricing:', error);
     return fallback;
@@ -66,4 +68,22 @@ export async function loadTaxRates() {
     console.error('Error loading tax rates:', error);
     return {};
   }
+}
+
+// Admin -> Country Pricing -> "Razorpay: International payments enabled" (paymentSettings/razorpay).
+// Missing, unreadable (rules not published yet) or false = off, so non-INR countries keep using PayPal.
+export async function loadInternationalEnabled() {
+  try {
+    const snap = await getDoc(doc(db, 'paymentSettings', 'razorpay'));
+    return snap.exists() && snap.data().internationalEnabled === true;
+  } catch {
+    return false;
+  }
+}
+
+// Which gateway a user's checkout uses: { gateway, via, reason?, currency, gatewayOverride }
+export async function loadGatewayChoice(countryCode, pricing) {
+  const p = pricing || await loadCountryPricing(countryCode);
+  const internationalEnabled = await loadInternationalEnabled();
+  return { ...resolveGateway({ currency: p.currency, override: p.gatewayOverride, internationalEnabled }), currency: p.currency, gatewayOverride: p.gatewayOverride };
 }

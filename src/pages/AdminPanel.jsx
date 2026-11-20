@@ -130,6 +130,8 @@ export default function AdminPanel() {
 
   // Country pricing
   const [countrySettings, setCountrySettings] = useState([]);
+  // Razorpay "International payments enabled" (paymentSettings/razorpay). Off until Razorpay approves it.
+  const [internationalEnabled, setInternationalEnabled] = useState(false);
   const [showCountryModal, setShowCountryModal] = useState(false);
   const [editingCountry, setEditingCountry] = useState(null);
   const [countryFormData, setCountryFormData] = useState({
@@ -138,6 +140,7 @@ export default function AdminPanel() {
     price: '',
     referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
     taxPercent: '',
+    gatewayOverride: 'auto',
     isActive: true
   });
 
@@ -605,7 +608,29 @@ export default function AdminPanel() {
     }
   };
 
+  const loadInternationalFlag = async () => {
+    try {
+      const snap = await getDoc(doc(db, 'paymentSettings', 'razorpay'));
+      setInternationalEnabled(snap.exists() && snap.data().internationalEnabled === true);
+    } catch (error) {
+      console.error('Error loading payment settings:', error);
+    }
+  };
+
+  const handleToggleInternational = async (value) => {
+    const previous = internationalEnabled;
+    setInternationalEnabled(value);
+    try {
+      await setDoc(doc(db, 'paymentSettings', 'razorpay'), { internationalEnabled: value, updatedAt: Timestamp.now(), updatedBy: currentAdmin.email }, { merge: true });
+    } catch (error) {
+      console.error('Error saving payment settings:', error);
+      setInternationalEnabled(previous);
+      alert('Could not save the setting: ' + error.message);
+    }
+  };
+
   const loadCountrySettings = async () => {
+    loadInternationalFlag();
     try {
       const settingsSnapshot = await getDocs(collection(db, 'countrySettings'));
       const settingsList = [];
@@ -810,6 +835,7 @@ export default function AdminPanel() {
       price: '',
       referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
       taxPercent: '',
+      gatewayOverride: 'auto',
       isActive: true
     });
     setShowCountryModal(true);
@@ -825,6 +851,7 @@ export default function AdminPanel() {
       price: plan.price,
       referralDiscount: plan.discountPercent,
       taxPercent: country.taxPercent ?? '',
+      gatewayOverride: country.gatewayOverride || 'auto',
       isActive: country.isActive
     });
     setShowCountryModal(true);
@@ -871,6 +898,7 @@ export default function AdminPanel() {
         referralDiscount: Number(countryFormData.referralDiscount) || 0,
         // blank = not set, so commission falls back to GST_RATE_BY_COUNTRY (IN 18, others 0)
         taxPercent: String(countryFormData.taxPercent).trim() === '' ? null : Math.max(0, Number(countryFormData.taxPercent) || 0),
+        gatewayOverride: ['razorpay', 'paypal'].includes(countryFormData.gatewayOverride) ? countryFormData.gatewayOverride : 'auto',
         isActive: countryFormData.isActive,
         updatedAt: Timestamp.now(),
         updatedBy: currentAdmin.email
@@ -1068,6 +1096,8 @@ export default function AdminPanel() {
     countryFormData={countryFormData}
     setCountryFormData={setCountryFormData}
     handleSaveCountry={handleSaveCountry}
+    internationalEnabled={internationalEnabled}
+    handleToggleInternational={handleToggleInternational}
     userFilters={userFilters}
     setUserFilters={setUserFilters}
     ambassadorFilters={ambassadorFilters}

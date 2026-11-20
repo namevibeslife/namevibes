@@ -289,6 +289,8 @@
   },
   "payment": {
     "securePowered": "🔒 సురక్షిత చెల్లింపు: {{gateway}}",
+    "unavailable": "మీ దేశానికి చెల్లింపులు ఇంకా అందుబాటులో లేవు. దయచేసి సహాయాన్ని సంప్రదించండి; ప్రారంభమైనప్పుడు మీకు తెలియజేస్తాము.",
+    "mockGateway": "ఉపయోగించబడే గేట్‌వే: {{gateway}}",
     "planLine": "NAMASUTRA వార్షిక ప్లాన్ (1 సంవత్సరం)",
     "referralLine": "రెఫరల్ కోడ్ <code>{{code}}</code> ({{percent}}% తగ్గింపు)",
     "includesGst": "{{percent}}% GST సహా",

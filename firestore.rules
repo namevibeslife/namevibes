@@ -177,6 +177,12 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Razorpay "International payments enabled" switch (Admin -> Country Pricing). Checkout reads it.
+    match /paymentSettings/{docId} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
     match /revenueReports/{reportId} {
       allow read, write: if isAdmin();
     }
@@ -191,7 +197,7 @@ service cloud.firestore {
     function hasOwnRules(collection) {
       return collection in ['users', 'payments', 'admins', 'ambassadors', 'referralCodes',
         'payoutRequests', 'countrySettings', 'revenueReports', 'ambassadorContent',
-        'ambassadorAccess'];
+        'ambassadorAccess', 'paymentSettings'];
     }
     match /{collection}/{docId} {
       allow read, write: if isAdmin() && !hasOwnRules(collection);

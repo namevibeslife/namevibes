@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { COUNTRIES, getCountry } from '../data/countries';
-import { loadCountryPricing, discountedPrice } from '../utils/pricing';
+import { loadCountryPricing, discountedPrice, loadGatewayChoice } from '../utils/pricing';
 import { FAMILY_MAX_NAMES } from '../utils/plan';
 import { Check, ArrowLeft, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +16,11 @@ export default function Pricing() {
   const [userProfile, setUserProfile] = useState(null);
   const [pricing, setPricing] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // null = neither gateway can take this country's currency (checkout is blocked)
+  const [gateway, setGateway] = useState('pending');
+  const [testMode, setTestMode] = useState(false);
+  const checkoutBlocked = gateway === null && !testMode;
 
   useEffect(() => {
     loadUserProfile();
@@ -32,7 +37,12 @@ export default function Pricing() {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         setUserProfile(userDoc.data());
-        setPricing(await loadCountryPricing(userDoc.data().countryCode));
+        const loaded = await loadCountryPricing(userDoc.data().countryCode);
+        setPricing(loaded);
+        setGateway((await loadGatewayChoice(userDoc.data().countryCode, loaded)).gateway);
+        if (import.meta.env.MODE !== 'mock') {
+          try { setTestMode((await (await fetch('/api/payment-mode')).json()).testMode === true); } catch { /* normal checkout */ }
+        }
       }
     } catch (error) {
       console.error('Error loading profile:', error);
@@ -163,7 +173,8 @@ export default function Pricing() {
 
             <button
               onClick={handleSelectPlan}
-              className="w-full bg-paper text-brand-600 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-lg"
+              disabled={checkoutBlocked}
+              className="w-full bg-paper text-brand-600 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-lg disabled:opacity-60 disabled:transform-none disabled:cursor-not-allowed"
             >
               {t('pricing.cta')}
             </button>
@@ -171,9 +182,15 @@ export default function Pricing() {
         </div>
 
         <div className="text-center text-gray-600 max-w-2xl mx-auto">
-          <p className="mb-4">
-            {t('payment.securePowered', { gateway: countryInfo.gateway === 'razorpay' ? 'Razorpay' : 'PayPal' })}
-          </p>
+          {checkoutBlocked ? (
+            <p role="alert" className="mb-4 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 text-amber-900 font-medium">
+              {t('payment.unavailable')}
+            </p>
+          ) : (
+            <p className="mb-4">
+              {t('payment.securePowered', { gateway: gateway === 'razorpay' ? 'Razorpay' : 'PayPal' })}
+            </p>
+          )}
           <p className="text-sm">
             {t('pricing.billing')}
           </p>
