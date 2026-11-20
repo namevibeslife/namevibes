@@ -6,7 +6,6 @@ import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
 import LanguagePicker from './LanguagePicker';
-import LanguageButton from './LanguageButton';
 import { isPlanActive } from '../utils/plan';
 import { useTranslation } from 'react-i18next';
 
@@ -66,10 +65,10 @@ export default function UserNav() {
     <div className="site-navigation-bar">
       <Link to="/" aria-label={t('nav.homeAria')} className="site-navigation-logo"><Logo /></Link>
       <nav aria-label={t('nav.primary')} className="site-navigation-actions">
+        <LanguagePicker className="language-picker-compact" />
         <NavLink to="/" end className="site-home-link" aria-label={t('nav.home')}><Home size={18} aria-hidden="true" /><span className="site-home-text">{t('nav.home')}</span></NavLink>
-        <LanguageButton onOpen={() => setOpen(false)} />
-        <button ref={toggle} type="button" aria-expanded={open} aria-controls="site-navigation-menu" onClick={() => setOpen(value => !value)} className="site-menu-toggle">
-          {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />} {t('nav.menu')}
+        <button ref={toggle} type="button" aria-expanded={open} aria-label={t('nav.menu')} aria-controls="site-navigation-menu" onClick={() => setOpen(value => !value)} className="site-menu-toggle">
+          {open ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />} <span className="site-menu-text">{t('nav.menu')}</span>
         </button>
       </nav>
       {open && <nav id="site-navigation-menu" aria-label={t('nav.allPages')} className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>

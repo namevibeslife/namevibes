@@ -3,8 +3,6 @@ import { parseNameToElements } from '../utils/elements';
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
-import LanguagePicker from '../components/LanguagePicker';
-import { hasChosenLanguage } from '../i18n';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { captureReferralFromUrl } from '../utils/referralCode';
@@ -27,7 +25,6 @@ export default function LandingPage() {
 
       {/* Hero Section */}
       <section className="landing-hero container mx-auto px-4 py-20 text-center">
-        {!hasChosenLanguage() && <div className="mb-8"><LanguagePicker prominent /></div>}
         <p className="hero-kicker">{t('landing.kicker')}</p>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
           {t('landing.headingLine1')}<br />
