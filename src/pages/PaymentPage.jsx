@@ -336,6 +336,7 @@ export default function PaymentPage() {
             </div>
             {taxRate > 0 && <p className="text-sm text-gray-600 mt-1 text-right">{userProfile?.countryCode === 'IN' ? t('payment.includesGst', { percent: taxRate }) : t('payment.includesTax', { percent: taxRate })}</p>}
           </div>
+          <p className="text-sm text-gray-600 mb-6">{t('payment.cancelFull')}</p>
 
           {/* Payment Method */}
           <div className="space-y-4">

@@ -41,6 +41,7 @@ export default function MyProfile() {
               </div>
             ))}
           </dl>
+          {active && <p className="mt-4 text-sm text-gray-600">{t('payment.cancelFull')}</p>}
           <div className="mt-6 flex flex-wrap gap-3 text-sm">
             {!complete && <Link to="/profile-complete" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg bg-brand-600 text-white font-semibold">{t('profile.complete')}</Link>}
             <Link to="/settings" className="px-4 py-2 min-h-[44px] inline-flex items-center rounded-lg border border-gray-300 text-gray-700">{t('profile.settings')}</Link>

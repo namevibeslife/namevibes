@@ -291,11 +291,12 @@
     "feature6": "Zodiac name guide",
     "feature7": "Element & Nakshatra insights",
     "cta": "Get the Annual Plan",
-    "billing": "The plan is billed yearly. Cancel anytime.",
+    "billing": "Billed yearly. Cancel anytime; your plan will not renew after the period ends.",
     "subtitle2": "Unlock name analyses and insights"
   },
   "payment": {
     "securePowered": "🔒 Secure payment powered by {{gateway}}",
+    "cancelFull": "Cancel anytime. Your plan stays active until the end of the current subscription period, and it will not renew after that.",
     "comingSoon": "Payments for your country are coming soon",
     "comingSoonBody": "Leave your email and we will tell you as soon as you can subscribe.",
     "notifyEmail": "Your email",
@@ -361,7 +362,7 @@
     "welcome": "👋 Welcome, {{name}}!",
     "plan": "Plan:",
     "annualPlan": "Annual Plan",
-    "renews": "(Renews: {{date}})",
+    "renews": "(Active until {{date}})",
     "expired": "(Expired {{date}})",
     "analysesUsed": "Analyses Used:",
     "usedOf": "{{used}}/{{total}} this month",
