@@ -1753,7 +1753,7 @@ export default function AdminDashboard(props) {
       {/* Country Modal */}
       {showCountryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-lg p-6">
+          <div className="bg-paper rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[calc(100dvh-2rem)] overflow-y-auto">
             <h3 className="text-2xl font-bold text-gray-800 mb-4">
               {editingCountry ? 'Edit Country Settings' : 'Add Country'}
             </h3>
