@@ -286,7 +286,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.cancer.dates` | Jun 21 - Jul 22 | 21 जून - 22 जुलाई |
 | `zodiac.western.cancer.element` | Water | जल |
 | `zodiac.western.cancer.colors` | White, Silver | सफ़ेद, चाँदी |
-| `zodiac.western.cancer.traits` | Nurturing, intuitive, emotional, protective | पालन-पोषण करने वाला, सहज-बोध वाला, भावुक, रक्षक |
+| `zodiac.western.cancer.traits` | Nurturing, intuitive, emotional, protective | पालन-पोषण करने वाला, अंतर्ज्ञानी, भावुक, रक्षक |
 | `zodiac.western.cancer.bestFor` | Healthcare, hospitality, counseling | स्वास्थ्य सेवा, आतिथ्य, परामर्श |
 | `zodiac.western.leo.sign` | Leo | सिंह (Leo) |
 | `zodiac.western.leo.dates` | Jul 23 - Aug 22 | 23 जुलाई - 22 अगस्त |
@@ -334,7 +334,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.pisces.dates` | Feb 19 - Mar 20 | 19 फ़रवरी - 20 मार्च |
 | `zodiac.western.pisces.element` | Water | जल |
 | `zodiac.western.pisces.colors` | Sea Green, Lavender | समुद्री हरा, लैवेंडर |
-| `zodiac.western.pisces.traits` | Compassionate, artistic, intuitive, sensitive | करुणामय, कलात्मक, सहज-बोध वाला, संवेदनशील |
+| `zodiac.western.pisces.traits` | Compassionate, artistic, intuitive, sensitive | करुणामय, कलात्मक, अंतर्ज्ञानी, संवेदनशील |
 | `zodiac.western.pisces.bestFor` | Arts, music, healing, spirituality | कला, संगीत, उपचार, आध्यात्मिकता |
 | `zodiac.vedic.meshaAries.sign` | Mesha (Aries) | मेष (Aries) |
 | `zodiac.vedic.meshaAries.dates` | Apr 13 - May 14 | 13 अप्रैल - 14 मई |
@@ -358,7 +358,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.vedic.karkaCancer.dates` | Jul 15 - Aug 14 | 15 जुलाई - 14 अगस्त |
 | `zodiac.vedic.karkaCancer.element` | Water | जल |
 | `zodiac.vedic.karkaCancer.colors` | White, Cream | सफ़ेद, क्रीम |
-| `zodiac.vedic.karkaCancer.traits` | Emotional, nurturing, protective, intuitive | भावुक, पालन-पोषण करने वाला, रक्षक, सहज-बोध वाला |
+| `zodiac.vedic.karkaCancer.traits` | Emotional, nurturing, protective, intuitive | भावुक, पालन-पोषण करने वाला, रक्षक, अंतर्ज्ञानी |
 | `zodiac.vedic.karkaCancer.bestFor` | Healthcare, hospitality, social work | स्वास्थ्य सेवा, आतिथ्य, समाजसेवा |
 | `zodiac.vedic.simhaLeo.sign` | Simha (Leo) | सिंह (Leo) |
 | `zodiac.vedic.simhaLeo.dates` | Aug 15 - Sep 15 | 15 अगस्त - 15 सितंबर |
@@ -406,7 +406,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.vedic.meenaPisces.dates` | Mar 13 - Apr 12 | 13 मार्च - 12 अप्रैल |
 | `zodiac.vedic.meenaPisces.element` | Water | जल |
 | `zodiac.vedic.meenaPisces.colors` | Yellow, Light Green | पीला, हल्का हरा |
-| `zodiac.vedic.meenaPisces.traits` | Compassionate, spiritual, artistic, intuitive | करुणामय, आध्यात्मिक, कलात्मक, सहज-बोध वाला |
+| `zodiac.vedic.meenaPisces.traits` | Compassionate, spiritual, artistic, intuitive | करुणामय, आध्यात्मिक, कलात्मक, अंतर्ज्ञानी |
 | `zodiac.vedic.meenaPisces.bestFor` | Arts, healing, spirituality, charity | कला, उपचार, आध्यात्मिकता, दान |
 | `zodiac.titleWestern` | 🌟 Western Zodiac | 🌟 पश्चिमी राशि |
 | `zodiac.titleVedic` | 🕉️ Vedic Astrology | 🕉️ वैदिक ज्योतिष |
@@ -1710,7 +1710,7 @@ Languages: hi, kn, ml, ta, te
 
 | Key | English | ml |
 |---|---|---|
-| `numerology.interpretation.1` | Leadership, independence, innovation. You are a natural pioneer. | നേതൃത്വം, സ്വാതന്ത്ര്യം, നവീനത. നിങ്ങൾ സ്വാഭാവിക മുൻനിരക്കാരനാണ്. |
+| `numerology.interpretation.1` | Leadership, independence, innovation. You are a natural pioneer. | നേതൃത്വം, സ്വാതന്ത്ര്യം, നവീനത. നിങ്ങൾ സ്വാഭാവികമായി മുൻനിരയിൽ നിൽക്കുന്നവരാണ്. |
 | `numerology.interpretation.2` | Harmony, cooperation, balance. You excel in partnerships. | ഇണക്കം, സഹകരണം, സന്തുലിതാവസ്ഥ. പങ്കാളിത്തങ്ങളിൽ നിങ്ങൾ മികച്ചുനിൽക്കുന്നു. |
 | `numerology.interpretation.3` | Creativity, expression, joy. You bring light and inspiration. | സർഗാത്മകത, ആവിഷ്കാരം, സന്തോഷം. നിങ്ങൾ വെളിച്ചവും പ്രചോദനവും നൽകുന്നു. |
 | `numerology.interpretation.4` | Stability, hard work, foundation. You build lasting structures. | സ്ഥിരത, കഠിനാധ്വാനം, അടിത്തറ. നിങ്ങൾ നിലനിൽക്കുന്ന ഘടനകൾ പണിയുന്നു. |
@@ -1723,62 +1723,62 @@ Languages: hi, kn, ml, ta, te
 | `numerology.interpretation.22` | Master builder, vision, manifestation. You turn dreams into reality. | മാസ്റ്റർ നിർമാതാവ്, ദർശനം, സാക്ഷാത്കാരം. നിങ്ങൾ സ്വപ്നങ്ങളെ യാഥാർഥ്യമാക്കുന്നു. |
 | `numerology.interpretation.33` | Master teacher, compassion, blessing. You uplift and heal others. | മാസ്റ്റർ ഗുരു, കരുണ, അനുഗ്രഹം. നിങ്ങൾ മറ്റുള്ളവരെ ഉയർത്തുകയും സുഖപ്പെടുത്തുകയും ചെയ്യുന്നു. |
 | `numerology.interpretation.default` | Unique energy pattern | സവിശേഷ ഊർജ രീതി |
-| `numerology.meaning.1.destiny` | Natural leader, independent, ambitious. You're meant to pioneer new paths. | സ്വാഭാവിക നേതാവ്, സ്വതന്ത്രൻ, അഭിലാഷമുള്ളവൻ. പുതിയ വഴികൾ വെട്ടിത്തുറക്കാനാണ് നിങ്ങൾ ജനിച്ചത്. |
+| `numerology.meaning.1.destiny` | Natural leader, independent, ambitious. You're meant to pioneer new paths. | സ്വാഭാവിക നേതൃത്വം, സ്വാതന്ത്ര്യം, അഭിലാഷം. പുതിയ വഴികൾ വെട്ടിത്തുറക്കാനാണ് നിങ്ങൾ ജനിച്ചത്. |
 | `numerology.meaning.1.soulUrge` | Deep desire for independence and leadership. You crave recognition. | സ്വാതന്ത്ര്യത്തോടും നേതൃത്വത്തോടുമുള്ള ആഴമേറിയ ആഗ്രഹം. നിങ്ങൾ അംഗീകാരം ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.1.personality` | Others see you as confident, assertive, and self-reliant. | മറ്റുള്ളവർ നിങ്ങളെ ആത്മവിശ്വാസമുള്ളവനായും ദൃഢനിശ്ചയമുള്ളവനായും സ്വയംപര്യാപ്തനായും കാണുന്നു. |
+| `numerology.meaning.1.personality` | Others see you as confident, assertive, and self-reliant. | മറ്റുള്ളവർ നിങ്ങളെ ആത്മവിശ്വാസവും ദൃഢനിശ്ചയവും സ്വയംപര്യാപ്തതയുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.1.lifePath` | Your journey is about developing leadership and independence. | നിങ്ങളുടെ യാത്ര നേതൃത്വവും സ്വാതന്ത്ര്യവും വളർത്തിയെടുക്കുന്നതിനെക്കുറിച്ചാണ്. |
 | `numerology.meaning.1.expression` | You express yourself through innovation and individuality. | നവീനതയിലൂടെയും വ്യക്തിത്വത്തിലൂടെയും നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.2.destiny` | Peacemaker, diplomat, cooperative. You bring harmony to situations. | സമാധാനദൂതൻ, നയതന്ത്രജ്ഞൻ, സഹകാരി. നിങ്ങൾ എല്ലാ സാഹചര്യങ്ങളിലും ഇണക്കം കൊണ്ടുവരുന്നു. |
+| `numerology.meaning.2.destiny` | Peacemaker, diplomat, cooperative. You bring harmony to situations. | സമാധാനസ്ഥാപനം, നയതന്ത്രം, സഹകരണം. നിങ്ങൾ എല്ലാ സാഹചര്യങ്ങളിലും ഇണക്കം കൊണ്ടുവരുന്നു. |
 | `numerology.meaning.2.soulUrge` | You desire peace, partnership, and emotional connections. | നിങ്ങൾ സമാധാനം, പങ്കാളിത്തം, വൈകാരിക ബന്ധങ്ങൾ എന്നിവ ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.2.personality` | Others perceive you as gentle, diplomatic, and supportive. | മറ്റുള്ളവർ നിങ്ങളെ സൗമ്യനായും നയചാതുര്യമുള്ളവനായും പിന്തുണയ്ക്കുന്നവനായും കാണുന്നു. |
+| `numerology.meaning.2.personality` | Others perceive you as gentle, diplomatic, and supportive. | മറ്റുള്ളവർ നിങ്ങളെ സൗമ്യതയും നയചാതുര്യവും പിന്തുണയ്ക്കുന്ന സ്വഭാവവുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.2.lifePath` | Your path involves cooperation, relationships, and balance. | നിങ്ങളുടെ പാതയിൽ സഹകരണം, ബന്ധങ്ങൾ, സന്തുലിതാവസ്ഥ എന്നിവ ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.2.expression` | You express through empathy, mediation, and partnerships. | സഹാനുഭൂതി, മധ്യസ്ഥത, പങ്കാളിത്തങ്ങൾ എന്നിവയിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.3.destiny` | Creative communicator, artist, entertainer. You inspire through expression. | സർഗാത്മക ആശയവിനിമയക്കാരൻ, കലാകാരൻ, വിനോദിപ്പിക്കുന്നവൻ. ആവിഷ്കാരത്തിലൂടെ നിങ്ങൾ പ്രചോദിപ്പിക്കുന്നു. |
+| `numerology.meaning.3.destiny` | Creative communicator, artist, entertainer. You inspire through expression. | സർഗാത്മക ആശയവിനിമയം, കല, വിനോദം. ആവിഷ്കാരത്തിലൂടെ നിങ്ങൾ പ്രചോദിപ്പിക്കുന്നു. |
 | `numerology.meaning.3.soulUrge` | You crave creative expression and joyful connections. | നിങ്ങൾ സർഗാത്മക ആവിഷ്കാരവും സന്തോഷകരമായ ബന്ധങ്ങളും ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.3.personality` | Others see you as charming, creative, and expressive. | മറ്റുള്ളവർ നിങ്ങളെ ആകർഷകനായും സർഗാത്മകനായും ആവിഷ്കാരശീലനായും കാണുന്നു. |
+| `numerology.meaning.3.personality` | Others see you as charming, creative, and expressive. | മറ്റുള്ളവർ നിങ്ങളെ ആകർഷകത്വവും സർഗാത്മകതയും ആവിഷ്കാരശേഷിയുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.3.lifePath` | Your journey centers on creativity and self-expression. | നിങ്ങളുടെ യാത്ര സർഗാത്മകതയിലും ആത്മപ്രകാശനത്തിലും കേന്ദ്രീകരിച്ചിരിക്കുന്നു. |
 | `numerology.meaning.3.expression` | You express through art, words, and creative pursuits. | കല, വാക്കുകൾ, സർഗാത്മക പ്രവർത്തനങ്ങൾ എന്നിവയിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.4.destiny` | Builder, organizer, practical. You create stable foundations. | നിർമാതാവ്, ക്രമീകരിക്കുന്നവൻ, പ്രായോഗികൻ. നിങ്ങൾ സ്ഥിരമായ അടിത്തറകൾ ഉണ്ടാക്കുന്നു. |
+| `numerology.meaning.4.destiny` | Builder, organizer, practical. You create stable foundations. | നിർമാണം, ക്രമീകരണം, പ്രായോഗികത. നിങ്ങൾ സ്ഥിരമായ അടിത്തറകൾ ഉണ്ടാക്കുന്നു. |
 | `numerology.meaning.4.soulUrge` | You desire security, order, and tangible achievements. | നിങ്ങൾ സുരക്ഷ, ക്രമം, പ്രത്യക്ഷമായ നേട്ടങ്ങൾ എന്നിവ ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.4.personality` | Others view you as reliable, hardworking, and grounded. | മറ്റുള്ളവർ നിങ്ങളെ വിശ്വസനീയനായും കഠിനാധ്വാനിയായും ഉറച്ച നിലപാടുള്ളവനായും കാണുന്നു. |
+| `numerology.meaning.4.personality` | Others view you as reliable, hardworking, and grounded. | മറ്റുള്ളവർ നിങ്ങളെ വിശ്വസനീയതയും കഠിനാധ്വാനവും ഉറച്ച നിലപാടുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.4.lifePath` | Your path involves building lasting structures and systems. | നിങ്ങളുടെ പാതയിൽ നിലനിൽക്കുന്ന ഘടനകളും സംവിധാനങ്ങളും പണിയുന്നത് ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.4.expression` | You express through practical work and organization. | പ്രായോഗിക ജോലിയിലൂടെയും ക്രമീകരണത്തിലൂടെയും നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.5.destiny` | Freedom seeker, adventurer, change agent. You thrive on variety. | സ്വാതന്ത്ര്യം തേടുന്നവൻ, സാഹസികൻ, മാറ്റത്തിന്റെ വാഹകൻ. നിങ്ങൾ വൈവിധ്യത്തിൽ തഴച്ചുവളരുന്നു. |
+| `numerology.meaning.5.destiny` | Freedom seeker, adventurer, change agent. You thrive on variety. | സ്വാതന്ത്ര്യാന്വേഷണം, സാഹസികത, മാറ്റത്തിന്റെ വാഹകത്വം. നിങ്ങൾ വൈവിധ്യത്തിൽ തഴച്ചുവളരുന്നു. |
 | `numerology.meaning.5.soulUrge` | You crave freedom, adventure, and new experiences. | നിങ്ങൾ സ്വാതന്ത്ര്യം, സാഹസം, പുതിയ അനുഭവങ്ങൾ എന്നിവ ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.5.personality` | Others see you as dynamic, adventurous, and unpredictable. | മറ്റുള്ളവർ നിങ്ങളെ ചലനാത്മകനായും സാഹസികനായും പ്രവചിക്കാനാവാത്തവനായും കാണുന്നു. |
+| `numerology.meaning.5.personality` | Others see you as dynamic, adventurous, and unpredictable. | മറ്റുള്ളവർ നിങ്ങളെ ചലനാത്മകതയും സാഹസികതയും പ്രവചിക്കാനാവാത്ത സ്വഭാവവുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.5.lifePath` | Your journey is about embracing change and freedom. | നിങ്ങളുടെ യാത്ര മാറ്റത്തെയും സ്വാതന്ത്ര്യത്തെയും സ്വീകരിക്കുന്നതിനെക്കുറിച്ചാണ്. |
 | `numerology.meaning.5.expression` | You express through exploration and adaptability. | അന്വേഷണത്തിലൂടെയും പൊരുത്തപ്പെടലിലൂടെയും നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.6.destiny` | Nurturer, caregiver, teacher. You create harmony and beauty. | പരിപോഷിപ്പിക്കുന്നവൻ, പരിചരിക്കുന്നവൻ, അധ്യാപകൻ. നിങ്ങൾ ഇണക്കവും സൗന്ദര്യവും സൃഷ്ടിക്കുന്നു. |
+| `numerology.meaning.6.destiny` | Nurturer, caregiver, teacher. You create harmony and beauty. | പരിപോഷണം, പരിചരണം, അധ്യാപനം. നിങ്ങൾ ഇണക്കവും സൗന്ദര്യവും സൃഷ്ടിക്കുന്നു. |
 | `numerology.meaning.6.soulUrge` | You desire to nurture, love, and create beautiful environments. | നിങ്ങൾ പരിപോഷിപ്പിക്കാനും സ്നേഹിക്കാനും മനോഹരമായ ചുറ്റുപാടുകൾ ഉണ്ടാക്കാനും ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.6.personality` | Others perceive you as caring, responsible, and supportive. | മറ്റുള്ളവർ നിങ്ങളെ കരുതലുള്ളവനായും ഉത്തരവാദിത്തമുള്ളവനായും പിന്തുണയ്ക്കുന്നവനായും കാണുന്നു. |
+| `numerology.meaning.6.personality` | Others perceive you as caring, responsible, and supportive. | മറ്റുള്ളവർ നിങ്ങളെ കരുതലും ഉത്തരവാദിത്തവും പിന്തുണയ്ക്കുന്ന മനസ്സുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.6.lifePath` | Your path involves service, family, and community. | നിങ്ങളുടെ പാതയിൽ സേവനം, കുടുംബം, സമൂഹം എന്നിവ ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.6.expression` | You express through caring, teaching, and healing. | കരുതൽ, അധ്യാപനം, സുഖപ്പെടുത്തൽ എന്നിവയിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.7.destiny` | Seeker, analyst, mystic. You search for deeper truths. | അന്വേഷകൻ, വിശകലനക്കാരൻ, മിസ്റ്റിക്. നിങ്ങൾ ആഴമേറിയ സത്യങ്ങൾ തേടുന്നു. |
+| `numerology.meaning.7.destiny` | Seeker, analyst, mystic. You search for deeper truths. | അന്വേഷണം, വിശകലനം, നിഗൂഢജ്ഞാനം. നിങ്ങൾ ആഴമേറിയ സത്യങ്ങൾ തേടുന്നു. |
 | `numerology.meaning.7.soulUrge` | You crave knowledge, solitude, and spiritual understanding. | നിങ്ങൾ അറിവ്, ഏകാന്തത, ആത്മീയ ധാരണ എന്നിവ ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.7.personality` | Others see you as mysterious, intellectual, and reserved. | മറ്റുള്ളവർ നിങ്ങളെ നിഗൂഢനായും ബൗദ്ധികനായും അന്തർമുഖനായും കാണുന്നു. |
+| `numerology.meaning.7.personality` | Others see you as mysterious, intellectual, and reserved. | മറ്റുള്ളവർ നിങ്ങളെ നിഗൂഢതയും ബൗദ്ധികതയും അന്തർമുഖത്വവുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.7.lifePath` | Your journey involves spiritual growth and inner wisdom. | നിങ്ങളുടെ യാത്രയിൽ ആത്മീയ വളർച്ചയും ആന്തരിക ജ്ഞാനവും ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.7.expression` | You express through analysis, research, and spirituality. | വിശകലനം, ഗവേഷണം, ആത്മീയത എന്നിവയിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.8.destiny` | Powerhouse, executive, manifester. You achieve material success. | ശക്തികേന്ദ്രം, നിർവാഹകൻ, സാക്ഷാത്കരിക്കുന്നവൻ. നിങ്ങൾ ഭൗതിക വിജയം കൈവരിക്കുന്നു. |
+| `numerology.meaning.8.destiny` | Powerhouse, executive, manifester. You achieve material success. | ശക്തികേന്ദ്രം, നിർവഹണശേഷി, സാക്ഷാത്കാരം. നിങ്ങൾ ഭൗതിക വിജയം കൈവരിക്കുന്നു. |
 | `numerology.meaning.8.soulUrge` | You desire power, success, and material accomplishment. | നിങ്ങൾ അധികാരം, വിജയം, ഭൗതിക നേട്ടം എന്നിവ ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.8.personality` | Others view you as powerful, ambitious, and authoritative. | മറ്റുള്ളവർ നിങ്ങളെ ശക്തനായും അഭിലാഷമുള്ളവനായും അധികാരമുള്ളവനായും കാണുന്നു. |
+| `numerology.meaning.8.personality` | Others view you as powerful, ambitious, and authoritative. | മറ്റുള്ളവർ നിങ്ങളെ ശക്തിയും അഭിലാഷവും അധികാരഭാവവുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.8.lifePath` | Your path involves mastering material world and leadership. | നിങ്ങളുടെ പാതയിൽ ഭൗതിക ലോകത്തിലെ പ്രാവീണ്യവും നേതൃത്വവും ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.8.expression` | You express through business, management, and achievement. | ബിസിനസ്, മാനേജ്മെന്റ്, നേട്ടം എന്നിവയിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.9.destiny` | Humanitarian, teacher, healer. You serve humanity. | മാനവികതാവാദി, അധ്യാപകൻ, രോഗശാന്തി നൽകുന്നവൻ. നിങ്ങൾ മനുഷ്യരാശിയെ സേവിക്കുന്നു. |
+| `numerology.meaning.9.destiny` | Humanitarian, teacher, healer. You serve humanity. | മാനവികത, അധ്യാപനം, രോഗശാന്തി. നിങ്ങൾ മനുഷ്യരാശിയെ സേവിക്കുന്നു. |
 | `numerology.meaning.9.soulUrge` | You desire to help humanity and create positive change. | നിങ്ങൾ മനുഷ്യരാശിയെ സഹായിക്കാനും നല്ല മാറ്റം ഉണ്ടാക്കാനും ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.9.personality` | Others see you as compassionate, wise, and selfless. | മറ്റുള്ളവർ നിങ്ങളെ കരുണയുള്ളവനായും ജ്ഞാനിയായും നിസ്വാർഥനായും കാണുന്നു. |
+| `numerology.meaning.9.personality` | Others see you as compassionate, wise, and selfless. | മറ്റുള്ളവർ നിങ്ങളെ കരുണയും ജ്ഞാനവും നിസ്വാർഥതയുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.9.lifePath` | Your journey is about service, compassion, and completion. | നിങ്ങളുടെ യാത്ര സേവനം, കരുണ, പൂർണ്ണത എന്നിവയെക്കുറിച്ചാണ്. |
 | `numerology.meaning.9.expression` | You express through humanitarian work and universal love. | മാനുഷിക പ്രവർത്തനത്തിലൂടെയും സാർവത്രിക സ്നേഹത്തിലൂടെയും നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.11.destiny` | Master teacher, spiritual messenger. You inspire and enlighten. | മാസ്റ്റർ ഗുരു, ആത്മീയ സന്ദേശവാഹകൻ. നിങ്ങൾ പ്രചോദിപ്പിക്കുകയും പ്രകാശിപ്പിക്കുകയും ചെയ്യുന്നു. |
+| `numerology.meaning.11.destiny` | Master teacher, spiritual messenger. You inspire and enlighten. | മാസ്റ്റർ ഗുരുത്വം, ആത്മീയ സന്ദേശം. നിങ്ങൾ പ്രചോദിപ്പിക്കുകയും പ്രകാശിപ്പിക്കുകയും ചെയ്യുന്നു. |
 | `numerology.meaning.11.soulUrge` | You desire spiritual illumination and to inspire others. | നിങ്ങൾ ആത്മീയ പ്രകാശവും മറ്റുള്ളവരെ പ്രചോദിപ്പിക്കലും ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.11.personality` | Others see you as inspirational and spiritually gifted. | മറ്റുള്ളവർ നിങ്ങളെ പ്രചോദനാത്മകനായും ആത്മീയമായി കഴിവുള്ളവനായും കാണുന്നു. |
+| `numerology.meaning.11.personality` | Others see you as inspirational and spiritually gifted. | മറ്റുള്ളവർ നിങ്ങളെ പ്രചോദനവും ആത്മീയ കഴിവുമുള്ള വ്യക്തിയായി കാണുന്നു. |
 | `numerology.meaning.11.lifePath` | Your path is spiritual leadership and enlightenment. | നിങ്ങളുടെ പാത ആത്മീയ നേതൃത്വവും പ്രബുദ്ധതയുമാണ്. |
 | `numerology.meaning.11.expression` | You express through intuition and spiritual teaching. | അന്തർജ്ഞാനത്തിലൂടെയും ആത്മീയ അധ്യാപനത്തിലൂടെയും നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.22.destiny` | Master builder. You manifest dreams into reality on large scale. | മാസ്റ്റർ നിർമാതാവ്. നിങ്ങൾ വലിയ തോതിൽ സ്വപ്നങ്ങളെ യാഥാർഥ്യമാക്കുന്നു. |
+| `numerology.meaning.22.destiny` | Master builder. You manifest dreams into reality on large scale. | മാസ്റ്റർ നിർമാണം. നിങ്ങൾ വലിയ തോതിൽ സ്വപ്നങ്ങളെ യാഥാർഥ്യമാക്കുന്നു. |
 | `numerology.meaning.22.soulUrge` | You desire to build something lasting and significant. | നിങ്ങൾ നിലനിൽക്കുന്നതും പ്രധാനപ്പെട്ടതുമായ ഒന്ന് പണിയാൻ ആഗ്രഹിക്കുന്നു. |
-| `numerology.meaning.22.personality` | Others view you as capable of achieving the impossible. | അസാധ്യമായത് നേടാൻ കഴിവുള്ളവനായി മറ്റുള്ളവർ നിങ്ങളെ കാണുന്നു. |
+| `numerology.meaning.22.personality` | Others view you as capable of achieving the impossible. | അസാധ്യമായത് നേടാൻ കഴിവുള്ള വ്യക്തിയായി മറ്റുള്ളവർ നിങ്ങളെ കാണുന്നു. |
 | `numerology.meaning.22.lifePath` | Your path involves manifesting grand visions into reality. | നിങ്ങളുടെ പാതയിൽ മഹത്തായ ദർശനങ്ങളെ യാഥാർഥ്യമാക്കുന്നത് ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.22.expression` | You express through building systems that serve many. | പലർക്കും പ്രയോജനപ്പെടുന്ന സംവിധാനങ്ങൾ പണിയുന്നതിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.33.destiny` | Master teacher, healer of healers. You uplift humanity. | മാസ്റ്റർ ഗുരു, രോഗശാന്തിക്കാരുടെ രോഗശാന്തിക്കാരൻ. നിങ്ങൾ മനുഷ്യരാശിയെ ഉയർത്തുന്നു. |
+| `numerology.meaning.33.destiny` | Master teacher, healer of healers. You uplift humanity. | മാസ്റ്റർ ഗുരുത്വം, രോഗശാന്തിയുടെ രോഗശാന്തി. നിങ്ങൾ മനുഷ്യരാശിയെ ഉയർത്തുന്നു. |
 | `numerology.meaning.33.soulUrge` | You desire to nurture and heal on a universal scale. | നിങ്ങൾ സാർവത്രിക തലത്തിൽ പരിപോഷിപ്പിക്കാനും സുഖപ്പെടുത്താനും ആഗ്രഹിക്കുന്നു. |
 | `numerology.meaning.33.personality` | Others see you as a beacon of unconditional love. | മറ്റുള്ളവർ നിങ്ങളെ നിരുപാധിക സ്നേഹത്തിന്റെ ദീപസ്തംഭമായി കാണുന്നു. |
 | `numerology.meaning.33.lifePath` | Your path is about selfless service and universal love. | നിങ്ങളുടെ പാത നിസ്വാർഥ സേവനവും സാർവത്രിക സ്നേഹവുമാണ്. |
@@ -1838,25 +1838,25 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.aries.dates` | Mar 21 - Apr 19 | മാർച്ച് 21 - ഏപ്രിൽ 19 |
 | `zodiac.western.aries.element` | Fire | അഗ്നി |
 | `zodiac.western.aries.colors` | Red, Scarlet | ചുവപ്പ്, കടും ചുവപ്പ് |
-| `zodiac.western.aries.traits` | Bold, ambitious, confident, energetic | ധീരൻ, അഭിലാഷമുള്ളവൻ, ആത്മവിശ്വാസി, ഊർജസ്വലൻ |
+| `zodiac.western.aries.traits` | Bold, ambitious, confident, energetic | ധീരത, അഭിലാഷം, ആത്മവിശ്വാസം, ഊർജസ്വലത |
 | `zodiac.western.aries.bestFor` | Leadership, entrepreneurship, sports | നേതൃത്വം, സംരംഭകത്വം, കായികം |
 | `zodiac.western.taurus.sign` | Taurus | ഇടവം (Taurus) |
 | `zodiac.western.taurus.dates` | Apr 20 - May 20 | ഏപ്രിൽ 20 - മേയ് 20 |
 | `zodiac.western.taurus.element` | Earth | ഭൂമി |
 | `zodiac.western.taurus.colors` | Pink, Green | പിങ്ക്, പച്ച |
-| `zodiac.western.taurus.traits` | Reliable, patient, practical, devoted | വിശ്വസ്തൻ, ക്ഷമയുള്ളവൻ, പ്രായോഗികൻ, അർപ്പണബോധമുള്ളവൻ |
+| `zodiac.western.taurus.traits` | Reliable, patient, practical, devoted | വിശ്വസ്തത, ക്ഷമ, പ്രായോഗികത, അർപ്പണബോധം |
 | `zodiac.western.taurus.bestFor` | Finance, art, fashion, agriculture | ധനകാര്യം, കല, ഫാഷൻ, കൃഷി |
 | `zodiac.western.gemini.sign` | Gemini | മിഥുനം (Gemini) |
 | `zodiac.western.gemini.dates` | May 21 - Jun 20 | മേയ് 21 - ജൂൺ 20 |
 | `zodiac.western.gemini.element` | Air | വായു |
 | `zodiac.western.gemini.colors` | Yellow, Light Green | മഞ്ഞ, ഇളം പച്ച |
-| `zodiac.western.gemini.traits` | Curious, adaptable, communicative, witty | ജിജ്ഞാസു, പൊരുത്തപ്പെടുന്നവൻ, ആശയവിനിമയശീലൻ, നർമബോധമുള്ളവൻ |
+| `zodiac.western.gemini.traits` | Curious, adaptable, communicative, witty | ജിജ്ഞാസ, പൊരുത്തപ്പെടൽ, ആശയവിനിമയശേഷി, നർമബോധം |
 | `zodiac.western.gemini.bestFor` | Media, teaching, sales, writing | മാധ്യമം, അധ്യാപനം, വിൽപ്പന, എഴുത്ത് |
 | `zodiac.western.cancer.sign` | Cancer | കർക്കടകം (Cancer) |
 | `zodiac.western.cancer.dates` | Jun 21 - Jul 22 | ജൂൺ 21 - ജൂലൈ 22 |
 | `zodiac.western.cancer.element` | Water | ജലം |
 | `zodiac.western.cancer.colors` | White, Silver | വെള്ള, വെള്ളി |
-| `zodiac.western.cancer.traits` | Nurturing, intuitive, emotional, protective | പരിപോഷിപ്പിക്കുന്നവൻ, അന്തർജ്ഞാനമുള്ളവൻ, വൈകാരികൻ, സംരക്ഷകൻ |
+| `zodiac.western.cancer.traits` | Nurturing, intuitive, emotional, protective | പരിപോഷണ സ്വഭാവം, അന്തർജ്ഞാനം, വൈകാരികത, സംരക്ഷണ മനോഭാവം |
 | `zodiac.western.cancer.bestFor` | Healthcare, hospitality, counseling | ആരോഗ്യപരിചരണം, ആതിഥ്യം, കൗൺസലിംഗ് |
 | `zodiac.western.leo.sign` | Leo | ചിങ്ങം (Leo) |
 | `zodiac.western.leo.dates` | Jul 23 - Aug 22 | ജൂലൈ 23 - ഓഗസ്റ്റ് 22 |
@@ -1868,67 +1868,67 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.virgo.dates` | Aug 23 - Sep 22 | ഓഗസ്റ്റ് 23 - സെപ്റ്റംബർ 22 |
 | `zodiac.western.virgo.element` | Earth | ഭൂമി |
 | `zodiac.western.virgo.colors` | Green, Brown | പച്ച, തവിട്ട് |
-| `zodiac.western.virgo.traits` | Analytical, practical, perfectionist, helpful | വിശകലനശീലൻ, പ്രായോഗികൻ, പൂർണതാവാദി, സഹായമനസ്കൻ |
+| `zodiac.western.virgo.traits` | Analytical, practical, perfectionist, helpful | വിശകലനശേഷി, പ്രായോഗികത, പൂർണതാവാദം, സഹായമനസ്കത |
 | `zodiac.western.virgo.bestFor` | Healthcare, analysis, service industry | ആരോഗ്യപരിചരണം, വിശകലനം, സേവന മേഖല |
 | `zodiac.western.libra.sign` | Libra | തുലാം (Libra) |
 | `zodiac.western.libra.dates` | Sep 23 - Oct 22 | സെപ്റ്റംബർ 23 - ഒക്ടോബർ 22 |
 | `zodiac.western.libra.element` | Air | വായു |
 | `zodiac.western.libra.colors` | Blue, Pink | നീല, പിങ്ക് |
-| `zodiac.western.libra.traits` | Diplomatic, fair, social, harmonious | നയതന്ത്രജ്ഞൻ, നീതിമാൻ, സാമൂഹികൻ, ഇണക്കമുള്ളവൻ |
+| `zodiac.western.libra.traits` | Diplomatic, fair, social, harmonious | നയതന്ത്രം, നീതിബോധം, സാമൂഹികത, ഇണക്കം |
 | `zodiac.western.libra.bestFor` | Law, diplomacy, design, partnerships | നിയമം, നയതന്ത്രം, രൂപകൽപ്പന, പങ്കാളിത്തങ്ങൾ |
 | `zodiac.western.scorpio.sign` | Scorpio | വൃശ്ചികം (Scorpio) |
 | `zodiac.western.scorpio.dates` | Oct 23 - Nov 21 | ഒക്ടോബർ 23 - നവംബർ 21 |
 | `zodiac.western.scorpio.element` | Water | ജലം |
 | `zodiac.western.scorpio.colors` | Red, Maroon | ചുവപ്പ്, മറൂൺ |
-| `zodiac.western.scorpio.traits` | Passionate, mysterious, intense, transformative | വികാരതീവ്രൻ, നിഗൂഢൻ, തീവ്രൻ, പരിവർത്തനശീലൻ |
+| `zodiac.western.scorpio.traits` | Passionate, mysterious, intense, transformative | വികാരതീവ്രത, നിഗൂഢത, തീവ്രത, പരിവർത്തനശേഷി |
 | `zodiac.western.scorpio.bestFor` | Research, psychology, investigation | ഗവേഷണം, മനഃശാസ്ത്രം, അന്വേഷണം |
 | `zodiac.western.sagittarius.sign` | Sagittarius | ധനു (Sagittarius) |
 | `zodiac.western.sagittarius.dates` | Nov 22 - Dec 21 | നവംബർ 22 - ഡിസംബർ 21 |
 | `zodiac.western.sagittarius.element` | Fire | അഗ്നി |
 | `zodiac.western.sagittarius.colors` | Purple, Yellow | പർപ്പിൾ, മഞ്ഞ |
-| `zodiac.western.sagittarius.traits` | Optimistic, adventurous, philosophical, free | ശുഭാപ്തിവിശ്വാസി, സാഹസികൻ, തത്ത്വചിന്തകൻ, സ്വതന്ത്രൻ |
+| `zodiac.western.sagittarius.traits` | Optimistic, adventurous, philosophical, free | ശുഭാപ്തിവിശ്വാസം, സാഹസികത, തത്ത്വചിന്ത, സ്വാതന്ത്ര്യം |
 | `zodiac.western.sagittarius.bestFor` | Travel, education, publishing | യാത്ര, വിദ്യാഭ്യാസം, പ്രസിദ്ധീകരണം |
 | `zodiac.western.capricorn.sign` | Capricorn | മകരം (Capricorn) |
 | `zodiac.western.capricorn.dates` | Dec 22 - Jan 19 | ഡിസംബർ 22 - ജനുവരി 19 |
 | `zodiac.western.capricorn.element` | Earth | ഭൂമി |
 | `zodiac.western.capricorn.colors` | Black, Brown | കറുപ്പ്, തവിട്ട് |
-| `zodiac.western.capricorn.traits` | Disciplined, ambitious, responsible, patient | അച്ചടക്കമുള്ളവൻ, അഭിലാഷമുള്ളവൻ, ഉത്തരവാദിത്തമുള്ളവൻ, ക്ഷമയുള്ളവൻ |
+| `zodiac.western.capricorn.traits` | Disciplined, ambitious, responsible, patient | അച്ചടക്കം, അഭിലാഷം, ഉത്തരവാദിത്തം, ക്ഷമ |
 | `zodiac.western.capricorn.bestFor` | Business, real estate, governance | ബിസിനസ്, റിയൽ എസ്റ്റേറ്റ്, ഭരണം |
 | `zodiac.western.aquarius.sign` | Aquarius | കുംഭം (Aquarius) |
 | `zodiac.western.aquarius.dates` | Jan 20 - Feb 18 | ജനുവരി 20 - ഫെബ്രുവരി 18 |
 | `zodiac.western.aquarius.element` | Air | വായു |
 | `zodiac.western.aquarius.colors` | Blue, Grey | നീല, ചാരനിറം |
-| `zodiac.western.aquarius.traits` | Independent, innovative, humanitarian, eccentric | സ്വതന്ത്രൻ, നൂതനചിന്തകൻ, മാനവികതാവാദി, വിചിത്രൻ |
+| `zodiac.western.aquarius.traits` | Independent, innovative, humanitarian, eccentric | സ്വാതന്ത്ര്യബോധം, നൂതനചിന്ത, മാനവികത, വിചിത്രത |
 | `zodiac.western.aquarius.bestFor` | Technology, social work, innovation | സാങ്കേതികവിദ്യ, സാമൂഹിക സേവനം, നവീകരണം |
 | `zodiac.western.pisces.sign` | Pisces | മീനം (Pisces) |
 | `zodiac.western.pisces.dates` | Feb 19 - Mar 20 | ഫെബ്രുവരി 19 - മാർച്ച് 20 |
 | `zodiac.western.pisces.element` | Water | ജലം |
 | `zodiac.western.pisces.colors` | Sea Green, Lavender | കടൽ പച്ച, ലാവെൻഡർ |
-| `zodiac.western.pisces.traits` | Compassionate, artistic, intuitive, sensitive | കരുണയുള്ളവൻ, കലാഹൃദയൻ, അന്തർജ്ഞാനമുള്ളവൻ, സംവേദനക്ഷമൻ |
+| `zodiac.western.pisces.traits` | Compassionate, artistic, intuitive, sensitive | കരുണ, കലാഹൃദയം, അന്തർജ്ഞാനം, സംവേദനക്ഷമത |
 | `zodiac.western.pisces.bestFor` | Arts, music, healing, spirituality | കല, സംഗീതം, രോഗശാന്തി, ആത്മീയത |
 | `zodiac.vedic.meshaAries.sign` | Mesha (Aries) | മേടം (Aries) |
 | `zodiac.vedic.meshaAries.dates` | Apr 13 - May 14 | ഏപ്രിൽ 13 - മേയ് 14 |
 | `zodiac.vedic.meshaAries.element` | Fire | അഗ്നി |
 | `zodiac.vedic.meshaAries.colors` | Red, Maroon | ചുവപ്പ്, മറൂൺ |
-| `zodiac.vedic.meshaAries.traits` | Bold, ambitious, warrior spirit, leadership | ധീരൻ, അഭിലാഷമുള്ളവൻ, യോദ്ധാവിന്റെ മനോഭാവം, നേതൃത്വം |
+| `zodiac.vedic.meshaAries.traits` | Bold, ambitious, warrior spirit, leadership | ധീരത, അഭിലാഷം, യോദ്ധാവിന്റെ മനോഭാവം, നേതൃത്വം |
 | `zodiac.vedic.meshaAries.bestFor` | Defense, sports, entrepreneurship | പ്രതിരോധം, കായികം, സംരംഭകത്വം |
 | `zodiac.vedic.vrishabhaTaurus.sign` | Vrishabha (Taurus) | ഇടവം (Taurus) |
 | `zodiac.vedic.vrishabhaTaurus.dates` | May 15 - Jun 14 | മേയ് 15 - ജൂൺ 14 |
 | `zodiac.vedic.vrishabhaTaurus.element` | Earth | ഭൂമി |
 | `zodiac.vedic.vrishabhaTaurus.colors` | White, Pink | വെള്ള, പിങ്ക് |
-| `zodiac.vedic.vrishabhaTaurus.traits` | Stable, practical, artistic, luxury-loving | സ്ഥിരചിത്തൻ, പ്രായോഗികൻ, കലാഹൃദയൻ, ആഡംബരപ്രിയൻ |
+| `zodiac.vedic.vrishabhaTaurus.traits` | Stable, practical, artistic, luxury-loving | സ്ഥിരചിത്തത, പ്രായോഗികത, കലാഹൃദയം, ആഡംബരപ്രിയത |
 | `zodiac.vedic.vrishabhaTaurus.bestFor` | Finance, beauty, art, agriculture | ധനകാര്യം, സൗന്ദര്യം, കല, കൃഷി |
 | `zodiac.vedic.mithunaGemini.sign` | Mithuna (Gemini) | മിഥുനം (Gemini) |
 | `zodiac.vedic.mithunaGemini.dates` | Jun 15 - Jul 14 | ജൂൺ 15 - ജൂലൈ 14 |
 | `zodiac.vedic.mithunaGemini.element` | Air | വായു |
 | `zodiac.vedic.mithunaGemini.colors` | Green, Yellow | പച്ച, മഞ്ഞ |
-| `zodiac.vedic.mithunaGemini.traits` | Intelligent, communicative, dual nature | ബുദ്ധിമാൻ, ആശയവിനിമയശീലൻ, ദ്വന്ദ്വ സ്വഭാവം |
+| `zodiac.vedic.mithunaGemini.traits` | Intelligent, communicative, dual nature | ബുദ്ധി, ആശയവിനിമയശേഷി, ദ്വന്ദ്വ സ്വഭാവം |
 | `zodiac.vedic.mithunaGemini.bestFor` | Media, business, communication, trade | മാധ്യമം, ബിസിനസ്, ആശയവിനിമയം, വ്യാപാരം |
 | `zodiac.vedic.karkaCancer.sign` | Karka (Cancer) | കർക്കടകം (Cancer) |
 | `zodiac.vedic.karkaCancer.dates` | Jul 15 - Aug 14 | ജൂലൈ 15 - ഓഗസ്റ്റ് 14 |
 | `zodiac.vedic.karkaCancer.element` | Water | ജലം |
 | `zodiac.vedic.karkaCancer.colors` | White, Cream | വെള്ള, ക്രീം |
-| `zodiac.vedic.karkaCancer.traits` | Emotional, nurturing, protective, intuitive | വൈകാരികൻ, പരിപോഷിപ്പിക്കുന്നവൻ, സംരക്ഷകൻ, അന്തർജ്ഞാനമുള്ളവൻ |
+| `zodiac.vedic.karkaCancer.traits` | Emotional, nurturing, protective, intuitive | വൈകാരികത, പരിപോഷണ സ്വഭാവം, സംരക്ഷണ മനോഭാവം, അന്തർജ്ഞാനം |
 | `zodiac.vedic.karkaCancer.bestFor` | Healthcare, hospitality, social work | ആരോഗ്യപരിചരണം, ആതിഥ്യം, സാമൂഹിക സേവനം |
 | `zodiac.vedic.simhaLeo.sign` | Simha (Leo) | ചിങ്ങം (Leo) |
 | `zodiac.vedic.simhaLeo.dates` | Aug 15 - Sep 15 | ഓഗസ്റ്റ് 15 - സെപ്റ്റംബർ 15 |
@@ -1940,43 +1940,43 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.vedic.kanyaVirgo.dates` | Sep 16 - Oct 15 | സെപ്റ്റംബർ 16 - ഒക്ടോബർ 15 |
 | `zodiac.vedic.kanyaVirgo.element` | Earth | ഭൂമി |
 | `zodiac.vedic.kanyaVirgo.colors` | Green, Brown | പച്ച, തവിട്ട് |
-| `zodiac.vedic.kanyaVirgo.traits` | Analytical, perfectionist, service-oriented | വിശകലനശീലൻ, പൂർണതാവാദി, സേവനമനോഭാവമുള്ളവൻ |
+| `zodiac.vedic.kanyaVirgo.traits` | Analytical, perfectionist, service-oriented | വിശകലനശേഷി, പൂർണതാവാദം, സേവനമനോഭാവം |
 | `zodiac.vedic.kanyaVirgo.bestFor` | Medicine, accounting, analysis | വൈദ്യശാസ്ത്രം, അക്കൗണ്ടിംഗ്, വിശകലനം |
 | `zodiac.vedic.tulaLibra.sign` | Tula (Libra) | തുലാം (Libra) |
 | `zodiac.vedic.tulaLibra.dates` | Oct 16 - Nov 14 | ഒക്ടോബർ 16 - നവംബർ 14 |
 | `zodiac.vedic.tulaLibra.element` | Air | വായു |
 | `zodiac.vedic.tulaLibra.colors` | White, Pink | വെള്ള, പിങ്ക് |
-| `zodiac.vedic.tulaLibra.traits` | Balanced, diplomatic, artistic, fair | സന്തുലിതൻ, നയതന്ത്രജ്ഞൻ, കലാഹൃദയൻ, നീതിമാൻ |
+| `zodiac.vedic.tulaLibra.traits` | Balanced, diplomatic, artistic, fair | സന്തുലിതത്വം, നയതന്ത്രം, കലാഹൃദയം, നീതിബോധം |
 | `zodiac.vedic.tulaLibra.bestFor` | Law, arts, business, partnerships | നിയമം, കല, ബിസിനസ്, പങ്കാളിത്തങ്ങൾ |
 | `zodiac.vedic.vrishchikaScorpio.sign` | Vrishchika (Scorpio) | വൃശ്ചികം (Scorpio) |
 | `zodiac.vedic.vrishchikaScorpio.dates` | Nov 15 - Dec 14 | നവംബർ 15 - ഡിസംബർ 14 |
 | `zodiac.vedic.vrishchikaScorpio.element` | Water | ജലം |
 | `zodiac.vedic.vrishchikaScorpio.colors` | Red, Maroon | ചുവപ്പ്, മറൂൺ |
-| `zodiac.vedic.vrishchikaScorpio.traits` | Intense, secretive, transformative, powerful | തീവ്രൻ, രഹസ്യസ്വഭാവി, പരിവർത്തനശീലൻ, ശക്തൻ |
+| `zodiac.vedic.vrishchikaScorpio.traits` | Intense, secretive, transformative, powerful | തീവ്രത, രഹസ്യസ്വഭാവം, പരിവർത്തനശേഷി, ശക്തി |
 | `zodiac.vedic.vrishchikaScorpio.bestFor` | Research, occult, surgery, investigation | ഗവേഷണം, ഗൂഢവിദ്യ, ശസ്ത്രക്രിയ, അന്വേഷണം |
 | `zodiac.vedic.dhanuSagittarius.sign` | Dhanu (Sagittarius) | ധനു (Sagittarius) |
 | `zodiac.vedic.dhanuSagittarius.dates` | Dec 15 - Jan 13 | ഡിസംബർ 15 - ജനുവരി 13 |
 | `zodiac.vedic.dhanuSagittarius.element` | Fire | അഗ്നി |
 | `zodiac.vedic.dhanuSagittarius.colors` | Yellow, Orange | മഞ്ഞ, ഓറഞ്ച് |
-| `zodiac.vedic.dhanuSagittarius.traits` | Philosophical, optimistic, spiritual, truthful | തത്ത്വചിന്തകൻ, ശുഭാപ്തിവിശ്വാസി, ആത്മീയൻ, സത്യസന്ധൻ |
+| `zodiac.vedic.dhanuSagittarius.traits` | Philosophical, optimistic, spiritual, truthful | തത്ത്വചിന്ത, ശുഭാപ്തിവിശ്വാസം, ആത്മീയത, സത്യസന്ധത |
 | `zodiac.vedic.dhanuSagittarius.bestFor` | Teaching, religion, travel, education | അധ്യാപനം, മതം, യാത്ര, വിദ്യാഭ്യാസം |
 | `zodiac.vedic.makaraCapricorn.sign` | Makara (Capricorn) | മകരം (Capricorn) |
 | `zodiac.vedic.makaraCapricorn.dates` | Jan 14 - Feb 12 | ജനുവരി 14 - ഫെബ്രുവരി 12 |
 | `zodiac.vedic.makaraCapricorn.element` | Earth | ഭൂമി |
 | `zodiac.vedic.makaraCapricorn.colors` | Black, Dark Blue | കറുപ്പ്, കടും നീല |
-| `zodiac.vedic.makaraCapricorn.traits` | Disciplined, hardworking, ambitious, practical | അച്ചടക്കമുള്ളവൻ, കഠിനാധ്വാനി, അഭിലാഷമുള്ളവൻ, പ്രായോഗികൻ |
+| `zodiac.vedic.makaraCapricorn.traits` | Disciplined, hardworking, ambitious, practical | അച്ചടക്കം, കഠിനാധ്വാനം, അഭിലാഷം, പ്രായോഗികത |
 | `zodiac.vedic.makaraCapricorn.bestFor` | Administration, construction, governance | ഭരണനിർവഹണം, നിർമാണം, ഭരണം |
 | `zodiac.vedic.kumbhaAquarius.sign` | Kumbha (Aquarius) | കുംഭം (Aquarius) |
 | `zodiac.vedic.kumbhaAquarius.dates` | Feb 13 - Mar 12 | ഫെബ്രുവരി 13 - മാർച്ച് 12 |
 | `zodiac.vedic.kumbhaAquarius.element` | Air | വായു |
 | `zodiac.vedic.kumbhaAquarius.colors` | Blue, Grey | നീല, ചാരനിറം |
-| `zodiac.vedic.kumbhaAquarius.traits` | Humanitarian, innovative, unconventional | മാനവികതാവാദി, നൂതനചിന്തകൻ, പാരമ്പര്യേതരൻ |
+| `zodiac.vedic.kumbhaAquarius.traits` | Humanitarian, innovative, unconventional | മാനവികത, നൂതനചിന്ത, പാരമ്പര്യേതരത്വം |
 | `zodiac.vedic.kumbhaAquarius.bestFor` | Technology, social reform, science | സാങ്കേതികവിദ്യ, സാമൂഹിക പരിഷ്കരണം, ശാസ്ത്രം |
 | `zodiac.vedic.meenaPisces.sign` | Meena (Pisces) | മീനം (Pisces) |
 | `zodiac.vedic.meenaPisces.dates` | Mar 13 - Apr 12 | മാർച്ച് 13 - ഏപ്രിൽ 12 |
 | `zodiac.vedic.meenaPisces.element` | Water | ജലം |
 | `zodiac.vedic.meenaPisces.colors` | Yellow, Light Green | മഞ്ഞ, ഇളം പച്ച |
-| `zodiac.vedic.meenaPisces.traits` | Compassionate, spiritual, artistic, intuitive | കരുണയുള്ളവൻ, ആത്മീയൻ, കലാഹൃദയൻ, അന്തർജ്ഞാനമുള്ളവൻ |
+| `zodiac.vedic.meenaPisces.traits` | Compassionate, spiritual, artistic, intuitive | കരുണ, ആത്മീയത, കലാഹൃദയം, അന്തർജ്ഞാനം |
 | `zodiac.vedic.meenaPisces.bestFor` | Arts, healing, spirituality, charity | കല, രോഗശാന്തി, ആത്മീയത, ജീവകാരുണ്യം |
 | `zodiac.titleWestern` | 🌟 Western Zodiac | 🌟 പാശ്ചാത്യ രാശി |
 | `zodiac.titleVedic` | 🕉️ Vedic Astrology | 🕉️ വൈദിക ജ്യോതിഷം |
@@ -2094,7 +2094,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n162` | Root investigation, spiritual depth | വേരുകളുടെ അന്വേഷണം, ആത്മീയ ആഴം |
 | `insights.n163` | 🌊 Water Nakshatras (Ruled by Moon, Mercury) | 🌊 ജല നക്ഷത്രങ്ങൾ (അധിപന്മാർ: ചന്ദ്രൻ, ബുധൻ) |
 | `insights.n167` | Growth, beauty, materialistic | വളർച്ച, സൗന്ദര്യം, ഭൗതികവാദം |
-| `insights.n170` | Skillful hands, clever, dexterous | വൈദഗ്ധ്യമുള്ള കൈകൾ, ബുദ്ധിമാൻ, നൈപുണ്യമുള്ള |
+| `insights.n170` | Skillful hands, clever, dexterous | വൈദഗ്ധ്യമുള്ള കൈകൾ, ബുദ്ധിശക്തി, നൈപുണ്യം |
 | `insights.n173` | Listening, learning, wisdom | കേൾക്കൽ, പഠിക്കൽ, ജ്ഞാനം |
 | `insights.n177` | Mystical, serpent wisdom, cunning | നിഗൂഢമായ, സർപ്പജ്ഞാനം, കൗശലം |
 | `insights.n180` | Elder authority, protective | മുതിർന്നവരുടെ അധികാരം, സംരക്ഷണം |
@@ -2635,7 +2635,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.gemini.dates` | May 21 - Jun 20 | மே 21 - ஜூன் 20 |
 | `zodiac.western.gemini.element` | Air | காற்று |
 | `zodiac.western.gemini.colors` | Yellow, Light Green | மஞ்சள், வெளிர் பச்சை |
-| `zodiac.western.gemini.traits` | Curious, adaptable, communicative, witty | ஆர்வமுள்ள, தகவமைக்கும், தொடர்பு கொள்ளும், நகைச்சுவை மிக்க |
+| `zodiac.western.gemini.traits` | Curious, adaptable, communicative, witty | ஆர்வமுள்ள, தகவமைத்துக்கொள்ளும், தொடர்பு கொள்ளும், நகைச்சுவை மிக்க |
 | `zodiac.western.gemini.bestFor` | Media, teaching, sales, writing | ஊடகம், கற்பித்தல், விற்பனை, எழுத்து |
 | `zodiac.western.cancer.sign` | Cancer | கடகம் (Cancer) |
 | `zodiac.western.cancer.dates` | Jun 21 - Jul 22 | ஜூன் 21 - ஜூலை 22 |
@@ -2688,7 +2688,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.pisces.sign` | Pisces | மீனம் (Pisces) |
 | `zodiac.western.pisces.dates` | Feb 19 - Mar 20 | பிப்ரவரி 19 - மார்ச் 20 |
 | `zodiac.western.pisces.element` | Water | நீர் |
-| `zodiac.western.pisces.colors` | Sea Green, Lavender | கடல் பச்சை, இளநீலம் |
+| `zodiac.western.pisces.colors` | Sea Green, Lavender | கடல் பச்சை, இளஊதா |
 | `zodiac.western.pisces.traits` | Compassionate, artistic, intuitive, sensitive | இரக்கமுள்ள, கலைநயம், உள்ளுணர்வு மிக்க, உணர்திறன் கொண்ட |
 | `zodiac.western.pisces.bestFor` | Arts, music, healing, spirituality | கலை, இசை, குணப்படுத்துதல், ஆன்மிகம் |
 | `zodiac.vedic.meshaAries.sign` | Mesha (Aries) | மேஷம் (Aries) |
@@ -3293,54 +3293,54 @@ Languages: hi, kn, ml, ta, te
 | `numerology.interpretation.22` | Master builder, vision, manifestation. You turn dreams into reality. | మాస్టర్ నిర్మాత, దార్శనికత, సాకారం. మీరు కలలను వాస్తవంగా మారుస్తారు. |
 | `numerology.interpretation.33` | Master teacher, compassion, blessing. You uplift and heal others. | మాస్టర్ గురువు, కరుణ, ఆశీర్వాదం. మీరు ఇతరులను ఉన్నతీకరించి నయం చేస్తారు. |
 | `numerology.interpretation.default` | Unique energy pattern | ప్రత్యేక శక్తి రీతి |
-| `numerology.meaning.1.destiny` | Natural leader, independent, ambitious. You're meant to pioneer new paths. | సహజ నాయకుడు, స్వతంత్రుడు, ఆశయం గలవాడు. కొత్త మార్గాలను నిర్మించడానికే మీరు పుట్టారు. |
+| `numerology.meaning.1.destiny` | Natural leader, independent, ambitious. You're meant to pioneer new paths. | సహజ నాయకత్వం, స్వతంత్రత, ఆశయం. కొత్త మార్గాలను నిర్మించడానికే మీరు పుట్టారు. |
 | `numerology.meaning.1.soulUrge` | Deep desire for independence and leadership. You crave recognition. | స్వతంత్రత, నాయకత్వం పట్ల లోతైన కోరిక. మీరు గుర్తింపును కోరుకుంటారు. |
 | `numerology.meaning.1.personality` | Others see you as confident, assertive, and self-reliant. | ఇతరులు మిమ్మల్ని ఆత్మవిశ్వాసం, దృఢత్వం, స్వయం సమృద్ధి గలవారిగా చూస్తారు. |
 | `numerology.meaning.1.lifePath` | Your journey is about developing leadership and independence. | మీ ప్రయాణం నాయకత్వాన్ని, స్వతంత్రతను పెంపొందించుకోవడం గురించి. |
 | `numerology.meaning.1.expression` | You express yourself through innovation and individuality. | నవీనత, వ్యక్తిత్వం ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.2.destiny` | Peacemaker, diplomat, cooperative. You bring harmony to situations. | శాంతి కారకుడు, రాయబారి, సహకారి. మీరు ప్రతి సందర్భంలో సామరస్యాన్ని తెస్తారు. |
+| `numerology.meaning.2.destiny` | Peacemaker, diplomat, cooperative. You bring harmony to situations. | శాంతి స్థాపన, దౌత్యం, సహకారం. మీరు ప్రతి సందర్భంలో సామరస్యాన్ని తెస్తారు. |
 | `numerology.meaning.2.soulUrge` | You desire peace, partnership, and emotional connections. | మీరు శాంతి, భాగస్వామ్యం, భావోద్వేగ అనుబంధాలను కోరుకుంటారు. |
-| `numerology.meaning.2.personality` | Others perceive you as gentle, diplomatic, and supportive. | ఇతరులు మిమ్మల్ని సౌమ్యుడు, చతురుడు, తోడ్పాటునిచ్చేవారిగా చూస్తారు. |
+| `numerology.meaning.2.personality` | Others perceive you as gentle, diplomatic, and supportive. | ఇతరులు మిమ్మల్ని సౌమ్యత, చతురత గలవారిగా, తోడ్పాటునిచ్చేవారిగా చూస్తారు. |
 | `numerology.meaning.2.lifePath` | Your path involves cooperation, relationships, and balance. | మీ మార్గంలో సహకారం, సంబంధాలు, సమతుల్యత ఉన్నాయి. |
 | `numerology.meaning.2.expression` | You express through empathy, mediation, and partnerships. | సానుభూతి, మధ్యవర్తిత్వం, భాగస్వామ్యాల ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.3.destiny` | Creative communicator, artist, entertainer. You inspire through expression. | సృజనాత్మక సంభాషణకర్త, కళాకారుడు, వినోదకారుడు. వ్యక్తీకరణ ద్వారా ప్రేరేపిస్తారు. |
+| `numerology.meaning.3.destiny` | Creative communicator, artist, entertainer. You inspire through expression. | సృజనాత్మక సంభాషణ, కళ, వినోదం. వ్యక్తీకరణ ద్వారా ప్రేరేపిస్తారు. |
 | `numerology.meaning.3.soulUrge` | You crave creative expression and joyful connections. | మీరు సృజనాత్మక వ్యక్తీకరణను, ఆనందమయ అనుబంధాలను కోరుకుంటారు. |
-| `numerology.meaning.3.personality` | Others see you as charming, creative, and expressive. | ఇతరులు మిమ్మల్ని ఆకర్షణీయుడు, సృజనశీలి, వ్యక్తీకరణశీలిగా చూస్తారు. |
+| `numerology.meaning.3.personality` | Others see you as charming, creative, and expressive. | ఇతరులు మిమ్మల్ని ఆకర్షణ, సృజనాత్మకత, వ్యక్తీకరణ గలవారిగా చూస్తారు. |
 | `numerology.meaning.3.lifePath` | Your journey centers on creativity and self-expression. | మీ ప్రయాణం సృజనాత్మకత, స్వీయ వ్యక్తీకరణపై కేంద్రీకృతమై ఉంది. |
 | `numerology.meaning.3.expression` | You express through art, words, and creative pursuits. | కళ, మాటలు, సృజనాత్మక పనుల ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.4.destiny` | Builder, organizer, practical. You create stable foundations. | నిర్మాత, నిర్వాహకుడు, ఆచరణాత్మకుడు. మీరు స్థిరమైన పునాదులను నిర్మిస్తారు. |
+| `numerology.meaning.4.destiny` | Builder, organizer, practical. You create stable foundations. | నిర్మాణం, నిర్వహణ, ఆచరణాత్మకత. మీరు స్థిరమైన పునాదులను నిర్మిస్తారు. |
 | `numerology.meaning.4.soulUrge` | You desire security, order, and tangible achievements. | మీరు భద్రత, క్రమం, కనిపించే విజయాలను కోరుకుంటారు. |
 | `numerology.meaning.4.personality` | Others view you as reliable, hardworking, and grounded. | ఇతరులు మిమ్మల్ని నమ్మదగినవారు, కష్టపడేవారు, నేలమీద నిలబడినవారిగా చూస్తారు. |
 | `numerology.meaning.4.lifePath` | Your path involves building lasting structures and systems. | మీ మార్గంలో శాశ్వత నిర్మాణాలను, వ్యవస్థలను నిర్మించడం ఉంది. |
 | `numerology.meaning.4.expression` | You express through practical work and organization. | ఆచరణాత్మక పని, నిర్వహణ ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.5.destiny` | Freedom seeker, adventurer, change agent. You thrive on variety. | స్వేచ్ఛ కోరేవారు, సాహసి, మార్పుకు చోదకుడు. మీరు వైవిధ్యంలో వర్ధిల్లుతారు. |
+| `numerology.meaning.5.destiny` | Freedom seeker, adventurer, change agent. You thrive on variety. | స్వేచ్ఛాన్వేషణ, సాహసం, మార్పును నడిపించే శక్తి. మీరు వైవిధ్యంలో వర్ధిల్లుతారు. |
 | `numerology.meaning.5.soulUrge` | You crave freedom, adventure, and new experiences. | మీరు స్వేచ్ఛ, సాహసం, కొత్త అనుభవాలను కోరుకుంటారు. |
-| `numerology.meaning.5.personality` | Others see you as dynamic, adventurous, and unpredictable. | ఇతరులు మిమ్మల్ని చైతన్యవంతుడు, సాహసి, ఊహించలేనివారిగా చూస్తారు. |
+| `numerology.meaning.5.personality` | Others see you as dynamic, adventurous, and unpredictable. | ఇతరులు మిమ్మల్ని చైతన్యం, సాహసం గలవారిగా, ఊహించలేనివారిగా చూస్తారు. |
 | `numerology.meaning.5.lifePath` | Your journey is about embracing change and freedom. | మీ ప్రయాణం మార్పును, స్వేచ్ఛను ఆలింగనం చేసుకోవడం గురించి. |
 | `numerology.meaning.5.expression` | You express through exploration and adaptability. | అన్వేషణ, అనుకూలత ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.6.destiny` | Nurturer, caregiver, teacher. You create harmony and beauty. | పోషకుడు, సంరక్షకుడు, గురువు. మీరు సామరస్యాన్ని, అందాన్ని సృష్టిస్తారు. |
+| `numerology.meaning.6.destiny` | Nurturer, caregiver, teacher. You create harmony and beauty. | పోషణ, సంరక్షణ, బోధన. మీరు సామరస్యాన్ని, అందాన్ని సృష్టిస్తారు. |
 | `numerology.meaning.6.soulUrge` | You desire to nurture, love, and create beautiful environments. | మీరు పోషించాలని, ప్రేమించాలని, అందమైన వాతావరణాలను సృష్టించాలని కోరుకుంటారు. |
 | `numerology.meaning.6.personality` | Others perceive you as caring, responsible, and supportive. | ఇతరులు మిమ్మల్ని శ్రద్ధగలవారు, బాధ్యతగలవారు, తోడ్పాటునిచ్చేవారిగా చూస్తారు. |
 | `numerology.meaning.6.lifePath` | Your path involves service, family, and community. | మీ మార్గంలో సేవ, కుటుంబం, సమాజం ఉన్నాయి. |
 | `numerology.meaning.6.expression` | You express through caring, teaching, and healing. | శ్రద్ధ, బోధన, నయం చేయడం ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.7.destiny` | Seeker, analyst, mystic. You search for deeper truths. | అన్వేషి, విశ్లేషకుడు, ఆధ్యాత్మికుడు. మీరు లోతైన సత్యాల కోసం వెతుకుతారు. |
+| `numerology.meaning.7.destiny` | Seeker, analyst, mystic. You search for deeper truths. | అన్వేషణ, విశ్లేషణ, ఆధ్యాత్మిక చింతన. మీరు లోతైన సత్యాల కోసం వెతుకుతారు. |
 | `numerology.meaning.7.soulUrge` | You crave knowledge, solitude, and spiritual understanding. | మీరు జ్ఞానం, ఏకాంతం, ఆధ్యాత్మిక అవగాహనను కోరుకుంటారు. |
-| `numerology.meaning.7.personality` | Others see you as mysterious, intellectual, and reserved. | ఇతరులు మిమ్మల్ని రహస్యమైనవారు, మేధావి, అంతర్ముఖులుగా చూస్తారు. |
+| `numerology.meaning.7.personality` | Others see you as mysterious, intellectual, and reserved. | ఇతరులు మిమ్మల్ని రహస్యమైనవారిగా, మేధావులుగా, అంతర్ముఖులుగా చూస్తారు. |
 | `numerology.meaning.7.lifePath` | Your journey involves spiritual growth and inner wisdom. | మీ ప్రయాణంలో ఆధ్యాత్మిక వృద్ధి, అంతర్గత జ్ఞానం ఉన్నాయి. |
 | `numerology.meaning.7.expression` | You express through analysis, research, and spirituality. | విశ్లేషణ, పరిశోధన, ఆధ్యాత్మికత ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.8.destiny` | Powerhouse, executive, manifester. You achieve material success. | శక్తికేంద్రం, కార్యనిర్వాహకుడు, సాకారకుడు. మీరు భౌతిక విజయాన్ని సాధిస్తారు. |
+| `numerology.meaning.8.destiny` | Powerhouse, executive, manifester. You achieve material success. | శక్తికేంద్రం, కార్యనిర్వహణ, సాకారం. మీరు భౌతిక విజయాన్ని సాధిస్తారు. |
 | `numerology.meaning.8.soulUrge` | You desire power, success, and material accomplishment. | మీరు అధికారం, విజయం, భౌతిక సాధనను కోరుకుంటారు. |
-| `numerology.meaning.8.personality` | Others view you as powerful, ambitious, and authoritative. | ఇతరులు మిమ్మల్ని శక్తివంతుడు, ఆశయం గలవాడు, అధికారం గలవారిగా చూస్తారు. |
+| `numerology.meaning.8.personality` | Others view you as powerful, ambitious, and authoritative. | ఇతరులు మిమ్మల్ని శక్తి, ఆశయం, అధికారం గలవారిగా చూస్తారు. |
 | `numerology.meaning.8.lifePath` | Your path involves mastering material world and leadership. | మీ మార్గంలో భౌతిక ప్రపంచంలో నైపుణ్యం, నాయకత్వం ఉన్నాయి. |
 | `numerology.meaning.8.expression` | You express through business, management, and achievement. | వ్యాపారం, నిర్వహణ, సాధన ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.9.destiny` | Humanitarian, teacher, healer. You serve humanity. | మానవతావాది, గురువు, వైద్యుడు. మీరు మానవాళికి సేవ చేస్తారు. |
+| `numerology.meaning.9.destiny` | Humanitarian, teacher, healer. You serve humanity. | మానవతావాదం, బోధన, నయం చేసే గుణం. మీరు మానవాళికి సేవ చేస్తారు. |
 | `numerology.meaning.9.soulUrge` | You desire to help humanity and create positive change. | మీరు మానవాళికి సహాయం చేయాలని, సానుకూల మార్పు తేవాలని కోరుకుంటారు. |
-| `numerology.meaning.9.personality` | Others see you as compassionate, wise, and selfless. | ఇతరులు మిమ్మల్ని కరుణామయుడు, జ్ఞాని, నిస్వార్థపరుడిగా చూస్తారు. |
+| `numerology.meaning.9.personality` | Others see you as compassionate, wise, and selfless. | ఇతరులు మిమ్మల్ని కరుణామయులుగా, జ్ఞానులుగా, నిస్వార్థపరులుగా చూస్తారు. |
 | `numerology.meaning.9.lifePath` | Your journey is about service, compassion, and completion. | మీ ప్రయాణం సేవ, కరుణ, పరిపూర్ణత గురించి. |
 | `numerology.meaning.9.expression` | You express through humanitarian work and universal love. | మానవతా కార్యం, విశ్వ ప్రేమ ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.11.destiny` | Master teacher, spiritual messenger. You inspire and enlighten. | మాస్టర్ గురువు, ఆధ్యాత్మిక సందేశహరుడు. మీరు ప్రేరేపించి వెలుగునిస్తారు. |
+| `numerology.meaning.11.destiny` | Master teacher, spiritual messenger. You inspire and enlighten. | మాస్టర్ గురుత్వం, ఆధ్యాత్మిక సందేశం. మీరు ప్రేరేపించి వెలుగునిస్తారు. |
 | `numerology.meaning.11.soulUrge` | You desire spiritual illumination and to inspire others. | మీరు ఆధ్యాత్మిక జ్ఞానోదయాన్ని, ఇతరులను ప్రేరేపించడాన్ని కోరుకుంటారు. |
-| `numerology.meaning.11.personality` | Others see you as inspirational and spiritually gifted. | ఇతరులు మిమ్మల్ని స్ఫూర్తిదాయకుడిగా, ఆధ్యాత్మిక ప్రతిభ గలవారిగా చూస్తారు. |
+| `numerology.meaning.11.personality` | Others see you as inspirational and spiritually gifted. | ఇతరులు మిమ్మల్ని స్ఫూర్తిదాయకులుగా, ఆధ్యాత్మిక ప్రతిభ గలవారిగా చూస్తారు. |
 | `numerology.meaning.11.lifePath` | Your path is spiritual leadership and enlightenment. | మీ మార్గం ఆధ్యాత్మిక నాయకత్వం, జ్ఞానోదయం. |
 | `numerology.meaning.11.expression` | You express through intuition and spiritual teaching. | అంతర్ దృష్టి, ఆధ్యాత్మిక బోధన ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
 | `numerology.meaning.22.destiny` | Master builder. You manifest dreams into reality on large scale. | మాస్టర్ నిర్మాత. మీరు పెద్ద స్థాయిలో కలలను వాస్తవంగా మారుస్తారు. |
@@ -3348,7 +3348,7 @@ Languages: hi, kn, ml, ta, te
 | `numerology.meaning.22.personality` | Others view you as capable of achieving the impossible. | అసాధ్యాన్ని సాధించగల సామర్థ్యం ఉన్నవారిగా ఇతరులు మిమ్మల్ని చూస్తారు. |
 | `numerology.meaning.22.lifePath` | Your path involves manifesting grand visions into reality. | మీ మార్గంలో గొప్ప దార్శనికతలను వాస్తవంగా మార్చడం ఉంది. |
 | `numerology.meaning.22.expression` | You express through building systems that serve many. | అనేకమందికి ఉపయోగపడే వ్యవస్థలను నిర్మించడం ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు. |
-| `numerology.meaning.33.destiny` | Master teacher, healer of healers. You uplift humanity. | మాస్టర్ గురువు, వైద్యులకే వైద్యుడు. మీరు మానవాళిని ఉన్నతీకరిస్తారు. |
+| `numerology.meaning.33.destiny` | Master teacher, healer of healers. You uplift humanity. | మాస్టర్ గురుత్వం, నయం చేసేవారిని నయం చేసే శక్తి. మీరు మానవాళిని ఉన్నతీకరిస్తారు. |
 | `numerology.meaning.33.soulUrge` | You desire to nurture and heal on a universal scale. | మీరు విశ్వ స్థాయిలో పోషించాలని, నయం చేయాలని కోరుకుంటారు. |
 | `numerology.meaning.33.personality` | Others see you as a beacon of unconditional love. | ఇతరులు మిమ్మల్ని షరతులు లేని ప్రేమకు దీపస్తంభంగా చూస్తారు. |
 | `numerology.meaning.33.lifePath` | Your path is about selfless service and universal love. | మీ మార్గం నిస్వార్థ సేవ, విశ్వ ప్రేమ. |
@@ -3409,7 +3409,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.western.aries.element` | Fire | అగ్ని |
 | `zodiac.western.aries.colors` | Red, Scarlet | ఎరుపు, ముదురు ఎరుపు |
 | `zodiac.western.aries.traits` | Bold, ambitious, confident, energetic | ధైర్యవంతమైన, ఆశయం గల, ఆత్మవిశ్వాసం గల, శక్తివంతమైన |
-| `zodiac.western.aries.bestFor` | Leadership, entrepreneurship, sports | నాయకత్వం, వ్యాపారవేత్తృత్వం, క్రీడలు |
+| `zodiac.western.aries.bestFor` | Leadership, entrepreneurship, sports | నాయకత్వం, పారిశ్రామికత, క్రీడలు |
 | `zodiac.western.taurus.sign` | Taurus | వృషభం (Taurus) |
 | `zodiac.western.taurus.dates` | Apr 20 - May 20 | ఏప్రిల్ 20 - మే 20 |
 | `zodiac.western.taurus.element` | Earth | భూమి |
@@ -3481,7 +3481,7 @@ Languages: hi, kn, ml, ta, te
 | `zodiac.vedic.meshaAries.element` | Fire | అగ్ని |
 | `zodiac.vedic.meshaAries.colors` | Red, Maroon | ఎరుపు, మెరూన్ |
 | `zodiac.vedic.meshaAries.traits` | Bold, ambitious, warrior spirit, leadership | ధైర్యవంతమైన, ఆశయం గల, యోధ స్ఫూర్తి, నాయకత్వం |
-| `zodiac.vedic.meshaAries.bestFor` | Defense, sports, entrepreneurship | రక్షణ, క్రీడలు, వ్యాపారవేత్తృత్వం |
+| `zodiac.vedic.meshaAries.bestFor` | Defense, sports, entrepreneurship | రక్షణ, క్రీడలు, పారిశ్రామికత |
 | `zodiac.vedic.vrishabhaTaurus.sign` | Vrishabha (Taurus) | వృషభం (Taurus) |
 | `zodiac.vedic.vrishabhaTaurus.dates` | May 15 - Jun 14 | మే 15 - జూన్ 14 |
 | `zodiac.vedic.vrishabhaTaurus.element` | Earth | భూమి |
