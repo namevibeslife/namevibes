@@ -7,7 +7,6 @@ import { formatMoney } from '../i18n/format';
 import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { loadTaxRates, loadGatewayChoice } from '../utils/pricing';
-import { toSubunits, toGatewayAmount } from '../data/gatewayCurrencies';
 import { GST_RATE_BY_COUNTRY } from '../utils/commission';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +21,20 @@ const loadScript = (src) => new Promise((resolve, reject) => {
   script.onerror = () => reject(new Error(`Failed to load ${src}`));
   document.body.appendChild(script);
 });
+
+// The server decides the price and checks every payment with the gateway before activating a plan.
+// The browser only asks it to start an order and to verify the result.
+async function callPayApi(path, payload) {
+  const token = await auth.currentUser.getIdToken();
+  const res = await fetch(`/api/pay/${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(data.error || 'Payment request failed'), { code: data.code });
+  return data;
+}
 
 export default function PaymentPage() {
   const { t } = useTranslation();
@@ -84,21 +97,19 @@ export default function PaymentPage() {
     }
 
     window.paypal.Buttons({
-      createOrder: (data, actions) => {
-        return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: toGatewayAmount(amount, currency || 'USD'),
-              currency_code: currency || 'USD'
-            },
-            description: 'NAMASUTRA Annual Plan'
-          }]
-        });
+      // Order is created on the server with the server-computed amount; the server captures and verifies it
+      createOrder: async () => {
+        const order = await callPayApi('create-order', { gateway: 'paypal' });
+        return order.orderId;
       },
-      onApprove: async (data, actions) => {
-        return actions.order.capture().then(async (details) => {
-          await savePaymentSuccess('paypal', details.id);
-        });
+      onApprove: async (data) => {
+        try {
+          await callPayApi('verify', { gateway: 'paypal', orderId: data.orderID });
+          await finishPayment();
+        } catch (error) {
+          console.error('PayPal verification error:', error);
+          alert(t('errors.paymentRecorded'));
+        }
       },
       onError: (err) => {
         console.error('PayPal error:', err);
@@ -142,15 +153,28 @@ export default function PaymentPage() {
     setLoading(true);
     try {
       await loadScript('https://checkout.razorpay.com/v1/checkout.js');
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        // smallest unit of the currency: 100 per rupee/dollar, 1 per yen, 1000 per dinar
-        amount: toSubunits(amount, currency || 'INR'),
-        currency: currency || 'INR',
+      // amount, currency and order are created server-side; the key id comes from the server too
+      const order = await callPayApi('create-order', { gateway: 'razorpay' });
+      const rzp = new window.Razorpay({
+        key: order.keyId,
+        order_id: order.orderId,
+        amount: order.amount,
+        currency: order.currency,
         name: 'Namasutra',
         description: 'NAMASUTRA Annual Plan',
         handler: async function (response) {
-          await savePaymentSuccess('razorpay', response.razorpay_payment_id);
+          try {
+            await callPayApi('verify', {
+              gateway: 'razorpay',
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature
+            });
+            await finishPayment();
+          } catch (error) {
+            console.error('Razorpay verification error:', error);
+            alert(t('errors.paymentRecorded'));
+          }
         },
         prefill: {
           email: auth.currentUser.email,
@@ -159,9 +183,7 @@ export default function PaymentPage() {
         theme: {
           color: '#9333ea'
         }
-      };
-
-      const rzp = new window.Razorpay(options);
+      });
       rzp.open();
     } catch (error) {
       console.error('Razorpay error:', error);
@@ -169,6 +191,12 @@ export default function PaymentPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // After the server has verified the payment and activated the plan
+  const finishPayment = async () => {
+    await refreshProfile();
+    navigate('/dashboard');
   };
 
   // Test mode: the server activates the plan without a card, then we show the success screen
@@ -192,7 +220,9 @@ export default function PaymentPage() {
     }
   };
 
-  const savePaymentSuccess = async (gateway, transactionId) => {
+  // Simulated payment, dev:mock only. Real payments are recorded by the server (functions/api/pay/verify.js).
+  const saveMockPayment = async (gateway, transactionId) => {
+    if (!IS_MOCK) return;
     try {
       const user = auth.currentUser;
       const userRef = doc(db, 'users', user.uid);
@@ -309,7 +339,7 @@ export default function PaymentPage() {
                 <p className="text-sm text-amber-800 font-semibold">{t('payment.mockNote')}</p>
                 <p className="text-xs text-amber-800" data-testid="mock-gateway">{t('payment.mockGateway', { gateway: chosenGateway === 'razorpay' ? 'Razorpay' : 'PayPal' })}</p>
                 <button
-                  onClick={() => savePaymentSuccess('mock', `mock_${Date.now()}`)}
+                  onClick={() => saveMockPayment('mock', `mock_${Date.now()}`)}
                   className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition"
                 >
                   {t('payment.simulateOk')}
