@@ -5,6 +5,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
+import { isPlanActive } from '../utils/plan';
 
 const explore = [
   ['Home', '/'], ['Know More', '/learn-more'], ['Dashboard', '/dashboard'],
@@ -17,7 +18,7 @@ const explore = [
 
 // One shared navigation bar on every route, including public and error pages.
 export default function UserNav() {
-  const { user, logout } = useAuthStore();
+  const { user, profile, logout } = useAuthStore();
   const location = useLocation();
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
@@ -44,7 +45,11 @@ export default function UserNav() {
     document.addEventListener('keydown', escape);
     return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
   }, [open]);
-  const account = user ? [['Settings', '/settings'], ['My Profile', '/profile-complete']] : [['Sign In', '/login']];
+  // An approved ambassador with no paid plan only sees links that open for them; the paid tools
+  // (and the dashboard that leads to them) stay hidden rather than bouncing to the payment card.
+  const planless = user && isAmbassador && !isPlanActive(profile);
+  const exploreLinks = planless ? explore.filter(([, to]) => ['/', '/learn-more'].includes(to) || (to === '/pricing' && profile?.profileComplete)) : explore;
+  const account = user ? [['Settings', '/settings'], ['My Profile', '/profile']] : [['Sign In', '/login']];
   // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
   // One link to the ambassador sign-in page; it reads "Ambassador area" for a signed-in ambassador.
   const partners = [[isAmbassador ? 'Ambassador area' : 'Ambassador Login', '/ambassador']];
@@ -63,7 +68,7 @@ export default function UserNav() {
         </button>
       </nav>
       {open && <nav id="site-navigation-menu" aria-label="All pages" className="site-navigation-dropdown" onBlur={event => { if (event.relatedTarget && !container.current?.contains(event.relatedTarget)) setOpen(false); }}>
-        {[['Explore Namasutra', explore], ['Your account', account], ['Ambassadors', partners]].map(([title, links]) => <section key={title}>
+        {[['Explore Namasutra', exploreLinks], ['Your account', account], ['Ambassadors', partners]].map(([title, links]) => <section key={title}>
           <h2>{title}</h2>
           <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{label}</NavLink>)}</div>
         </section>)}

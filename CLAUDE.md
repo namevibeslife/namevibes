@@ -1,3 +1,9 @@
+## My Profile page and plan-free account links - 20 November 2026
+
+- Bug: Menu "My Profile" pointed at /profile-complete (the sign-up form), which sends a completed profile on to /pricing, so signed-in users without a plan landed on the payment card. Added a real read-only profile page, src/pages/MyProfile.jsx at /profile, behind a plain signed-in guard (no profile or plan requirement; shows name, email, saved details and plan status, never a payment prompt). Menu "My Profile" -> /profile. Settings, /profile, Know More and /ambassador already needed no plan.
+- Menu for an approved ambassador with no active plan: Home, Know More, (Plans & Pricing only once a user profile exists), Settings, My Profile, Ambassador area. Paid tools and Dashboard are hidden for them. Plan guards (requiresPlan/requiresFamily/requiresProfile), role guards, payments, commission and Firestore rules unchanged. Admin/Accounts links still show only on those routes.
+- Known behaviour kept: /pricing, /dashboard and the paid tools send a signed-in user with no saved profile to /profile-complete first (pricing needs the country); signed-out visitors are sent to /login.
+
 ## Referral discount wording on Pricing and Payment - 20 November 2026
 
 - Pricing card: with a referral code it shows the list price struck through, "₹359 / year" and "10% referral discount applied" (percent from the country's setting); without a code only "₹399 / year". The old "Save ₹40!" is gone; no other "Save <amount>" copy exists in the app. Payment page ("Complete Payment") now shows plan line, "Referral code <CODE> (10% off) -₹40" and Total, plus "Includes 18% GST" (India; other countries use their Country Pricing tax %, nothing shown when 0). Without a code only the plan line and total. Pricing passes listPrice and discountPercent in the navigation state; the discount line is listPrice minus the amount charged, so lines always add up. Amount charged, commission, tax and payment logic unchanged.

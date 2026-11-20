@@ -21,6 +21,7 @@ const AnalysisView = lazy(() => import('./pages/AnalysisView'));
 const FamilyAnalysisView = lazy(() => import('./pages/FamilyAnalysisView'));
 const Pricing = lazy(() => import('./pages/Pricing'));
 const Settings = lazy(() => import('./pages/Settings'));
+const MyProfile = lazy(() => import('./pages/MyProfile'));
 const AmbassadorHome = lazy(() => import('./pages/AmbassadorHome'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ElementInsightsPage = lazy(() => import('./pages/ElementInsightsPage'));
@@ -97,6 +98,8 @@ function App() {
           <Route path="/numerology-calculator" element={<ProtectedRoute requiresPlan><NumerologyCalculator /></ProtectedRoute>} />
           <Route path="/element-insights" element={<ProtectedRoute requiresPlan><ElementInsightsPage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+          {/* Any signed-in user: no profile or plan requirement */}
+          <Route path="/profile" element={<ProtectedRoute><MyProfile /></ProtectedRoute>} />
 
           {/* Ambassadors are invite-only: no public sign-up. Old links land on the ambassador page. */}
           <Route path="/ambassador" element={<AmbassadorHome />} />
