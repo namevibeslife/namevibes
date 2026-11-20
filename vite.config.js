@@ -10,6 +10,14 @@ export default defineConfig(({ mode }) => ({
     name: 'site-url-html',
     transformIndexHtml: (html) => html.replaceAll('__SITE_URL__', SITE_URL)
   }],
+  build: {
+    rollupOptions: {
+      // Chunk URL pattern. Changed once (20 Nov 2026) because Cloudflare's edge had cached an HTML page
+      // as the immutable response for /assets/en-4182f899.js (requested while a deploy was still
+      // propagating), which broke the English content chunk. A new pattern means new URLs.
+      output: { chunkFileNames: 'assets/[name].[hash].js' }
+    }
+  },
   resolve: {
     alias: mode === 'mock'
       ? [{
