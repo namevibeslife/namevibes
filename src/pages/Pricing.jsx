@@ -51,6 +51,8 @@ export default function Pricing() {
       state: {
         planType: 'family',
         amount: finalPrice,
+        listPrice: plan.price,
+        discountPercent: plan.discountPercent,
         currency: pricing.currency,
         symbol: pricing.symbol,
         referralCode: userProfile.referralCodeUsed || userProfile.referralCode || null
@@ -129,13 +131,12 @@ export default function Pricing() {
                 {discounted !== null ? (
                   <>
                     <p className="text-brand-200 line-through text-lg">{symbol}{price}</p>
-                    <p className="text-5xl font-bold text-white">{symbol}{discounted}</p>
-                    <p className="text-yellow-300 font-semibold mt-1">Save {symbol}{price - discounted}!</p>
+                    <p className="text-5xl font-bold text-white">{symbol}{discounted} <span className="text-2xl font-semibold text-brand-100">/ year</span></p>
+                    <p className="text-yellow-300 font-semibold mt-1">{pricing.plan.discountPercent}% referral discount applied</p>
                   </>
                 ) : (
-                  <p className="text-5xl font-bold text-white">{symbol}{price}</p>
+                  <p className="text-5xl font-bold text-white">{symbol}{price} <span className="text-2xl font-semibold text-brand-100">/ year</span></p>
                 )}
-                <p className="text-brand-100 mt-2">per year</p>
               </div>
             </div>
 

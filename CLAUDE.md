@@ -1,3 +1,7 @@
+## Referral discount wording on Pricing and Payment - 20 November 2026
+
+- Pricing card: with a referral code it shows the list price struck through, "₹359 / year" and "10% referral discount applied" (percent from the country's setting); without a code only "₹399 / year". The old "Save ₹40!" is gone; no other "Save <amount>" copy exists in the app. Payment page ("Complete Payment") now shows plan line, "Referral code <CODE> (10% off) -₹40" and Total, plus "Includes 18% GST" (India; other countries use their Country Pricing tax %, nothing shown when 0). Without a code only the plan line and total. Pricing passes listPrice and discountPercent in the navigation state; the discount line is listPrice minus the amount charged, so lines always add up. Amount charged, commission, tax and payment logic unchanged.
+
 ## Firebase authDomain moved to namasutra.life - 20 November 2026
 
 - src/firebase.js authDomain is now "namasutra.life" (project ID, storage bucket and the rest unchanged). Sign-in goes through the Cloudflare auth proxy functions/__/[[path]].js on the same domain. Service worker VERSION bumped to v6. Requires namasutra.life in Firebase Authorized domains and the Google OAuth client's authorized redirect URI https://namasutra.life/__/auth/handler; sign-in on namevibes.life will no longer work unless that domain is kept authorized with its own redirect URI (it is being retired).

@@ -4,6 +4,8 @@ import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
+import { loadTaxRates } from '../utils/pricing';
+import { GST_RATE_BY_COUNTRY } from '../utils/commission';
 
 // In mock mode (npm run dev:mock) no gateway scripts load; payments are simulated
 const IS_MOCK = import.meta.env.MODE === 'mock';
@@ -27,7 +29,10 @@ export default function PaymentPage() {
   const [paypalLoaded, setPaypalLoaded] = useState(false);
   const [paid, setPaid] = useState(false);
 
-  const { planType, amount, currency, symbol, referralCode } = location.state || {};
+  const { planType, amount, currency, symbol, referralCode, listPrice, discountPercent } = location.state || {};
+  const [taxRate, setTaxRate] = useState(null);
+  // The discount is always list price minus the amount actually charged, so the lines add up.
+  const discountAmount = referralCode && Number(listPrice) > Number(amount) ? Number(listPrice) - Number(amount) : 0;
 
   useEffect(() => {
     if (!planType || !amount) {
@@ -36,6 +41,15 @@ export default function PaymentPage() {
     }
     loadUserProfile();
   }, []);
+
+  // Tax text comes from the country's own setting (Country Pricing), with the same fallback as commission
+  useEffect(() => {
+    if (!userProfile?.countryCode) return;
+    loadTaxRates().then(rates => {
+      const set = rates[userProfile.countryCode];
+      setTaxRate(Number.isFinite(Number(set)) && set !== undefined && set !== null ? Number(set) : (GST_RATE_BY_COUNTRY[userProfile.countryCode] || 0));
+    }).catch(() => setTaxRate(GST_RATE_BY_COUNTRY[userProfile.countryCode] || 0));
+  }, [userProfile?.countryCode]);
 
   useEffect(() => {
     // Load PayPal SDK if needed
@@ -248,18 +262,28 @@ export default function PaymentPage() {
 
           {/* Plan Summary */}
           <div className="bg-gradient-to-r from-brand-100 to-ocean-100 rounded-xl p-6 mb-8">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-lg text-gray-700">NAMASUTRA Annual Plan</span>
-              <span className="text-3xl font-bold text-brand-600">
-                {symbol}{amount}
-              </span>
-            </div>
-            {referralCode && (
-              <div className="bg-paper rounded-lg p-3 text-sm">
-                <span className="text-gray-600">Referral Code Applied: </span>
-                <span className="font-mono font-bold text-brand-600">{referralCode}</span>
+            {discountAmount > 0 ? (
+              <>
+                <div className="flex justify-between items-center mb-2 text-gray-700">
+                  <span>NAMASUTRA Annual Plan (1 year)</span>
+                  <span>{symbol}{listPrice}</span>
+                </div>
+                <div className="flex justify-between items-center mb-3 text-green-700">
+                  <span>Referral code <span className="font-mono font-semibold">{referralCode}</span> ({discountPercent}% off)</span>
+                  <span>&minus;{symbol}{discountAmount}</span>
+                </div>
+              </>
+            ) : (
+              <div className="flex justify-between items-center mb-3 text-gray-700">
+                <span>NAMASUTRA Annual Plan (1 year)</span>
+                <span>{symbol}{amount}</span>
               </div>
             )}
+            <div className="flex justify-between items-center border-t border-brand-300 pt-3">
+              <span className="text-lg font-semibold text-gray-800">Total</span>
+              <span className="text-3xl font-bold text-brand-600">{symbol}{amount}</span>
+            </div>
+            {taxRate > 0 && <p className="text-sm text-gray-600 mt-1 text-right">Includes {taxRate}% {userProfile?.countryCode === 'IN' ? 'GST' : 'tax'}</p>}
           </div>
 
           {/* Payment Method */}
