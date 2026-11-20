@@ -1,0 +1,200 @@
+ambassador.field.youtube|YouTube
+ambassador.field.twitter|Twitter / X
+ambassador.field.bankAccountName|கணக்கு வைத்திருப்பவர் பெயர்
+ambassador.field.bankName|வங்கியின் பெயர்
+ambassador.field.accountNumber|கணக்கு எண்
+ambassador.field.accountType|கணக்கு வகை
+ambassador.field.ifscCode|IFSC / SWIFT குறியீடு
+ambassador.field.branchName|கிளையின் பெயர்
+ambassador.field.upiId|UPI ஐடி
+ambassador.field.panNumber|பான் எண்
+ambassador.field.idType|அடையாள அட்டை வகை
+ambassador.field.idNumber|அடையாள அட்டை எண்
+ambassador.field.nomineeName|வாரிசுதாரர் பெயர்
+ambassador.field.nomineeRelation|உறவு
+ambassador.field.nomineeContact|தொடர்பு
+ambassador.section.personalDetails|தனிப்பட்ட விவரங்கள்
+ambassador.section.contactDetails|தொடர்பு விவரங்கள்
+ambassador.section.addressDetails|முகவரி விவரங்கள்
+ambassador.section.socialMediaHandles|சமூக ஊடகக் கணக்குகள்
+ambassador.section.bankComplianceDetails|வங்கி மற்றும் இணக்க விவரங்கள்
+ambassador.section.nomineeDetailsOptional|வாரிசுதாரர் விவரங்கள் (விருப்பம்)
+ambassador.section.personal|தனிப்பட்டவை
+ambassador.section.contact|தொடர்பு
+ambassador.section.address|முகவரி
+ambassador.section.bankPayout|வங்கி / பணப்பட்டுவாடா
+ambassador.section.idNominee|அடையாளம் / வாரிசுதாரர்
+ambassador.option.male|ஆண்
+ambassador.option.female|பெண்
+ambassador.option.other|பிற
+ambassador.option.aadhaar|ஆதார்
+ambassador.option.passport|கடவுச்சீட்டு
+ambassador.option.drivingLicense|ஓட்டுநர் உரிமம்
+ambassador.option.voterId|வாக்காளர் அடையாள அட்டை
+ambassador.option.savings|சேமிப்பு
+ambassador.option.current|நடப்பு
+ambassador.hint.profileUrl|சுயவிவர இணைப்பு
+ambassador.hint.channelUrl|சேனல் இணைப்பு
+ambassador.hint.selectGender|பாலினத்தைத் தேர்ந்தெடுக்கவும்
+ambassador.selectCountry|நாட்டைத் தேர்ந்தெடுக்கவும்
+ambassador.selectState|மாநிலத்தைத் தேர்ந்தெடுக்கவும்
+ambassador.emailLocked|இது உங்கள் Google உள்நுழைவு மின்னஞ்சல். இதை மாற்ற முடியாது.
+ambassador.saveMyDetails|என் விவரங்களைச் சேமி
+ambassador.account|கணக்கு
+ambassador.code|தூதர் குறியீடு
+ambassador.history|மாற்ற வரலாறு
+ambassador.historyFailed|வரலாற்றை ஏற்ற முடியவில்லை.
+ambassador.historyEmpty|இதுவரை மாற்றங்கள் எதுவும் பதிவாகவில்லை.
+ambassador.detailsSubmitted|விவரங்கள் சமர்ப்பிக்கப்பட்டன
+ambassador.changedList|மாற்றப்பட்டவை: {{fields}}
+ambassador.detailsChanged|விவரங்கள் மாற்றப்பட்டன
+ambassador.changedLine|{{label}} மாற்றம்: {{old}} → {{new}}
+ambassador.bankChanged|⚠ வங்கி விவரங்கள் {{date}} அன்று மாற்றப்பட்டன
+ambassador.detailsSaved|உங்கள் விவரங்கள் சேமிக்கப்பட்டன.
+ambassador.saveFailed|உங்கள் விவரங்களைச் சேமிக்க முடியவில்லை: {{message}}
+ambassador.noChanges|சேமிக்க மாற்றங்கள் எதுவும் இல்லை
+ambassador.changesSaved|உங்கள் மாற்றங்கள் சேமிக்கப்பட்டன.
+ambassador.saveChangesFailed|உங்கள் மாற்றங்களைச் சேமிக்க முடியவில்லை: {{message}}
+ambassador.myDetails|என் விவரங்கள்
+ambassador.myDetailsHint|உங்கள் சுயவிவரமும் பணப்பட்டுவாடா விவரங்களும்.
+ambassador.saveChanges|மாற்றங்களைச் சேமி
+ambassador.confirmChanges|உங்கள் மாற்றங்களை உறுதிசெய்யுங்கள்
+ambassador.confirmButton|மாற்றங்களை உறுதிசெய்
+ambassador.tabHome|முகப்பு
+ambassador.tabRegister|பதிவு
+ambassador.tabFollowers|என் பின்தொடர்பவர்கள்
+ambassador.welcome|வரவேற்கிறோம், {{name}}.
+ambassador.fallbackName|தூதர்
+ambassador.everything|உங்களுக்குத் தேவையான அனைத்தும், ஒரே இடத்தில்.
+ambassador.yourSpace|உங்கள் தூதர் இடம்
+ambassador.active|செயலில் உள்ள தூதர்
+ambassador.sectionsAria|தூதர் பிரிவுகள்
+ambassador.loadingWelcome|உங்கள் வரவேற்பை ஏற்றுகிறது...
+ambassador.emptyKicker|NAMASUTRA-வுக்கு வரவேற்கிறோம்
+ambassador.emptyTitle|உங்கள் தூதர் முகப்பு
+ambassador.emptyText|உங்கள் கணக்கு தயார். உங்கள் சுயவிவரத்தை நிர்வகிக்கவும் பின்தொடர்பவர்களைப் பார்க்கவும் மேலுள்ள தாவல்களைப் பயன்படுத்துங்கள்.
+ambassador.welcomeFailed|வரவேற்பு உரையை இப்போது ஏற்ற முடியவில்லை.
+ambassador.toolsAria|உங்கள் தூதர் கருவிகள்
+ambassador.yourProfile|உங்கள் சுயவிவரம்
+ambassador.detailsSavedTitle|விவரங்கள் சேமிக்கப்பட்டன
+ambassador.makeHome|உங்கள் வீடு போல் உணருங்கள்
+ambassador.profileSavedText|உங்கள் பதிவு விவரங்கள் சேமிக்கப்பட்டுள்ளன. தேவைப்படும்போது பார்க்கலாம் அல்லது புதுப்பிக்கலாம்.
+ambassador.profileCompleteText|பணம் பெற உங்கள் விவரங்களை நிறைவு செய்யுங்கள்.
+ambassador.viewProfile|உங்கள் சுயவிவரத்தைப் பாருங்கள்
+ambassador.completeDetails|விவரங்களை நிறைவு செய்யுங்கள்
+ambassador.signedInAs|{{email}} ஆக உள்நுழைந்துள்ளீர்கள்
+followers.latestOnly|ஒவ்வொரு உறுப்பினரின் சமீபத்திய கட்டணம் மட்டும் காட்டப்படுகிறது. முழுக் கட்டண வரலாறு இயக்கப்பட்டதும் தெரியும்.
+followers.loadFailed|உங்கள் பின்தொடர்பவர்களை ஏற்ற முடியவில்லை. பக்கத்தைப் புதுப்பியுங்கள்.
+followers.loading|உங்கள் பின்தொடர்பவர்களை ஏற்றுகிறது...
+followers.unknown|தெரியவில்லை
+followers.noData|தரவு இல்லை
+followers.members|உறுப்பினர்கள்
+followers.currentTier|தற்போதைய நிலை
+followers.rateCommission|{{rate}} கமிஷன்
+followers.totalEarnings|மொத்த வருமானம் (GST நீக்கியது)
+followers.renewalsDue|புதுப்பிப்பு நிலுவை (30 நாட்கள்)
+followers.tierHeading|உங்கள் கமிஷன் நிலை
+followers.tierText|உங்கள் முதல் {{max}} உறுப்பினர்களின் ஒவ்வொரு கட்டணத்துக்கும் {{first}}, பின்னர் {{next}}-வது உறுப்பினர் முதல் {{rate2}}. கமிஷன், செலுத்திய தொகையிலிருந்து GST நீக்கி கணக்கிடப்படுகிறது.
+followers.progressAria|{{rate}} நிலையை நோக்கிய முன்னேற்றம்
+followers.onTier2|நீங்கள் {{rate}} நிலையில் உள்ளீர்கள். புதிய உறுப்பினர்கள் உங்களுக்கு {{rate}} ஈட்டித் தருவார்கள்.
+followers.toNextTier_one|{{rate}} அடைய இன்னும் {{count}} உறுப்பினர்
+followers.toNextTier_other|{{rate}} அடைய இன்னும் {{count}} உறுப்பினர்கள்
+followers.membersHeading|உறுப்பினர்களும் கமிஷனும்
+followers.noPayments|உங்கள் பரிந்துரைகளிலிருந்து இன்னும் கட்டணங்கள் இல்லை. தொடங்க உங்கள் குறியீட்டைப் பகிருங்கள்.
+followers.example|எடுத்துக்காட்டு: {{paid}} செலுத்தியது − {{tax}} {{taxName}} = {{net}} நிகரம் × {{rate}} = {{commission}}
+followers.gst|GST
+followers.tax|வரி
+followers.colMember|உறுப்பினர்
+followers.colPaid|செலுத்தியது
+followers.colTax|நீக்கிய வரி
+followers.colNet|நிகரத் தொகை
+followers.colRate|விகிதம்
+followers.colCommission|கமிஷன்
+followers.payoutHistory|பணப்பட்டுவாடா வரலாறு
+followers.colMonth|மாதம்
+followers.colAmount|தொகை
+followers.colStatus|நிலை
+followers.colPaidOn|செலுத்திய தேதி
+followers.colNote|குறிப்பு
+followers.status.paid|செலுத்தப்பட்டது
+followers.status.pending|நிலுவையில்
+followers.byCountry|நாடு வாரியாக
+followers.byState|மாநிலம் வாரியாக
+followers.byGender|பாலினம் வாரியாக
+followers.byMonth|மாதம் வாரியான பதிவுகள்
+followers.upcoming|வரவிருக்கும் புதுப்பிப்புகள் (அடுத்த 30 நாட்கள்)
+followers.expires|{{date}} அன்று முடிகிறது
+followers.daysLeft_one|{{count}} நாள் மீதம்
+followers.daysLeft_other|{{count}} நாட்கள் மீதம்
+share.line1|உங்கள் பெயர் வெறும் அடையாளம் மட்டுமல்ல. அதற்கு நம் பிரபஞ்சத்தின் தனிமங்களுடன் தொடர்பு இருந்தால் எப்படி இருக்கும்? 🌌
+share.line2|Namasutra-வில் ஒரு சுவாரஸ்யமான விஷயத்தைக் கண்டேன் — நம் பெயர்களின் எழுத்துகளை வேதியியல் தனிமங்களுடன் இணைக்கும் தனித்துவமான தளம்; எண் கணிதம், ஜோதிடம், நட்சத்திர நுண்ணறிவுகளையும் தருகிறது.
+share.line3|ஒவ்வொரு பெயருக்கும் ஒரு கதை உண்டு. உங்களுடையது என்ன சொல்கிறது என்று அறியுங்கள்! ✨
+share.line4|🔗 உங்கள் Namasutra-வை ஆராயுங்கள்: {{link}}
+share.line5|🎁 என் பரிந்துரைக் குறியீட்டுடன் முயலுங்கள்: {{code}} இதன் மூலம் உங்களுக்குத் தள்ளுபடி கிடைக்கலாம்
+share.emailSubject|உங்கள் பெயரில் மறைந்திருக்கும் தனிமங்களை அறியுங்கள்
+share.copiedBang|நகலெடுக்கப்பட்டது!
+share.messageCopiedBang|செய்தி நகலெடுக்கப்பட்டது!
+share.cancelled|பகிர்வு ரத்து செய்யப்பட்டது.
+share.messageCopied|செய்தி நகலெடுக்கப்பட்டது
+share.pasteMessenger|செய்தி நகலெடுக்கப்பட்டது. அதை Messenger-இல் ஒட்டுங்கள்.
+share.pasteLinkedIn|செய்தி நகலெடுக்கப்பட்டது. அதை உங்கள் LinkedIn பதிவில் ஒட்டுங்கள்.
+share.pasteFacebook|செய்தி நகலெடுக்கப்பட்டது. Facebook-இல் பகிர்ந்த பிறகு அதை ஒட்டுங்கள்.
+share.pasteInstagram|செய்தி நகலெடுக்கப்பட்டது. அதை Instagram-இல் ஒட்டுங்கள்.
+share.title|உங்கள் பரிந்துரைக் குறியீடு
+share.copyCodeAria|பரிந்துரைக் குறியீட்டை நகலெடு
+share.copied|நகலெடுக்கப்பட்டது
+share.copy|நகலெடு
+share.subtitle|கமிஷன் ஈட்ட இந்தக் குறியீட்டை உங்கள் தொடர்புகளுடன் பகிருங்கள்!
+share.share|பகிர்
+share.onApp|{{app}}-இல் பகிர்
+share.byEmail|மின்னஞ்சலில் பகிர்
+share.email|மின்னஞ்சல்
+share.copyMessageAria|செய்தியை கிளிப்போர்டுக்கு நகலெடு
+share.copyMessage|செய்தியை நகலெடு
+share.emailWith|மின்னஞ்சலுக்கு:
+share.defaultMail|இயல்பு அஞ்சல் செயலி
+share.messagePreview|அனுப்பப்படும் செய்தி
+invite.subject|NAMASUTRA தூதராக உங்களுக்கு அழைப்பு
+invite.line1|NAMASUTRA தூதராக உங்களுக்கு அழைப்பு 🌟
+invite.line2|உங்கள் Google கணக்கில் ({{email}}) இங்கே உள்நுழையுங்கள்: {{url}}
+invite.line3|உங்களுக்கான தனித்துவ தூதர் குறியீடு உங்கள் டாஷ்போர்டில் காத்திருக்கிறது.
+invite.member|உறுப்பினர்
+hora.planet.Sun|சூரியன்
+hora.planet.Moon|சந்திரன்
+hora.planet.Mars|செவ்வாய்
+hora.planet.Mercury|புதன்
+hora.planet.Jupiter|குரு
+hora.planet.Venus|சுக்கிரன்
+hora.planet.Saturn|சனி
+hora.note.Sun|அதிகாரம், அரசுப் பணிகள், ஆரோக்கியம்
+hora.note.Moon|பயணம், படைப்பாற்றல், குடும்ப விஷயங்கள்
+hora.note.Mars|துணிவு, செயல்; தகராறுகளைத் தவிர்க்கவும்
+hora.note.Mercury|வணிகம், கல்வி, தகவல் தொடர்பு
+hora.note.Jupiter|கற்பித்தல், நிதி, நல்ல தொடக்கங்கள்
+hora.note.Venus|கலை, உறவுகள், வாங்குதல்
+hora.note.Saturn|மெதுவான, நீண்டகால, வழக்கமான பணிகள்
+hora.weekday.0|ஞாயிறு
+hora.weekday.1|திங்கள்
+hora.weekday.2|செவ்வாய்
+hora.weekday.3|புதன்
+hora.weekday.4|வியாழன்
+hora.weekday.5|வெள்ளி
+hora.weekday.6|சனி
+hora.chog.Udveg|உத்வேகம்
+hora.chog.Char|சர
+hora.chog.Labh|லாபம்
+hora.chog.Amrit|அமிர்தம்
+hora.chog.Kaal|காலம்
+hora.chog.Shubh|சுபம்
+hora.chog.Rog|ரோகம்
+hora.quality.best|மிக நல்லது
+hora.quality.good|நல்லது
+hora.quality.avoid|தவிர்க்கவும்
+hora.now|இப்போது
+hora.yourLocation|உங்கள் இருப்பிடம்
+hora.geoUnavailable|இந்த உலாவியில் இருப்பிடம் கிடைக்கவில்லை.
+hora.geoFailed|உங்கள் இருப்பிடத்தைப் படிக்க முடியவில்லை. அதற்குப் பதிலாக ஒரு நகரத்தைத் தேர்ந்தெடுங்கள்.
+hora.intro|பாரம்பரிய வேத நேரங்களுக்கான உங்கள் தினசரி வழிகாட்டி; உங்கள் இடத்தின் உள்ளூர் சூரிய உதயம், அஸ்தமனத்தைக் கொண்டு கணக்கிடப்பட்டது.
+hora.location|இடம்
+hora.groupIndia|இந்தியா
+hora.groupWorld|உலகம் முழுவதும்

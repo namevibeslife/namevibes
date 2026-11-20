@@ -76,38 +76,38 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n033')}</td>
-                  <td>{t('insights.n034')}</td>
+                  <td>Helium</td>
+                  <td>He</td>
                   <td>2</td>
                   <td>{t('insights.n035')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n036')}</td>
-                  <td>{t('insights.n037')}</td>
+                  <td>Neon</td>
+                  <td>Ne</td>
                   <td>10</td>
                   <td>{t('insights.n038')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n039')}</td>
-                  <td>{t('insights.n040')}</td>
+                  <td>Argon</td>
+                  <td>Ar</td>
                   <td>18</td>
                   <td>{t('insights.n041')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n042')}</td>
-                  <td>{t('insights.n043')}</td>
+                  <td>Krypton</td>
+                  <td>Kr</td>
                   <td>36</td>
                   <td>{t('insights.n044')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n045')}</td>
-                  <td>{t('insights.n046')}</td>
+                  <td>Xenon</td>
+                  <td>Xe</td>
                   <td>54</td>
                   <td>{t('insights.n047')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n048')}</td>
-                  <td>{t('insights.n049')}</td>
+                  <td>Radon</td>
+                  <td>Rn</td>
                   <td>86</td>
                   <td>{t('insights.n050')}</td>
                 </tr>
@@ -128,38 +128,38 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n052')}</td>
-                  <td>{t('insights.n053')}</td>
+                  <td>Lithium</td>
+                  <td>Li</td>
                   <td>3</td>
                   <td>{t('insights.n054')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n055')}</td>
-                  <td>{t('insights.n056')}</td>
+                  <td>Sodium</td>
+                  <td>Na</td>
                   <td>11</td>
                   <td>{t('insights.n057')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n058')}</td>
+                  <td>Potassium</td>
                   <td>K</td>
                   <td>19</td>
                   <td>{t('insights.n059')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n060')}</td>
-                  <td>{t('insights.n061')}</td>
+                  <td>Rubidium</td>
+                  <td>Rb</td>
                   <td>37</td>
                   <td>{t('insights.n062')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n063')}</td>
-                  <td>{t('insights.n064')}</td>
+                  <td>Cesium</td>
+                  <td>Cs</td>
                   <td>55</td>
                   <td>{t('insights.n065')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n066')}</td>
-                  <td>{t('insights.n067')}</td>
+                  <td>Francium</td>
+                  <td>Fr</td>
                   <td>87</td>
                   <td>{t('insights.n068')}</td>
                 </tr>
@@ -180,38 +180,38 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n070')}</td>
-                  <td>{t('insights.n071')}</td>
+                  <td>Beryllium</td>
+                  <td>Be</td>
                   <td>4</td>
                   <td>{t('insights.n072')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n073')}</td>
-                  <td>{t('insights.n074')}</td>
+                  <td>Magnesium</td>
+                  <td>Mg</td>
                   <td>12</td>
                   <td>{t('insights.n075')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n076')}</td>
-                  <td>{t('insights.n077')}</td>
+                  <td>Calcium</td>
+                  <td>Ca</td>
                   <td>20</td>
                   <td>{t('insights.n078')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n079')}</td>
-                  <td>{t('insights.n080')}</td>
+                  <td>Strontium</td>
+                  <td>Sr</td>
                   <td>38</td>
                   <td>{t('insights.n081')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n082')}</td>
-                  <td>{t('insights.n083')}</td>
+                  <td>Barium</td>
+                  <td>Ba</td>
                   <td>56</td>
                   <td>{t('insights.n084')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n085')}</td>
-                  <td>{t('insights.n086')}</td>
+                  <td>Radium</td>
+                  <td>Ra</td>
                   <td>88</td>
                   <td>{t('insights.n087')}</td>
                 </tr>
@@ -243,32 +243,32 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n095')}</td>
+                  <td>Hydrogen</td>
                   <td>H</td>
                   <td>{t('insights.n096')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n097')}</td>
+                  <td>Carbon</td>
                   <td>C</td>
                   <td>{t('insights.n098')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n099')}</td>
+                  <td>Nitrogen</td>
                   <td>N</td>
                   <td>{t('insights.n100')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n101')}</td>
+                  <td>Oxygen</td>
                   <td>O</td>
                   <td>{t('insights.n102')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n103')}</td>
+                  <td>Phosphorus</td>
                   <td>P</td>
                   <td>{t('insights.n104')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n105')}</td>
+                  <td>Sulfur</td>
                   <td>S</td>
                   <td>{t('insights.n106')}</td>
                 </tr>
@@ -288,28 +288,28 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n108')}</td>
+                  <td>Fluorine</td>
                   <td>F</td>
                   <td>{t('insights.n109')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n110')}</td>
-                  <td>{t('insights.n111')}</td>
+                  <td>Chlorine</td>
+                  <td>Cl</td>
                   <td>{t('insights.n112')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n113')}</td>
-                  <td>{t('insights.n114')}</td>
+                  <td>Bromine</td>
+                  <td>Br</td>
                   <td>{t('insights.n115')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n116')}</td>
+                  <td>Iodine</td>
                   <td>I</td>
                   <td>{t('insights.n117')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n118')}</td>
-                  <td>{t('insights.n119')}</td>
+                  <td>Astatine</td>
+                  <td>At</td>
                   <td>{t('insights.n120')}</td>
                 </tr>
               </tbody>
@@ -348,57 +348,57 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n133')}</td>
-                  <td>{t('insights.n134')}</td>
-                  <td>{t('insights.n135')}</td>
+                  <td>Ashwini</td>
+                  <td>{t('hora.planet.Ketu')}</td>
+                  <td>Chu, Che, Cho, La</td>
                   <td>{t('insights.n136')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n137')}</td>
-                  <td>{t('insights.n138')}</td>
-                  <td>{t('insights.n139')}</td>
+                  <td>Bharani</td>
+                  <td>{t('hora.planet.Venus')}</td>
+                  <td>Li, Lu, Le, Lo</td>
                   <td>{t('insights.n140')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n141')}</td>
-                  <td>{t('insights.n142')}</td>
-                  <td>{t('insights.n143')}</td>
+                  <td>Krittika</td>
+                  <td>{t('hora.planet.Sun')}</td>
+                  <td>A, I, U, E</td>
                   <td>{t('insights.n144')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n145')}</td>
-                  <td>{t('insights.n134')}</td>
-                  <td>{t('insights.n146')}</td>
+                  <td>Magha</td>
+                  <td>{t('hora.planet.Ketu')}</td>
+                  <td>Ma, Mi, Mu, Me</td>
                   <td>{t('insights.n147')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n148')}</td>
-                  <td>{t('insights.n138')}</td>
-                  <td>{t('insights.n149')}</td>
+                  <td>Purva Phalguni</td>
+                  <td>{t('hora.planet.Venus')}</td>
+                  <td>Mo, Ta, Ti, Tu</td>
                   <td>{t('insights.n150')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n151')}</td>
-                  <td>{t('insights.n142')}</td>
-                  <td>{t('insights.n152')}</td>
+                  <td>Uttara Phalguni</td>
+                  <td>{t('hora.planet.Sun')}</td>
+                  <td>Te, To, Pa, Pi</td>
                   <td>{t('insights.n153')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n154')}</td>
-                  <td>{t('insights.n138')}</td>
-                  <td>{t('insights.n155')}</td>
+                  <td>Purva Ashadha</td>
+                  <td>{t('hora.planet.Venus')}</td>
+                  <td>Bhu, Dha, Pha, Dha</td>
                   <td>{t('insights.n156')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n157')}</td>
-                  <td>{t('insights.n142')}</td>
-                  <td>{t('insights.n158')}</td>
+                  <td>Uttara Ashadha</td>
+                  <td>{t('hora.planet.Sun')}</td>
+                  <td>Bhe, Bho, Ja, Ji</td>
                   <td>{t('insights.n159')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n160')}</td>
-                  <td>{t('insights.n134')}</td>
-                  <td>{t('insights.n161')}</td>
+                  <td>Mula</td>
+                  <td>{t('hora.planet.Ketu')}</td>
+                  <td>Ye, Yo, Bha, Bhi</td>
                   <td>{t('insights.n162')}</td>
                 </tr>
               </tbody>
@@ -418,39 +418,39 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n164')}</td>
-                  <td>{t('insights.n165')}</td>
-                  <td>{t('insights.n166')}</td>
+                  <td>Rohini</td>
+                  <td>{t('hora.planet.Moon')}</td>
+                  <td>O, Va, Vi, Vu</td>
                   <td>{t('insights.n167')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n168')}</td>
-                  <td>{t('insights.n165')}</td>
-                  <td>{t('insights.n169')}</td>
+                  <td>Hasta</td>
+                  <td>{t('hora.planet.Moon')}</td>
+                  <td>Pu, Sha, Na, Tha</td>
                   <td>{t('insights.n170')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n171')}</td>
-                  <td>{t('insights.n165')}</td>
-                  <td>{t('insights.n172')}</td>
+                  <td>Shravana</td>
+                  <td>{t('hora.planet.Moon')}</td>
+                  <td>Ju, Je, Jo, Kha</td>
                   <td>{t('insights.n173')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n174')}</td>
-                  <td>{t('insights.n175')}</td>
-                  <td>{t('insights.n176')}</td>
+                  <td>Ashlesha</td>
+                  <td>{t('hora.planet.Mercury')}</td>
+                  <td>Di, Du, De, Do</td>
                   <td>{t('insights.n177')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n178')}</td>
-                  <td>{t('insights.n175')}</td>
-                  <td>{t('insights.n179')}</td>
+                  <td>Jyeshtha</td>
+                  <td>{t('hora.planet.Mercury')}</td>
+                  <td>No, Ya, Yi, Yu</td>
                   <td>{t('insights.n180')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n181')}</td>
-                  <td>{t('insights.n175')}</td>
-                  <td>{t('insights.n182')}</td>
+                  <td>Revati</td>
+                  <td>{t('hora.planet.Mercury')}</td>
+                  <td>De, Do, Cha, Chi</td>
                   <td>{t('insights.n183')}</td>
                 </tr>
               </tbody>
@@ -470,57 +470,57 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n185')}</td>
-                  <td>{t('insights.n186')}</td>
-                  <td>{t('insights.n187')}</td>
+                  <td>Mrigashira</td>
+                  <td>{t('hora.planet.Mars')}</td>
+                  <td>Ve, Vo, Ka, Ki</td>
                   <td>{t('insights.n188')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n189')}</td>
-                  <td>{t('insights.n186')}</td>
-                  <td>{t('insights.n190')}</td>
+                  <td>Chitra</td>
+                  <td>{t('hora.planet.Mars')}</td>
+                  <td>Pe, Po, Ra, Ri</td>
                   <td>{t('insights.n191')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n192')}</td>
-                  <td>{t('insights.n186')}</td>
-                  <td>{t('insights.n193')}</td>
+                  <td>Dhanishta</td>
+                  <td>{t('hora.planet.Mars')}</td>
+                  <td>Ga, Gi, Gu, Ge</td>
                   <td>{t('insights.n194')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n195')}</td>
-                  <td>{t('insights.n196')}</td>
-                  <td>{t('insights.n197')}</td>
+                  <td>Ardra</td>
+                  <td>{t('hora.planet.Rahu')}</td>
+                  <td>Ku, Gha, Nga, Chha</td>
                   <td>{t('insights.n198')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n199')}</td>
-                  <td>{t('insights.n196')}</td>
-                  <td>{t('insights.n200')}</td>
+                  <td>Swati</td>
+                  <td>{t('hora.planet.Rahu')}</td>
+                  <td>Ru, Re, Ro, Ta</td>
                   <td>{t('insights.n201')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n202')}</td>
-                  <td>{t('insights.n196')}</td>
-                  <td>{t('insights.n203')}</td>
+                  <td>Shatabhisha</td>
+                  <td>{t('hora.planet.Rahu')}</td>
+                  <td>Go, Sa, Si, Su</td>
                   <td>{t('insights.n204')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n205')}</td>
-                  <td>{t('insights.n206')}</td>
-                  <td>{t('insights.n207')}</td>
+                  <td>Pushya</td>
+                  <td>{t('hora.planet.Saturn')}</td>
+                  <td>Hu, He, Ho, Da</td>
                   <td>{t('insights.n208')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n209')}</td>
-                  <td>{t('insights.n206')}</td>
-                  <td>{t('insights.n210')}</td>
+                  <td>Anuradha</td>
+                  <td>{t('hora.planet.Saturn')}</td>
+                  <td>Na, Ni, Nu, Ne</td>
                   <td>{t('insights.n211')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n212')}</td>
-                  <td>{t('insights.n206')}</td>
-                  <td>{t('insights.n213')}</td>
+                  <td>Uttara Bhadrapada</td>
+                  <td>{t('hora.planet.Saturn')}</td>
+                  <td>Du, Tha, Jha, Tra</td>
                   <td>{t('insights.n214')}</td>
                 </tr>
               </tbody>
@@ -540,21 +540,21 @@ export default function ElementInsightsPage() {
               </thead>
               <tbody>
                 <tr>
-                  <td>{t('insights.n216')}</td>
-                  <td>{t('insights.n217')}</td>
-                  <td>{t('insights.n218')}</td>
+                  <td>Punarvasu</td>
+                  <td>{t('hora.planet.Jupiter')}</td>
+                  <td>Ke, Ko, Ha, Hi</td>
                   <td>{t('insights.n219')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n220')}</td>
-                  <td>{t('insights.n217')}</td>
-                  <td>{t('insights.n221')}</td>
+                  <td>Vishakha</td>
+                  <td>{t('hora.planet.Jupiter')}</td>
+                  <td>Ti, Tu, Te, To</td>
                   <td>{t('insights.n222')}</td>
                 </tr>
                 <tr>
-                  <td>{t('insights.n223')}</td>
-                  <td>{t('insights.n217')}</td>
-                  <td>{t('insights.n224')}</td>
+                  <td>Purva Bhadrapada</td>
+                  <td>{t('hora.planet.Jupiter')}</td>
+                  <td>Se, So, Da, Di</td>
                   <td>{t('insights.n225')}</td>
                 </tr>
               </tbody>

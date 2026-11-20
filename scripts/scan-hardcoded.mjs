@@ -12,6 +12,13 @@ const SKIP = [
 // text that is data or brand, not language
 const ALLOW = new Set(['you@example.com', 'IN482913', 'support@namevibes.life', 'BLESSINGS → B – Li – Es – S – In – G – S', 'Namasutra', 'NAMASUTRA', 'WhatsApp', 'Facebook', 'Instagram', 'Telegram', 'LinkedIn', 'Messenger', 'Outlook', 'Razorpay', 'PayPal', 'Claude', 'ChatGPT', 'Gemini', 'X', 'Vibes', 'Ctrl+V']);
 
+// Data, not language: element names/symbols, nakshatra names and their syllables stay as they are
+const dataNames = new Set([
+  ...[...fs.readFileSync('src/utils/elements.js', 'utf8').matchAll(/name: '([^']+)', number/g)].map(m => m[1]),
+  ...[...fs.readFileSync('src/utils/hindu-astrology.js', 'utf8').matchAll(/name: '([^']+)', syllables/g)].map(m => m[1]),
+]);
+const isData = (text) => dataNames.has(text) || /^[A-Z][a-z]?$/.test(text) || /^[A-Za-z]+(, [A-Za-z]+)+$/.test(text);
+
 function* walk(dir) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
     const p = path.join(dir, e.name);
@@ -32,7 +39,7 @@ for (const file of walk(ROOT)) {
   while ((m = re.exec(src))) {
     const text = m[1].replace(/\s+/g, ' ').trim();
     if (!/[A-Za-z]{2,}/.test(text)) continue;
-    if (ALLOW.has(text)) continue;
+    if (ALLOW.has(text) || isData(text)) continue;
     if (/[;?()=]|return|&&|\|\|/.test(text)) continue; // JavaScript between tags, not text
     if (/^(&\w+;|[\d\s.,:;()\-+/%·•→←×|*]+)$/.test(text)) continue;
     const line = src.slice(0, m.index).split('\n').length;

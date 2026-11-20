@@ -10,7 +10,7 @@ const dirs = [
 ];
 // Values that legitimately stay identical to English (brand names, abbreviations, symbols).
 const SAME_OK = [
-  /^followers\.gst$/, /^share\.email$/, /^ai\.promptHarmony$/, /^ambassador\.field\.(email)$/,
+  /^followers\.gst$/, /^share\.email$/, /^ai\.promptHarmony$/, /^ambassador\.field\.(instagram|facebook|youtube|twitter)$/,
 ];
 const errors = [];
 const fail = (msg) => errors.push(msg);
