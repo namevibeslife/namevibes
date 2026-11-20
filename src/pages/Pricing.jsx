@@ -3,8 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { COUNTRIES, getCountry } from '../data/countries';
-import { loadCountryPricing, discountedPrice, loadGatewayChoice } from '../utils/pricing';
+import { loadCountryPricing, discountedPrice, loadGatewayChoice, loadPricedCountries } from '../utils/pricing';
+import CountryPricePicker from '../components/CountryPricePicker';
+import ComingSoon from '../components/ComingSoon';
+import { countryLabel } from '../i18n/format';
+import { doc as fsDoc, updateDoc } from 'firebase/firestore';
+import { useAuthStore } from '../store/authStore';
 import { FAMILY_MAX_NAMES } from '../utils/plan';
 import { Check, ArrowLeft, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,6 +20,8 @@ export default function Pricing() {
   const [userProfile, setUserProfile] = useState(null);
   const [pricing, setPricing] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [pricedCountries, setPricedCountries] = useState([]);
+  const refreshProfile = useAuthStore(state => state.refreshProfile);
 
   // null = neither gateway can take this country's currency (checkout is blocked)
   const [gateway, setGateway] = useState('pending');
@@ -37,9 +43,16 @@ export default function Pricing() {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       if (userDoc.exists()) {
         setUserProfile(userDoc.data());
+        // Only this user's own country, from its Active Country Pricing record. No record = no price.
         const loaded = await loadCountryPricing(userDoc.data().countryCode);
         setPricing(loaded);
-        setGateway((await loadGatewayChoice(userDoc.data().countryCode, loaded)).gateway);
+        if (loaded) {
+          const choice = await loadGatewayChoice(userDoc.data().countryCode, loaded);
+          setGateway(choice.gateway);
+        } else {
+          setGateway('pending');
+          setPricedCountries(await loadPricedCountries());
+        }
         if (import.meta.env.MODE !== 'mock') {
           try { setTestMode((await (await fetch('/api/payment-mode')).json()).testMode === true); } catch { /* normal checkout */ }
         }
@@ -73,6 +86,17 @@ export default function Pricing() {
     });
   };
 
+  // The user's profile country has no Active price: let them pick one of the priced countries.
+  // The choice is saved to their profile, so checkout (which prices by profile country) agrees.
+  const chooseCountry = async (code) => {
+    const match = pricedCountries.find(c => c.code === code);
+    if (!match) return;
+    await updateDoc(fsDoc(db, 'users', auth.currentUser.uid), { countryCode: code, countryName: match.name, stateCode: '', stateName: '' });
+    await refreshProfile();
+    setLoading(true);
+    await loadUserProfile();
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen site-background flex items-center justify-center">
@@ -84,12 +108,28 @@ export default function Pricing() {
     );
   }
 
-  const countryInfo = getCountry(userProfile?.countryCode) || COUNTRIES.US;
-  const symbol = pricing?.symbol || countryInfo.symbol;
+  const countryName = countryLabel(userProfile?.countryCode, userProfile?.countryName || userProfile?.countryCode || '');
   const hasReferral = userProfile?.referralCodeUsed || userProfile?.referralCode;
   const price = pricing?.plan.price;
   // A discount only shows when there's a referral code and the discount actually lowers the price
   const discounted = hasReferral && pricing && discountedPrice(pricing.plan) < price ? discountedPrice(pricing.plan) : null;
+
+  // No Active price for this user's country: never show another country's price, offer the priced countries
+  if (!pricing) {
+    return (
+      <div className="min-h-screen site-background py-12 px-4">
+        <div className="max-w-md mx-auto bg-paper rounded-2xl shadow-xl p-8 text-center">
+          <h1 className="text-2xl font-bold text-gray-800 mb-3">{t('pricing.title')}</h1>
+          <p className="text-gray-700 mb-4" role="status">
+            {countryName ? t('pricing.countryUnavailable', { country: countryName }) : t('pricing.chooseCountry')}
+          </p>
+          <div className="text-left">
+            <CountryPricePicker countries={pricedCountries} value="" onChange={chooseCountry} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen site-background py-12 px-4">
@@ -139,7 +179,8 @@ export default function Pricing() {
             </div>
 
             <div className="text-center mb-6 mt-4">
-              <h3 className="text-2xl font-bold text-white mb-2">{t('pricing.title')}</h3>
+              <h3 className="text-2xl font-bold text-white mb-1">{t('pricing.title')}</h3>
+              <p className="text-brand-100 text-sm mb-2">{t('pricing.priceFor', { country: countryName })}</p>
               <div className="mb-4">
                 {discounted !== null ? (
                   <>
@@ -149,6 +190,11 @@ export default function Pricing() {
                   </>
                 ) : (
                   <p className="text-5xl font-bold text-white">{formatMoney(price, pricing?.currency)} <span className="text-2xl font-semibold text-brand-100">{t('pricing.perYear')}</span></p>
+                )}
+                {pricing.taxPercent > 0 && (
+                  <p className="text-brand-100 text-sm mt-1">
+                    {pricing.countryCode === 'IN' ? t('payment.includesGst', { percent: pricing.taxPercent }) : t('payment.includesTax', { percent: pricing.taxPercent })}
+                  </p>
                 )}
               </div>
             </div>
@@ -171,22 +217,21 @@ export default function Pricing() {
               ))}
             </ul>
 
-            <button
-              onClick={handleSelectPlan}
-              disabled={checkoutBlocked}
-              className="w-full bg-paper text-brand-600 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-lg disabled:opacity-60 disabled:transform-none disabled:cursor-not-allowed"
-            >
-              {t('pricing.cta')}
-            </button>
+            {checkoutBlocked ? (
+              <ComingSoon countryCode={userProfile?.countryCode} defaultEmail={userProfile?.email || auth.currentUser?.email || ''} />
+            ) : (
+              <button
+                onClick={handleSelectPlan}
+                className="w-full bg-paper text-brand-600 py-4 rounded-lg font-semibold text-lg hover:bg-gray-100 transition transform hover:scale-105 shadow-lg"
+              >
+                {t('pricing.cta')}
+              </button>
+            )}
           </div>
         </div>
 
         <div className="text-center text-gray-600 max-w-2xl mx-auto">
-          {checkoutBlocked ? (
-            <p role="alert" className="mb-4 rounded-lg border-2 border-amber-300 bg-amber-50 px-4 py-3 text-amber-900 font-medium">
-              {t('payment.unavailable')}
-            </p>
-          ) : (
+          {!checkoutBlocked && (
             <p className="mb-4">
               {t('payment.securePowered', { gateway: gateway === 'razorpay' ? 'Razorpay' : 'PayPal' })}
             </p>

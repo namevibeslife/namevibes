@@ -1,7 +1,7 @@
 // Shared helpers for the payment functions (functions/api/pay/*). Not a route: no onRequest export.
 // Everything that decides money (price, currency, gateway, referral discount) is computed HERE from
 // Firestore, never from what the browser sends.
-import { getPricing, DEFAULT_REFERRAL_DISCOUNT } from '../../src/data/countries.js';
+import { getCountry } from '../../src/data/countries.js';
 import { readPlanSettings, discountedPrice } from '../../src/utils/planMath.js';
 import { resolveGateway, currencyExponent, toSubunits, toGatewayAmount, GATEWAY_OVERRIDES } from '../../src/data/gatewayCurrencies.js';
 
@@ -144,20 +144,14 @@ export async function priceForUser(db, uid) {
   const countryCode = String(profile.countryCode || '').toUpperCase();
   if (!/^[A-Z]{2}$/.test(countryCode)) throw new Error('No country on profile');
 
-  // Same source as the Pricing page: the active countrySettings entry, else the built-in defaults
-  const settings = (await db.list('countrySettings')).find((s) => s.countryCode === countryCode && s.isActive);
-  let plan;
-  let currency;
-  let override = 'auto';
-  if (settings) {
-    plan = readPlanSettings(settings, getPricing(countryCode).currency);
-    currency = plan.currency;
-    if (GATEWAY_OVERRIDES.includes(settings.gatewayOverride)) override = settings.gatewayOverride;
-  } else {
-    const base = getPricing(countryCode);
-    currency = base.currency;
-    plan = { price: base.price, discountPercent: DEFAULT_REFERRAL_DISCOUNT };
-  }
+  // Same source as the Pricing page: the ACTIVE Country Pricing record with a price. There are no
+  // built-in prices; a country without one cannot buy (gateway null, reason 'no-pricing').
+  const settings = (await db.list('countrySettings')).find((s) => s.countryCode === countryCode && s.isActive
+    && Number(readPlanSettings(s, getCountry(countryCode)?.currency).price) > 0);
+  if (!settings) return { countryCode, gateway: null, reason: 'no-pricing' };
+  const plan = readPlanSettings(settings, getCountry(countryCode)?.currency);
+  const currency = plan.currency;
+  const override = GATEWAY_OVERRIDES.includes(settings.gatewayOverride) ? settings.gatewayOverride : 'auto';
 
   // The discount applies only to a referral code that really exists and is active
   let referralCode = null;
@@ -174,7 +168,7 @@ export async function priceForUser(db, uid) {
 
   return {
     countryCode, currency, listPrice: plan.price, amount, discountPercent: plan.discountPercent,
-    referralCode, gateway: choice.gateway, via: choice.via, userEmail: profile.email || ''
+    referralCode, gateway: choice.gateway, via: choice.via, reason: choice.reason, userEmail: profile.email || ''
   };
 }
 

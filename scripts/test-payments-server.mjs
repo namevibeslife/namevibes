@@ -3,6 +3,7 @@
 import { generateKeyPairSync, createHmac } from 'node:crypto';
 import { onRequestPost as createOrder } from '../functions/api/pay/create-order.js';
 import { onRequestPost as verify } from '../functions/api/pay/verify.js';
+import { onRequestGet as publicPricing } from '../functions/api/pricing.js';
 
 const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } });
 const env = {
@@ -120,9 +121,16 @@ check('India asking for PayPal is refused (gateway chosen by server)', r.status 
 r = await call(createOrder, 'usUser', { gateway: 'paypal' });
 check('US, international off: PayPal 25.00 USD', r.status === 200 && paypalOrders.get(r.body.orderId).purchase_units[0].amount.value === '25.00', JSON.stringify(r));
 r = await call(createOrder, 'aeUser', { gateway: 'razorpay' });
-check('AE, international off: blocked (AED not on PayPal)', r.status === 409 && r.body.code === 'unavailable', JSON.stringify(r));
+check('AE, international off: coming soon (AED not on PayPal)', r.status === 409 && r.body.code === 'coming-soon', JSON.stringify(r));
 r = await call(createOrder, 'jpUser', { gateway: 'paypal' });
 check('JP PayPal amount is whole yen "3500"', r.status === 200 && paypalOrders.get(r.body.orderId).purchase_units[0].amount.value === '3500', JSON.stringify(r));
+put('users/frUser', { countryCode: 'FR' });
+r = await call(createOrder, 'frUser', { gateway: 'paypal' });
+check('country with no Active pricing record: refused, no built-in price (no-pricing)', r.status === 409 && r.body.code === 'no-pricing', JSON.stringify(r));
+put('countrySettings/ae-off', { countryCode: 'SA', currency: 'SAR', price: 40, isActive: false });
+put('users/saUser', { countryCode: 'SA' });
+r = await call(createOrder, 'saUser', { gateway: 'razorpay' });
+check('inactive record is not priced', r.status === 409 && r.body.code === 'no-pricing', JSON.stringify(r));
 r = await call(createOrder, 'noCountry', { gateway: 'paypal' });
 check('profile without country fails safely', r.status === 500);
 put('paymentSettings/razorpay', { internationalEnabled: true });
@@ -171,6 +179,18 @@ const pp = [...store.entries()].find(([k]) => k.startsWith('payments/usUser_'));
 check('approved + exact amount and currency: activated and recorded', r.status === 200 && store.get('users/usUser').planActive === true && pp && pp[1].amount === 25 && pp[1].currency === 'USD' && pp[1].gateway === 'paypal', JSON.stringify([r, pp]));
 r = await call(verify, 'usUser', { gateway: 'razorpay', razorpay_order_id: ppo2, razorpay_payment_id: 'x', razorpay_signature: 'y' });
 check('wrong gateway for the order rejected', r.status === 400 || r.body.already === true);
+
+console.log('public pricing (signed-out visitors)');
+put('countrySettings/us', { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true, gatewayOverride: 'paypal', updatedBy: 'admin@x.test' });
+const pub = async (q) => (await publicPricing({ request: new Request('http://x/api/pricing' + q), env })).json();
+let pr = await pub('?country=US');
+check('returns only public fields, no admin fields', pr.pricing && pr.pricing.price === 25 && pr.pricing.currency === 'USD' && !('gatewayOverride' in pr.pricing) && !('updatedBy' in pr.pricing), JSON.stringify(pr));
+pr = await pub('?country=FR');
+check('country with no record returns null (no default price)', pr.pricing === null, JSON.stringify(pr));
+pr = await pub('?country=SA');
+check('inactive country returns null', pr.pricing === null);
+pr = await pub('');
+check('list holds only Active priced countries', pr.countries.length === 4 && !pr.countries.some((c) => c.code === 'SA'), JSON.stringify(pr));
 
 console.log(failed ? `\n${failed} FAILED` : '\nall passed');
 process.exit(failed ? 1 : 0);

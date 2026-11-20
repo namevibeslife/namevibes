@@ -23,7 +23,7 @@ export function filterCountries(countries, query, limit = 80) {
   return scored.sort((a, b) => b[0] - a[0] || a[1].name.localeCompare(b[1].name)).slice(0, limit).map(x => x[1]);
 }
 
-export default function CountryCombobox({ countries, value, onChange, disabled = false, id, placeholder = 'Type a country name or code (e.g. swe)', label = 'Country' }) {
+export default function CountryCombobox({ countries, value, onChange, disabled = false, id, placeholder = 'Type a country name or code (e.g. swe)', label = 'Country', noMatch = 'No country matches', inputClassName = '' }) {
   const uid = useId();
   const listId = `${uid}-list`;
   const selected = useMemo(() => countries.find(c => c.code === value), [countries, value]);
@@ -73,13 +73,13 @@ export default function CountryCombobox({ countries, value, onChange, disabled =
           onFocus={() => { setOpen(true); }}
           onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
           onKeyDown={onKeyDown}
-          className="w-full px-4 py-2 pr-10 border-2 border-gray-300 rounded-lg disabled:bg-gray-100 min-h-[44px]"
+          className={`w-full px-4 py-2 pr-10 border-2 border-gray-300 rounded-lg disabled:bg-gray-100 min-h-[44px] ${inputClassName}`}
         />
         <ChevronDown size={18} aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" />
       </div>
       {open && !disabled && (
         <ul id={listId} ref={listRef} role="listbox" aria-label={label} className="absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-paper border-2 border-gray-300 rounded-lg shadow-lg">
-          {results.length === 0 && <li className="px-4 py-3 text-sm text-gray-500" role="presentation">No country matches "{query}"</li>}
+          {results.length === 0 && <li className="px-4 py-3 text-sm text-gray-500" role="presentation">{noMatch} "{query}"</li>}
           {results.map((c, i) => (
             <li
               key={c.code}

@@ -1,6 +1,6 @@
 // Pure plan-price maths, shared by the browser (utils/pricing.js) and the payment server functions
 // (functions/api/pay), so the amount the server charges is computed exactly the way the page shows it.
-import { defaultPriceFor, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT } from '../data/countries.js';
+import { CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT } from '../data/countries.js';
 
 const positive = (n) => Number.isFinite(n) && n > 0;
 const nonNegative = (n) => Number.isFinite(n) && n >= 0;
@@ -17,7 +17,9 @@ export function readPlanSettings(settings, fallbackCurrency = 'USD') {
   return {
     currency,
     symbol: settings?.symbol || CURRENCY_SYMBOLS[currency] || '$',
-    price: price ?? defaultPriceFor(currency),
+    // No price on the record means the country is not priced: callers must treat price null as
+    // "not available". Prices come from Country Pricing only, never from code.
+    price: price ?? null,
     discountPercent: discount ?? DEFAULT_REFERRAL_DISCOUNT
   };
 }

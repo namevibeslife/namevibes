@@ -7,6 +7,7 @@ import { formatMoney } from '../i18n/format';
 import { ArrowLeft, CreditCard, CheckCircle } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { loadTaxRates, loadGatewayChoice } from '../utils/pricing';
+import ComingSoon from '../components/ComingSoon';
 import { GST_RATE_BY_COUNTRY } from '../utils/commission';
 import { useTranslation } from 'react-i18next';
 
@@ -100,6 +101,7 @@ export default function PaymentPage() {
       // Order is created on the server with the server-computed amount; the server captures and verifies it
       createOrder: async () => {
         const order = await callPayApi('create-order', { gateway: 'paypal' });
+        assertSameAmount(order);
         return order.orderId;
       },
       onApprove: async (data) => {
@@ -155,6 +157,7 @@ export default function PaymentPage() {
       await loadScript('https://checkout.razorpay.com/v1/checkout.js');
       // amount, currency and order are created server-side; the key id comes from the server too
       const order = await callPayApi('create-order', { gateway: 'razorpay' });
+      assertSameAmount(order);
       const rzp = new window.Razorpay({
         key: order.keyId,
         order_id: order.orderId,
@@ -190,6 +193,14 @@ export default function PaymentPage() {
       alert(t('errors.paymentFailed'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  // The server prices the order itself. If its amount is not what this page shows, stop and re-load the price.
+  const assertSameAmount = (order) => {
+    if (Number(order.displayAmount) !== Number(amount) || order.currency !== (currency || order.currency)) {
+      navigate('/pricing');
+      throw new Error('Price changed');
     }
   };
 
@@ -331,9 +342,7 @@ export default function PaymentPage() {
             <h3 className="text-lg font-semibold text-gray-800 mb-4">{t('payment.selectMethod')}</h3>
 
             {paymentMethod === 'unavailable' ? (
-              <div role="alert" className="border-2 border-amber-300 bg-amber-50 rounded-lg p-4 text-amber-900 font-medium">
-                {t('payment.unavailable')}
-              </div>
+              <ComingSoon countryCode={userProfile?.countryCode} defaultEmail={userProfile?.email || auth.currentUser?.email || ''} />
             ) : paymentMethod === 'mock' ? (
               <div className="border-2 border-dashed border-amber-400 bg-amber-50 rounded-lg p-4 space-y-3">
                 <p className="text-sm text-amber-800 font-semibold">{t('payment.mockNote')}</p>

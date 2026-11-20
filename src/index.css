@@ -187,6 +187,10 @@ nav.bg-paper, header.bg-paper { border-bottom: 1px solid #e8d3a0; }
 @media (max-width: 640px) { .site-language { position: static; } .site-language-menu { left: 8px; right: 8px; width: auto; top: calc(100% + 8px); } }
 .site-signout { padding: 10px; min-height: 44px; color: #9b2828; margin-top: 10px; }
 @media (max-width: 420px) { .site-navigation-actions { gap: 4px; } .site-navigation-logo img { width: 112px; } .site-navigation-bar { gap: 6px; padding: 0 12px; } .site-home-link, .site-menu-toggle { padding: 8px; } .site-navigation-links { grid-template-columns: 1fr; } }
+/* The bar never wraps: very narrow screens drop the word "Home" (the icon and aria-label stay) so Home, language and Menu all fit */
+.site-navigation-actions { flex-wrap: nowrap; white-space: nowrap; }
+.site-navigation-logo { overflow: hidden; }
+@media (max-width: 359px) { .site-home-text { display: none; } .site-home-link { padding: 8px 10px; } .site-navigation-logo img { width: 96px; } .site-navigation-actions { gap: 3px; } .site-navigation-bar { padding: 0 8px; } }
 @media print { .site-navigation { display: none; } }
 
 .site-background, .element-insights-page { background-color: #fcf3df; background-image: linear-gradient(#fffaf044, #fffaf044), url('/theme/poster-gold-elements.png'); background-size: auto, 100% auto; background-position: center top; background-repeat: repeat-y; }

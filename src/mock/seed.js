@@ -16,6 +16,9 @@ const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 const daysAhead = (n) => new Date(Date.now() + n * 24 * 60 * 60 * 1000);
 
 export const SEED_DATA = {
+  // Country Pricing (admin) - the app shows prices from these records only
+  'countrySettings/mock-in': { countryCode: 'IN', countryName: 'India', currency: 'INR', symbol: '₹', price: 399, referralDiscount: 10, taxPercent: 18, isActive: true },
+  'countrySettings/mock-us': { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true },
   'users/mock-unpaid': {
     fullName: 'Uma Unpaid', dob: '1990-05-14', gender: 'Female',
     countryCode: 'IN', countryName: 'India', stateCode: 'KA', stateName: 'Karnataka',

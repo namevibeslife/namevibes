@@ -183,6 +183,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // "Notify me" list for countries whose payments are not open yet. A signed-in user may add one entry
+    // (id = COUNTRY_email, so a repeat is a refused update); only admins read. No update or delete.
+    match /waitlist/{entryId} {
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly(['email', 'countryCode', 'createdAt'])
+        && request.resource.data.email is string && request.resource.data.email.size() <= 200
+        && request.resource.data.email.matches('.+@.+')
+        && request.resource.data.countryCode is string && request.resource.data.countryCode.size() == 2
+        && request.resource.data.createdAt == request.time
+        && entryId == request.resource.data.countryCode + '_' + request.resource.data.email;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
     match /revenueReports/{reportId} {
       allow read, write: if isAdmin();
     }
@@ -197,7 +211,7 @@ service cloud.firestore {
     function hasOwnRules(collection) {
       return collection in ['users', 'payments', 'admins', 'ambassadors', 'referralCodes',
         'payoutRequests', 'countrySettings', 'revenueReports', 'ambassadorContent',
-        'ambassadorAccess', 'paymentSettings'];
+        'ambassadorAccess', 'paymentSettings', 'waitlist'];
     }
     match /{collection}/{docId} {
       allow read, write: if isAdmin() && !hasOwnRules(collection);

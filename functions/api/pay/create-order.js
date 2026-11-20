@@ -25,7 +25,7 @@ export async function onRequestPost({ request, env }) {
   try {
     const db = await firestore(env);
     const price = await priceForUser(db, who.uid);
-    if (!price.gateway) return json({ error: 'Payments are not available for this country yet', code: 'unavailable' }, 409);
+    if (!price.gateway) return json({ error: 'Payments are not available for this country yet', code: price.reason || 'unavailable' }, 409);
     if (body.gateway !== price.gateway) return json({ error: 'That payment method is not available', code: 'gateway-mismatch', gateway: price.gateway }, 409);
     if (!(price.amount > 0)) return json({ error: 'Bad price' }, 500);
 

@@ -8,6 +8,7 @@ import { hasChosenLanguage } from '../i18n';
 import { Sparkles, Atom, BookOpen } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { captureReferralFromUrl } from '../utils/referralCode';
+import LandingPrice from '../components/LandingPrice';
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -66,6 +67,7 @@ export default function LandingPage() {
           <p className="font-semibold text-brand-700">{t('landing.about5')}</p>
         </div>
       </section>
+      <LandingPrice />
       <section className="landing-showcase" aria-label={t('landing.sampleAria')}>
         <p className="text-center text-brand-600 text-sm mb-4 tracking-widest uppercase">{t('landing.sampleLabel')}</p>
         <ChemistryPoster people={[{ fullName: 'Vibes', elements: parseNameToElements('Vibes') }]} theme="gold" />

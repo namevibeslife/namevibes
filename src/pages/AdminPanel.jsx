@@ -848,7 +848,7 @@ export default function AdminPanel() {
     setCountryFormData({
       countryCode: country.countryCode,
       currency: plan.currency,
-      price: plan.price,
+      price: plan.price ?? '',
       referralDiscount: plan.discountPercent,
       taxPercent: country.taxPercent ?? '',
       gatewayOverride: country.gatewayOverride || 'auto',

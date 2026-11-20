@@ -443,9 +443,7 @@ export const getActiveCountries = (countrySettings = []) => {
     .sort((a, b) => a.name.localeCompare(b.name));
 };
 
-// The one NAMASUTRA Annual Plan. In-code fallbacks by currency, used only when a country has no
-// saved price under Admin -> Country Pricing.
-export const DEFAULT_PLAN_PRICES = { INR: 399, USD: 25, EUR: 25, AED: 50 };
+// There are NO built-in prices: every price comes from a country's Active Country Pricing record.
 export const DEFAULT_REFERRAL_DISCOUNT = 10;
 const SYMBOL_OVERRIDES = { INR: '₹', USD: '$', EUR: '€', AED: 'AED ' };
 
@@ -488,12 +486,3 @@ export const ALL_COUNTRIES = Object.fromEntries(
 export const getCountry = (code) => ALL_COUNTRIES[code];
 // Currency the admin form fills in when a country is picked (euro countries get EUR)
 export const suggestedCurrency = (code) => COUNTRY_CURRENCY[code] || 'USD';
-
-export const defaultPriceFor = (currency) => DEFAULT_PLAN_PRICES[currency] ?? DEFAULT_PLAN_PRICES.USD;
-
-export const getPricing = (countryCode) => {
-  const country = COUNTRIES[countryCode] || COUNTRIES.US;
-  const currency = country.currency || 'USD';
-  const symbol = country.symbol || CURRENCY_SYMBOLS[currency] || '$';
-  return { price: defaultPriceFor(currency), currency, symbol };
-};

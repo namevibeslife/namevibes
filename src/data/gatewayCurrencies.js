@@ -49,6 +49,9 @@ export function resolveGateway({ currency, override = 'auto', internationalEnabl
   if (cur === 'INR') return { gateway: 'razorpay', via: 'inr' };
   if (internationalEnabled && razorpaySupports(cur)) return { gateway: 'razorpay', via: 'razorpay-supported' };
   if (paypalSupports(cur)) return { gateway: 'paypal', via: 'paypal-fallback' };
+  // Only Razorpay takes it (e.g. AED) but International Payments is not switched on yet: "coming soon".
+  // Turning the admin switch on moves these countries to Razorpay with no code change.
+  if (razorpaySupports(cur)) return { gateway: null, reason: 'coming-soon' };
   return { gateway: null, reason: 'unsupported' };
 }
 
@@ -91,12 +94,12 @@ export function gatewayWarnings(countryCode, currency, price, { override = 'auto
   } else if (rz && !internationalEnabled) {
     out.push({
       level: 'warn',
-      text: `Only Razorpay supports ${currency} (PayPal does not), and Razorpay's International Payments is switched off, so customers here will see "payments not available" and cannot check out. Switch on "Razorpay: International payments enabled" above once Razorpay has approved it, or force PayPal/Razorpay with the Payment gateway selector.`
+      text: `Only Razorpay supports ${currency} (PayPal does not), and Razorpay's International Payments is switched off, so customers here see "Payments for your country are coming soon" with a Notify me email box instead of a pay button. Switching on "Razorpay: International payments enabled" above (once Razorpay has approved it) moves this country to Razorpay automatically, with nothing to deploy. Or force a gateway with the Payment gateway selector.`
     });
   } else {
     out.push({
       level: 'warn',
-      text: `Neither gateway can take ${currency}, so customers in this country will see "payments not available" and cannot check out. Choose a currency PayPal or Razorpay supports (for example USD or EUR).`
+      text: `Neither gateway can take ${currency}, so customers in this country see "Payments for your country are coming soon" and cannot check out. Choose a currency PayPal or Razorpay supports (for example USD or EUR).`
     });
   }
 

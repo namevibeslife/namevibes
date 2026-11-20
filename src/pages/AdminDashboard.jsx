@@ -1432,7 +1432,7 @@ export default function AdminDashboard(props) {
                         <div className="flex justify-between items-center py-2 border-b">
                           <span className="text-sm text-gray-600">Annual Plan ({readPlanSettings(country).currency})</span>
                           <span className="text-lg font-bold text-gray-800">
-                            {readPlanSettings(country).symbol}{readPlanSettings(country).price}
+                            {readPlanSettings(country).price ? `${readPlanSettings(country).symbol}${readPlanSettings(country).price}` : 'No price set'}
                           </span>
                         </div>
                         <div className="flex justify-between items-center py-2 border-b">
@@ -1446,7 +1446,7 @@ export default function AdminDashboard(props) {
                           <span className="text-sm font-semibold text-gray-800">
                             {(() => {
                               const r = resolveGateway({ currency: readPlanSettings(country).currency, override: country.gatewayOverride, internationalEnabled });
-                              const label = r.gateway ? GATEWAY_NAMES[r.gateway] : 'None (checkout blocked)';
+                              const label = r.gateway ? GATEWAY_NAMES[r.gateway] : (r.reason === 'coming-soon' ? 'Coming soon (needs Razorpay International Payments)' : 'None (checkout blocked)');
                               return r.via === 'forced' ? `${label} (forced)` : `${label} (auto)`;
                             })()}
                           </span>
