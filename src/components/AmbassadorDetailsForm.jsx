@@ -31,7 +31,7 @@ export default function AmbassadorDetailsForm({ initial, submitLabel, busy = fal
       control = states.length || !data.countryCode
         ? <select {...common} disabled={!data.countryCode}><option value="">{t('ambassador.selectState')}</option>
           {states.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}</select>
-        : <input {...common} required={false} type="text" placeholder={t('ambassador.stateOptional', { defaultValue: 'State / region (optional)' })} />;
+        : <input {...common} required={false} type="text" placeholder={t('ambassador.stateOptional')} />;
     } else {
       control = <input {...common} type={type} placeholder={extra.placeholder} readOnly={extra.readOnly}
         title={extra.readOnly ? t('ambassador.emailLocked') : undefined}

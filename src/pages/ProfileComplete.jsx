@@ -295,7 +295,7 @@ export default function ProfileComplete() {
             {/* State - Searchable */}
             {formData.countryCode && !(getCountry(formData.countryCode)?.states || []).length && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">State/Province (optional)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{t('profileComplete.stateOptional')}</label>
                 <input
                   type="text"
                   value={formData.stateName}
