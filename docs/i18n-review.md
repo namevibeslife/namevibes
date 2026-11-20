@@ -1778,7 +1778,7 @@ Languages: hi, kn, ml, ta, te
 | `numerology.meaning.22.personality` | Others view you as capable of achieving the impossible. | അസാധ്യമായത് നേടാൻ കഴിവുള്ള വ്യക്തിയായി മറ്റുള്ളവർ നിങ്ങളെ കാണുന്നു. |
 | `numerology.meaning.22.lifePath` | Your path involves manifesting grand visions into reality. | നിങ്ങളുടെ പാതയിൽ മഹത്തായ ദർശനങ്ങളെ യാഥാർഥ്യമാക്കുന്നത് ഉൾപ്പെടുന്നു. |
 | `numerology.meaning.22.expression` | You express through building systems that serve many. | പലർക്കും പ്രയോജനപ്പെടുന്ന സംവിധാനങ്ങൾ പണിയുന്നതിലൂടെ നിങ്ങൾ സ്വയം പ്രകടിപ്പിക്കുന്നു. |
-| `numerology.meaning.33.destiny` | Master teacher, healer of healers. You uplift humanity. | മാസ്റ്റർ ഗുരുത്വം, രോഗശാന്തിയുടെ രോഗശാന്തി. നിങ്ങൾ മനുഷ്യരാശിയെ ഉയർത്തുന്നു. |
+| `numerology.meaning.33.destiny` | Master teacher, healer of healers. You uplift humanity. | മാസ്റ്റർ ഗുരുത്വം, രോഗശാന്തിക്കാരെ സുഖപ്പെടുത്തുന്ന ശക്തി. നിങ്ങൾ മനുഷ്യരാശിയെ ഉയർത്തുന്നു. |
 | `numerology.meaning.33.soulUrge` | You desire to nurture and heal on a universal scale. | നിങ്ങൾ സാർവത്രിക തലത്തിൽ പരിപോഷിപ്പിക്കാനും സുഖപ്പെടുത്താനും ആഗ്രഹിക്കുന്നു. |
 | `numerology.meaning.33.personality` | Others see you as a beacon of unconditional love. | മറ്റുള്ളവർ നിങ്ങളെ നിരുപാധിക സ്നേഹത്തിന്റെ ദീപസ്തംഭമായി കാണുന്നു. |
 | `numerology.meaning.33.lifePath` | Your path is about selfless service and universal love. | നിങ്ങളുടെ പാത നിസ്വാർഥ സേവനവും സാർവത്രിക സ്നേഹവുമാണ്. |
@@ -2045,7 +2045,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n062` | Explosive potential, rare talent | സ്ഫോടന ശേഷി, അപൂർവ പ്രതിഭ |
 | `insights.n065` | Extremely reactive, time-precise | അങ്ങേയറ്റം പ്രതിപ്രവർത്തിക്കുന്ന, സമയ കൃത്യത |
 | `insights.n068` | Rarest, most reactive, unstable genius | ഏറ്റവും അപൂർവ, ഏറ്റവും പ്രതിപ്രവർത്തിക്കുന്ന, അസ്ഥിര പ്രതിഭ |
-| `insights.n069` | 💪 Alkaline Earth Metals (Group 2) - The Stable Supporters | 💪 ക്ഷാരീയ മൃണ്ണ് ലോഹങ്ങൾ (ഗ്രൂപ്പ് 2) - സ്ഥിരമായ പിന്തുണക്കാർ |
+| `insights.n069` | 💪 Alkaline Earth Metals (Group 2) - The Stable Supporters | 💪 ആൽക്കലൈൻ എർത്ത് ലോഹങ്ങൾ (ഗ്രൂപ്പ് 2) - സ്ഥിരമായ പിന്തുണക്കാർ |
 | `insights.n072` | Strong yet lightweight, resilient | കരുത്തുള്ളതെങ്കിലും ഭാരം കുറഞ്ഞ, ഇലാസ്തികതയുള്ള |
 | `insights.n075` | Vital for energy, bright burning | ഊർജത്തിന് അത്യാവശ്യം, പ്രകാശിച്ച് കത്തുന്ന |
 | `insights.n078` | Structural support, bone of operations | ഘടനാപരമായ പിന്തുണ, എല്ലാ പ്രവർത്തനങ്ങളുടെയും നട്ടെല്ല് |
@@ -2056,7 +2056,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n089` | Key metals include: Iron (Fe), Copper (Cu), Silver (Ag), Gold (Au), Platinum (Pt) | പ്രധാന ലോഹങ്ങൾ: ഇരുമ്പ് (Fe), ചെമ്പ് (Cu), വെള്ളി (Ag), സ്വർണം (Au), പ്ലാറ്റിനം (Pt) |
 | `insights.n090` | Traits: Strength, conductivity, versatility, value, beauty, durability | ഗുണങ്ങൾ: കരുത്ത്, ചാലകത, ബഹുമുഖത, മൂല്യം, സൗന്ദര്യം, ഈട് |
 | `insights.n091` | 🌍 Lanthanides & Actinides - The Rare & Powerful | 🌍 ലാന്തനൈഡുകളും ആക്ടിനൈഡുകളും - അപൂർവവും ശക്തവും |
-| `insights.n092` | Rare earth elements and radioactive elements | അപൂർവ മൃണ്ണ് മൂലകങ്ങളും റേഡിയോ ആക്ടീവ് മൂലകങ്ങളും |
+| `insights.n092` | Rare earth elements and radioactive elements | അപൂർവ ഭൗമ മൂലകങ്ങളും റേഡിയോ ആക്ടീവ് മൂലകങ്ങളും |
 | `insights.n093` | Traits: Magnetic properties, hidden power, transformative energy, technological advancement | ഗുണങ്ങൾ: കാന്തിക ഗുണങ്ങൾ, ഒളിഞ്ഞിരിക്കുന്ന ശക്തി, പരിവർത്തന ഊർജം, സാങ്കേതിക പുരോഗതി |
 | `insights.n094` | 🧬 Non-metals - The Life Essentials | 🧬 അലോഹങ്ങൾ - ജീവന്റെ അവശ്യ ഘടകങ്ങൾ |
 | `insights.n096` | Most abundant, foundation of stars, light | ഏറ്റവും സമൃദ്ധം, നക്ഷത്രങ്ങളുടെ അടിത്തറ, ലഘു |
@@ -2083,7 +2083,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n130` | Nakshatra | നക്ഷത്രം |
 | `insights.n131` | Ruling Planet | അധിപ ഗ്രഹം |
 | `insights.n132` | Pada Syllables | പാദ അക്ഷരങ്ങൾ |
-| `insights.n136` | Swift action, healing, pioneering | വേഗമേറിയ പ്രവർത്തനം, രോഗശാന്തി, മുൻനിര |
+| `insights.n136` | Swift action, healing, pioneering | വേഗമേറിയ പ്രവർത്തനം, രോഗശാന്തി, മുൻകൈയെടുക്കൽ |
 | `insights.n140` | Nurturing, creative, transformative | പരിപോഷിപ്പിക്കുന്ന, സർഗാത്മകമായ, പരിവർത്തനം വരുത്തുന്ന |
 | `insights.n144` | Sharp intellect, purifying, fiery | മൂർച്ചയുള്ള ബുദ്ധി, ശുദ്ധീകരിക്കുന്ന, അഗ്നിസമാനമായ |
 | `insights.n147` | Royal authority, ancestral pride | രാജകീയ അധികാരം, പൂർവികരെക്കുറിച്ചുള്ള അഭിമാനം |
@@ -2093,7 +2093,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n159` | Victory, lasting success | വിജയം, ശാശ്വത വിജയം |
 | `insights.n162` | Root investigation, spiritual depth | വേരുകളുടെ അന്വേഷണം, ആത്മീയ ആഴം |
 | `insights.n163` | 🌊 Water Nakshatras (Ruled by Moon, Mercury) | 🌊 ജല നക്ഷത്രങ്ങൾ (അധിപന്മാർ: ചന്ദ്രൻ, ബുധൻ) |
-| `insights.n167` | Growth, beauty, materialistic | വളർച്ച, സൗന്ദര്യം, ഭൗതികവാദം |
+| `insights.n167` | Growth, beauty, materialistic | വളർച്ച, സൗന്ദര്യം, ഭൗതിക സുഖാസക്തി |
 | `insights.n170` | Skillful hands, clever, dexterous | വൈദഗ്ധ്യമുള്ള കൈകൾ, ബുദ്ധിശക്തി, നൈപുണ്യം |
 | `insights.n173` | Listening, learning, wisdom | കേൾക്കൽ, പഠിക്കൽ, ജ്ഞാനം |
 | `insights.n177` | Mystical, serpent wisdom, cunning | നിഗൂഢമായ, സർപ്പജ്ഞാനം, കൗശലം |
@@ -2190,7 +2190,7 @@ Languages: hi, kn, ml, ta, te
 | `hora.sunrise` | Sunrise | സൂര്യോദയം |
 | `hora.sunset` | Sunset | സൂര്യാസ്തമയം |
 | `hora.daylight` | Daylight | പകൽ ദൈർഘ്യം |
-| `hora.duration` | {{h}}h {{m}}m | {{h}} മ {{m}} മി |
+| `hora.duration` | {{h}}h {{m}}m | {{h}} മണിക്കൂർ {{m}} മി |
 | `hora.oneMuhurta` | One muhurta | ഒരു മുഹൂർത്തം |
 | `hora.minutes_one` | {{count}} min | {{count}} മിനിറ്റ് |
 | `hora.minutes_other` | {{count}} min | {{count}} മിനിറ്റ് |
@@ -3653,7 +3653,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n130` | Nakshatra | నక్షత్రం |
 | `insights.n131` | Ruling Planet | అధిపతి గ్రహం |
 | `insights.n132` | Pada Syllables | పాద అక్షరాలు |
-| `insights.n136` | Swift action, healing, pioneering | వేగవంతమైన చర్య, నయం చేయడం, మార్గదర్శకత్వం |
+| `insights.n136` | Swift action, healing, pioneering | వేగవంతమైన చర్య, నయం చేయడం, ముందడుగు వేసే గుణం |
 | `insights.n140` | Nurturing, creative, transformative | పోషించే, సృజనాత్మకమైన, మార్పు తెచ్చే |
 | `insights.n144` | Sharp intellect, purifying, fiery | పదునైన బుద్ధి, శుద్ధి చేసే, అగ్నిలాంటి |
 | `insights.n147` | Royal authority, ancestral pride | రాజసం, పూర్వీకుల గర్వం |
@@ -3663,7 +3663,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n159` | Victory, lasting success | విజయం, శాశ్వత విజయం |
 | `insights.n162` | Root investigation, spiritual depth | మూలాలను శోధించడం, ఆధ్యాత్మిక లోతు |
 | `insights.n163` | 🌊 Water Nakshatras (Ruled by Moon, Mercury) | 🌊 జల నక్షత్రాలు (అధిపతులు: చంద్రుడు, బుధుడు) |
-| `insights.n167` | Growth, beauty, materialistic | వృద్ధి, అందం, భౌతికవాదం |
+| `insights.n167` | Growth, beauty, materialistic | వృద్ధి, అందం, భౌతిక సుఖాసక్తి |
 | `insights.n170` | Skillful hands, clever, dexterous | నైపుణ్యం గల చేతులు, తెలివైన, నేర్పరి |
 | `insights.n173` | Listening, learning, wisdom | వినడం, నేర్చుకోవడం, జ్ఞానం |
 | `insights.n177` | Mystical, serpent wisdom, cunning | మర్మమైన, సర్ప జ్ఞానం, జిత్తులమారి |
