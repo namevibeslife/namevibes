@@ -1439,7 +1439,7 @@ Languages: hi, kn, ml, ta, te
 | `errors.monthlyLimit` | You've used all {{limit}} analyses for this month. Your allowance resets on the 1st. | ಈ ತಿಂಗಳ ಎಲ್ಲ {{limit}} ವಿಶ್ಲೇಷಣೆಗಳನ್ನೂ ಬಳಸಿದ್ದೀರಿ. ನಿಮ್ಮ ಮಿತಿ 1ನೇ ತಾರೀಖಿಗೆ ಮರುಹೊಂದುತ್ತದೆ. |
 | `errors.paymentFailed` | Payment failed. Please try again. | ಪಾವತಿ ವಿಫಲವಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. |
 | `errors.testPaymentFailed` | Test payment failed. Please try again. | ಪರೀಕ್ಷಾ ಪಾವತಿ ವಿಫಲವಾಯಿತು. ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ. |
-| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | ಪಾವತಿ ದಾಖಲಾಗಿದೆ ಆದರೆ ಪ್ರೊಫೈಲ್ ನವೀಕರಣ ವಿಫಲವಾಯಿತು. ದಯವಿಟ್ಟು ಸಹಾಯವನ್ನು ಸಂಪರ್ಕಿಸಿ. |
+| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | ಪಾವತಿ ದಾಖಲಾಗಿದೆ ಆದರೆ ಪ್ರೊಫೈಲ್ ನವೀಕರಣ ವಿಫಲವಾಯಿತು. ದಯವಿಟ್ಟು ಸಹಾಯ ತಂಡವನ್ನು ಸಂಪರ್ಕಿಸಿ. |
 | `pricing.reasonFamily` | The Family Package is part of the Annual Plan. | ಕುಟುಂಬ ಪ್ಯಾಕೇಜ್ ವಾರ್ಷಿಕ ಯೋಜನೆಯ ಭಾಗವಾಗಿದೆ. |
 | `pricing.reasonPlan` | Choose the Annual Plan to unlock name analyses and insights. | ಹೆಸರಿನ ವಿಶ್ಲೇಷಣೆ ಮತ್ತು ಒಳನೋಟಗಳನ್ನು ಪಡೆಯಲು ವಾರ್ಷಿಕ ಯೋಜನೆ ಆಯ್ಕೆಮಾಡಿ. |
 | `pricing.referralApplied` | 🎉 Referral Code Applied: {{code}} | 🎉 ರೆಫರಲ್ ಕೋಡ್ ಅನ್ವಯಿಸಲಾಗಿದೆ: {{code}} |
@@ -2224,7 +2224,7 @@ Languages: hi, kn, ml, ta, te
 | `errors.monthlyLimit` | You've used all {{limit}} analyses for this month. Your allowance resets on the 1st. | ഈ മാസത്തെ എല്ലാ {{limit}} വിശകലനങ്ങളും നിങ്ങൾ ഉപയോഗിച്ചു. നിങ്ങളുടെ പരിധി 1-ാം തീയതി പുതുക്കപ്പെടും. |
 | `errors.paymentFailed` | Payment failed. Please try again. | പേയ്‌മെന്റ് പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കൂ. |
 | `errors.testPaymentFailed` | Test payment failed. Please try again. | പരീക്ഷണ പേയ്‌മെന്റ് പരാജയപ്പെട്ടു. വീണ്ടും ശ്രമിക്കൂ. |
-| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | പേയ്‌മെന്റ് രേഖപ്പെടുത്തി, പക്ഷേ പ്രൊഫൈൽ അപ്ഡേറ്റ് പരാജയപ്പെട്ടു. ദയവായി സഹായവുമായി ബന്ധപ്പെടൂ. |
+| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | പേയ്‌മെന്റ് രേഖപ്പെടുത്തി, പക്ഷേ പ്രൊഫൈൽ അപ്ഡേറ്റ് പരാജയപ്പെട്ടു. ദയവായി സഹായ വിഭാഗവുമായി ബന്ധപ്പെടൂ. |
 | `pricing.reasonFamily` | The Family Package is part of the Annual Plan. | കുടുംബ പാക്കേജ് വാർഷിക പ്ലാനിന്റെ ഭാഗമാണ്. |
 | `pricing.reasonPlan` | Choose the Annual Plan to unlock name analyses and insights. | പേര് വിശകലനങ്ങളും ഉൾക്കാഴ്ചകളും ലഭിക്കാൻ വാർഷിക പ്ലാൻ തിരഞ്ഞെടുക്കൂ. |
 | `pricing.referralApplied` | 🎉 Referral Code Applied: {{code}} | 🎉 റഫറൽ കോഡ് ചേർത്തു: {{code}} |
@@ -2790,7 +2790,7 @@ Languages: hi, kn, ml, ta, te
 | `insights.n003` | Elements Guide | தனிமங்கள் வழிகாட்டி |
 | `insights.n004` | Nakshatras | நட்சத்திரங்கள் |
 | `insights.n005` | Practical Guide | நடைமுறை வழிகாட்டி |
-| `insights.n006` | Back to Dashboard | டாஷ்போர்டுக்குத் திரும்பு |
+| `insights.n006` | Back to Dashboard | டாஷ்போர்டுக்குத் திரும்புங்கள் |
 | `insights.n007` | 🌟 Unlock the Cosmic Secrets of Your Name 🌟 | 🌟 உங்கள் பெயரின் பிரபஞ்ச ரகசியங்களைத் திறங்கள் 🌟 |
 | `insights.n008` | Discover how the periodic table elements and ancient Nakshatras shape your identity, personality, and destiny | தனிம அட்டவணைத் தனிமங்களும் பண்டைய நட்சத்திரங்களும் உங்கள் அடையாளம், குணம், விதியை எப்படி வடிவமைக்கின்றன என்பதை அறியுங்கள் |
 | `insights.n009` | 📖 How to Read Your Analysis | 📖 உங்கள் பகுப்பாய்வை எப்படிப் படிப்பது |
@@ -3009,7 +3009,7 @@ Languages: hi, kn, ml, ta, te
 | `errors.monthlyLimit` | You've used all {{limit}} analyses for this month. Your allowance resets on the 1st. | இந்த மாதத்தின் {{limit}} பகுப்பாய்வுகளையும் பயன்படுத்திவிட்டீர்கள். உங்கள் வரம்பு 1ஆம் தேதி புதுப்பிக்கப்படும். |
 | `errors.paymentFailed` | Payment failed. Please try again. | பணம் செலுத்த முடியவில்லை. மீண்டும் முயலுங்கள். |
 | `errors.testPaymentFailed` | Test payment failed. Please try again. | சோதனைப் பணம் செலுத்த முடியவில்லை. மீண்டும் முயலுங்கள். |
-| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | பணம் செலுத்தியது பதிவாகிவிட்டது, ஆனால் சுயவிவரப் புதுப்பிப்பு தோல்வியடைந்தது. ஆதரவைத் தொடர்பு கொள்ளுங்கள். |
+| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | பணம் செலுத்தியது பதிவாகிவிட்டது, ஆனால் சுயவிவரப் புதுப்பிப்பு தோல்வியடைந்தது. உதவி மையத்தைத் தொடர்பு கொள்ளுங்கள். |
 | `pricing.reasonFamily` | The Family Package is part of the Annual Plan. | குடும்பத் தொகுப்பு ஆண்டுத் திட்டத்தின் ஒரு பகுதி. |
 | `pricing.reasonPlan` | Choose the Annual Plan to unlock name analyses and insights. | பெயர் பகுப்பாய்வுகளையும் நுண்ணறிவுகளையும் திறக்க ஆண்டுத் திட்டத்தைத் தேர்ந்தெடுங்கள். |
 | `pricing.referralApplied` | 🎉 Referral Code Applied: {{code}} | 🎉 பரிந்துரைக் குறியீடு சேர்க்கப்பட்டது: {{code}} |
@@ -3041,17 +3041,17 @@ Languages: hi, kn, ml, ta, te
 | `payment.title` | Complete Payment | கட்டணத்தை நிறைவு செய்யுங்கள் |
 | `payment.subtitle` | Secure payment for your NAMASUTRA Annual Plan | உங்கள் NAMASUTRA ஆண்டுத் திட்டத்துக்கான பாதுகாப்பான கட்டணம் |
 | `payment.total` | Total | மொத்தம் |
-| `payment.backToPricing` | Back to Pricing | விலை விவரத்துக்குத் திரும்பு |
+| `payment.backToPricing` | Back to Pricing | விலை விவரத்துக்குத் திரும்புங்கள் |
 | `payment.selectMethod` | Select Payment Method | கட்டண முறையைத் தேர்ந்தெடுக்கவும் |
 | `payment.success` | Payment successful | கட்டணம் வெற்றிகரமாக முடிந்தது |
 | `payment.active` | Your plan is now active. | உங்கள் திட்டம் இப்போது செயலில் உள்ளது. |
 | `payment.taking` | Taking you to your dashboard... | உங்களை டாஷ்போர்டுக்கு அழைத்துச் செல்கிறோம்... |
 | `payment.mockNote` | Mock mode: no real payment gateway is used. | மாதிரி முறை: உண்மையான கட்டண நுழைவாயில் பயன்படுத்தப்படவில்லை. |
-| `payment.simulateOk` | Simulate successful payment | வெற்றிகரமான கட்டணத்தைப் பாவனை செய் |
-| `payment.simulateFail` | Simulate failed payment | தோல்வியுற்ற கட்டணத்தைப் பாவனை செய் |
+| `payment.simulateOk` | Simulate successful payment | வெற்றிகரமான கட்டணத்தைப் பாவனை செய்யுங்கள் |
+| `payment.simulateFail` | Simulate failed payment | தோல்வியுற்ற கட்டணத்தைப் பாவனை செய்யுங்கள் |
 | `payment.testNote` | Test mode: no card needed. Click below to simulate a successful payment. | சோதனை முறை: அட்டை தேவையில்லை. வெற்றிகரமான கட்டணத்தைப் பாவனை செய்ய கீழே அழுத்துங்கள். |
 | `payment.loadingPaypal` | Loading PayPal... | PayPal ஏற்றுகிறது... |
-| `payment.cancel` | Cancel Payment | கட்டணத்தை ரத்து செய் |
+| `payment.cancel` | Cancel Payment | கட்டணத்தை ரத்து செய்யுங்கள் |
 | `payment.processing` | Processing... | செயலாக்குகிறது... |
 | `payment.payRazorpay` | Pay with Razorpay | Razorpay மூலம் செலுத்துங்கள் |
 | `settings.clearHint` | Clear all cached data and sign out from all devices where you're logged in. You'll need to sign in again on all devices. | எல்லாத் தற்காலிகத் தரவையும் அழித்து, நீங்கள் உள்நுழைந்துள்ள எல்லாச் சாதனங்களிலிருந்தும் வெளியேறுங்கள். எல்லாச் சாதனங்களிலும் மீண்டும் உள்நுழைய வேண்டும். |
@@ -3134,14 +3134,14 @@ Languages: hi, kn, ml, ta, te
 | `ai.title` | Deepen Your Understanding with AI (Free) | AI மூலம் உங்கள் புரிதலை ஆழமாக்குங்கள் (இலவசம்) |
 | `ai.subtitle` | Uses your own AI account. Your full report is sent along. | உங்கள் சொந்த AI கணக்கைப் பயன்படுத்துகிறது. உங்கள் முழு அறிக்கையும் உடன் அனுப்பப்படும். |
 | `ai.subtitleReasons` | Uses your own AI account. Your full report is sent along, including the reasons you selected. | உங்கள் சொந்த AI கணக்கைப் பயன்படுத்துகிறது. நீங்கள் தேர்ந்தெடுத்த காரணங்கள் உட்பட உங்கள் முழு அறிக்கையும் உடன் அனுப்பப்படும். |
-| `ai.sendPdf` | Send PDF to my AI app | PDF-ஐ என் AI செயலிக்கு அனுப்பு |
+| `ai.sendPdf` | Send PDF to my AI app | PDF-ஐ என் AI செயலிக்கு அனுப்புங்கள் |
 | `ai.ask` | Ask {{name}} | {{name}}-இடம் கேளுங்கள் |
 | `ai.copied` | ✅ Your report has been copied. If it isn't already in the {{app}} chat box, paste it in (<b>Ctrl+V</b> on a computer, or <b>long-press → Paste</b> on a phone) and send. | ✅ உங்கள் அறிக்கை நகலெடுக்கப்பட்டது. அது {{app}} அரட்டைப் பெட்டியில் ஏற்கனவே இல்லையென்றால், அதை ஒட்டி (கணினியில் <b>Ctrl+V</b>, தொலைபேசியில் <b>நீண்ட நேரம் அழுத்தி → ஒட்டு</b>) அனுப்புங்கள். |
-| `ai.hideHelp` | Hide help | உதவியை மறை |
+| `ai.hideHelp` | Hide help | உதவியை மறைக்கவும் |
 | `ai.howWorks` | How does this work? | இது எப்படி வேலை செய்கிறது? |
-| `ai.help1` | <b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send. | <b>PDF-ஐ என் AI செயலிக்கு அனுப்பு:</b> PDF அறிக்கை இணைக்கப்பட்ட உங்கள் தொலைபேசியின் பகிர்வு மெனு திறக்கும். Claude, ChatGPT அல்லது Gemini-ஐத் தேர்ந்தெடுங்கள்; அறிக்கை அனுப்பத் தயாராக வந்து சேரும். |
+| `ai.help1` | <b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send. | <b>PDF-ஐ என் AI செயலிக்கு அனுப்புங்கள்:</b> PDF அறிக்கை இணைக்கப்பட்ட உங்கள் தொலைபேசியின் பகிர்வு மெனு திறக்கும். Claude, ChatGPT அல்லது Gemini-ஐத் தேர்ந்தெடுங்கள்; அறிக்கை அனுப்பத் தயாராக வந்து சேரும். |
 | `ai.help2` | <b>Ask Claude / ChatGPT / Gemini:</b> opens the AI in a new tab with your full report (names, elements, meanings and harmony) already written as a question. It's also copied, so you can paste it if the box is empty. Gemini always needs a paste. | <b>Claude / ChatGPT / Gemini-இடம் கேளுங்கள்:</b> AI புதிய தாவலில் திறக்கும்; உங்கள் முழு அறிக்கை (பெயர்கள், தனிமங்கள், பொருள்கள், இணக்கம்) ஏற்கனவே ஒரு கேள்வியாக எழுதப்பட்டிருக்கும். அதுவும் நகலெடுக்கப்படும்; பெட்டி காலியாக இருந்தால் ஒட்டலாம். Gemini-க்கு எப்போதும் ஒட்ட வேண்டும். |
-| `ai.help3` | <b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button. | <b>PDF-ஐயும் இணைக்க வேண்டுமா?</b> மேலே உள்ள <i>PDF-ஐப் பதிவிறக்கு</i> என்பதைப் பயன்படுத்தி, பிறகு கோப்பை அரட்டையில் இழுத்து விடுங்கள் அல்லது AI-யின் இணைப்பு (காகிதக்கிளிப்) பொத்தானைப் பயன்படுத்துங்கள். |
+| `ai.help3` | <b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button. | <b>PDF-ஐயும் இணைக்க வேண்டுமா?</b> மேலே உள்ள <i>PDF-ஐப் பதிவிறக்குங்கள்</i> என்பதைப் பயன்படுத்தி, பிறகு கோப்பை அரட்டையில் இழுத்து விடுங்கள் அல்லது AI-யின் இணைப்பு (காகிதக்கிளிப்) பொத்தானைப் பயன்படுத்துங்கள். |
 | `ai.help4` | You'll need to be signed in to your AI account. Namasutra doesn't see your conversation. | நீங்கள் உங்கள் AI கணக்கில் உள்நுழைந்திருக்க வேண்டும். Namasutra உங்கள் உரையாடலைப் பார்ப்பதில்லை. |
 | `ai.promptIntro` | I used Namasutra ({{host}}), which maps the letters of a name to periodic table elements. Here is my family report: | நான் Namasutra ({{host}}) பயன்படுத்தினேன்; அது ஒரு பெயரின் எழுத்துகளைத் தனிம அட்டவணைத் தனிமங்களுடன் இணைக்கிறது. இது என் குடும்ப அறிக்கை: |
 | `ai.promptElement` |   - {{name}} ({{symbol}}, atomic number {{number}}): {{meaning}} | - {{name}} ({{symbol}}, அணு எண் {{number}}): {{meaning}} |
@@ -3794,7 +3794,7 @@ Languages: hi, kn, ml, ta, te
 | `errors.monthlyLimit` | You've used all {{limit}} analyses for this month. Your allowance resets on the 1st. | ఈ నెలలోని మొత్తం {{limit}} విశ్లేషణలనూ ఉపయోగించారు. మీ పరిమితి 1వ తేదీన తిరిగి ప్రారంభమవుతుంది. |
 | `errors.paymentFailed` | Payment failed. Please try again. | చెల్లింపు విఫలమైంది. మళ్లీ ప్రయత్నించండి. |
 | `errors.testPaymentFailed` | Test payment failed. Please try again. | పరీక్ష చెల్లింపు విఫలమైంది. మళ్లీ ప్రయత్నించండి. |
-| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | చెల్లింపు నమోదైంది కానీ ప్రొఫైల్ అప్‌డేట్ విఫలమైంది. దయచేసి సహాయాన్ని సంప్రదించండి. |
+| `errors.paymentRecorded` | Payment recorded but profile update failed. Please contact support. | చెల్లింపు నమోదైంది కానీ ప్రొఫైల్ అప్‌డేట్ విఫలమైంది. దయచేసి సహాయ బృందాన్ని సంప్రదించండి. |
 | `pricing.reasonFamily` | The Family Package is part of the Annual Plan. | కుటుంబ ప్యాకేజీ వార్షిక ప్లాన్‌లో భాగం. |
 | `pricing.reasonPlan` | Choose the Annual Plan to unlock name analyses and insights. | పేరు విశ్లేషణలు, అంతర్దృష్టులను పొందడానికి వార్షిక ప్లాన్ ఎంచుకోండి. |
 | `pricing.referralApplied` | 🎉 Referral Code Applied: {{code}} | 🎉 రెఫరల్ కోడ్ వర్తింపజేయబడింది: {{code}} |
@@ -3804,7 +3804,7 @@ Languages: hi, kn, ml, ta, te
 | `pricing.featureFamily` | Family Package: analyze up to {{max}} names together | కుటుంబ ప్యాకేజీ: ఒకేసారి {{max}} పేర్ల వరకు విశ్లేషణ |
 | `pricing.title` | NAMASUTRA Annual Plan | NAMASUTRA వార్షిక ప్లాన్ |
 | `pricing.subtitle` | Unlock the chemistry in names | పేర్ల రసాయన శాస్త్రాన్ని తెరవండి |
-| `pricing.badge` | EVERYTHING INCLUDED | అన్నీ కలిపి |
+| `pricing.badge` | EVERYTHING INCLUDED | అన్నీ ఉన్నాయి |
 | `pricing.feature1` | 8 name analyses per month | నెలకు 8 పేరు విశ్లేషణలు |
 | `pricing.feature2` | Family harmony analysis | కుటుంబ సామరస్య విశ్లేషణ |
 | `pricing.feature3` | Beautiful PDF & PNG posters | అందమైన PDF, PNG పోస్టర్లు |
@@ -3818,7 +3818,7 @@ Languages: hi, kn, ml, ta, te
 | `payment.securePowered` | 🔒 Secure payment powered by {{gateway}} | 🔒 సురక్షిత చెల్లింపు: {{gateway}} |
 | `payment.planLine` | NAMASUTRA Annual Plan (1 year) | NAMASUTRA వార్షిక ప్లాన్ (1 సంవత్సరం) |
 | `payment.referralLine` | Referral code <code>{{code}}</code> ({{percent}}% off) | రెఫరల్ కోడ్ <code>{{code}}</code> ({{percent}}% తగ్గింపు) |
-| `payment.includesGst` | Includes {{percent}}% GST | {{percent}}% GST కలిపి |
+| `payment.includesGst` | Includes {{percent}}% GST | {{percent}}% GST సహా |
 | `payment.includesTax` | Includes {{percent}}% tax | {{percent}}% పన్ను కలిపి |
 | `payment.payTest` | Pay {{amount}} (test) | {{amount}} చెల్లించండి (పరీక్ష) |
 | `payment.poweredMock` | 🔒 Secure payment powered by nothing (mock mode) | 🔒 సురక్షిత చెల్లింపు: ఏదీ లేదు (మాక్ మోడ్) |
@@ -3832,11 +3832,11 @@ Languages: hi, kn, ml, ta, te
 | `payment.active` | Your plan is now active. | మీ ప్లాన్ ఇప్పుడు యాక్టివ్‌గా ఉంది. |
 | `payment.taking` | Taking you to your dashboard... | మిమ్మల్ని డాష్‌బోర్డ్‌కు తీసుకెళ్తున్నాము... |
 | `payment.mockNote` | Mock mode: no real payment gateway is used. | మాక్ మోడ్: నిజమైన చెల్లింపు గేట్‌వే ఉపయోగించబడదు. |
-| `payment.simulateOk` | Simulate successful payment | విజయవంతమైన చెల్లింపును అనుకరించు |
-| `payment.simulateFail` | Simulate failed payment | విఫలమైన చెల్లింపును అనుకరించు |
+| `payment.simulateOk` | Simulate successful payment | విజయవంతమైన చెల్లింపును అనుకరించండి |
+| `payment.simulateFail` | Simulate failed payment | విఫలమైన చెల్లింపును అనుకరించండి |
 | `payment.testNote` | Test mode: no card needed. Click below to simulate a successful payment. | పరీక్ష మోడ్: కార్డ్ అవసరం లేదు. విజయవంతమైన చెల్లింపును అనుకరించడానికి కింద నొక్కండి. |
 | `payment.loadingPaypal` | Loading PayPal... | PayPal లోడ్ అవుతోంది... |
-| `payment.cancel` | Cancel Payment | చెల్లింపును రద్దు చేయి |
+| `payment.cancel` | Cancel Payment | చెల్లింపును రద్దు చేయండి |
 | `payment.processing` | Processing... | ప్రాసెస్ అవుతోంది... |
 | `payment.payRazorpay` | Pay with Razorpay | Razorpay‌తో చెల్లించండి |
 | `settings.clearHint` | Clear all cached data and sign out from all devices where you're logged in. You'll need to sign in again on all devices. | కాష్ చేసిన డేటా అంతా క్లియర్ చేసి, మీరు లాగిన్ అయి ఉన్న అన్ని పరికరాల నుండి సైన్ అవుట్ చేయండి. అన్ని పరికరాల్లో మళ్లీ సైన్ ఇన్ చేయాల్సి ఉంటుంది. |
@@ -3919,12 +3919,12 @@ Languages: hi, kn, ml, ta, te
 | `ai.title` | Deepen Your Understanding with AI (Free) | AI తో మీ అవగాహనను మరింత లోతుగా చేసుకోండి (ఉచితం) |
 | `ai.subtitle` | Uses your own AI account. Your full report is sent along. | మీ సొంత AI ఖాతాను ఉపయోగిస్తుంది. మీ పూర్తి నివేదిక కూడా పంపబడుతుంది. |
 | `ai.subtitleReasons` | Uses your own AI account. Your full report is sent along, including the reasons you selected. | మీ సొంత AI ఖాతాను ఉపయోగిస్తుంది. మీరు ఎంచుకున్న కారణాలతో సహా మీ పూర్తి నివేదిక పంపబడుతుంది. |
-| `ai.sendPdf` | Send PDF to my AI app | PDF ను నా AI యాప్‌కు పంపు |
+| `ai.sendPdf` | Send PDF to my AI app | PDF ను నా AI యాప్‌కు పంపండి |
 | `ai.ask` | Ask {{name}} | {{name}} ను అడగండి |
 | `ai.copied` | ✅ Your report has been copied. If it isn't already in the {{app}} chat box, paste it in (<b>Ctrl+V</b> on a computer, or <b>long-press → Paste</b> on a phone) and send. | ✅ మీ నివేదిక కాపీ అయింది. అది ఇప్పటికే {{app}} చాట్ బాక్స్‌లో లేకపోతే, దాన్ని పేస్ట్ చేసి (కంప్యూటర్‌లో <b>Ctrl+V</b>, ఫోన్‌లో <b>ఎక్కువసేపు నొక్కి → పేస్ట్</b>) పంపండి. |
-| `ai.hideHelp` | Hide help | సహాయాన్ని దాచు |
+| `ai.hideHelp` | Hide help | సహాయాన్ని దాచండి |
 | `ai.howWorks` | How does this work? | ఇది ఎలా పనిచేస్తుంది? |
-| `ai.help1` | <b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send. | <b>PDF ను నా AI యాప్‌కు పంపు:</b> PDF నివేదిక జతచేయబడిన మీ ఫోన్ షేర్ మెనూ తెరుచుకుంటుంది. Claude, ChatGPT లేదా Gemini ఎంచుకోండి; నివేదిక పంపడానికి సిద్ధంగా చేరుతుంది. |
+| `ai.help1` | <b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send. | <b>PDF ను నా AI యాప్‌కు పంపండి:</b> PDF నివేదిక జతచేయబడిన మీ ఫోన్ షేర్ మెనూ తెరుచుకుంటుంది. Claude, ChatGPT లేదా Gemini ఎంచుకోండి; నివేదిక పంపడానికి సిద్ధంగా చేరుతుంది. |
 | `ai.help2` | <b>Ask Claude / ChatGPT / Gemini:</b> opens the AI in a new tab with your full report (names, elements, meanings and harmony) already written as a question. It's also copied, so you can paste it if the box is empty. Gemini always needs a paste. | <b>Claude / ChatGPT / Gemini ను అడగండి:</b> AI కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది; మీ పూర్తి నివేదిక (పేర్లు, మూలకాలు, అర్థాలు, సామరస్యం) ఇప్పటికే ఒక ప్రశ్నగా రాయబడి ఉంటుంది. అది కాపీ కూడా అవుతుంది, కాబట్టి బాక్స్ ఖాళీగా ఉంటే పేస్ట్ చేయవచ్చు. Gemini కి ఎప్పుడూ పేస్ట్ అవసరం. |
 | `ai.help3` | <b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button. | <b>PDF ను కూడా జతచేయాలా?</b> పైన ఉన్న <i>PDF డౌన్‌లోడ్</i> ఉపయోగించి, ఆపై ఫైల్‌ను చాట్‌లోకి లాగండి లేదా AI యొక్క అటాచ్ (పేపర్‌క్లిప్) బటన్ ఉపయోగించండి. |
 | `ai.help4` | You'll need to be signed in to your AI account. Namasutra doesn't see your conversation. | మీరు మీ AI ఖాతాలో సైన్ ఇన్ అయి ఉండాలి. Namasutra మీ సంభాషణను చూడదు. |
