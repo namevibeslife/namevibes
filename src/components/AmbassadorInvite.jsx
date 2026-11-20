@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { collection, doc, getDocs, query, setDoc, Timestamp, where } from 'firebase/firestore';
 import { db } from '../firebase';
-import { COUNTRIES, getActiveCountries } from '../data/countries';
+import { COUNTRIES, getCountry, getActiveCountries } from '../data/countries';
 import { reserveReferralCode, setAmbassadorAccess, CURRENT_CODE_VERSION } from '../utils/referralCodeAdmin';
 import { buildInviteMessage, normalizeEmail, isEmailLike } from '../utils/ambassadorInvite';
 import InviteMessageBox from './InviteMessageBox';
@@ -28,7 +28,7 @@ export default function AmbassadorInvite({ currentAdmin, ambassadors = [], count
     const fullName = form.fullName.trim();
     if (!fullName) return setError('Please enter the full name.');
     if (!isEmailLike(email)) return setError('Please enter a valid Google email address.');
-    if (!COUNTRIES[form.countryCode]) return setError('Please choose a country.');
+    if (!getCountry(form.countryCode)) return setError('Please choose a country.');
     if (ambassadors.some(a => normalizeEmail(a.email) === email)) {
       return setError(`${email} is already an ambassador (or has a pending application).`);
     }
@@ -39,7 +39,7 @@ export default function AmbassadorInvite({ currentAdmin, ambassadors = [], count
       if (!existing.empty) throw Object.assign(new Error('exists'), { friendly: `${email} is already an ambassador (or has a pending application).` });
 
       const ref = doc(collection(db, 'ambassadors'));
-      const country = COUNTRIES[form.countryCode];
+      const country = getCountry(form.countryCode);
       // Reserve the code first (atomic) so the ambassador doc is written once, complete, with the
       // code locked at the current version.
       const referralCode = await reserveReferralCode(ref.id, email, form.countryCode);

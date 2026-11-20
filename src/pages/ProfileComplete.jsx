@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc, getDoc, collection, getDocs } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { COUNTRIES, getActiveCountries } from '../data/countries';
+import { COUNTRIES, getCountry, getActiveCountries } from '../data/countries';
 import { detectBrowserCountry } from '../utils/countryDetect';
 import { normalizeReferralCode, isWellFormedCode, getStoredReferralCode, clearStoredReferralCode } from '../utils/referralCode';
 import { useAuthStore } from '../store/authStore';
@@ -98,7 +98,7 @@ export default function ProfileComplete() {
   // Filter states based on search
   const getFilteredStates = () => {
     if (!formData.countryCode) return [];
-    const country = COUNTRIES[formData.countryCode];
+    const country = getCountry(formData.countryCode);
     if (!country) return [];
     
     if (!stateSearch) return country.states;
@@ -291,7 +291,19 @@ export default function ProfileComplete() {
             </div>
 
             {/* State - Searchable */}
-            {formData.countryCode && (
+            {formData.countryCode && !(getCountry(formData.countryCode)?.states || []).length && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">State/Province (optional)</label>
+                <input
+                  type="text"
+                  value={formData.stateName}
+                  onChange={(e) => setFormData({ ...formData, stateCode: '', stateName: e.target.value })}
+                  className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                />
+              </div>
+            )}
+
+            {formData.countryCode && (getCountry(formData.countryCode)?.states || []).length > 0 && (
               <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   State/Province *

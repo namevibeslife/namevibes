@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
-import { COUNTRIES } from '../data/countries';
+import { COUNTRIES, getCountry } from '../data/countries';
 import { loadCountryPricing, discountedPrice } from '../utils/pricing';
 import { FAMILY_MAX_NAMES } from '../utils/plan';
 import { Check, ArrowLeft, Sparkles } from 'lucide-react';
@@ -71,7 +71,7 @@ export default function Pricing() {
     );
   }
 
-  const countryInfo = COUNTRIES[userProfile?.countryCode] || COUNTRIES.US;
+  const countryInfo = getCountry(userProfile?.countryCode) || COUNTRIES.US;
   const symbol = pricing?.symbol || countryInfo.symbol;
   const hasReferral = userProfile?.referralCodeUsed || userProfile?.referralCode;
   const price = pricing?.plan.price;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { COUNTRIES } from '../data/countries';
+import { ALL_COUNTRIES, getCountry } from '../data/countries';
 import { FORM_SECTIONS } from '../utils/ambassadorProfile';
 
 const input = 'w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none';
@@ -22,10 +22,13 @@ export default function AmbassadorDetailsForm({ initial, submitLabel = 'Save my 
       </select>;
     } else if (type === 'country') {
       control = <select {...common}><option value="">Select Country</option>
-        {Object.values(COUNTRIES).map(c => <option key={c.code} value={c.code}>{c.name}</option>)}</select>;
+        {Object.values(ALL_COUNTRIES).sort((a, b) => a.name.localeCompare(b.name)).map(c => <option key={c.code} value={c.code}>{c.name}</option>)}</select>;
     } else if (type === 'state') {
-      control = <select {...common} disabled={!data.countryCode}><option value="">Select State</option>
-        {(COUNTRIES[data.countryCode]?.states || []).map(s => <option key={s.code} value={s.code}>{s.name}</option>)}</select>;
+      const states = getCountry(data.countryCode)?.states || [];
+      control = states.length || !data.countryCode
+        ? <select {...common} disabled={!data.countryCode}><option value="">Select State</option>
+          {states.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}</select>
+        : <input {...common} required={false} type="text" placeholder="State / region (optional)" />;
     } else {
       control = <input {...common} type={type} placeholder={extra.placeholder} readOnly={extra.readOnly}
         title={extra.readOnly ? 'Your Google sign-in email. It cannot be changed.' : undefined}

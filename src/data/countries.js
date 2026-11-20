@@ -1,3 +1,5 @@
+import { ISO_COUNTRIES, COUNTRY_CURRENCY } from './isoCountries.js';
+
 export const COUNTRIES = {
   IN: {
     name: 'India',
@@ -427,26 +429,65 @@ export const COUNTRIES = {
 // metadata (states, gateway). Only these are offered in the sign-up country picker. A country
 // missing a currency/symbol in its admin settings falls back to USD/$.
 export const getActiveCountries = (countrySettings = []) => {
-  const activeByCode = new Map(
-    countrySettings.filter(s => s.isActive).map(s => [s.countryCode, s])
-  );
-  return Object.values(COUNTRIES)
-    .filter(country => activeByCode.has(country.code))
-    .map(country => {
-      const settings = activeByCode.get(country.code);
+  const seen = new Set();
+  return countrySettings
+    .filter(s => s.isActive && getCountry(s.countryCode) && !seen.has(s.countryCode) && seen.add(s.countryCode))
+    .map(settings => {
+      const country = getCountry(settings.countryCode);
       return {
         ...country,
         currency: settings.currency || country.currency || 'USD',
-        symbol: settings.symbol || country.symbol || '$'
+        symbol: settings.symbol || country.symbol || currencySymbol(settings.currency || country.currency)
       };
-    });
+    })
+    .sort((a, b) => a.name.localeCompare(b.name));
 };
 
 // The one NAMASUTRA Annual Plan. In-code fallbacks by currency, used only when a country has no
 // saved price under Admin -> Country Pricing.
 export const DEFAULT_PLAN_PRICES = { INR: 399, USD: 25, EUR: 25, AED: 50 };
 export const DEFAULT_REFERRAL_DISCOUNT = 10;
-export const CURRENCY_SYMBOLS = { INR: '₹', USD: '$', EUR: '€', AED: 'AED ' };
+const SYMBOL_OVERRIDES = { INR: '₹', USD: '$', EUR: '€', AED: 'AED ' };
+
+// Symbol for any ISO 4217 code, derived with Intl (so it works for currencies we never listed).
+// Letter-only symbols ("CHF", "kr", "AED") get a trailing space so prices read "CHF 250".
+// Anything Intl cannot format falls back to "$", as before.
+export function currencySymbol(code) {
+  const c = String(code || '').toUpperCase();
+  if (SYMBOL_OVERRIDES[c]) return SYMBOL_OVERRIDES[c];
+  if (!/^[A-Z]{3}$/.test(c)) return '$';
+  try {
+    const part = new Intl.NumberFormat('en', { style: 'currency', currency: c, currencyDisplay: 'narrowSymbol' })
+      .formatToParts(1).find(x => x.type === 'currency');
+    const sym = part?.value || c;
+    return /^[\p{L}]+$/u.test(sym) ? `${sym} ` : sym;
+  } catch {
+    return '$';
+  }
+}
+
+// CURRENCY_SYMBOLS[code] works for every ISO code (kept so existing call sites need no change)
+export const CURRENCY_SYMBOLS = new Proxy({}, {
+  get: (_, code) => (typeof code === 'string' && /^[A-Z]{3}$/.test(code) ? currencySymbol(code) : undefined),
+  has: (_, code) => typeof code === 'string' && /^[A-Z]{3}$/.test(code),
+});
+
+// Every ISO currency, for the admin currency dropdown
+export const allCurrencies = () => {
+  try { return Intl.supportedValuesOf('currency'); } catch { return [...new Set(Object.values(COUNTRY_CURRENCY))].sort(); }
+};
+
+// The full country list. The first 18 keep their saved metadata (states, gateway) exactly; every
+// other ISO country is built on the fly (no states, PayPal) so any country can be added in admin.
+export const ALL_COUNTRIES = Object.fromEntries(
+  ISO_COUNTRIES.map(([code, name]) => [code, COUNTRIES[code] || {
+    name, code, currency: COUNTRY_CURRENCY[code] || 'USD', symbol: currencySymbol(COUNTRY_CURRENCY[code] || 'USD'),
+    gateway: code === 'IN' ? 'razorpay' : 'paypal', states: []
+  }])
+);
+export const getCountry = (code) => ALL_COUNTRIES[code];
+// Currency the admin form fills in when a country is picked (euro countries get EUR)
+export const suggestedCurrency = (code) => COUNTRY_CURRENCY[code] || 'USD';
 
 export const defaultPriceFor = (currency) => DEFAULT_PLAN_PRICES[currency] ?? DEFAULT_PLAN_PRICES.USD;
 
