@@ -5,7 +5,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../firebase';
 import { Users, TrendingUp, Calendar, Globe, MapPin } from 'lucide-react';
 import { computeCommissions, countryOf, formatRate, COMMISSION_TIER1_RATE, COMMISSION_TIER1_MAX_MEMBERS, COMMISSION_TIER2_RATE } from '../utils/commission';
-import { CURRENCY_SYMBOLS, COUNTRIES } from '../data/countries';
+import { CURRENCY_SYMBOLS, getCountry } from '../data/countries';
 import { loadTaxRates } from '../utils/pricing';
 import { maskEmail, maskName } from '../utils/ambassadorInvite';
 
@@ -81,7 +81,7 @@ export default function AmbassadorFollowers({ ambassador }) {
     return () => { cancelled = true; };
   }, [ambassador.email, ambassador.referralCode]);
 
-  const country = COUNTRIES[ambassador.countryCode];
+  const country = getCountry(ambassador.countryCode);
   const ownCurrency = payments.find(p => p.currency)?.currency || country?.currency || 'USD';
 
   const { rows, totals, byCurrency } = useMemo(() => {

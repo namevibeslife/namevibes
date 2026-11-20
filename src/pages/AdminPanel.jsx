@@ -15,7 +15,7 @@ import {
 } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from 'firebase/auth';
-import { COUNTRIES, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT, defaultPriceFor } from '../data/countries';
+import { ALL_COUNTRIES, getCountry, currencySymbol, DEFAULT_REFERRAL_DISCOUNT } from '../data/countries';
 import { readPlanSettings, loadTaxRates } from '../utils/pricing';
 import { ambassadorLabel } from '../utils/payoutLabel';
 import { computeCommissions } from '../utils/commission';
@@ -134,8 +134,8 @@ export default function AdminPanel() {
   const [editingCountry, setEditingCountry] = useState(null);
   const [countryFormData, setCountryFormData] = useState({
     countryCode: '',
-    currency: 'USD',
-    price: 12,
+    currency: '',
+    price: '',
     referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
     taxPercent: '',
     isActive: true
@@ -220,7 +220,7 @@ export default function AdminPanel() {
   };
 
   const getAvailableStates = (countryCode) => {
-    const country = COUNTRIES[countryCode];
+    const country = getCountry(countryCode);
     return country ? country.states : [];
   };
 
@@ -584,7 +584,7 @@ export default function AdminPanel() {
             ambassadorName: nameByCode[code] || '',
             ambassadorEmail: emailByCode[code] || '',
             currency,
-            currencySymbol: CURRENCY_SYMBOLS[currency] || currency + ' ',
+            currencySymbol: currencySymbol(currency),
             totalSales: 0,
             totalTax: 0,
             totalNet: 0,
@@ -806,8 +806,8 @@ export default function AdminPanel() {
     setEditingCountry(null);
     setCountryFormData({
       countryCode: '',
-      currency: 'USD',
-      price: defaultPriceFor('USD'),
+      currency: '',
+      price: '',
       referralDiscount: DEFAULT_REFERRAL_DISCOUNT,
       taxPercent: '',
       isActive: true
@@ -818,7 +818,7 @@ export default function AdminPanel() {
   const handleEditCountry = (country) => {
     setEditingCountry(country);
     // Older docs only have familyPrice/familyDiscount; readPlanSettings reads those as a fallback
-    const plan = readPlanSettings(country, COUNTRIES[country.countryCode]?.currency);
+    const plan = readPlanSettings(country, getCountry(country.countryCode)?.currency);
     setCountryFormData({
       countryCode: country.countryCode,
       currency: plan.currency,
@@ -834,7 +834,7 @@ export default function AdminPanel() {
     try {
       setLoading(true);
 
-      const countryInfo = COUNTRIES[countryFormData.countryCode];
+      const countryInfo = getCountry(countryFormData.countryCode);
       if (!countryInfo) {
         alert('Invalid country code');
         setLoading(false);
@@ -853,6 +853,12 @@ export default function AdminPanel() {
         }
       }
 
+      if (!(Number(countryFormData.price) > 0)) {
+        alert('Enter the annual plan price for this country (a number above 0). Prices are never filled in automatically.');
+        setLoading(false);
+        return;
+      }
+
       // One Annual Plan price and one referral discount per country. Old individual/family and
       // commission fields on existing docs are left untouched (updateDoc merges).
       const currency = countryFormData.currency || countryInfo.currency || 'USD';
@@ -860,7 +866,7 @@ export default function AdminPanel() {
         countryCode: countryFormData.countryCode,
         countryName: countryInfo.name,
         currency,
-        symbol: CURRENCY_SYMBOLS[currency] || countryInfo.symbol || '$',
+        symbol: currencySymbol(currency),
         price: Number(countryFormData.price) || 0,
         referralDiscount: Number(countryFormData.referralDiscount) || 0,
         // blank = not set, so commission falls back to GST_RATE_BY_COUNTRY (IN 18, others 0)
@@ -1011,7 +1017,7 @@ export default function AdminPanel() {
     setAdminFormData={setAdminFormData}
     handleSaveAdmin={handleSaveAdmin}
     loading={loading}
-    COUNTRIES={COUNTRIES}
+    COUNTRIES={ALL_COUNTRIES}
     users={users}
     getFilteredUsers={getFilteredUsers}
     userSearchTerm={userSearchTerm}

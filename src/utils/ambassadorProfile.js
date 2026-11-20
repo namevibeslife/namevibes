@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 import i18n from 'i18next';
-import { COUNTRIES } from '../data/countries';
+import { getCountry } from '../data/countries';
 import { countryLabel } from '../i18n/format.js';
 
 // Profile / payout details an ambassador fills in on the Register tab.
@@ -71,9 +71,9 @@ export function maskValue(field, value) {
 
 // Human-readable (and masked where sensitive) value for a form field
 export function displayValue(field, value, data = {}) {
-  if (field === 'countryCode') return value ? countryLabel(value, COUNTRIES[value]?.name || value) : '—';
+  if (field === 'countryCode') return value ? countryLabel(value, getCountry(value)?.name || value) : '—';
   if (field === 'stateCode') {
-    const state = COUNTRIES[data.countryCode]?.states?.find(s => s.code === value);
+    const state = getCountry(data.countryCode)?.states?.find(s => s.code === value);
     return value ? (state?.name || value) : '—';
   }
   if (field === 'accountType') return value === 'current' ? optionLabel('Current') : value === 'savings' ? optionLabel('Savings') : maskValue(field, value);
@@ -104,7 +104,7 @@ export function fromAmbassador(a, user) {
 // Form values -> fields to write on the ambassador document (only keys firestore.rules lets an
 // ambassador change). The detailsCompleted markers are set on the first save only.
 export function buildUpdate(data, { first = false } = {}) {
-  const country = COUNTRIES[data.countryCode];
+  const country = getCountry(data.countryCode);
   const state = country?.states?.find(s => s.code === data.stateCode);
   return {
     fullName: `${data.firstName} ${data.middleName} ${data.lastName}`.replace(/\s+/g, ' ').trim(),
@@ -114,7 +114,7 @@ export function buildUpdate(data, { first = false } = {}) {
     gender: data.gender, profession: data.profession,
     mobileNumber: data.mobileNumber, alternateMobile: data.alternateMobile,
     countryCode: data.countryCode, countryName: country?.name || '',
-    stateCode: data.stateCode, stateName: state?.name || '',
+    stateCode: data.stateCode, stateName: state?.name || (country && !country.states?.length ? data.stateCode : ''),
     city: data.city, zipCode: data.zipCode, addressLine1: data.addressLine1,
     socialMedia: { instagram: data.instagram, facebook: data.facebook, youtube: data.youtube, twitter: data.twitter },
     bankAccountName: data.bankAccountName, bankName: data.bankName, accountNumber: data.accountNumber,

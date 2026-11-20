@@ -1,6 +1,6 @@
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
-import { COUNTRIES, getPricing, defaultPriceFor, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT } from '../data/countries';
+import { COUNTRIES, getCountry, getPricing, defaultPriceFor, CURRENCY_SYMBOLS, DEFAULT_REFERRAL_DISCOUNT } from '../data/countries';
 
 const positive = (n) => Number.isFinite(n) && n > 0;
 const nonNegative = (n) => Number.isFinite(n) && n >= 0;
@@ -27,7 +27,7 @@ export function readPlanSettings(settings, fallbackCurrency = 'USD') {
  * otherwise the built-in defaults. Returns { currency, symbol, plan: { price, discountPercent } }.
  */
 export async function loadCountryPricing(countryCode) {
-  const country = COUNTRIES[countryCode] || COUNTRIES.US;
+  const country = getCountry(countryCode) || COUNTRIES.US;
   const base = getPricing(countryCode);
   const fallback = {
     currency: base.currency,

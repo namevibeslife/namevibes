@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { COUNTRIES } from '../data/countries';
+import { ALL_COUNTRIES, getCountry } from '../data/countries';
 import { FORM_SECTIONS, fieldLabel, sectionLabel, optionLabel, hintLabel } from '../utils/ambassadorProfile';
 import { countryLabel } from '../i18n/format';
 import { useTranslation } from 'react-i18next';
@@ -25,10 +25,13 @@ export default function AmbassadorDetailsForm({ initial, submitLabel, busy = fal
       </select>;
     } else if (type === 'country') {
       control = <select {...common}><option value="">{t('ambassador.selectCountry')}</option>
-        {Object.values(COUNTRIES).map(c => <option key={c.code} value={c.code}>{countryLabel(c.code, c.name)}</option>)}</select>;
+        {Object.values(ALL_COUNTRIES).sort((x, y) => x.name.localeCompare(y.name)).map(c => <option key={c.code} value={c.code}>{countryLabel(c.code, c.name)}</option>)}</select>;
     } else if (type === 'state') {
-      control = <select {...common} disabled={!data.countryCode}><option value="">{t('ambassador.selectState')}</option>
-        {(COUNTRIES[data.countryCode]?.states || []).map(s => <option key={s.code} value={s.code}>{s.name}</option>)}</select>;
+      const states = getCountry(data.countryCode)?.states || [];
+      control = states.length || !data.countryCode
+        ? <select {...common} disabled={!data.countryCode}><option value="">{t('ambassador.selectState')}</option>
+          {states.map(s => <option key={s.code} value={s.code}>{s.name}</option>)}</select>
+        : <input {...common} required={false} type="text" placeholder={t('ambassador.stateOptional', { defaultValue: 'State / region (optional)' })} />;
     } else {
       control = <input {...common} type={type} placeholder={extra.placeholder} readOnly={extra.readOnly}
         title={extra.readOnly ? t('ambassador.emailLocked') : undefined}
