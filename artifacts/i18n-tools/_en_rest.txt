@@ -1,0 +1,190 @@
+zodiac.intro.western.heading|Discover a Name That Resonates with Your Zodiac Sign
+zodiac.intro.western.p1|In Western astrology, every zodiac sign is traditionally associated with distinct qualities, energies and personality traits.
+zodiac.intro.western.p2|Whether you're naming a newborn, starting a business or beginning something new, explore names and starting syllables traditionally associated with your zodiac sign.
+zodiac.intro.western.p3|According to astrological beliefs, choosing a name aligned with these qualities is thought to create a symbolic harmony between the name, the individual's identity and the universal energies represented by the zodiac.
+zodiac.intro.vedic.heading|Discover a Name That Resonates with Your Birth Star
+zodiac.intro.vedic.p1|In Vedic astrology, the moment of birth determines a child's Nakshatra (birth star) and Pada (quarter). Each of the 27 Nakshatras is traditionally associated with specific sounds and syllables believed to carry distinct cosmic vibrations.
+zodiac.intro.vedic.p2|For generations, families have used these auspicious syllables when naming newborns, believing that a name beginning with the recommended sound creates harmony with the cosmic energies associated with the child's birth star.
+zodiac.intro.vedic.p3|This traditional practice can also inspire the naming of businesses, ventures and new beginnings, with the belief that a thoughtfully chosen name symbolises harmony, positivity and auspicious beginnings.
+zodiac.western.aries.sign|Aries
+zodiac.western.aries.dates|Mar 21 - Apr 19
+zodiac.western.aries.element|Fire
+zodiac.western.aries.colors|Red, Scarlet
+zodiac.western.aries.traits|Bold, ambitious, confident, energetic
+zodiac.western.aries.bestFor|Leadership, entrepreneurship, sports
+zodiac.western.taurus.sign|Taurus
+zodiac.western.taurus.dates|Apr 20 - May 20
+zodiac.western.taurus.element|Earth
+zodiac.western.taurus.colors|Pink, Green
+zodiac.western.taurus.traits|Reliable, patient, practical, devoted
+zodiac.western.taurus.bestFor|Finance, art, fashion, agriculture
+zodiac.western.gemini.sign|Gemini
+zodiac.western.gemini.dates|May 21 - Jun 20
+zodiac.western.gemini.element|Air
+zodiac.western.gemini.colors|Yellow, Light Green
+zodiac.western.gemini.traits|Curious, adaptable, communicative, witty
+zodiac.western.gemini.bestFor|Media, teaching, sales, writing
+zodiac.western.cancer.sign|Cancer
+zodiac.western.cancer.dates|Jun 21 - Jul 22
+zodiac.western.cancer.element|Water
+zodiac.western.cancer.colors|White, Silver
+zodiac.western.cancer.traits|Nurturing, intuitive, emotional, protective
+zodiac.western.cancer.bestFor|Healthcare, hospitality, counseling
+zodiac.western.leo.sign|Leo
+zodiac.western.leo.dates|Jul 23 - Aug 22
+zodiac.western.leo.element|Fire
+zodiac.western.leo.colors|Gold, Orange
+zodiac.western.leo.traits|Confident, generous, charismatic, dramatic
+zodiac.western.leo.bestFor|Entertainment, politics, management
+zodiac.western.virgo.sign|Virgo
+zodiac.western.virgo.dates|Aug 23 - Sep 22
+zodiac.western.virgo.element|Earth
+zodiac.western.virgo.colors|Green, Brown
+zodiac.western.virgo.traits|Analytical, practical, perfectionist, helpful
+zodiac.western.virgo.bestFor|Healthcare, analysis, service industry
+zodiac.western.libra.sign|Libra
+zodiac.western.libra.dates|Sep 23 - Oct 22
+zodiac.western.libra.element|Air
+zodiac.western.libra.colors|Blue, Pink
+zodiac.western.libra.traits|Diplomatic, fair, social, harmonious
+zodiac.western.libra.bestFor|Law, diplomacy, design, partnerships
+zodiac.western.scorpio.sign|Scorpio
+zodiac.western.scorpio.dates|Oct 23 - Nov 21
+zodiac.western.scorpio.element|Water
+zodiac.western.scorpio.colors|Red, Maroon
+zodiac.western.scorpio.traits|Passionate, mysterious, intense, transformative
+zodiac.western.scorpio.bestFor|Research, psychology, investigation
+zodiac.western.sagittarius.sign|Sagittarius
+zodiac.western.sagittarius.dates|Nov 22 - Dec 21
+zodiac.western.sagittarius.element|Fire
+zodiac.western.sagittarius.colors|Purple, Yellow
+zodiac.western.sagittarius.traits|Optimistic, adventurous, philosophical, free
+zodiac.western.sagittarius.bestFor|Travel, education, publishing
+zodiac.western.capricorn.sign|Capricorn
+zodiac.western.capricorn.dates|Dec 22 - Jan 19
+zodiac.western.capricorn.element|Earth
+zodiac.western.capricorn.colors|Black, Brown
+zodiac.western.capricorn.traits|Disciplined, ambitious, responsible, patient
+zodiac.western.capricorn.bestFor|Business, real estate, governance
+zodiac.western.aquarius.sign|Aquarius
+zodiac.western.aquarius.dates|Jan 20 - Feb 18
+zodiac.western.aquarius.element|Air
+zodiac.western.aquarius.colors|Blue, Grey
+zodiac.western.aquarius.traits|Independent, innovative, humanitarian, eccentric
+zodiac.western.aquarius.bestFor|Technology, social work, innovation
+zodiac.western.pisces.sign|Pisces
+zodiac.western.pisces.dates|Feb 19 - Mar 20
+zodiac.western.pisces.element|Water
+zodiac.western.pisces.colors|Sea Green, Lavender
+zodiac.western.pisces.traits|Compassionate, artistic, intuitive, sensitive
+zodiac.western.pisces.bestFor|Arts, music, healing, spirituality
+zodiac.vedic.meshaAries.sign|Mesha (Aries)
+zodiac.vedic.meshaAries.dates|Apr 13 - May 14
+zodiac.vedic.meshaAries.element|Fire
+zodiac.vedic.meshaAries.colors|Red, Maroon
+zodiac.vedic.meshaAries.traits|Bold, ambitious, warrior spirit, leadership
+zodiac.vedic.meshaAries.bestFor|Defense, sports, entrepreneurship
+zodiac.vedic.vrishabhaTaurus.sign|Vrishabha (Taurus)
+zodiac.vedic.vrishabhaTaurus.dates|May 15 - Jun 14
+zodiac.vedic.vrishabhaTaurus.element|Earth
+zodiac.vedic.vrishabhaTaurus.colors|White, Pink
+zodiac.vedic.vrishabhaTaurus.traits|Stable, practical, artistic, luxury-loving
+zodiac.vedic.vrishabhaTaurus.bestFor|Finance, beauty, art, agriculture
+zodiac.vedic.mithunaGemini.sign|Mithuna (Gemini)
+zodiac.vedic.mithunaGemini.dates|Jun 15 - Jul 14
+zodiac.vedic.mithunaGemini.element|Air
+zodiac.vedic.mithunaGemini.colors|Green, Yellow
+zodiac.vedic.mithunaGemini.traits|Intelligent, communicative, dual nature
+zodiac.vedic.mithunaGemini.bestFor|Media, business, communication, trade
+zodiac.vedic.karkaCancer.sign|Karka (Cancer)
+zodiac.vedic.karkaCancer.dates|Jul 15 - Aug 14
+zodiac.vedic.karkaCancer.element|Water
+zodiac.vedic.karkaCancer.colors|White, Cream
+zodiac.vedic.karkaCancer.traits|Emotional, nurturing, protective, intuitive
+zodiac.vedic.karkaCancer.bestFor|Healthcare, hospitality, social work
+zodiac.vedic.simhaLeo.sign|Simha (Leo)
+zodiac.vedic.simhaLeo.dates|Aug 15 - Sep 15
+zodiac.vedic.simhaLeo.element|Fire
+zodiac.vedic.simhaLeo.colors|Gold, Orange
+zodiac.vedic.simhaLeo.traits|Royal, confident, generous, leadership
+zodiac.vedic.simhaLeo.bestFor|Politics, entertainment, authority roles
+zodiac.vedic.kanyaVirgo.sign|Kanya (Virgo)
+zodiac.vedic.kanyaVirgo.dates|Sep 16 - Oct 15
+zodiac.vedic.kanyaVirgo.element|Earth
+zodiac.vedic.kanyaVirgo.colors|Green, Brown
+zodiac.vedic.kanyaVirgo.traits|Analytical, perfectionist, service-oriented
+zodiac.vedic.kanyaVirgo.bestFor|Medicine, accounting, analysis
+zodiac.vedic.tulaLibra.sign|Tula (Libra)
+zodiac.vedic.tulaLibra.dates|Oct 16 - Nov 14
+zodiac.vedic.tulaLibra.element|Air
+zodiac.vedic.tulaLibra.colors|White, Pink
+zodiac.vedic.tulaLibra.traits|Balanced, diplomatic, artistic, fair
+zodiac.vedic.tulaLibra.bestFor|Law, arts, business, partnerships
+zodiac.vedic.vrishchikaScorpio.sign|Vrishchika (Scorpio)
+zodiac.vedic.vrishchikaScorpio.dates|Nov 15 - Dec 14
+zodiac.vedic.vrishchikaScorpio.element|Water
+zodiac.vedic.vrishchikaScorpio.colors|Red, Maroon
+zodiac.vedic.vrishchikaScorpio.traits|Intense, secretive, transformative, powerful
+zodiac.vedic.vrishchikaScorpio.bestFor|Research, occult, surgery, investigation
+zodiac.vedic.dhanuSagittarius.sign|Dhanu (Sagittarius)
+zodiac.vedic.dhanuSagittarius.dates|Dec 15 - Jan 13
+zodiac.vedic.dhanuSagittarius.element|Fire
+zodiac.vedic.dhanuSagittarius.colors|Yellow, Orange
+zodiac.vedic.dhanuSagittarius.traits|Philosophical, optimistic, spiritual, truthful
+zodiac.vedic.dhanuSagittarius.bestFor|Teaching, religion, travel, education
+zodiac.vedic.makaraCapricorn.sign|Makara (Capricorn)
+zodiac.vedic.makaraCapricorn.dates|Jan 14 - Feb 12
+zodiac.vedic.makaraCapricorn.element|Earth
+zodiac.vedic.makaraCapricorn.colors|Black, Dark Blue
+zodiac.vedic.makaraCapricorn.traits|Disciplined, hardworking, ambitious, practical
+zodiac.vedic.makaraCapricorn.bestFor|Administration, construction, governance
+zodiac.vedic.kumbhaAquarius.sign|Kumbha (Aquarius)
+zodiac.vedic.kumbhaAquarius.dates|Feb 13 - Mar 12
+zodiac.vedic.kumbhaAquarius.element|Air
+zodiac.vedic.kumbhaAquarius.colors|Blue, Grey
+zodiac.vedic.kumbhaAquarius.traits|Humanitarian, innovative, unconventional
+zodiac.vedic.kumbhaAquarius.bestFor|Technology, social reform, science
+zodiac.vedic.meenaPisces.sign|Meena (Pisces)
+zodiac.vedic.meenaPisces.dates|Mar 13 - Apr 12
+zodiac.vedic.meenaPisces.element|Water
+zodiac.vedic.meenaPisces.colors|Yellow, Light Green
+zodiac.vedic.meenaPisces.traits|Compassionate, spiritual, artistic, intuitive
+zodiac.vedic.meenaPisces.bestFor|Arts, healing, spirituality, charity
+zodiac.titleWestern|🌟 Western Zodiac
+zodiac.titleVedic|🕉️ Vedic Astrology
+zodiac.optWestern|Western Zodiac
+zodiac.optVedic|Vedic Astrology
+zodiac.hide|Tap to hide details
+zodiac.more|Tap to see more
+zodiacPage.n001|✨ Auspicious Syllables:
+zodiacPage.n002|📝 Example Names:
+zodiacPage.n003|🎲 Lucky Numbers:
+zodiacPage.n004|🎨 Lucky Colors:
+zodiacPage.n005|✨ Personality:
+zodiacPage.n006|💼 Best Career:
+zodiacPage.n007|💡 How to Use
+zodiacPage.n008|Find your zodiac sign based on birth date
+zodiacPage.n009|Choose names starting with the auspicious syllables
+zodiacPage.n010|Tap any card to see more details and examples
+zodiacPage.n011|Switch between Western and Vedic systems using dropdown above
+ai.yourApp|your AI app
+ai.reportTitle|Namasutra Family Report
+ai.title|Deepen Your Understanding with AI (Free)
+ai.subtitle|Uses your own AI account. Your full report is sent along.
+ai.subtitleReasons|Uses your own AI account. Your full report is sent along, including the reasons you selected.
+ai.sendPdf|Send PDF to my AI app
+ai.ask|Ask {{name}}
+ai.copied|✅ Your report has been copied. If it isn't already in the {{app}} chat box, paste it in (<b>Ctrl+V</b> on a computer, or <b>long-press → Paste</b> on a phone) and send.
+ai.hideHelp|Hide help
+ai.howWorks|How does this work?
+ai.help1|<b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send.
+ai.help2|<b>Ask Claude / ChatGPT / Gemini:</b> opens the AI in a new tab with your full report (names, elements, meanings and harmony) already written as a question. It's also copied, so you can paste it if the box is empty. Gemini always needs a paste.
+ai.help3|<b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button.
+ai.help4|You'll need to be signed in to your AI account. Namasutra doesn't see your conversation.
+ai.promptIntro|I used Namasutra ({{host}}), which maps the letters of a name to periodic table elements. Here is my family report:
+ai.promptElement|  - {{name}} ({{symbol}}, atomic number {{number}}): {{meaning}}
+ai.promptHarmony|Harmony elements shared by everyone: {{elements}}
+ai.promptWhy|Why I'm exploring this: {{reasons}}
+ai.promptQuestion|Can you help me understand what these elements and the harmony between our names might signify, and how they connect us as a family?
+page.title|Namasutra - Your Elemental Identity
+page.description|Discover the hidden chemistry in your name through periodic elements, Chaldean numerology and Hindu astrology.

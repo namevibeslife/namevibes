@@ -1,0 +1,190 @@
+zodiac.intro.western.heading|अपनी राशि से मेल खाता नाम खोजें
+zodiac.intro.western.p1|पश्चिमी ज्योतिष में हर राशि परंपरा से अलग-अलग गुणों, ऊर्जाओं और व्यक्तित्व-लक्षणों से जुड़ी मानी जाती है।
+zodiac.intro.western.p2|चाहे आप नवजात का नाम रख रहे हों, कोई व्यवसाय शुरू कर रहे हों या कुछ नया आरंभ कर रहे हों, अपनी राशि से परंपरागत रूप से जुड़े नामों और आरंभिक अक्षरों को देखिए।
+zodiac.intro.western.p3|ज्योतिषीय मान्यताओं के अनुसार, इन गुणों से मेल खाता नाम चुनने से नाम, व्यक्ति की पहचान और राशि द्वारा दर्शाई गई ब्रह्मांडीय ऊर्जाओं के बीच प्रतीकात्मक सामंजस्य बनता है।
+zodiac.intro.vedic.heading|अपने जन्म-नक्षत्र से मेल खाता नाम खोजें
+zodiac.intro.vedic.p1|वैदिक ज्योतिष में जन्म का क्षण बच्चे का नक्षत्र (जन्म-तारा) और चरण तय करता है। 27 नक्षत्रों में से हर एक परंपरा से कुछ विशेष ध्वनियों और अक्षरों से जुड़ा है, जिनके बारे में माना जाता है कि वे अलग-अलग ब्रह्मांडीय कंपन रखते हैं।
+zodiac.intro.vedic.p2|पीढ़ियों से परिवार नवजात का नाम रखते समय इन शुभ अक्षरों का उपयोग करते आए हैं, इस विश्वास के साथ कि सुझाई गई ध्वनि से शुरू होने वाला नाम बच्चे के जन्म-नक्षत्र से जुड़ी ब्रह्मांडीय ऊर्जाओं के साथ सामंजस्य बनाता है।
+zodiac.intro.vedic.p3|यह परंपरा व्यवसायों, उपक्रमों और नई शुरुआतों के नामकरण को भी प्रेरित कर सकती है, इस मान्यता के साथ कि सोच-समझकर चुना गया नाम सामंजस्य, सकारात्मकता और शुभ आरंभ का प्रतीक है।
+zodiac.western.aries.sign|मेष (Aries)
+zodiac.western.aries.dates|21 मार्च - 19 अप्रैल
+zodiac.western.aries.element|अग्नि
+zodiac.western.aries.colors|लाल, सिंदूरी
+zodiac.western.aries.traits|साहसी, महत्वाकांक्षी, आत्मविश्वासी, ऊर्जावान
+zodiac.western.aries.bestFor|नेतृत्व, उद्यमिता, खेल
+zodiac.western.taurus.sign|वृषभ (Taurus)
+zodiac.western.taurus.dates|20 अप्रैल - 20 मई
+zodiac.western.taurus.element|पृथ्वी
+zodiac.western.taurus.colors|गुलाबी, हरा
+zodiac.western.taurus.traits|भरोसेमंद, धैर्यवान, व्यावहारिक, निष्ठावान
+zodiac.western.taurus.bestFor|वित्त, कला, फ़ैशन, कृषि
+zodiac.western.gemini.sign|मिथुन (Gemini)
+zodiac.western.gemini.dates|21 मई - 20 जून
+zodiac.western.gemini.element|वायु
+zodiac.western.gemini.colors|पीला, हल्का हरा
+zodiac.western.gemini.traits|जिज्ञासु, अनुकूलनशील, संवादप्रिय, हाज़िरजवाब
+zodiac.western.gemini.bestFor|मीडिया, शिक्षण, बिक्री, लेखन
+zodiac.western.cancer.sign|कर्क (Cancer)
+zodiac.western.cancer.dates|21 जून - 22 जुलाई
+zodiac.western.cancer.element|जल
+zodiac.western.cancer.colors|सफ़ेद, चाँदी
+zodiac.western.cancer.traits|पालन-पोषण करने वाला, सहज-बोध वाला, भावुक, रक्षक
+zodiac.western.cancer.bestFor|स्वास्थ्य सेवा, आतिथ्य, परामर्श
+zodiac.western.leo.sign|सिंह (Leo)
+zodiac.western.leo.dates|23 जुलाई - 22 अगस्त
+zodiac.western.leo.element|अग्नि
+zodiac.western.leo.colors|सुनहरा, नारंगी
+zodiac.western.leo.traits|आत्मविश्वासी, उदार, प्रभावशाली, नाटकीय
+zodiac.western.leo.bestFor|मनोरंजन, राजनीति, प्रबंधन
+zodiac.western.virgo.sign|कन्या (Virgo)
+zodiac.western.virgo.dates|23 अगस्त - 22 सितंबर
+zodiac.western.virgo.element|पृथ्वी
+zodiac.western.virgo.colors|हरा, भूरा
+zodiac.western.virgo.traits|विश्लेषणात्मक, व्यावहारिक, परफ़ेक्शनिस्ट, मददगार
+zodiac.western.virgo.bestFor|स्वास्थ्य सेवा, विश्लेषण, सेवा क्षेत्र
+zodiac.western.libra.sign|तुला (Libra)
+zodiac.western.libra.dates|23 सितंबर - 22 अक्टूबर
+zodiac.western.libra.element|वायु
+zodiac.western.libra.colors|नीला, गुलाबी
+zodiac.western.libra.traits|कूटनीतिक, न्यायप्रिय, मिलनसार, सामंजस्यपूर्ण
+zodiac.western.libra.bestFor|कानून, कूटनीति, डिज़ाइन, साझेदारी
+zodiac.western.scorpio.sign|वृश्चिक (Scorpio)
+zodiac.western.scorpio.dates|23 अक्टूबर - 21 नवंबर
+zodiac.western.scorpio.element|जल
+zodiac.western.scorpio.colors|लाल, मैरून
+zodiac.western.scorpio.traits|जोशीला, रहस्यमय, तीव्र, रूपांतरकारी
+zodiac.western.scorpio.bestFor|शोध, मनोविज्ञान, जाँच-पड़ताल
+zodiac.western.sagittarius.sign|धनु (Sagittarius)
+zodiac.western.sagittarius.dates|22 नवंबर - 21 दिसंबर
+zodiac.western.sagittarius.element|अग्नि
+zodiac.western.sagittarius.colors|बैंगनी, पीला
+zodiac.western.sagittarius.traits|आशावादी, साहसी, दार्शनिक, स्वतंत्र
+zodiac.western.sagittarius.bestFor|यात्रा, शिक्षा, प्रकाशन
+zodiac.western.capricorn.sign|मकर (Capricorn)
+zodiac.western.capricorn.dates|22 दिसंबर - 19 जनवरी
+zodiac.western.capricorn.element|पृथ्वी
+zodiac.western.capricorn.colors|काला, भूरा
+zodiac.western.capricorn.traits|अनुशासित, महत्वाकांक्षी, ज़िम्मेदार, धैर्यवान
+zodiac.western.capricorn.bestFor|व्यापार, रियल एस्टेट, शासन
+zodiac.western.aquarius.sign|कुंभ (Aquarius)
+zodiac.western.aquarius.dates|20 जनवरी - 18 फ़रवरी
+zodiac.western.aquarius.element|वायु
+zodiac.western.aquarius.colors|नीला, धूसर
+zodiac.western.aquarius.traits|स्वतंत्र, नवोन्मेषी, मानवतावादी, अनोखा
+zodiac.western.aquarius.bestFor|प्रौद्योगिकी, समाजसेवा, नवाचार
+zodiac.western.pisces.sign|मीन (Pisces)
+zodiac.western.pisces.dates|19 फ़रवरी - 20 मार्च
+zodiac.western.pisces.element|जल
+zodiac.western.pisces.colors|समुद्री हरा, लैवेंडर
+zodiac.western.pisces.traits|करुणामय, कलात्मक, सहज-बोध वाला, संवेदनशील
+zodiac.western.pisces.bestFor|कला, संगीत, उपचार, आध्यात्मिकता
+zodiac.vedic.meshaAries.sign|मेष (Aries)
+zodiac.vedic.meshaAries.dates|13 अप्रैल - 14 मई
+zodiac.vedic.meshaAries.element|अग्नि
+zodiac.vedic.meshaAries.colors|लाल, मैरून
+zodiac.vedic.meshaAries.traits|साहसी, महत्वाकांक्षी, योद्धा भावना, नेतृत्व
+zodiac.vedic.meshaAries.bestFor|रक्षा, खेल, उद्यमिता
+zodiac.vedic.vrishabhaTaurus.sign|वृषभ (Taurus)
+zodiac.vedic.vrishabhaTaurus.dates|15 मई - 14 जून
+zodiac.vedic.vrishabhaTaurus.element|पृथ्वी
+zodiac.vedic.vrishabhaTaurus.colors|सफ़ेद, गुलाबी
+zodiac.vedic.vrishabhaTaurus.traits|स्थिर, व्यावहारिक, कलात्मक, विलासप्रिय
+zodiac.vedic.vrishabhaTaurus.bestFor|वित्त, सौंदर्य, कला, कृषि
+zodiac.vedic.mithunaGemini.sign|मिथुन (Gemini)
+zodiac.vedic.mithunaGemini.dates|15 जून - 14 जुलाई
+zodiac.vedic.mithunaGemini.element|वायु
+zodiac.vedic.mithunaGemini.colors|हरा, पीला
+zodiac.vedic.mithunaGemini.traits|बुद्धिमान, संवादप्रिय, द्वैत स्वभाव
+zodiac.vedic.mithunaGemini.bestFor|मीडिया, व्यापार, संचार, वाणिज्य
+zodiac.vedic.karkaCancer.sign|कर्क (Cancer)
+zodiac.vedic.karkaCancer.dates|15 जुलाई - 14 अगस्त
+zodiac.vedic.karkaCancer.element|जल
+zodiac.vedic.karkaCancer.colors|सफ़ेद, क्रीम
+zodiac.vedic.karkaCancer.traits|भावुक, पालन-पोषण करने वाला, रक्षक, सहज-बोध वाला
+zodiac.vedic.karkaCancer.bestFor|स्वास्थ्य सेवा, आतिथ्य, समाजसेवा
+zodiac.vedic.simhaLeo.sign|सिंह (Leo)
+zodiac.vedic.simhaLeo.dates|15 अगस्त - 15 सितंबर
+zodiac.vedic.simhaLeo.element|अग्नि
+zodiac.vedic.simhaLeo.colors|सुनहरा, नारंगी
+zodiac.vedic.simhaLeo.traits|राजसी, आत्मविश्वासी, उदार, नेतृत्व
+zodiac.vedic.simhaLeo.bestFor|राजनीति, मनोरंजन, अधिकार वाले पद
+zodiac.vedic.kanyaVirgo.sign|कन्या (Virgo)
+zodiac.vedic.kanyaVirgo.dates|16 सितंबर - 15 अक्टूबर
+zodiac.vedic.kanyaVirgo.element|पृथ्वी
+zodiac.vedic.kanyaVirgo.colors|हरा, भूरा
+zodiac.vedic.kanyaVirgo.traits|विश्लेषणात्मक, परफ़ेक्शनिस्ट, सेवाभावी
+zodiac.vedic.kanyaVirgo.bestFor|चिकित्सा, लेखा, विश्लेषण
+zodiac.vedic.tulaLibra.sign|तुला (Libra)
+zodiac.vedic.tulaLibra.dates|16 अक्टूबर - 14 नवंबर
+zodiac.vedic.tulaLibra.element|वायु
+zodiac.vedic.tulaLibra.colors|सफ़ेद, गुलाबी
+zodiac.vedic.tulaLibra.traits|संतुलित, कूटनीतिक, कलात्मक, न्यायप्रिय
+zodiac.vedic.tulaLibra.bestFor|कानून, कला, व्यापार, साझेदारी
+zodiac.vedic.vrishchikaScorpio.sign|वृश्चिक (Scorpio)
+zodiac.vedic.vrishchikaScorpio.dates|15 नवंबर - 14 दिसंबर
+zodiac.vedic.vrishchikaScorpio.element|जल
+zodiac.vedic.vrishchikaScorpio.colors|लाल, मैरून
+zodiac.vedic.vrishchikaScorpio.traits|तीव्र, गोपनीय, रूपांतरकारी, शक्तिशाली
+zodiac.vedic.vrishchikaScorpio.bestFor|शोध, गूढ़ विद्या, शल्य चिकित्सा, जाँच-पड़ताल
+zodiac.vedic.dhanuSagittarius.sign|धनु (Sagittarius)
+zodiac.vedic.dhanuSagittarius.dates|15 दिसंबर - 13 जनवरी
+zodiac.vedic.dhanuSagittarius.element|अग्नि
+zodiac.vedic.dhanuSagittarius.colors|पीला, नारंगी
+zodiac.vedic.dhanuSagittarius.traits|दार्शनिक, आशावादी, आध्यात्मिक, सत्यनिष्ठ
+zodiac.vedic.dhanuSagittarius.bestFor|शिक्षण, धर्म, यात्रा, शिक्षा
+zodiac.vedic.makaraCapricorn.sign|मकर (Capricorn)
+zodiac.vedic.makaraCapricorn.dates|14 जनवरी - 12 फ़रवरी
+zodiac.vedic.makaraCapricorn.element|पृथ्वी
+zodiac.vedic.makaraCapricorn.colors|काला, गहरा नीला
+zodiac.vedic.makaraCapricorn.traits|अनुशासित, परिश्रमी, महत्वाकांक्षी, व्यावहारिक
+zodiac.vedic.makaraCapricorn.bestFor|प्रशासन, निर्माण, शासन
+zodiac.vedic.kumbhaAquarius.sign|कुंभ (Aquarius)
+zodiac.vedic.kumbhaAquarius.dates|13 फ़रवरी - 12 मार्च
+zodiac.vedic.kumbhaAquarius.element|वायु
+zodiac.vedic.kumbhaAquarius.colors|नीला, धूसर
+zodiac.vedic.kumbhaAquarius.traits|मानवतावादी, नवोन्मेषी, अपरंपरागत
+zodiac.vedic.kumbhaAquarius.bestFor|प्रौद्योगिकी, समाज सुधार, विज्ञान
+zodiac.vedic.meenaPisces.sign|मीन (Pisces)
+zodiac.vedic.meenaPisces.dates|13 मार्च - 12 अप्रैल
+zodiac.vedic.meenaPisces.element|जल
+zodiac.vedic.meenaPisces.colors|पीला, हल्का हरा
+zodiac.vedic.meenaPisces.traits|करुणामय, आध्यात्मिक, कलात्मक, सहज-बोध वाला
+zodiac.vedic.meenaPisces.bestFor|कला, उपचार, आध्यात्मिकता, दान
+zodiac.titleWestern|🌟 पश्चिमी राशि
+zodiac.titleVedic|🕉️ वैदिक ज्योतिष
+zodiac.optWestern|पश्चिमी राशि
+zodiac.optVedic|वैदिक ज्योतिष
+zodiac.hide|विवरण छिपाने के लिए दबाएँ
+zodiac.more|और देखने के लिए दबाएँ
+zodiacPage.n001|✨ शुभ अक्षर:
+zodiacPage.n002|📝 उदाहरण नाम:
+zodiacPage.n003|🎲 शुभ अंक:
+zodiacPage.n004|🎨 शुभ रंग:
+zodiacPage.n005|✨ व्यक्तित्व:
+zodiacPage.n006|💼 सर्वोत्तम करियर:
+zodiacPage.n007|💡 कैसे उपयोग करें
+zodiacPage.n008|जन्म तिथि के आधार पर अपनी राशि खोजें
+zodiacPage.n009|शुभ अक्षरों से शुरू होने वाले नाम चुनें
+zodiacPage.n010|अधिक विवरण और उदाहरण देखने के लिए किसी भी कार्ड को दबाएँ
+zodiacPage.n011|ऊपर के ड्रॉपडाउन से पश्चिमी और वैदिक पद्धति के बीच बदलें
+ai.yourApp|आपका AI ऐप
+ai.reportTitle|Namasutra पारिवारिक रिपोर्ट
+ai.title|AI के साथ अपनी समझ और गहरी करें (निःशुल्क)
+ai.subtitle|आपके अपने AI खाते का उपयोग होता है। आपकी पूरी रिपोर्ट साथ भेजी जाती है।
+ai.subtitleReasons|आपके अपने AI खाते का उपयोग होता है। आपकी पूरी रिपोर्ट, आपके चुने कारणों सहित, साथ भेजी जाती है।
+ai.sendPdf|PDF को मेरे AI ऐप में भेजें
+ai.ask|{{name}} से पूछें
+ai.copied|✅ आपकी रिपोर्ट कॉपी हो गई है। अगर वह {{app}} के चैट बॉक्स में पहले से नहीं है, तो उसे पेस्ट करें (कंप्यूटर पर <b>Ctrl+V</b>, या फ़ोन पर <b>देर तक दबाकर → पेस्ट</b>) और भेज दें।
+ai.hideHelp|मदद छिपाएँ
+ai.howWorks|यह कैसे काम करता है?
+ai.help1|<b>PDF को मेरे AI ऐप में भेजें:</b> आपके फ़ोन का शेयर मेनू PDF रिपोर्ट के साथ खुलता है। Claude, ChatGPT या Gemini चुनें और रिपोर्ट भेजने के लिए तैयार पहुँच जाती है।
+ai.help2|<b>Claude / ChatGPT / Gemini से पूछें:</b> AI नए टैब में खुलता है और आपकी पूरी रिपोर्ट (नाम, तत्व, अर्थ और सामंजस्य) पहले से एक प्रश्न के रूप में लिखी होती है। वह कॉपी भी हो जाती है, इसलिए बॉक्स खाली हो तो पेस्ट कर सकते हैं। Gemini में हमेशा पेस्ट करना पड़ता है।
+ai.help3|<b>PDF भी जोड़ना चाहते हैं?</b> ऊपर <i>PDF डाउनलोड करें</i> दबाएँ, फिर फ़ाइल को चैट में खींचें या AI के अटैच (पेपरक्लिप) बटन का उपयोग करें।
+ai.help4|आपको अपने AI खाते में साइन इन होना होगा। Namasutra आपकी बातचीत नहीं देखता।
+ai.promptIntro|मैंने Namasutra ({{host}}) का उपयोग किया, जो किसी नाम के अक्षरों को आवर्त सारणी के तत्वों से जोड़ता है। यह मेरी पारिवारिक रिपोर्ट है:
+ai.promptElement|  - {{name}} ({{symbol}}, परमाणु क्रमांक {{number}}): {{meaning}}
+ai.promptHarmony|सभी में साझा सामंजस्य के तत्व: {{elements}}
+ai.promptWhy|मैं यह क्यों जानना चाहता/चाहती हूँ: {{reasons}}
+ai.promptQuestion|क्या आप समझा सकते हैं कि ये तत्व और हमारे नामों के बीच का सामंजस्य क्या संकेत दे सकते हैं, और ये हमें एक परिवार के रूप में कैसे जोड़ते हैं?
+page.title|Namasutra - आपकी तात्विक पहचान
+page.description|आवर्त तत्वों, कैल्डियन अंकशास्त्र और हिंदू ज्योतिष के ज़रिए अपने नाम की छिपी रसायन-विद्या खोजें।

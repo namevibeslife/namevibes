@@ -1,0 +1,10 @@
+import {chromium} from 'file:///C:/Users/sresq/AppData/Local/npm-cache/_npx/420ff84f11983ee5/node_modules/playwright/index.mjs';
+import fs from 'node:fs';
+const b=await chromium.launch({executablePath:'C:/Users/sresq/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe'});
+const p=await b.newPage();const errs=[];p.on('pageerror',e=>errs.push(e.message));
+await p.goto('http://localhost:5199/');await p.waitForTimeout(1200);
+const data=await p.evaluate(async()=>{const m=await import('/src/utils/posterImage.js');const {parseNameToElements}=await import('/src/utils/elements.js');
+const el=parseNameToElements('Vibes');const person=Array.isArray(el)?{fullName:'Vibes',elements:el}:{fullName:'Vibes',...el};
+const r=await m.buildPosterImage(person,false,'dark');const blob=r.blob||r;
+return await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.readAsDataURL(blob instanceof Blob?blob:blob.blob)})});
+fs.writeFileSync('artifacts/annual-plan/poster-footer.png',Buffer.from(data.split(',')[1],'base64'));console.log('ok',errs);await b.close();

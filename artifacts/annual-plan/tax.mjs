@@ -1,0 +1,23 @@
+import {chromium} from 'file:///C:/Users/sresq/AppData/Local/npm-cache/_npx/420ff84f11983ee5/node_modules/playwright/index.mjs';
+const b=await chromium.launch({executablePath:'C:/Users/sresq/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe'});
+const errors=[];
+async function ctx(session,w){const c=await b.newContext({viewport:{width:w,height:900}});await c.addInitScript(s=>localStorage.setItem('nv_mock_session',JSON.stringify(s)),session);const p=await c.newPage();p.on('pageerror',e=>errors.push(e.message));return p}
+let p=await ctx({uid:'mock-ambassador',email:'ambassador@namevibes.test',displayName:'Arjun'},360);
+await p.goto('http://localhost:5173/ambassador?tab=followers');await p.waitForTimeout(1200);
+console.log('heads',(await p.locator('table').first().locator('th').allInnerTexts()).join('|'));
+console.log('example',await p.getByTestId('commission-example').innerText());
+console.log('first row',(await p.locator('table').first().locator('tbody tr').first().innerText()).replace(/\s+/g,' '));
+console.log('overflow',await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth));
+await p.screenshot({path:'artifacts/annual-plan/tax-followers.png',fullPage:true});
+p=await ctx({uid:'mock-admin',email:'admin@namevibes.test',displayName:'Admin'},1280);
+await p.goto('http://localhost:5173/admin');await p.waitForTimeout(1000);
+await p.getByRole('button',{name:/Countr/}).first().click();await p.waitForTimeout(400);
+await p.getByRole('button',{name:/Add Country/}).click();await p.waitForTimeout(300);
+await p.locator('select').filter({hasText:'Select Country'}).selectOption('AE');
+const modal=p.locator('.fixed.inset-0');
+await modal.locator('select').nth(1).selectOption('AED');
+const nums=modal.locator('input[type=number]');
+await nums.nth(0).fill('50');await nums.nth(2).fill('5');
+await p.getByRole('button',{name:/^Save|Add Country$|Update/}).last().click();await p.waitForTimeout(800);
+const t=await p.locator('body').innerText();console.log('AE card',/United Arab Emirates/.test(t),/Tax included in price\s*5%/.test(t),/AED\s*50/.test(t));
+console.log('errors',errors);await b.close();

@@ -1,0 +1,190 @@
+zodiac.intro.western.heading|നിങ്ങളുടെ രാശിക്ക് ചേരുന്ന പേര് കണ്ടെത്തൂ
+zodiac.intro.western.p1|പാശ്ചാത്യ ജ്യോതിഷത്തിൽ ഓരോ രാശിയും പരമ്പരാഗതമായി സവിശേഷ ഗുണങ്ങൾ, ഊർജങ്ങൾ, വ്യക്തിത്വ സവിശേഷതകൾ എന്നിവയുമായി ബന്ധപ്പെട്ടിരിക്കുന്നു.
+zodiac.intro.western.p2|നവജാത ശിശുവിന് പേരിടുകയാണെങ്കിലും, ബിസിനസ് തുടങ്ങുകയാണെങ്കിലും, പുതിയ എന്തെങ്കിലും ആരംഭിക്കുകയാണെങ്കിലും, നിങ്ങളുടെ രാശിയുമായി പരമ്പരാഗതമായി ബന്ധപ്പെട്ട പേരുകളും ആദ്യാക്ഷരങ്ങളും അന്വേഷിക്കൂ.
+zodiac.intro.western.p3|ജ്യോതിഷ വിശ്വാസങ്ങൾ അനുസരിച്ച്, ഈ ഗുണങ്ങൾക്ക് ചേരുന്ന പേര് തിരഞ്ഞെടുക്കുന്നത് പേരിനും വ്യക്തിയുടെ വ്യക്തിത്വത്തിനും രാശി പ്രതിനിധാനം ചെയ്യുന്ന പ്രാപഞ്ചിക ഊർജങ്ങൾക്കുമിടയിൽ പ്രതീകാത്മകമായ ഇണക്കം സൃഷ്ടിക്കുമെന്ന് കരുതപ്പെടുന്നു.
+zodiac.intro.vedic.heading|നിങ്ങളുടെ ജന്മനക്ഷത്രത്തിന് ചേരുന്ന പേര് കണ്ടെത്തൂ
+zodiac.intro.vedic.p1|വൈദിക ജ്യോതിഷത്തിൽ ജനനത്തിന്റെ നിമിഷം കുഞ്ഞിന്റെ നക്ഷത്രവും (ജന്മനക്ഷത്രം) പാദവും (കാൽഭാഗം) നിർണയിക്കുന്നു. 27 നക്ഷത്രങ്ങളിൽ ഓരോന്നും പരമ്പരാഗതമായി നിശ്ചിത ശബ്ദങ്ങളോടും അക്ഷരങ്ങളോടും ബന്ധപ്പെട്ടിരിക്കുന്നു; അവയ്ക്ക് സവിശേഷ പ്രാപഞ്ചിക സ്പന്ദനങ്ങളുണ്ടെന്ന് വിശ്വസിക്കപ്പെടുന്നു.
+zodiac.intro.vedic.p2|തലമുറകളായി കുടുംബങ്ങൾ നവജാത ശിശുക്കൾക്ക് പേരിടുമ്പോൾ ഈ ശുഭാക്ഷരങ്ങൾ ഉപയോഗിക്കുന്നു; നിർദേശിച്ച ശബ്ദത്തിൽ തുടങ്ങുന്ന പേര് കുഞ്ഞിന്റെ ജന്മനക്ഷത്രവുമായി ബന്ധപ്പെട്ട പ്രാപഞ്ചിക ഊർജങ്ങളുമായി ഇണക്കം സൃഷ്ടിക്കുമെന്നാണ് അവരുടെ വിശ്വാസം.
+zodiac.intro.vedic.p3|ഈ പാരമ്പര്യം ബിസിനസുകൾക്കും സംരംഭങ്ങൾക്കും പുതിയ തുടക്കങ്ങൾക്കും പേരിടാനും പ്രചോദനമാകാം; ശ്രദ്ധയോടെ തിരഞ്ഞെടുത്ത പേര് ഇണക്കത്തെയും ശുഭാപ്തിവിശ്വാസത്തെയും ശുഭാരംഭത്തെയും സൂചിപ്പിക്കുമെന്ന വിശ്വാസത്തോടെ.
+zodiac.western.aries.sign|മേടം (Aries)
+zodiac.western.aries.dates|മാർച്ച് 21 - ഏപ്രിൽ 19
+zodiac.western.aries.element|അഗ്നി
+zodiac.western.aries.colors|ചുവപ്പ്, കടും ചുവപ്പ്
+zodiac.western.aries.traits|ധീരൻ, അഭിലാഷമുള്ളവൻ, ആത്മവിശ്വാസി, ഊർജസ്വലൻ
+zodiac.western.aries.bestFor|നേതൃത്വം, സംരംഭകത്വം, കായികം
+zodiac.western.taurus.sign|ഇടവം (Taurus)
+zodiac.western.taurus.dates|ഏപ്രിൽ 20 - മേയ് 20
+zodiac.western.taurus.element|ഭൂമി
+zodiac.western.taurus.colors|പിങ്ക്, പച്ച
+zodiac.western.taurus.traits|വിശ്വസ്തൻ, ക്ഷമയുള്ളവൻ, പ്രായോഗികൻ, അർപ്പണബോധമുള്ളവൻ
+zodiac.western.taurus.bestFor|ധനകാര്യം, കല, ഫാഷൻ, കൃഷി
+zodiac.western.gemini.sign|മിഥുനം (Gemini)
+zodiac.western.gemini.dates|മേയ് 21 - ജൂൺ 20
+zodiac.western.gemini.element|വായു
+zodiac.western.gemini.colors|മഞ്ഞ, ഇളം പച്ച
+zodiac.western.gemini.traits|ജിജ്ഞാസു, പൊരുത്തപ്പെടുന്നവൻ, ആശയവിനിമയശീലൻ, നർമബോധമുള്ളവൻ
+zodiac.western.gemini.bestFor|മാധ്യമം, അധ്യാപനം, വിൽപ്പന, എഴുത്ത്
+zodiac.western.cancer.sign|കർക്കടകം (Cancer)
+zodiac.western.cancer.dates|ജൂൺ 21 - ജൂലൈ 22
+zodiac.western.cancer.element|ജലം
+zodiac.western.cancer.colors|വെള്ള, വെള്ളി
+zodiac.western.cancer.traits|പരിപോഷിപ്പിക്കുന്നവൻ, അന്തർജ്ഞാനമുള്ളവൻ, വൈകാരികൻ, സംരക്ഷകൻ
+zodiac.western.cancer.bestFor|ആരോഗ്യപരിചരണം, ആതിഥ്യം, കൗൺസലിംഗ്
+zodiac.western.leo.sign|ചിങ്ങം (Leo)
+zodiac.western.leo.dates|ജൂലൈ 23 - ഓഗസ്റ്റ് 22
+zodiac.western.leo.element|അഗ്നി
+zodiac.western.leo.colors|സ്വർണം, ഓറഞ്ച്
+zodiac.western.leo.traits|ആത്മവിശ്വാസം, ഉദാരത, ആകർഷണീയത, നാടകീയത
+zodiac.western.leo.bestFor|വിനോദം, രാഷ്ട്രീയം, മാനേജ്മെന്റ്
+zodiac.western.virgo.sign|കന്നി (Virgo)
+zodiac.western.virgo.dates|ഓഗസ്റ്റ് 23 - സെപ്റ്റംബർ 22
+zodiac.western.virgo.element|ഭൂമി
+zodiac.western.virgo.colors|പച്ച, തവിട്ട്
+zodiac.western.virgo.traits|വിശകലനശീലൻ, പ്രായോഗികൻ, പൂർണതാവാദി, സഹായമനസ്കൻ
+zodiac.western.virgo.bestFor|ആരോഗ്യപരിചരണം, വിശകലനം, സേവന മേഖല
+zodiac.western.libra.sign|തുലാം (Libra)
+zodiac.western.libra.dates|സെപ്റ്റംബർ 23 - ഒക്ടോബർ 22
+zodiac.western.libra.element|വായു
+zodiac.western.libra.colors|നീല, പിങ്ക്
+zodiac.western.libra.traits|നയതന്ത്രജ്ഞൻ, നീതിമാൻ, സാമൂഹികൻ, ഇണക്കമുള്ളവൻ
+zodiac.western.libra.bestFor|നിയമം, നയതന്ത്രം, രൂപകൽപ്പന, പങ്കാളിത്തങ്ങൾ
+zodiac.western.scorpio.sign|വൃശ്ചികം (Scorpio)
+zodiac.western.scorpio.dates|ഒക്ടോബർ 23 - നവംബർ 21
+zodiac.western.scorpio.element|ജലം
+zodiac.western.scorpio.colors|ചുവപ്പ്, മറൂൺ
+zodiac.western.scorpio.traits|വികാരതീവ്രൻ, നിഗൂഢൻ, തീവ്രൻ, പരിവർത്തനശീലൻ
+zodiac.western.scorpio.bestFor|ഗവേഷണം, മനഃശാസ്ത്രം, അന്വേഷണം
+zodiac.western.sagittarius.sign|ധനു (Sagittarius)
+zodiac.western.sagittarius.dates|നവംബർ 22 - ഡിസംബർ 21
+zodiac.western.sagittarius.element|അഗ്നി
+zodiac.western.sagittarius.colors|പർപ്പിൾ, മഞ്ഞ
+zodiac.western.sagittarius.traits|ശുഭാപ്തിവിശ്വാസി, സാഹസികൻ, തത്ത്വചിന്തകൻ, സ്വതന്ത്രൻ
+zodiac.western.sagittarius.bestFor|യാത്ര, വിദ്യാഭ്യാസം, പ്രസിദ്ധീകരണം
+zodiac.western.capricorn.sign|മകരം (Capricorn)
+zodiac.western.capricorn.dates|ഡിസംബർ 22 - ജനുവരി 19
+zodiac.western.capricorn.element|ഭൂമി
+zodiac.western.capricorn.colors|കറുപ്പ്, തവിട്ട്
+zodiac.western.capricorn.traits|അച്ചടക്കമുള്ളവൻ, അഭിലാഷമുള്ളവൻ, ഉത്തരവാദിത്തമുള്ളവൻ, ക്ഷമയുള്ളവൻ
+zodiac.western.capricorn.bestFor|ബിസിനസ്, റിയൽ എസ്റ്റേറ്റ്, ഭരണം
+zodiac.western.aquarius.sign|കുംഭം (Aquarius)
+zodiac.western.aquarius.dates|ജനുവരി 20 - ഫെബ്രുവരി 18
+zodiac.western.aquarius.element|വായു
+zodiac.western.aquarius.colors|നീല, ചാരനിറം
+zodiac.western.aquarius.traits|സ്വതന്ത്രൻ, നൂതനചിന്തകൻ, മാനവികതാവാദി, വിചിത്രൻ
+zodiac.western.aquarius.bestFor|സാങ്കേതികവിദ്യ, സാമൂഹിക സേവനം, നവീകരണം
+zodiac.western.pisces.sign|മീനം (Pisces)
+zodiac.western.pisces.dates|ഫെബ്രുവരി 19 - മാർച്ച് 20
+zodiac.western.pisces.element|ജലം
+zodiac.western.pisces.colors|കടൽ പച്ച, ലാവെൻഡർ
+zodiac.western.pisces.traits|കരുണയുള്ളവൻ, കലാഹൃദയൻ, അന്തർജ്ഞാനമുള്ളവൻ, സംവേദനക്ഷമൻ
+zodiac.western.pisces.bestFor|കല, സംഗീതം, രോഗശാന്തി, ആത്മീയത
+zodiac.vedic.meshaAries.sign|മേടം (Aries)
+zodiac.vedic.meshaAries.dates|ഏപ്രിൽ 13 - മേയ് 14
+zodiac.vedic.meshaAries.element|അഗ്നി
+zodiac.vedic.meshaAries.colors|ചുവപ്പ്, മറൂൺ
+zodiac.vedic.meshaAries.traits|ധീരൻ, അഭിലാഷമുള്ളവൻ, യോദ്ധാവിന്റെ മനോഭാവം, നേതൃത്വം
+zodiac.vedic.meshaAries.bestFor|പ്രതിരോധം, കായികം, സംരംഭകത്വം
+zodiac.vedic.vrishabhaTaurus.sign|ഇടവം (Taurus)
+zodiac.vedic.vrishabhaTaurus.dates|മേയ് 15 - ജൂൺ 14
+zodiac.vedic.vrishabhaTaurus.element|ഭൂമി
+zodiac.vedic.vrishabhaTaurus.colors|വെള്ള, പിങ്ക്
+zodiac.vedic.vrishabhaTaurus.traits|സ്ഥിരചിത്തൻ, പ്രായോഗികൻ, കലാഹൃദയൻ, ആഡംബരപ്രിയൻ
+zodiac.vedic.vrishabhaTaurus.bestFor|ധനകാര്യം, സൗന്ദര്യം, കല, കൃഷി
+zodiac.vedic.mithunaGemini.sign|മിഥുനം (Gemini)
+zodiac.vedic.mithunaGemini.dates|ജൂൺ 15 - ജൂലൈ 14
+zodiac.vedic.mithunaGemini.element|വായു
+zodiac.vedic.mithunaGemini.colors|പച്ച, മഞ്ഞ
+zodiac.vedic.mithunaGemini.traits|ബുദ്ധിമാൻ, ആശയവിനിമയശീലൻ, ദ്വന്ദ്വ സ്വഭാവം
+zodiac.vedic.mithunaGemini.bestFor|മാധ്യമം, ബിസിനസ്, ആശയവിനിമയം, വ്യാപാരം
+zodiac.vedic.karkaCancer.sign|കർക്കടകം (Cancer)
+zodiac.vedic.karkaCancer.dates|ജൂലൈ 15 - ഓഗസ്റ്റ് 14
+zodiac.vedic.karkaCancer.element|ജലം
+zodiac.vedic.karkaCancer.colors|വെള്ള, ക്രീം
+zodiac.vedic.karkaCancer.traits|വൈകാരികൻ, പരിപോഷിപ്പിക്കുന്നവൻ, സംരക്ഷകൻ, അന്തർജ്ഞാനമുള്ളവൻ
+zodiac.vedic.karkaCancer.bestFor|ആരോഗ്യപരിചരണം, ആതിഥ്യം, സാമൂഹിക സേവനം
+zodiac.vedic.simhaLeo.sign|ചിങ്ങം (Leo)
+zodiac.vedic.simhaLeo.dates|ഓഗസ്റ്റ് 15 - സെപ്റ്റംബർ 15
+zodiac.vedic.simhaLeo.element|അഗ്നി
+zodiac.vedic.simhaLeo.colors|സ്വർണം, ഓറഞ്ച്
+zodiac.vedic.simhaLeo.traits|രാജകീയത, ആത്മവിശ്വാസം, ഉദാരത, നേതൃത്വം
+zodiac.vedic.simhaLeo.bestFor|രാഷ്ട്രീയം, വിനോദം, അധികാര പദവികൾ
+zodiac.vedic.kanyaVirgo.sign|കന്നി (Virgo)
+zodiac.vedic.kanyaVirgo.dates|സെപ്റ്റംബർ 16 - ഒക്ടോബർ 15
+zodiac.vedic.kanyaVirgo.element|ഭൂമി
+zodiac.vedic.kanyaVirgo.colors|പച്ച, തവിട്ട്
+zodiac.vedic.kanyaVirgo.traits|വിശകലനശീലൻ, പൂർണതാവാദി, സേവനമനോഭാവമുള്ളവൻ
+zodiac.vedic.kanyaVirgo.bestFor|വൈദ്യശാസ്ത്രം, അക്കൗണ്ടിംഗ്, വിശകലനം
+zodiac.vedic.tulaLibra.sign|തുലാം (Libra)
+zodiac.vedic.tulaLibra.dates|ഒക്ടോബർ 16 - നവംബർ 14
+zodiac.vedic.tulaLibra.element|വായു
+zodiac.vedic.tulaLibra.colors|വെള്ള, പിങ്ക്
+zodiac.vedic.tulaLibra.traits|സന്തുലിതൻ, നയതന്ത്രജ്ഞൻ, കലാഹൃദയൻ, നീതിമാൻ
+zodiac.vedic.tulaLibra.bestFor|നിയമം, കല, ബിസിനസ്, പങ്കാളിത്തങ്ങൾ
+zodiac.vedic.vrishchikaScorpio.sign|വൃശ്ചികം (Scorpio)
+zodiac.vedic.vrishchikaScorpio.dates|നവംബർ 15 - ഡിസംബർ 14
+zodiac.vedic.vrishchikaScorpio.element|ജലം
+zodiac.vedic.vrishchikaScorpio.colors|ചുവപ്പ്, മറൂൺ
+zodiac.vedic.vrishchikaScorpio.traits|തീവ്രൻ, രഹസ്യസ്വഭാവി, പരിവർത്തനശീലൻ, ശക്തൻ
+zodiac.vedic.vrishchikaScorpio.bestFor|ഗവേഷണം, ഗൂഢവിദ്യ, ശസ്ത്രക്രിയ, അന്വേഷണം
+zodiac.vedic.dhanuSagittarius.sign|ധനു (Sagittarius)
+zodiac.vedic.dhanuSagittarius.dates|ഡിസംബർ 15 - ജനുവരി 13
+zodiac.vedic.dhanuSagittarius.element|അഗ്നി
+zodiac.vedic.dhanuSagittarius.colors|മഞ്ഞ, ഓറഞ്ച്
+zodiac.vedic.dhanuSagittarius.traits|തത്ത്വചിന്തകൻ, ശുഭാപ്തിവിശ്വാസി, ആത്മീയൻ, സത്യസന്ധൻ
+zodiac.vedic.dhanuSagittarius.bestFor|അധ്യാപനം, മതം, യാത്ര, വിദ്യാഭ്യാസം
+zodiac.vedic.makaraCapricorn.sign|മകരം (Capricorn)
+zodiac.vedic.makaraCapricorn.dates|ജനുവരി 14 - ഫെബ്രുവരി 12
+zodiac.vedic.makaraCapricorn.element|ഭൂമി
+zodiac.vedic.makaraCapricorn.colors|കറുപ്പ്, കടും നീല
+zodiac.vedic.makaraCapricorn.traits|അച്ചടക്കമുള്ളവൻ, കഠിനാധ്വാനി, അഭിലാഷമുള്ളവൻ, പ്രായോഗികൻ
+zodiac.vedic.makaraCapricorn.bestFor|ഭരണനിർവഹണം, നിർമാണം, ഭരണം
+zodiac.vedic.kumbhaAquarius.sign|കുംഭം (Aquarius)
+zodiac.vedic.kumbhaAquarius.dates|ഫെബ്രുവരി 13 - മാർച്ച് 12
+zodiac.vedic.kumbhaAquarius.element|വായു
+zodiac.vedic.kumbhaAquarius.colors|നീല, ചാരനിറം
+zodiac.vedic.kumbhaAquarius.traits|മാനവികതാവാദി, നൂതനചിന്തകൻ, പാരമ്പര്യേതരൻ
+zodiac.vedic.kumbhaAquarius.bestFor|സാങ്കേതികവിദ്യ, സാമൂഹിക പരിഷ്കരണം, ശാസ്ത്രം
+zodiac.vedic.meenaPisces.sign|മീനം (Pisces)
+zodiac.vedic.meenaPisces.dates|മാർച്ച് 13 - ഏപ്രിൽ 12
+zodiac.vedic.meenaPisces.element|ജലം
+zodiac.vedic.meenaPisces.colors|മഞ്ഞ, ഇളം പച്ച
+zodiac.vedic.meenaPisces.traits|കരുണയുള്ളവൻ, ആത്മീയൻ, കലാഹൃദയൻ, അന്തർജ്ഞാനമുള്ളവൻ
+zodiac.vedic.meenaPisces.bestFor|കല, രോഗശാന്തി, ആത്മീയത, ജീവകാരുണ്യം
+zodiac.titleWestern|🌟 പാശ്ചാത്യ രാശി
+zodiac.titleVedic|🕉️ വൈദിക ജ്യോതിഷം
+zodiac.optWestern|പാശ്ചാത്യ രാശി
+zodiac.optVedic|വൈദിക ജ്യോതിഷം
+zodiac.hide|വിശദാംശങ്ങൾ മറയ്ക്കാൻ അമർത്തൂ
+zodiac.more|കൂടുതൽ കാണാൻ അമർത്തൂ
+zodiacPage.n001|✨ ശുഭാക്ഷരങ്ങൾ:
+zodiacPage.n002|📝 ഉദാഹരണ പേരുകൾ:
+zodiacPage.n003|🎲 ഭാഗ്യ സംഖ്യകൾ:
+zodiacPage.n004|🎨 ഭാഗ്യ നിറങ്ങൾ:
+zodiacPage.n005|✨ വ്യക്തിത്വം:
+zodiacPage.n006|💼 മികച്ച തൊഴിൽ:
+zodiacPage.n007|💡 എങ്ങനെ ഉപയോഗിക്കാം
+zodiacPage.n008|ജനനത്തീയതി അടിസ്ഥാനമാക്കി നിങ്ങളുടെ രാശി കണ്ടെത്തൂ
+zodiacPage.n009|ശുഭാക്ഷരങ്ങളിൽ തുടങ്ങുന്ന പേരുകൾ തിരഞ്ഞെടുക്കൂ
+zodiacPage.n010|കൂടുതൽ വിശദാംശങ്ങളും ഉദാഹരണങ്ങളും കാണാൻ ഏതെങ്കിലും കാർഡ് അമർത്തൂ
+zodiacPage.n011|മുകളിലെ ഡ്രോപ്പ്ഡൗൺ ഉപയോഗിച്ച് പാശ്ചാത്യ, വൈദിക രീതികൾക്കിടയിൽ മാറൂ
+ai.yourApp|നിങ്ങളുടെ AI ആപ്പ്
+ai.reportTitle|Namasutra കുടുംബ റിപ്പോർട്ട്
+ai.title|AI ഉപയോഗിച്ച് നിങ്ങളുടെ ധാരണ കൂടുതൽ ആഴത്തിലാക്കൂ (സൗജന്യം)
+ai.subtitle|നിങ്ങളുടെ സ്വന്തം AI അക്കൗണ്ട് ഉപയോഗിക്കുന്നു. നിങ്ങളുടെ പൂർണ്ണ റിപ്പോർട്ടും ഒപ്പം അയയ്ക്കുന്നു.
+ai.subtitleReasons|നിങ്ങളുടെ സ്വന്തം AI അക്കൗണ്ട് ഉപയോഗിക്കുന്നു. നിങ്ങൾ തിരഞ്ഞെടുത്ത കാരണങ്ങൾ ഉൾപ്പെടെ നിങ്ങളുടെ പൂർണ്ണ റിപ്പോർട്ടും ഒപ്പം അയയ്ക്കുന്നു.
+ai.sendPdf|PDF എന്റെ AI ആപ്പിലേക്ക് അയയ്ക്കൂ
+ai.ask|{{name}}-നോട് ചോദിക്കൂ
+ai.copied|✅ നിങ്ങളുടെ റിപ്പോർട്ട് കോപ്പി ചെയ്തു. അത് ഇതിനകം {{app}} ചാറ്റ് ബോക്സിൽ ഇല്ലെങ്കിൽ, അത് പേസ്റ്റ് ചെയ്ത് (കമ്പ്യൂട്ടറിൽ <b>Ctrl+V</b>, ഫോണിൽ <b>ദീർഘനേരം അമർത്തി → പേസ്റ്റ്</b>) അയയ്ക്കൂ.
+ai.hideHelp|സഹായം മറയ്ക്കൂ
+ai.howWorks|ഇത് എങ്ങനെ പ്രവർത്തിക്കുന്നു?
+ai.help1|<b>PDF എന്റെ AI ആപ്പിലേക്ക് അയയ്ക്കൂ:</b> PDF റിപ്പോർട്ട് ചേർത്ത നിങ്ങളുടെ ഫോണിന്റെ പങ്കിടൽ മെനു തുറക്കുന്നു. Claude, ChatGPT അല്ലെങ്കിൽ Gemini തിരഞ്ഞെടുക്കൂ; റിപ്പോർട്ട് അയയ്ക്കാൻ തയ്യാറായി എത്തും.
+ai.help2|<b>Claude / ChatGPT / Gemini-നോട് ചോദിക്കൂ:</b> AI പുതിയ ടാബിൽ തുറക്കുന്നു; നിങ്ങളുടെ പൂർണ്ണ റിപ്പോർട്ട് (പേരുകൾ, മൂലകങ്ങൾ, അർഥങ്ങൾ, ഇണക്കം) ഇതിനകം ഒരു ചോദ്യമായി എഴുതിയിരിക്കും. അതും കോപ്പി ചെയ്യപ്പെടും, അതിനാൽ ബോക്സ് ശൂന്യമാണെങ്കിൽ പേസ്റ്റ് ചെയ്യാം. Gemini-ക്ക് എപ്പോഴും പേസ്റ്റ് വേണം.
+ai.help3|<b>PDF-ഉം ചേർക്കണോ?</b> മുകളിലെ <i>PDF ഡൗൺലോഡ്</i> ഉപയോഗിക്കൂ, എന്നിട്ട് ഫയൽ ചാറ്റിലേക്ക് വലിച്ചിടുകയോ AI-യുടെ അറ്റാച്ച് (പേപ്പർക്ലിപ്പ്) ബട്ടൺ ഉപയോഗിക്കുകയോ ചെയ്യൂ.
+ai.help4|നിങ്ങളുടെ AI അക്കൗണ്ടിൽ സൈൻ ഇൻ ചെയ്തിരിക്കണം. Namasutra നിങ്ങളുടെ സംഭാഷണം കാണുന്നില്ല.
+ai.promptIntro|ഞാൻ Namasutra ({{host}}) ഉപയോഗിച്ചു; അത് പേരിലെ അക്ഷരങ്ങളെ ആവർത്തനപ്പട്ടികയിലെ മൂലകങ്ങളുമായി ബന്ധിപ്പിക്കുന്നു. ഇതാണ് എന്റെ കുടുംബ റിപ്പോർട്ട്:
+ai.promptElement|  - {{name}} ({{symbol}}, അറ്റോമിക സംഖ്യ {{number}}): {{meaning}}
+ai.promptHarmony|എല്ലാവരിലും പൊതുവായ ഇണക്ക മൂലകങ്ങൾ: {{elements}}
+ai.promptWhy|ഞാൻ ഇത് എന്തിനാണ് അറിയാൻ ആഗ്രഹിക്കുന്നത്: {{reasons}}
+ai.promptQuestion|ഈ മൂലകങ്ങളും ഞങ്ങളുടെ പേരുകൾ തമ്മിലുള്ള ഇണക്കവും എന്തിനെ സൂചിപ്പിക്കാം, അവ ഞങ്ങളെ ഒരു കുടുംബമായി എങ്ങനെ ബന്ധിപ്പിക്കുന്നു എന്ന് മനസ്സിലാക്കാൻ നിങ്ങൾക്ക് സഹായിക്കാമോ?
+page.title|Namasutra - നിങ്ങളുടെ മൂലക വ്യക്തിത്വം
+page.description|ആവർത്തന മൂലകങ്ങൾ, കാൽഡിയൻ സംഖ്യാശാസ്ത്രം, ഹിന്ദു ജ്യോതിഷം എന്നിവയിലൂടെ നിങ്ങളുടെ പേരിൽ ഒളിഞ്ഞിരിക്കുന്ന രസതന്ത്രം കണ്ടെത്തൂ.

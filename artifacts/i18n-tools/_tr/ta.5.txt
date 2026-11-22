@@ -1,0 +1,190 @@
+zodiac.intro.western.heading|உங்கள் ராசிக்குப் பொருந்தும் பெயரைக் கண்டறியுங்கள்
+zodiac.intro.western.p1|மேற்கத்திய ஜோதிடத்தில் ஒவ்வொரு ராசியும் மரபுப்படி தனித்துவ குணங்கள், ஆற்றல்கள், ஆளுமைப் பண்புகளுடன் தொடர்புடையது.
+zodiac.intro.western.p2|புதிதாகப் பிறந்த குழந்தைக்குப் பெயரிடுகிறீர்களா, தொழில் தொடங்குகிறீர்களா அல்லது புதிதாக ஒன்றைத் தொடங்குகிறீர்களா — உங்கள் ராசியுடன் மரபாகத் தொடர்புடைய பெயர்களையும் தொடக்க எழுத்தொலிகளையும் ஆராயுங்கள்.
+zodiac.intro.western.p3|ஜோதிட நம்பிக்கைகளின்படி, இந்தக் குணங்களுக்குப் பொருந்தும் பெயரைத் தேர்ந்தெடுப்பது, பெயர், தனிநபரின் அடையாளம், ராசி குறிக்கும் பிரபஞ்ச ஆற்றல்கள் ஆகியவற்றுக்கு இடையே ஒரு குறியீட்டு இணக்கத்தை உருவாக்குவதாகக் கருதப்படுகிறது.
+zodiac.intro.vedic.heading|உங்கள் பிறந்த நட்சத்திரத்துக்குப் பொருந்தும் பெயரைக் கண்டறியுங்கள்
+zodiac.intro.vedic.p1|வேத ஜோதிடத்தில் பிறந்த நொடி குழந்தையின் நட்சத்திரத்தையும் (பிறந்த விண்மீன்) பாதத்தையும் (கால்பகுதி) தீர்மானிக்கிறது. 27 நட்சத்திரங்களும் மரபுப்படி குறிப்பிட்ட ஒலிகள், எழுத்தொலிகளுடன் தொடர்புடையவை; அவை தனித்துவ பிரபஞ்ச அதிர்வுகளைக் கொண்டவை என நம்பப்படுகிறது.
+zodiac.intro.vedic.p2|தலைமுறை தலைமுறையாக குடும்பங்கள் புதிதாகப் பிறந்த குழந்தைக்குப் பெயரிடும்போது இந்த நல்ல எழுத்தொலிகளைப் பயன்படுத்தி வருகின்றன; பரிந்துரைக்கப்பட்ட ஒலியில் தொடங்கும் பெயர் குழந்தையின் பிறந்த நட்சத்திரத்துடன் தொடர்புடைய பிரபஞ்ச ஆற்றல்களுடன் இணக்கத்தை உருவாக்கும் என்பது நம்பிக்கை.
+zodiac.intro.vedic.p3|இந்த மரபு தொழில்கள், முயற்சிகள், புதிய தொடக்கங்களுக்குப் பெயரிடவும் உந்துதலாக இருக்கலாம்; சிந்தித்துத் தேர்ந்தெடுத்த பெயர் இணக்கம், நேர்மறை, நல்ல தொடக்கங்களைக் குறிக்கும் என்பது நம்பிக்கை.
+zodiac.western.aries.sign|மேஷம் (Aries)
+zodiac.western.aries.dates|மார்ச் 21 - ஏப்ரல் 19
+zodiac.western.aries.element|நெருப்பு
+zodiac.western.aries.colors|சிவப்பு, செந்நிறம்
+zodiac.western.aries.traits|துணிச்சலான, இலட்சிய வேட்கை, தன்னம்பிக்கை, ஆற்றல் மிக்க
+zodiac.western.aries.bestFor|தலைமை, தொழில்முனைவு, விளையாட்டு
+zodiac.western.taurus.sign|ரிஷபம் (Taurus)
+zodiac.western.taurus.dates|ஏப்ரல் 20 - மே 20
+zodiac.western.taurus.element|நிலம்
+zodiac.western.taurus.colors|இளஞ்சிவப்பு, பச்சை
+zodiac.western.taurus.traits|நம்பகமான, பொறுமையான, நடைமுறைசார்ந்த, விசுவாசமான
+zodiac.western.taurus.bestFor|நிதி, கலை, ஃபேஷன், வேளாண்மை
+zodiac.western.gemini.sign|மிதுனம் (Gemini)
+zodiac.western.gemini.dates|மே 21 - ஜூன் 20
+zodiac.western.gemini.element|காற்று
+zodiac.western.gemini.colors|மஞ்சள், வெளிர் பச்சை
+zodiac.western.gemini.traits|ஆர்வமுள்ள, தகவமைக்கும், தொடர்பு கொள்ளும், நகைச்சுவை மிக்க
+zodiac.western.gemini.bestFor|ஊடகம், கற்பித்தல், விற்பனை, எழுத்து
+zodiac.western.cancer.sign|கடகம் (Cancer)
+zodiac.western.cancer.dates|ஜூன் 21 - ஜூலை 22
+zodiac.western.cancer.element|நீர்
+zodiac.western.cancer.colors|வெள்ளை, வெள்ளி
+zodiac.western.cancer.traits|பேணும், உள்ளுணர்வு மிக்க, உணர்ச்சிமிக்க, பாதுகாக்கும்
+zodiac.western.cancer.bestFor|சுகாதாரம், விருந்தோம்பல், ஆலோசனை
+zodiac.western.leo.sign|சிம்மம் (Leo)
+zodiac.western.leo.dates|ஜூலை 23 - ஆகஸ்ட் 22
+zodiac.western.leo.element|நெருப்பு
+zodiac.western.leo.colors|தங்கம், ஆரஞ்சு
+zodiac.western.leo.traits|தன்னம்பிக்கை, தாராளம், கவர்ச்சி, நாடகத்தன்மை
+zodiac.western.leo.bestFor|பொழுதுபோக்கு, அரசியல், மேலாண்மை
+zodiac.western.virgo.sign|கன்னி (Virgo)
+zodiac.western.virgo.dates|ஆகஸ்ட் 23 - செப்டம்பர் 22
+zodiac.western.virgo.element|நிலம்
+zodiac.western.virgo.colors|பச்சை, பழுப்பு
+zodiac.western.virgo.traits|பகுப்பாய்வு செய்யும், நடைமுறைசார்ந்த, முழுமை நாடும், உதவும்
+zodiac.western.virgo.bestFor|சுகாதாரம், பகுப்பாய்வு, சேவைத் துறை
+zodiac.western.libra.sign|துலாம் (Libra)
+zodiac.western.libra.dates|செப்டம்பர் 23 - அக்டோபர் 22
+zodiac.western.libra.element|காற்று
+zodiac.western.libra.colors|நீலம், இளஞ்சிவப்பு
+zodiac.western.libra.traits|சாதுரியமான, நியாயமான, சமூகமான, இணக்கமான
+zodiac.western.libra.bestFor|சட்டம், ராஜதந்திரம், வடிவமைப்பு, கூட்டாண்மை
+zodiac.western.scorpio.sign|விருச்சிகம் (Scorpio)
+zodiac.western.scorpio.dates|அக்டோபர் 23 - நவம்பர் 21
+zodiac.western.scorpio.element|நீர்
+zodiac.western.scorpio.colors|சிவப்பு, மெரூன்
+zodiac.western.scorpio.traits|ஆர்வமிக்க, மர்மமான, தீவிரமான, மாற்றும்
+zodiac.western.scorpio.bestFor|ஆராய்ச்சி, உளவியல், புலனாய்வு
+zodiac.western.sagittarius.sign|தனுசு (Sagittarius)
+zodiac.western.sagittarius.dates|நவம்பர் 22 - டிசம்பர் 21
+zodiac.western.sagittarius.element|நெருப்பு
+zodiac.western.sagittarius.colors|ஊதா, மஞ்சள்
+zodiac.western.sagittarius.traits|நம்பிக்கையுள்ள, சாகசமான, தத்துவ நோக்குள்ள, சுதந்திரமான
+zodiac.western.sagittarius.bestFor|பயணம், கல்வி, பதிப்புத் துறை
+zodiac.western.capricorn.sign|மகரம் (Capricorn)
+zodiac.western.capricorn.dates|டிசம்பர் 22 - ஜனவரி 19
+zodiac.western.capricorn.element|நிலம்
+zodiac.western.capricorn.colors|கருப்பு, பழுப்பு
+zodiac.western.capricorn.traits|ஒழுக்கமான, இலட்சிய வேட்கை, பொறுப்பான, பொறுமையான
+zodiac.western.capricorn.bestFor|வணிகம், ரியல் எஸ்டேட், ஆட்சி
+zodiac.western.aquarius.sign|கும்பம் (Aquarius)
+zodiac.western.aquarius.dates|ஜனவரி 20 - பிப்ரவரி 18
+zodiac.western.aquarius.element|காற்று
+zodiac.western.aquarius.colors|நீலம், சாம்பல்
+zodiac.western.aquarius.traits|சுதந்திரமான, புத்தாக்கமான, மனிதநேயமிக்க, விசித்திரமான
+zodiac.western.aquarius.bestFor|தொழில்நுட்பம், சமூகப் பணி, புத்தாக்கம்
+zodiac.western.pisces.sign|மீனம் (Pisces)
+zodiac.western.pisces.dates|பிப்ரவரி 19 - மார்ச் 20
+zodiac.western.pisces.element|நீர்
+zodiac.western.pisces.colors|கடல் பச்சை, இளநீலம்
+zodiac.western.pisces.traits|இரக்கமுள்ள, கலைநயம், உள்ளுணர்வு மிக்க, உணர்திறன் கொண்ட
+zodiac.western.pisces.bestFor|கலை, இசை, குணப்படுத்துதல், ஆன்மிகம்
+zodiac.vedic.meshaAries.sign|மேஷம் (Aries)
+zodiac.vedic.meshaAries.dates|ஏப்ரல் 13 - மே 14
+zodiac.vedic.meshaAries.element|நெருப்பு
+zodiac.vedic.meshaAries.colors|சிவப்பு, மெரூன்
+zodiac.vedic.meshaAries.traits|துணிச்சலான, இலட்சிய வேட்கை, வீரர் உணர்வு, தலைமை
+zodiac.vedic.meshaAries.bestFor|பாதுகாப்பு, விளையாட்டு, தொழில்முனைவு
+zodiac.vedic.vrishabhaTaurus.sign|ரிஷபம் (Taurus)
+zodiac.vedic.vrishabhaTaurus.dates|மே 15 - ஜூன் 14
+zodiac.vedic.vrishabhaTaurus.element|நிலம்
+zodiac.vedic.vrishabhaTaurus.colors|வெள்ளை, இளஞ்சிவப்பு
+zodiac.vedic.vrishabhaTaurus.traits|நிலையான, நடைமுறைசார்ந்த, கலைநயம், ஆடம்பர விருப்பம்
+zodiac.vedic.vrishabhaTaurus.bestFor|நிதி, அழகு, கலை, வேளாண்மை
+zodiac.vedic.mithunaGemini.sign|மிதுனம் (Gemini)
+zodiac.vedic.mithunaGemini.dates|ஜூன் 15 - ஜூலை 14
+zodiac.vedic.mithunaGemini.element|காற்று
+zodiac.vedic.mithunaGemini.colors|பச்சை, மஞ்சள்
+zodiac.vedic.mithunaGemini.traits|அறிவார்ந்த, தொடர்பு கொள்ளும், இரட்டை இயல்பு
+zodiac.vedic.mithunaGemini.bestFor|ஊடகம், வணிகம், தகவல் தொடர்பு, வர்த்தகம்
+zodiac.vedic.karkaCancer.sign|கடகம் (Cancer)
+zodiac.vedic.karkaCancer.dates|ஜூலை 15 - ஆகஸ்ட் 14
+zodiac.vedic.karkaCancer.element|நீர்
+zodiac.vedic.karkaCancer.colors|வெள்ளை, கிரீம்
+zodiac.vedic.karkaCancer.traits|உணர்ச்சிமிக்க, பேணும், பாதுகாக்கும், உள்ளுணர்வு மிக்க
+zodiac.vedic.karkaCancer.bestFor|சுகாதாரம், விருந்தோம்பல், சமூகப் பணி
+zodiac.vedic.simhaLeo.sign|சிம்மம் (Leo)
+zodiac.vedic.simhaLeo.dates|ஆகஸ்ட் 15 - செப்டம்பர் 15
+zodiac.vedic.simhaLeo.element|நெருப்பு
+zodiac.vedic.simhaLeo.colors|தங்கம், ஆரஞ்சு
+zodiac.vedic.simhaLeo.traits|அரச தோரணை, தன்னம்பிக்கை, தாராளம், தலைமை
+zodiac.vedic.simhaLeo.bestFor|அரசியல், பொழுதுபோக்கு, அதிகாரப் பதவிகள்
+zodiac.vedic.kanyaVirgo.sign|கன்னி (Virgo)
+zodiac.vedic.kanyaVirgo.dates|செப்டம்பர் 16 - அக்டோபர் 15
+zodiac.vedic.kanyaVirgo.element|நிலம்
+zodiac.vedic.kanyaVirgo.colors|பச்சை, பழுப்பு
+zodiac.vedic.kanyaVirgo.traits|பகுப்பாய்வு செய்யும், முழுமை நாடும், சேவை மனப்பான்மை
+zodiac.vedic.kanyaVirgo.bestFor|மருத்துவம், கணக்கியல், பகுப்பாய்வு
+zodiac.vedic.tulaLibra.sign|துலாம் (Libra)
+zodiac.vedic.tulaLibra.dates|அக்டோபர் 16 - நவம்பர் 14
+zodiac.vedic.tulaLibra.element|காற்று
+zodiac.vedic.tulaLibra.colors|வெள்ளை, இளஞ்சிவப்பு
+zodiac.vedic.tulaLibra.traits|சமநிலையான, சாதுரியமான, கலைநயம், நியாயமான
+zodiac.vedic.tulaLibra.bestFor|சட்டம், கலை, வணிகம், கூட்டாண்மை
+zodiac.vedic.vrishchikaScorpio.sign|விருச்சிகம் (Scorpio)
+zodiac.vedic.vrishchikaScorpio.dates|நவம்பர் 15 - டிசம்பர் 14
+zodiac.vedic.vrishchikaScorpio.element|நீர்
+zodiac.vedic.vrishchikaScorpio.colors|சிவப்பு, மெரூன்
+zodiac.vedic.vrishchikaScorpio.traits|தீவிரமான, ரகசியமான, மாற்றும், சக்தி வாய்ந்த
+zodiac.vedic.vrishchikaScorpio.bestFor|ஆராய்ச்சி, மறைபொருள் கல்வி, அறுவை சிகிச்சை, புலனாய்வு
+zodiac.vedic.dhanuSagittarius.sign|தனுசு (Sagittarius)
+zodiac.vedic.dhanuSagittarius.dates|டிசம்பர் 15 - ஜனவரி 13
+zodiac.vedic.dhanuSagittarius.element|நெருப்பு
+zodiac.vedic.dhanuSagittarius.colors|மஞ்சள், ஆரஞ்சு
+zodiac.vedic.dhanuSagittarius.traits|தத்துவ நோக்குள்ள, நம்பிக்கையுள்ள, ஆன்மிகமான, வாய்மை
+zodiac.vedic.dhanuSagittarius.bestFor|கற்பித்தல், சமயம், பயணம், கல்வி
+zodiac.vedic.makaraCapricorn.sign|மகரம் (Capricorn)
+zodiac.vedic.makaraCapricorn.dates|ஜனவரி 14 - பிப்ரவரி 12
+zodiac.vedic.makaraCapricorn.element|நிலம்
+zodiac.vedic.makaraCapricorn.colors|கருப்பு, அடர் நீலம்
+zodiac.vedic.makaraCapricorn.traits|ஒழுக்கமான, கடின உழைப்பாளி, இலட்சிய வேட்கை, நடைமுறைசார்ந்த
+zodiac.vedic.makaraCapricorn.bestFor|நிர்வாகம், கட்டுமானம், ஆட்சி
+zodiac.vedic.kumbhaAquarius.sign|கும்பம் (Aquarius)
+zodiac.vedic.kumbhaAquarius.dates|பிப்ரவரி 13 - மார்ச் 12
+zodiac.vedic.kumbhaAquarius.element|காற்று
+zodiac.vedic.kumbhaAquarius.colors|நீலம், சாம்பல்
+zodiac.vedic.kumbhaAquarius.traits|மனிதநேயமிக்க, புத்தாக்கமான, மரபை மீறிய
+zodiac.vedic.kumbhaAquarius.bestFor|தொழில்நுட்பம், சமூகச் சீர்திருத்தம், அறிவியல்
+zodiac.vedic.meenaPisces.sign|மீனம் (Pisces)
+zodiac.vedic.meenaPisces.dates|மார்ச் 13 - ஏப்ரல் 12
+zodiac.vedic.meenaPisces.element|நீர்
+zodiac.vedic.meenaPisces.colors|மஞ்சள், வெளிர் பச்சை
+zodiac.vedic.meenaPisces.traits|இரக்கமுள்ள, ஆன்மிகமான, கலைநயம், உள்ளுணர்வு மிக்க
+zodiac.vedic.meenaPisces.bestFor|கலை, குணப்படுத்துதல், ஆன்மிகம், அறக்கொடை
+zodiac.titleWestern|🌟 மேற்கத்திய ராசி
+zodiac.titleVedic|🕉️ வேத ஜோதிடம்
+zodiac.optWestern|மேற்கத்திய ராசி
+zodiac.optVedic|வேத ஜோதிடம்
+zodiac.hide|விவரங்களை மறைக்கத் தட்டுங்கள்
+zodiac.more|மேலும் காணத் தட்டுங்கள்
+zodiacPage.n001|✨ நல்ல எழுத்தொலிகள்:
+zodiacPage.n002|📝 எடுத்துக்காட்டுப் பெயர்கள்:
+zodiacPage.n003|🎲 அதிர்ஷ்ட எண்கள்:
+zodiacPage.n004|🎨 அதிர்ஷ்ட நிறங்கள்:
+zodiacPage.n005|✨ ஆளுமை:
+zodiacPage.n006|💼 சிறந்த தொழில்:
+zodiacPage.n007|💡 எப்படிப் பயன்படுத்துவது
+zodiacPage.n008|பிறந்த தேதியின் அடிப்படையில் உங்கள் ராசியைக் கண்டறியுங்கள்
+zodiacPage.n009|நல்ல எழுத்தொலிகளில் தொடங்கும் பெயர்களைத் தேர்ந்தெடுங்கள்
+zodiacPage.n010|மேலும் விவரங்களையும் எடுத்துக்காட்டுகளையும் காண எந்த அட்டையையும் தட்டுங்கள்
+zodiacPage.n011|மேலுள்ள கீழிறங்கும் பட்டியலில் மேற்கத்திய, வேத முறைகளுக்கிடையே மாறுங்கள்
+ai.yourApp|உங்கள் AI செயலி
+ai.reportTitle|Namasutra குடும்ப அறிக்கை
+ai.title|AI மூலம் உங்கள் புரிதலை ஆழமாக்குங்கள் (இலவசம்)
+ai.subtitle|உங்கள் சொந்த AI கணக்கைப் பயன்படுத்துகிறது. உங்கள் முழு அறிக்கையும் உடன் அனுப்பப்படும்.
+ai.subtitleReasons|உங்கள் சொந்த AI கணக்கைப் பயன்படுத்துகிறது. நீங்கள் தேர்ந்தெடுத்த காரணங்கள் உட்பட உங்கள் முழு அறிக்கையும் உடன் அனுப்பப்படும்.
+ai.sendPdf|PDF-ஐ என் AI செயலிக்கு அனுப்பு
+ai.ask|{{name}}-இடம் கேளுங்கள்
+ai.copied|✅ உங்கள் அறிக்கை நகலெடுக்கப்பட்டது. அது {{app}} அரட்டைப் பெட்டியில் ஏற்கனவே இல்லையென்றால், அதை ஒட்டி (கணினியில் <b>Ctrl+V</b>, தொலைபேசியில் <b>நீண்ட நேரம் அழுத்தி → ஒட்டு</b>) அனுப்புங்கள்.
+ai.hideHelp|உதவியை மறை
+ai.howWorks|இது எப்படி வேலை செய்கிறது?
+ai.help1|<b>PDF-ஐ என் AI செயலிக்கு அனுப்பு:</b> PDF அறிக்கை இணைக்கப்பட்ட உங்கள் தொலைபேசியின் பகிர்வு மெனு திறக்கும். Claude, ChatGPT அல்லது Gemini-ஐத் தேர்ந்தெடுங்கள்; அறிக்கை அனுப்பத் தயாராக வந்து சேரும்.
+ai.help2|<b>Claude / ChatGPT / Gemini-இடம் கேளுங்கள்:</b> AI புதிய தாவலில் திறக்கும்; உங்கள் முழு அறிக்கை (பெயர்கள், தனிமங்கள், பொருள்கள், இணக்கம்) ஏற்கனவே ஒரு கேள்வியாக எழுதப்பட்டிருக்கும். அதுவும் நகலெடுக்கப்படும்; பெட்டி காலியாக இருந்தால் ஒட்டலாம். Gemini-க்கு எப்போதும் ஒட்ட வேண்டும்.
+ai.help3|<b>PDF-ஐயும் இணைக்க வேண்டுமா?</b> மேலே உள்ள <i>PDF-ஐப் பதிவிறக்கு</i> என்பதைப் பயன்படுத்தி, பிறகு கோப்பை அரட்டையில் இழுத்து விடுங்கள் அல்லது AI-யின் இணைப்பு (காகிதக்கிளிப்) பொத்தானைப் பயன்படுத்துங்கள்.
+ai.help4|நீங்கள் உங்கள் AI கணக்கில் உள்நுழைந்திருக்க வேண்டும். Namasutra உங்கள் உரையாடலைப் பார்ப்பதில்லை.
+ai.promptIntro|நான் Namasutra ({{host}}) பயன்படுத்தினேன்; அது ஒரு பெயரின் எழுத்துகளைத் தனிம அட்டவணைத் தனிமங்களுடன் இணைக்கிறது. இது என் குடும்ப அறிக்கை:
+ai.promptElement|  - {{name}} ({{symbol}}, அணு எண் {{number}}): {{meaning}}
+ai.promptHarmony|அனைவரிடமும் பொதுவான இணக்கத் தனிமங்கள்: {{elements}}
+ai.promptWhy|இதை ஏன் அறிய விரும்புகிறேன்: {{reasons}}
+ai.promptQuestion|இந்தத் தனிமங்களும் எங்கள் பெயர்களுக்கு இடையிலான இணக்கமும் எதைக் குறிக்கக்கூடும், அவை எங்களை ஒரு குடும்பமாக எப்படி இணைக்கின்றன என்பதைப் புரிந்துகொள்ள உதவ முடியுமா?
+page.title|Namasutra - உங்கள் தனிம அடையாளம்
+page.description|தனிமங்கள், கால்டியன் எண் கணிதம், இந்து ஜோதிடம் வழியாக உங்கள் பெயரில் மறைந்திருக்கும் வேதியியலைக் கண்டறியுங்கள்.

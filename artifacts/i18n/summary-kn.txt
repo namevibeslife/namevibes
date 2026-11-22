@@ -1,0 +1,14 @@
+kn 390 landing: overflow=false htmlLang=kn english=-
+kn 390 signin: overflow=false htmlLang=kn english=-
+kn 390 profile-complete: overflow=false htmlLang=kn english=-
+kn 390 pricing-nocode: overflow=false htmlLang=kn english=-
+kn 390 pricing-code: overflow=false htmlLang=kn english=-
+kn 390 payment: overflow=false htmlLang=kn english=-
+kn 390 dashboard: overflow=false htmlLang=kn english=-
+kn 390 analyze-result: overflow=false htmlLang=kn english=-
+kn 390 family-result: overflow=false htmlLang=kn english=-
+kn 390 hora: overflow=false htmlLang=kn english=-
+kn 390 profile: overflow=false htmlLang=kn english=-
+kn 390 settings: overflow=false htmlLang=kn english=-
+kn 390 menu: overflow=false htmlLang=kn english=-
+kn 390 ambassador: overflow=false htmlLang=kn english=-

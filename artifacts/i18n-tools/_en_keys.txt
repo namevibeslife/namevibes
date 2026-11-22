@@ -1,0 +1,1203 @@
+landing.headingLine1|Discover Your Name's
+landing.headingLine2|Hidden Chemistry
+landing.about4|<b>Namasutra</b> uncovers the fascinating connection between your name and the elements of the periodic table.
+landing.copyright|© {{year}} Namasutra. All rights reserved.
+landing.kicker|Your name is energy. Discover how it connects you to the universe.
+landing.subheading|Decode the hidden elements in your identity through periodic table science, Chaldean numerology, and Hindu astrology
+landing.getStarted|Get Started
+landing.learnMore|Learn More
+landing.aboutHeading|A lifelong companion. A world within.
+landing.about1|From the cradle to the grave, your name is your constant companion, defining your identity throughout life's journey.
+landing.about2|Every name carries a unique vibration, an energy that resonates with who you are.
+landing.about3|But have you ever wondered what lies within the letters of your name?
+landing.about5|Discover the elements. Explore the connections. Feel your Namasutra.
+landing.sampleAria|Vibes sample analysis
+landing.sampleLabel|See how it works / Vibes sample analysis
+landing.feature1Title|Periodic Elements
+landing.feature1Text|Break down your name into chemical elements and discover their unique properties and meanings
+landing.feature2Title|Chaldean Numerology
+landing.feature2Text|Uncover your life path number, name number, and destiny through ancient wisdom
+landing.feature3Title|Hindu Astrology
+landing.feature3Text|Learn which syllables are auspicious for you based on your birth date and nakshatra
+landing.ctaHeading|Ready to Discover Your Vibes?
+landing.ctaText|See which elements of the universe live in your name
+landing.ctaButton|Start Your Journey
+errors.auth.invalidEmail|That email address does not look right.
+errors.auth.badCredentials|Incorrect email or password. If you signed up with Google or Apple, use that button instead.
+errors.auth.emailInUse|An account with this email already exists. Try signing in instead.
+errors.auth.weakPassword|Please choose a password with at least 6 characters.
+errors.auth.tooMany|Too many attempts. Please wait a few minutes and try again.
+errors.auth.network|Network problem. Check your connection and try again.
+errors.auth.popupBlocked|Your browser blocked the sign-in window. Please allow pop-ups and try again.
+errors.auth.differentMethod|This email is already registered with a different sign-in method. Try Google or email instead.
+errors.auth.appleUnavailable|Sign in with Apple is not available yet. Please use Google or email.
+errors.auth.methodUnavailable|This sign-in method is not available right now.
+errors.auth.failed|Sign-in failed. Please try again.
+errors.signInFirst|Please sign in first
+errors.referralFormat|Referral code format should be a 2-letter country code followed by 6 digits (e.g. IN482913).
+errors.referralInvalid|This referral code is not valid. Please check it, or leave it empty to continue without one.
+errors.profileSave|Error saving profile. Please try again.
+errors.monthlyLimit|You've used all {{limit}} analyses for this month. Your allowance resets on the 1st.
+errors.analysisNotFound|Analysis not found
+errors.analysisLoad|Error loading analysis
+errors.paymentFailed|Payment failed. Please try again.
+errors.testPaymentFailed|Test payment failed. Please try again.
+errors.paymentRecorded|Payment recorded but profile update failed. Please contact support.
+errors.clearCache|Error clearing cache. Please try again.
+errors.signOut|Could not sign out. Please try again.
+auth.resetSent|If an account exists for that email, a reset link is on its way. Check your inbox and spam folder.
+auth.titleSignup|Create your account
+auth.titleReset|Reset your password
+auth.titleSignin|Welcome back
+auth.submitSignup|Create account
+auth.submitReset|Send reset link
+auth.submitSignin|Sign in
+auth.passwordPlaceholderNew|At least 6 characters
+auth.passwordPlaceholder|Your password
+auth.hidePassword|Hide password
+auth.showPassword|Show password
+auth.newHere|New to Namasutra?
+auth.haveAccount|Already have an account?
+auth.or|or
+auth.tagline|Discover the chemistry in your name
+auth.orUseEmail|or use email
+auth.email|Email
+auth.password|Password
+auth.forgot|Forgot password?
+auth.createAccountLink|Create an account
+auth.signInLink|Sign in
+auth.backToSignin|← Back to sign in
+auth.continueGoogle|Continue with Google
+auth.continueApple|Continue with Apple
+common.pleaseWait|Please wait...
+common.backToHome|← Back to Home
+common.notAvailable|N/A
+common.backToHomeBtn|Back to Home
+common.loading|Loading...
+common.select|Select
+common.cancel|Cancel
+common.edit|Edit
+profileComplete.title|Complete Your Profile
+profileComplete.subtitle|Tell us a bit about yourself
+profileComplete.fullName|Full Name *
+profileComplete.fullNamePlaceholder|Enter your full name
+profileComplete.dob|Date of Birth *
+profileComplete.gender|Gender *
+profileComplete.selectGender|Select gender
+profileComplete.male|Male
+profileComplete.female|Female
+profileComplete.other|Other
+profileComplete.country|Country *
+profileComplete.countryPlaceholder|Type to search country...
+profileComplete.noCountries|No countries found
+profileComplete.detected|Detected automatically based on your location — change it if this isn't right.
+profileComplete.state|State/Province *
+profileComplete.statePlaceholder|Type to search state...
+profileComplete.noStates|No states found
+profileComplete.referral|Referral Code (Optional)
+profileComplete.referralFromLink|Applied from your invite link - change or clear it if this isn't right.
+profileComplete.referralFormat|Format: country code + 6 digits (e.g., IN482913)
+profileComplete.saving|Saving...
+profileComplete.continue|Continue to Pricing
+analyze.checking|Checking your monthly allowance...
+analyze.remaining_one|{{count}} of {{limit}} analysis remaining this month
+analyze.remaining_other|{{count}} of {{limit}} analyses remaining this month
+analyze.chemistryOf|Chemistry of "{{name}}"
+analyze.tagline|"Elements of the Universe Found in Your Name"
+analyze.title|Analyze Name
+analyze.enterName|Enter Name or Word
+analyze.placeholder|e.g., Rahul
+analyze.button|Analyze Chemistry
+analyze.posterIncluded|Poster image saving and sharing included
+analyze.upgradePdf|Get the Annual Plan for PDF downloads →
+results.colorsMeanings|Element Colors & Meanings
+results.element|Element
+results.atomicNumber|Atomic Number
+results.color|Color
+results.lifeMeaning|Life Meaning
+results.unmatched|Letters with no matching element:
+results.meaningsFor|Element meanings for {{name}}
+results.atomicNumberValue|Atomic number {{number}}
+results.analyzedOn|Analyzed on {{date}}
+results.memberCount_one|{{count}} Name
+results.memberCount_other|{{count}} Family Members
+results.loadingAnalysis|Loading analysis...
+results.loadingFamily|Loading family analysis...
+results.analyzeAnother|Analyze Another Name
+results.analyzeAnotherFamily|Analyze Another Family
+poster.sharedAll_one|Shared by all {{count}} members
+poster.sharedAll_other|Shared by all {{count}} members
+poster.sharedSome_one|Shared by {{n}} of {{count}} members
+poster.sharedSome_other|Shared by {{n}} of {{count}} members
+poster.eyebrow|Every name has a chemistry
+poster.heading|Your Elemental Identity, in Harmony with Nature.
+poster.nameFallback|Your name
+poster.noElements|No periodic elements found in this name.
+poster.noElementsShort|No periodic elements found.
+poster.footerSingle|More than a name. A higher you.
+poster.footerFamily|Different elements. A stronger us.
+poster.footerTagline|DISCOVER · EXPLORE · BE YOU
+poster.commonTitle|Common elements & their meaning
+poster.harmony|The Harmony
+poster.addMember|Add another family member to discover shared elements.
+poster.addMemberShort|Add another member to discover shared elements.
+poster.noShared|No elements are shared between these names.
+poster.noSharedLong|No elements are shared between these names. Each member brings a unique elemental combination.
+poster.sharedSubtitle|Elements shared by two or more family members
+poster.sharedSubtitleCounts|Elements shared by two or more family members. Counts show how many names contain each element.
+poster.relationFallback|Family member
+poster.elementsInNames|Elements in our names
+poster.yourProfile|Your elemental profile
+poster.totalElements|Total elements
+poster.uniqueElements|Unique elements
+poster.connectedNames|Connected names
+poster.elementsThatMake|The elements that make your name
+poster.ariaFamily|Family chemistry poster
+poster.ariaSingle|Personal chemistry poster
+poster.pdfContinued|Your elements / continued
+poster.pdfProfile|Your elemental profile
+poster.pdfTitle|Your Name Chemistry
+poster.pdfAll|All {{count}}
+poster.pdfNOf|{{n}} of {{count}}
+poster.noSharedTop|No elements are shared between these names. Each member brings their own unique elemental combination.
+poster.quoteShared|"Elements shared by two or more family members"
+poster.quoteUnique|"Each member brings a unique combination"
+poster.sharedSubtitlePage2|Elements shared by two or more family members. Their meanings follow on page 2.
+poster.frameProfileContinued|Your elemental profile / continued
+poster.frameCommonContinued|Common elements / continued
+relations.father|Father
+relations.mother|Mother
+relations.son|Son
+relations.daughter|Daughter
+relations.brother|Brother
+relations.sister|Sister
+relations.husband|Husband
+relations.wife|Wife
+relations.friend|Friend
+relations.uncle|Uncle
+relations.aunt|Aunt
+relations.grandfather|Grandfather
+relations.grandmother|Grandmother
+relations.cousin|Cousin
+relations.inLaw|In-Law
+relations.companyName|Company Name
+relations.brandName|Brand Name
+relations.petName|Pet Name
+relations.other|Other
+relations.self|Self
+relations.partner|Partner
+download.titleFamily|Save & share your family poster
+download.titleSingle|Save & share your poster
+download.golden|Golden
+download.dark|Dark
+download.preparing|Preparing...
+download.saveShare|Save & Share Poster
+download.hintFamily|One image with the whole family, shared elements and their meanings.
+download.hintSingle|Your name and element tiles, ready to save or share as an image.
+download.altFamily|Full family poster with shared elements and meanings
+download.altSingle|Share poster for {{name}}
+download.shareHint|Choose WhatsApp, Instagram or Facebook if available in your device share menu. You can also save the image for later.
+download.saveHint|Save the image, then attach it to a WhatsApp message or an Instagram or Facebook post.
+download.shareTitleFamily|Our Family Namasutra
+download.shareTitleSingle|My Namasutra
+download.aria|Download and share your poster
+download.styleLegend|Choose your poster style
+download.pdfFailed|The PDF could not be downloaded. Please try again.
+download.prepareFailed|The poster could not be prepared. Please try again.
+download.shareUnavailable|Sharing is unavailable. Use Save Image, then attach the poster in WhatsApp, Instagram or Facebook.
+download.ready|Your poster is ready. Save it or choose an app to share it.
+download.saveImage|Save Image
+download.shareApps|Share to Apps
+download.pdf|Download Poster PDF
+family.needName|Please enter at least one complete name (First and Last name required)
+family.resultTitleSingle|Name Chemistry
+family.resultTitleFamily|Family Chemistry Analysis
+family.resultTagline|"Elements of the Universe Found in Your Names"
+family.commonAcross|"Common Elements Across All Family Members"
+family.harmonyIntro|Your harmony elements <b>{{elements}}</b> represent shared connection and energy across all names.
+family.subtitle|Analyze up to {{max}} names together
+family.addName|Add Another Name ({{n}}/{{max}})
+family.limitNote|You can compare up to {{max}} names at a time. Run another analysis for more family members.
+family.context.health_stress|Family health-related stress
+family.context.emotional_imbalance|Emotional or relationship imbalance
+family.context.financial_pressure|Financial or career-related challenges
+family.context.general_curiosity|General curiosity / self-understanding
+family.title|Family Package
+family.firstName|First Name *
+family.middleName|Middle Name
+family.lastName|Last Name *
+family.relation|Relation
+family.analyzeAll|Analyze All Names
+family.knowHarmony|Know Your Harmony - Press to Know More
+family.whyExploring|Why are you exploring this? (Optional)
+family.whyHelp|This helps us give you a more meaningful interpretation.
+family.getInterpretation|Get Interpretation
+pricing.reasonFamily|The Family Package is part of the Annual Plan.
+pricing.reasonPlan|Choose the Annual Plan to unlock name analyses and insights.
+pricing.referralApplied|🎉 Referral Code Applied: {{code}}
+pricing.percentOff|{{percent}}% off your plan
+pricing.perYear|/ year
+pricing.referralDiscount|{{percent}}% referral discount applied
+pricing.featureFamily|Family Package: analyze up to {{max}} names together
+pricing.title|NAMASUTRA Annual Plan
+pricing.subtitle|Unlock the chemistry in names
+pricing.badge|EVERYTHING INCLUDED
+pricing.feature1|8 name analyses per month
+pricing.feature2|Family harmony analysis
+pricing.feature3|Beautiful PDF & PNG posters
+pricing.feature4|Hora & Muhurat timings
+pricing.feature5|Chaldean numerology insights
+pricing.feature6|Zodiac name guide
+pricing.feature7|Element & Nakshatra insights
+pricing.cta|Get the Annual Plan
+pricing.billing|The plan is billed yearly. Cancel anytime.
+pricing.subtitle2|Unlock name analyses and insights
+payment.securePowered|🔒 Secure payment powered by {{gateway}}
+payment.planLine|NAMASUTRA Annual Plan (1 year)
+payment.referralLine|Referral code <code>{{code}}</code> ({{percent}}% off)
+payment.includesGst|Includes {{percent}}% GST
+payment.includesTax|Includes {{percent}}% tax
+payment.payTest|Pay {{amount}} (test)
+payment.poweredMock|🔒 Secure payment powered by nothing (mock mode)
+payment.poweredTest|🔒 Secure payment powered by nothing (test mode)
+payment.title|Complete Payment
+payment.subtitle|Secure payment for your NAMASUTRA Annual Plan
+payment.total|Total
+payment.backToPricing|Back to Pricing
+payment.selectMethod|Select Payment Method
+payment.success|Payment successful
+payment.active|Your plan is now active.
+payment.taking|Taking you to your dashboard...
+payment.mockNote|Mock mode: no real payment gateway is used.
+payment.simulateOk|Simulate successful payment
+payment.simulateFail|Simulate failed payment
+payment.testNote|Test mode: no card needed. Click below to simulate a successful payment.
+payment.loadingPaypal|Loading PayPal...
+payment.cancel|Cancel Payment
+payment.processing|Processing...
+payment.payRazorpay|Pay with Razorpay
+nav.backToDashboard|Back to Dashboard
+nav.settings|Settings
+nav.language|Language
+nav.home|Home
+nav.knowMore|Know More
+nav.dashboard|Dashboard
+nav.analyze|Analyze Name
+nav.family|Family Analysis
+nav.insights|Element & Nakshatra Insights
+nav.numerology|Numerology Calculator
+nav.zodiac|Zodiac Name Guide
+nav.hora|Hora & Muhurat
+nav.pricing|Plans & Pricing
+nav.profile|My Profile
+nav.signIn|Sign In
+nav.ambassadorArea|Ambassador area
+nav.ambassadorLogin|Ambassador Login
+nav.admin|Admin
+nav.accounts|Accounts
+nav.explore|Explore Namasutra
+nav.account|Your account
+nav.ambassadors|Ambassadors
+nav.homeAria|Namasutra home
+nav.primary|Primary navigation
+nav.allPages|All pages
+nav.menu|Menu
+nav.signOut|Sign Out
+dashboard.welcome|👋 Welcome, {{name}}!
+dashboard.plan|Plan:
+dashboard.annualPlan|Annual Plan
+dashboard.renews|(Renews: {{date}})
+dashboard.expired|(Expired {{date}})
+dashboard.analysesUsed|Analyses Used:
+dashboard.usedOf|{{used}}/{{total}} this month
+dashboard.choosePlan|Choose a Plan
+dashboard.renewPlan|Renew Your Plan
+dashboard.upgradeHint|Family harmony, {{max}} names, PDF reports & more
+dashboard.familyEntry_one|Family ({{count}} name)
+dashboard.familyEntry_other|Family ({{count}} names)
+dashboard.horaTitle|Today's Hora & Muhurat
+dashboard.elementTitle|Element & Nakshatra Guide
+dashboard.analyzeNew|Analyze New Name
+dashboard.analyzeHint|Discover the chemistry in any name
+dashboard.settingsHint|Account & app settings
+dashboard.knowledgeBase|Knowledge Base
+dashboard.zodiacTitle|Zodiac Name Guide
+dashboard.zodiacText|Discover which starting letters and sounds are traditionally considered lucky for your name, based on your zodiac sign and birth details.
+dashboard.zodiacCta|Explore Name Guide
+dashboard.numerologyTitle|Numerology Calculator
+dashboard.numerologyText|Discover what the numbers in your name and date of birth traditionally reveal about your personality, natural strengths, and life journey.
+dashboard.numerologyCta|Discover Your Numbers
+dashboard.elementText|Explore the chemical elements hidden in the letters of your name and discover how your birth star connects with traditional Vedic beliefs.
+dashboard.elementCta|Explore Your Connections
+dashboard.horaText|See the planetary hora for every hour of the day, plus auspicious and avoid timings for your city.
+dashboard.horaCta|View Today's Timings
+dashboard.recent|Recent Analyses
+dashboard.noAnalyses|No analyses yet. Start by analyzing a name!
+settings.confirmSignOutAll|This will sign you out from all devices. Continue?
+settings.signedOutAll|✅ Signed out from all devices successfully!
+settings.title|Account Settings
+settings.email|Email
+settings.signOut|Sign Out
+settings.signOutDeviceHint|Sign out from this device only.
+settings.signOutDevice|Sign Out This Device
+settings.clearTitle|Sign Out & Clear This Device
+settings.clearHint|Clear all cached data and sign out from all devices where you're logged in. You'll need to sign in again on all devices.
+settings.warning|Warning: This action cannot be undone
+settings.warningText|This will clear all browser data, cookies, and cache. You'll be signed out immediately.
+settings.clearing|Clearing...
+settings.about|About
+settings.app|App:
+settings.version|Version:
+settings.support|Support:
+profile.name|Name
+profile.dob|Date of birth
+profile.gender|Gender
+profile.location|Location
+profile.referralUsed|Referral code used
+profile.plan|Plan
+profile.planActiveUntil|NAMASUTRA Annual Plan - active until {{date}}
+profile.planActive|NAMASUTRA Annual Plan - active
+profile.noPlan|No active plan
+profile.title|My Profile
+profile.complete|Complete your profile
+profile.settings|Account settings
+profile.pricing|Plans & pricing
+notFound.title|Page not found
+notFound.text|This element isn't on our periodic table.
+learn.science1|<b>Namasutra</b> explores how identity can be understood through <b>chemistry, structure, and vibration</b>.
+learn.science2|Every name can be mapped to:
+learn.scienceItem1|Chemical elements from the Periodic Table
+learn.scienceItem2|Atomic properties and elemental color frequencies
+learn.scienceItem3|Sound-based vibrational patterns
+learn.example|Example:
+learn.science3|These elements together form a <b>Name Chemistry Signature</b>, offering insight into personality traits, emotional balance, and compatibility.
+learn.science4|Right vibrations create better alignment.
+learn.spiritual1|At <b>Namasutra</b>, we see the universe as energy in motion — and sound as its first expression.
+learn.spiritual2a|A name carries sound.
+learn.spiritual2b|Sound carries vibration.
+learn.spiritual2c|Vibration shapes experience.
+learn.spiritual3|Each sound resonates with an element, a color, and a cosmic frequency — forming your unique <b>energetic signature</b>.
+learn.spiritual4|Right vibes matter — whether it’s a name, a child, or a brand.
+learn.tabScience|Science
+learn.tabSpiritual|Spiritual
+learn.tabExplainer|How It Works
+learn.topicsAria|Learn more topics
+learn.explainerAria|How Namasutra works
+learn.explainerText|Explore the letters, discover the elements, and create your own Namasutra poster.
+learn.explainerAlt|Namasutra illustrated guide: Vibes becomes Vanadium (V), Iodine (I), Beryllium (Be), and Sulfur (S). Discover your name's elements and create a poster to save and share.
+learn.explainerFull|View the explainer full size
+ambassador.welcomeLine1|Welcome to your
+ambassador.welcomeLine2|ambassador space.
+ambassador.tagline1|Your Elemental Identity,
+ambassador.tagline2|in Harmony with Nature.
+ambassador.signingIn|Signing in...
+ambassador.signInGoogle|Sign in with Google
+ambassador.signInFailed|Sign-in failed: {{message}}
+ambassador.kicker|NAMASUTRA / AMBASSADORS
+ambassador.invitationOnly|INVITATION ONLY
+ambassador.signInTitle|Ambassador sign-in
+ambassador.signInText|Welcome back. Continue with the Google account your invitation was sent to.
+ambassador.helpNote|Need help accessing your account? Contact the person who invited you.
+ambassador.checkInvitation|Check your invitation
+ambassador.notInvited|This Google account hasn't been invited as an Ambassador. Please contact the person who invited you.
+ambassador.signOut|Sign out
+ambassador.field.firstName|First Name
+ambassador.field.middleName|Middle Name
+ambassador.field.lastName|Last Name
+ambassador.field.motherName|Mother's Name
+ambassador.field.dob|Date of Birth
+ambassador.field.gender|Gender
+ambassador.field.profession|Current Profession
+ambassador.field.mobileNumber|Mobile Number
+ambassador.field.alternateMobile|Alternate Mobile
+ambassador.field.email|Email ID
+ambassador.field.countryCode|Country
+ambassador.field.stateCode|State
+ambassador.field.city|City
+ambassador.field.zipCode|ZIP / Postal Code
+ambassador.field.addressLine1|Address Line 1
+ambassador.field.instagram|Instagram
+ambassador.field.facebook|Facebook
+ambassador.field.youtube|YouTube
+ambassador.field.twitter|Twitter / X
+ambassador.field.bankAccountName|Account Holder Name
+ambassador.field.bankName|Bank Name
+ambassador.field.accountNumber|Account Number
+ambassador.field.accountType|Account Type
+ambassador.field.ifscCode|IFSC / SWIFT Code
+ambassador.field.branchName|Branch Name
+ambassador.field.upiId|UPI ID
+ambassador.field.panNumber|PAN Number
+ambassador.field.idType|ID Type
+ambassador.field.idNumber|ID Number
+ambassador.field.nomineeName|Nominee Name
+ambassador.field.nomineeRelation|Relation
+ambassador.field.nomineeContact|Contact
+ambassador.section.personalDetails|Personal Details
+ambassador.section.contactDetails|Contact Details
+ambassador.section.addressDetails|Address Details
+ambassador.section.socialMediaHandles|Social Media Handles
+ambassador.section.bankComplianceDetails|Bank & Compliance Details
+ambassador.section.nomineeDetailsOptional|Nominee Details (Optional)
+ambassador.section.personal|Personal
+ambassador.section.contact|Contact
+ambassador.section.address|Address
+ambassador.section.bankPayout|Bank / Payout
+ambassador.section.idNominee|ID / Nominee
+ambassador.option.male|Male
+ambassador.option.female|Female
+ambassador.option.other|Other
+ambassador.option.aadhaar|Aadhaar
+ambassador.option.passport|Passport
+ambassador.option.drivingLicense|Driving License
+ambassador.option.voterId|Voter ID
+ambassador.option.savings|Savings
+ambassador.option.current|Current
+ambassador.hint.profileUrl|Profile URL
+ambassador.hint.channelUrl|Channel URL
+ambassador.hint.selectGender|Select Gender
+ambassador.selectCountry|Select Country
+ambassador.selectState|Select State
+ambassador.emailLocked|Your Google sign-in email. It cannot be changed.
+ambassador.saveMyDetails|Save my details
+ambassador.account|Account
+ambassador.code|Ambassador Code
+ambassador.history|Change history
+ambassador.historyFailed|The history could not be loaded.
+ambassador.historyEmpty|No changes recorded yet.
+ambassador.detailsSubmitted|Details submitted
+ambassador.changedList|Changed {{fields}}
+ambassador.detailsChanged|Details changed
+ambassador.changedLine|Changed {{label}}: {{old}} → {{new}}
+ambassador.bankChanged|⚠ Bank details changed on {{date}}
+ambassador.detailsSaved|Your details are saved.
+ambassador.saveFailed|Could not save your details: {{message}}
+ambassador.noChanges|No changes to save
+ambassador.changesSaved|Your changes are saved.
+ambassador.saveChangesFailed|Could not save your changes: {{message}}
+ambassador.myDetails|My Details
+ambassador.myDetailsHint|Your profile and payout details.
+ambassador.saveChanges|Save changes
+ambassador.confirmChanges|Confirm your changes
+ambassador.confirmButton|Confirm changes
+ambassador.tabHome|Home
+ambassador.tabRegister|Register
+ambassador.tabFollowers|My Followers
+ambassador.welcome|Welcome, {{name}}.
+ambassador.fallbackName|Ambassador
+ambassador.everything|Everything you need, in one place.
+ambassador.yourSpace|YOUR AMBASSADOR SPACE
+ambassador.active|Active ambassador
+ambassador.sectionsAria|Ambassador sections
+ambassador.loadingWelcome|Loading your welcome...
+ambassador.emptyKicker|WELCOME TO NAMASUTRA
+ambassador.emptyTitle|Your ambassador home
+ambassador.emptyText|Your account is ready. Use the tabs above to manage your profile and view your followers.
+ambassador.welcomeFailed|The welcome text could not be loaded right now.
+ambassador.toolsAria|Your ambassador tools
+ambassador.yourProfile|YOUR PROFILE
+ambassador.detailsSavedTitle|Details saved
+ambassador.makeHome|Make yourself at home
+ambassador.profileSavedText|Your registration details are saved. Review or update them whenever you need.
+ambassador.profileCompleteText|Complete your details to receive payouts.
+ambassador.viewProfile|View your profile
+ambassador.completeDetails|Complete details
+ambassador.signedInAs|Signed in as {{email}}
+followers.latestOnly|Showing each member's latest payment only. Full payment history will appear once it is enabled.
+followers.loadFailed|Could not load your followers. Please refresh the page.
+followers.loading|Loading your followers...
+followers.unknown|Unknown
+followers.noData|No data available
+followers.members|Members
+followers.currentTier|Current tier
+followers.rateCommission|{{rate}} commission
+followers.totalEarnings|Total earnings (net of GST)
+followers.renewalsDue|Renewals due (30 days)
+followers.tierHeading|Your commission tier
+followers.tierText|{{first}} on every payment from your first {{max}} members, then {{rate2}} from the {{next}}st member onward. Commission is calculated on the amount paid, excluding GST.
+followers.progressAria|Progress to the {{rate}} tier
+followers.onTier2|You are on the {{rate}} tier. New members earn you {{rate}}.
+followers.toNextTier_one|{{count}} more member to reach {{rate}}
+followers.toNextTier_other|{{count}} more members to reach {{rate}}
+followers.membersHeading|Members and commission
+followers.noPayments|No payments from your referrals yet. Share your code to get started.
+followers.example|Example: {{paid}} paid − {{tax}} {{taxName}} = {{net}} net × {{rate}} = {{commission}}
+followers.gst|GST
+followers.tax|tax
+followers.colMember|Member
+followers.colPaid|Paid
+followers.colTax|Tax removed
+followers.colNet|Net amount
+followers.colRate|Rate
+followers.colCommission|Commission
+followers.payoutHistory|Payout history
+followers.colMonth|Month
+followers.colAmount|Amount
+followers.colStatus|Status
+followers.colPaidOn|Paid on
+followers.colNote|Note
+followers.status.paid|PAID
+followers.status.pending|PENDING
+followers.byCountry|By Country
+followers.byState|By State
+followers.byGender|By Gender
+followers.byMonth|Month-wise sign-ups
+followers.upcoming|Upcoming renewals (next 30 days)
+followers.expires|Expires {{date}}
+followers.daysLeft_one|{{count}} day left
+followers.daysLeft_other|{{count}} days left
+share.line1|Your name is more than just an identity. What if it has a connection to the very elements of our universe? 🌌
+share.line2|I discovered something fascinating on Namasutra — a unique platform that connects the letters of our names to chemical elements, while exploring numerology, astrology and Nakshatra insights.
+share.line3|Every name has a story. Discover what yours reveals! ✨
+share.line4|🔗 Explore your Namasutra: {{link}}
+share.line5|🎁 Try it with my referral code: {{code}} this can give you a DISCOUNT
+share.emailSubject|Discover the hidden elements in your name
+share.copiedBang|Copied!
+share.messageCopiedBang|Message copied!
+share.cancelled|Sharing was cancelled.
+share.messageCopied|Message copied
+share.pasteMessenger|Message copied. Paste it in Messenger.
+share.pasteLinkedIn|Message copied. Paste it into your LinkedIn post.
+share.pasteFacebook|Message copied. Paste it after sharing on Facebook.
+share.pasteInstagram|Message copied. Paste it in Instagram.
+share.title|Your Referral Code
+share.copyCodeAria|Copy referral code
+share.copied|Copied
+share.copy|Copy
+share.subtitle|Share this code with your network to earn commissions!
+share.share|Share
+share.onApp|Share on {{app}}
+share.byEmail|Share by email
+share.email|Email
+share.copyMessageAria|Copy message to clipboard
+share.copyMessage|Copy message
+share.emailWith|Email with:
+share.defaultMail|Default mail app
+share.messagePreview|Message that will be sent
+invite.subject|You are invited to become a NAMASUTRA Ambassador
+invite.line1|You're invited to become a NAMASUTRA Ambassador 🌟
+invite.line2|Sign in with your Google account ({{email}}) here: {{url}}
+invite.line3|Your unique Ambassador Code is already waiting for you in your dashboard.
+invite.member|Member
+hora.planet.Sun|Sun
+hora.planet.Moon|Moon
+hora.planet.Mars|Mars
+hora.planet.Mercury|Mercury
+hora.planet.Jupiter|Jupiter
+hora.planet.Venus|Venus
+hora.planet.Saturn|Saturn
+hora.note.Sun|Authority, government work, health
+hora.note.Moon|Travel, creativity, family matters
+hora.note.Mars|Courage and action; avoid disputes
+hora.note.Mercury|Business, learning, communication
+hora.note.Jupiter|Teaching, finance, auspicious beginnings
+hora.note.Venus|Arts, relationships, purchases
+hora.note.Saturn|Slow, long-term and routine work
+hora.weekday.0|Sunday
+hora.weekday.1|Monday
+hora.weekday.2|Tuesday
+hora.weekday.3|Wednesday
+hora.weekday.4|Thursday
+hora.weekday.5|Friday
+hora.weekday.6|Saturday
+hora.chog.Udveg|Udveg
+hora.chog.Char|Char
+hora.chog.Labh|Labh
+hora.chog.Amrit|Amrit
+hora.chog.Kaal|Kaal
+hora.chog.Shubh|Shubh
+hora.chog.Rog|Rog
+hora.quality.best|Best
+hora.quality.good|Good
+hora.quality.avoid|Avoid
+hora.now|Now
+hora.yourLocation|Your location
+hora.geoUnavailable|Location is not available in this browser.
+hora.geoFailed|Could not read your location. Please choose a city instead.
+hora.intro|Your daily guide to traditional Vedic timings, calculated for your location from local sunrise and sunset.
+hora.location|Location
+hora.groupIndia|India
+hora.groupWorld|Around the world
+hora.date|Date
+hora.today|Today
+hora.nearMe|Near me
+hora.privacy|Your location is used only in your browser to calculate sunrise and sunset. It is not stored.
+hora.noSun|The sun does not rise or set on this date at this location, so the daily timings cannot be calculated. Please choose another location.
+hora.ruledBy|Ruled by {{planet}}
+hora.sunrise|Sunrise
+hora.sunset|Sunset
+hora.daylight|Daylight
+hora.duration|{{h}}h {{m}}m
+hora.oneMuhurta|One muhurta
+hora.minutes_one|{{count}} min
+hora.minutes_other|{{count}} min
+hora.currentHora|Current hora
+hora.choghadiyaNow|Choghadiya now:
+hora.auspicious|Auspicious timings
+hora.abhijit|Abhijit Muhurat
+hora.abhijitNote|Around local midday, traditionally favourable
+hora.abhijitOff|Abhijit Muhurat: not used today
+hora.abhijitOffNote|On Wednesdays this midday slot ({{range}}) is not treated as auspicious.
+hora.brahma|Brahma Muhurta
+hora.brahmaNote|Before dawn, traditionally for prayer and meditation
+hora.avoid|Timings to avoid
+hora.rahu|Rahu Kalam
+hora.yamagandam|Yamagandam
+hora.gulika|Gulika Kalam
+hora.durMuhurat|Dur Muhurat
+hora.durMuhuratNight|Dur Muhurat (night)
+hora.durSoon|Dur Muhurat: coming soon.
+hora.table24|24-hour planetary hora
+hora.table24Note|12 day horas from sunrise and 12 night horas from sunset. Notes are traditional associations.
+hora.day|Day
+hora.night|Night
+hora.choghadiya|Choghadiya
+hora.disclaimer|Timings follow the Vedic day (sunrise to sunrise) at the selected location and use the common north- and south-Indian calculation rules. Regional almanacs can differ by a few minutes. Tithi, Nakshatra and Yoga will be added later. For guidance and tradition only.
+insights.n001|Element & Nakshatra Insights
+insights.n002|Periodic Table
+insights.n003|Elements Guide
+insights.n004|Nakshatras
+insights.n005|Practical Guide
+insights.n006|Back to Dashboard
+insights.n007|🌟 Unlock the Cosmic Secrets of Your Name 🌟
+insights.n008|Discover how the periodic table elements and ancient Nakshatras shape your identity, personality, and destiny
+insights.n009|📖 How to Read Your Analysis
+insights.n010|Element Percentage:
+insights.n011|Higher % = Stronger influence on your personality
+insights.n012|Nakshatra Ruling Planet:
+insights.n013|Each Nakshatra is governed by a planet that influences your cosmic energy
+insights.n014|Name Chemistry:
+insights.n015|The unique blend of elements in your name creates your personal "cosmic signature"
+insights.n016|🔬 The Science Behind Name Analysis
+insights.n017|Periodic Table Elements:
+insights.n018|Every letter maps to specific elements (like Hydrogen, Carbon, Oxygen) based on vibrational patterns
+insights.n019|Element Properties:
+insights.n020|Each element carries unique traits (stability, reactivity, energy) that influence personality
+insights.n021|Nakshatras:
+insights.n022|Ancient Vedic star constellations linked to planetary energies
+insights.n023|Syllable Science:
+insights.n024|Sound vibrations of name syllables resonate with cosmic frequencies
+insights.n025|✨ Your name isn't just letters—it's a unique chemical and cosmic formula that shapes your energy field!
+insights.n026|🧪 The Periodic Table of Elements
+insights.n027|Understanding the building blocks of matter helps us decode the vibrational essence of your name. Each element carries specific energetic properties that influence personality traits.
+insights.n028|⚛️ Noble Gases (Group 18) - The Independent Souls
+insights.n029|Element
+insights.n030|Symbol
+insights.n031|Atomic Number
+insights.n032|Key Traits
+insights.n033|Helium
+insights.n034|He
+insights.n035|Light, uplifting, carefree nature
+insights.n036|Neon
+insights.n037|Ne
+insights.n038|Bright, attention-grabbing, vibrant
+insights.n039|Argon
+insights.n040|Ar
+insights.n041|Calm, non-reactive, peaceful
+insights.n042|Krypton
+insights.n043|Kr
+insights.n044|Mysterious, hidden strength
+insights.n045|Xenon
+insights.n046|Xe
+insights.n047|Unique, exotic, rare qualities
+insights.n048|Radon
+insights.n049|Rn
+insights.n050|Powerful but invisible influence
+insights.n051|🔥 Alkali Metals (Group 1) - The Reactive Leaders
+insights.n052|Lithium
+insights.n053|Li
+insights.n054|Energetic, mood-balancing, dynamic
+insights.n055|Sodium
+insights.n056|Na
+insights.n057|Essential, social, highly reactive
+insights.n058|Potassium
+insights.n059|Vital, nerve-conducting, quick
+insights.n060|Rubidium
+insights.n061|Rb
+insights.n062|Explosive potential, rare talent
+insights.n063|Cesium
+insights.n064|Cs
+insights.n065|Extremely reactive, time-precise
+insights.n066|Francium
+insights.n067|Fr
+insights.n068|Rarest, most reactive, unstable genius
+insights.n069|💪 Alkaline Earth Metals (Group 2) - The Stable Supporters
+insights.n070|Beryllium
+insights.n071|Be
+insights.n072|Strong yet lightweight, resilient
+insights.n073|Magnesium
+insights.n074|Mg
+insights.n075|Vital for energy, bright burning
+insights.n076|Calcium
+insights.n077|Ca
+insights.n078|Structural support, bone of operations
+insights.n079|Strontium
+insights.n080|Sr
+insights.n081|Firework-like brilliance, flashy
+insights.n082|Barium
+insights.n083|Ba
+insights.n084|Heavy, grounding, medical healing
+insights.n085|Radium
+insights.n086|Ra
+insights.n087|Radioactive glow, dangerous beauty
+insights.n088|⚙️ Transition Metals (Groups 3-12) - The Versatile Achievers
+insights.n089|Key metals include: Iron (Fe), Copper (Cu), Silver (Ag), Gold (Au), Platinum (Pt)
+insights.n090|Traits: Strength, conductivity, versatility, value, beauty, durability
+insights.n091|🌍 Lanthanides & Actinides - The Rare & Powerful
+insights.n092|Rare earth elements and radioactive elements
+insights.n093|Traits: Magnetic properties, hidden power, transformative energy, technological advancement
+insights.n094|🧬 Non-metals - The Life Essentials
+insights.n095|Hydrogen
+insights.n096|Most abundant, foundation of stars, light
+insights.n097|Carbon
+insights.n098|Basis of all life, versatile bonding
+insights.n099|Nitrogen
+insights.n100|Essential for growth, atmospheric calm
+insights.n101|Oxygen
+insights.n102|Life-giving breath, energy burning
+insights.n103|Phosphorus
+insights.n104|Energy transfer (ATP), glowing potential
+insights.n105|Sulfur
+insights.n106|Transformative, purifying, volcanic
+insights.n107|⚡ Halogens (Group 17) - The Intense Reactors
+insights.n108|Fluorine
+insights.n109|Most reactive, protective, sharp
+insights.n110|Chlorine
+insights.n111|Cl
+insights.n112|Purifying, cleansing, essential
+insights.n113|Bromine
+insights.n114|Br
+insights.n115|Liquid intensity, sedative calm
+insights.n116|Iodine
+insights.n117|Thyroid regulator, purple mystery
+insights.n118|Astatine
+insights.n119|At
+insights.n120|Rarest natural, fleeting presence
+insights.n121|🎯 What Each Element Means in Your Name
+insights.n122|Why Element Percentages Matter
+insights.n123|The elements in your name create your unique "energetic signature"
+insights.n124|High % Element = Dominant Trait
+insights.n125|Balanced Elements = Harmonious Personality
+insights.n126|Rare Elements = Unique Gifts
+insights.n127|⭐ The 27 Nakshatras - Cosmic Star Constellations
+insights.n128|Nakshatras are the 27 lunar mansions used in Vedic astrology. Each syllable of your name resonates with specific Nakshatra energies, influencing your personality and destiny.
+insights.n129|🔥 Fire Nakshatras (Ruled by Sun, Mars, Ketu)
+insights.n130|Nakshatra
+insights.n131|Ruling Planet
+insights.n132|Pada Syllables
+insights.n133|Ashwini
+insights.n134|Ketu
+insights.n135|Chu, Che, Cho, La
+insights.n136|Swift action, healing, pioneering
+insights.n137|Bharani
+insights.n138|Venus
+insights.n139|Li, Lu, Le, Lo
+insights.n140|Nurturing, creative, transformative
+insights.n141|Krittika
+insights.n142|Sun
+insights.n143|A, I, U, E
+insights.n144|Sharp intellect, purifying, fiery
+insights.n145|Magha
+insights.n146|Ma, Mi, Mu, Me
+insights.n147|Royal authority, ancestral pride
+insights.n148|Purva Phalguni
+insights.n149|Mo, Ta, Ti, Tu
+insights.n150|Artistic, pleasure-loving, generous
+insights.n151|Uttara Phalguni
+insights.n152|Te, To, Pa, Pi
+insights.n153|Leadership, friendship, helpful
+insights.n154|Purva Ashadha
+insights.n155|Bhu, Dha, Pha, Dha
+insights.n156|Invincible energy, optimistic
+insights.n157|Uttara Ashadha
+insights.n158|Bhe, Bho, Ja, Ji
+insights.n159|Victory, lasting success
+insights.n160|Mula
+insights.n161|Ye, Yo, Bha, Bhi
+insights.n162|Root investigation, spiritual depth
+insights.n163|🌊 Water Nakshatras (Ruled by Moon, Mercury)
+insights.n164|Rohini
+insights.n165|Moon
+insights.n166|O, Va, Vi, Vu
+insights.n167|Growth, beauty, materialistic
+insights.n168|Hasta
+insights.n169|Pu, Sha, Na, Tha
+insights.n170|Skillful hands, clever, dexterous
+insights.n171|Shravana
+insights.n172|Ju, Je, Jo, Kha
+insights.n173|Listening, learning, wisdom
+insights.n174|Ashlesha
+insights.n175|Mercury
+insights.n176|Di, Du, De, Do
+insights.n177|Mystical, serpent wisdom, cunning
+insights.n178|Jyeshtha
+insights.n179|No, Ya, Yi, Yu
+insights.n180|Elder authority, protective
+insights.n181|Revati
+insights.n182|De, Do, Cha, Chi
+insights.n183|Journey completion, nourishing
+insights.n184|🌍 Earth Nakshatras (Ruled by Mars, Rahu, Saturn)
+insights.n185|Mrigashira
+insights.n186|Mars
+insights.n187|Ve, Vo, Ka, Ki
+insights.n188|Searching, gentle, curious
+insights.n189|Chitra
+insights.n190|Pe, Po, Ra, Ri
+insights.n191|Artistic brilliance, craftsmanship
+insights.n192|Dhanishta
+insights.n193|Ga, Gi, Gu, Ge
+insights.n194|Wealthy, musical, rhythmic
+insights.n195|Ardra
+insights.n196|Rahu
+insights.n197|Ku, Gha, Nga, Chha
+insights.n198|Storm energy, transformative tears
+insights.n199|Swati
+insights.n200|Ru, Re, Ro, Ta
+insights.n201|Independent wind, freedom-loving
+insights.n202|Shatabhisha
+insights.n203|Go, Sa, Si, Su
+insights.n204|Healing, mysterious, secretive
+insights.n205|Pushya
+insights.n206|Saturn
+insights.n207|Hu, He, Ho, Da
+insights.n208|Nourishing, spiritual, disciplined
+insights.n209|Anuradha
+insights.n210|Na, Ni, Nu, Ne
+insights.n211|Devotional, friendship, balance
+insights.n212|Uttara Bhadrapada
+insights.n213|Du, Tha, Jha, Tra
+insights.n214|Deep wisdom, serpent power
+insights.n215|💨 Air Nakshatras (Ruled by Jupiter)
+insights.n216|Punarvasu
+insights.n217|Jupiter
+insights.n218|Ke, Ko, Ha, Hi
+insights.n219|Renewal, return, optimistic
+insights.n220|Vishakha
+insights.n221|Ti, Tu, Te, To
+insights.n222|Goal-oriented, determined, forked
+insights.n223|Purva Bhadrapada
+insights.n224|Se, So, Da, Di
+insights.n225|Intense transformation, dual nature
+insights.n226|⚠️ Important Correction:
+insights.n227|While traditional texts group Nakshatras by element, modern astrology recognizes that planetary rulers have more influence than elemental classification. Focus on the ruling planet's energy for accurate interpretation.
+insights.n228|📋 How to Use Your Name Analysis
+insights.n229|Identify Your Dominant Elements
+insights.n230|Check which elements have the highest percentage in your name
+insights.n231|These represent your core personality traits
+insights.n232|Example: High Carbon (C) = Strong life force, adaptable
+insights.n233|Find Your Nakshatra Connections
+insights.n234|Look up each syllable of your name in the Nakshatra tables
+insights.n235|Note the ruling planets for those Nakshatras
+insights.n236|Planets appearing multiple times have stronger influence
+insights.n237|Understand Element Interactions
+insights.n238|Metals + Non-metals = Balance of strength and flexibility
+insights.n239|Noble gases = Independent, self-sufficient nature
+insights.n240|Multiple reactive elements = Dynamic, energetic personality
+insights.n241|Apply to Life Decisions
+insights.n242|Career: Match your dominant elements with suitable professions
+insights.n243|Relationships: Understand compatibility through elemental balance
+insights.n244|Personal Growth: Strengthen weak elements through conscious effort
+insights.n245|🚀 Ready to Discover Your Cosmic Blueprint?
+insights.n246|Analyze your name now and unlock the secrets written in the stars!
+insights.n247|Analyze Your Name Now
+numerology.interpretation.1|Leadership, independence, innovation. You are a natural pioneer.
+numerology.interpretation.2|Harmony, cooperation, balance. You excel in partnerships.
+numerology.interpretation.3|Creativity, expression, joy. You bring light and inspiration.
+numerology.interpretation.4|Stability, hard work, foundation. You build lasting structures.
+numerology.interpretation.5|Freedom, adventure, change. You thrive on variety and exploration.
+numerology.interpretation.6|Nurturing, responsibility, harmony. You care for others naturally.
+numerology.interpretation.7|Wisdom, introspection, spirituality. You seek deeper truths.
+numerology.interpretation.8|Power, abundance, achievement. You manifest material success.
+numerology.interpretation.9|Compassion, completion, humanitarianism. You serve the greater good.
+numerology.interpretation.11|Intuition, enlightenment, inspiration. Master number of spiritual insight.
+numerology.interpretation.22|Master builder, vision, manifestation. You turn dreams into reality.
+numerology.interpretation.33|Master teacher, compassion, blessing. You uplift and heal others.
+numerology.interpretation.default|Unique energy pattern
+numerology.meaning.1.destiny|Natural leader, independent, ambitious. You're meant to pioneer new paths.
+numerology.meaning.1.soulUrge|Deep desire for independence and leadership. You crave recognition.
+numerology.meaning.1.personality|Others see you as confident, assertive, and self-reliant.
+numerology.meaning.1.lifePath|Your journey is about developing leadership and independence.
+numerology.meaning.1.expression|You express yourself through innovation and individuality.
+numerology.meaning.2.destiny|Peacemaker, diplomat, cooperative. You bring harmony to situations.
+numerology.meaning.2.soulUrge|You desire peace, partnership, and emotional connections.
+numerology.meaning.2.personality|Others perceive you as gentle, diplomatic, and supportive.
+numerology.meaning.2.lifePath|Your path involves cooperation, relationships, and balance.
+numerology.meaning.2.expression|You express through empathy, mediation, and partnerships.
+numerology.meaning.3.destiny|Creative communicator, artist, entertainer. You inspire through expression.
+numerology.meaning.3.soulUrge|You crave creative expression and joyful connections.
+numerology.meaning.3.personality|Others see you as charming, creative, and expressive.
+numerology.meaning.3.lifePath|Your journey centers on creativity and self-expression.
+numerology.meaning.3.expression|You express through art, words, and creative pursuits.
+numerology.meaning.4.destiny|Builder, organizer, practical. You create stable foundations.
+numerology.meaning.4.soulUrge|You desire security, order, and tangible achievements.
+numerology.meaning.4.personality|Others view you as reliable, hardworking, and grounded.
+numerology.meaning.4.lifePath|Your path involves building lasting structures and systems.
+numerology.meaning.4.expression|You express through practical work and organization.
+numerology.meaning.5.destiny|Freedom seeker, adventurer, change agent. You thrive on variety.
+numerology.meaning.5.soulUrge|You crave freedom, adventure, and new experiences.
+numerology.meaning.5.personality|Others see you as dynamic, adventurous, and unpredictable.
+numerology.meaning.5.lifePath|Your journey is about embracing change and freedom.
+numerology.meaning.5.expression|You express through exploration and adaptability.
+numerology.meaning.6.destiny|Nurturer, caregiver, teacher. You create harmony and beauty.
+numerology.meaning.6.soulUrge|You desire to nurture, love, and create beautiful environments.
+numerology.meaning.6.personality|Others perceive you as caring, responsible, and supportive.
+numerology.meaning.6.lifePath|Your path involves service, family, and community.
+numerology.meaning.6.expression|You express through caring, teaching, and healing.
+numerology.meaning.7.destiny|Seeker, analyst, mystic. You search for deeper truths.
+numerology.meaning.7.soulUrge|You crave knowledge, solitude, and spiritual understanding.
+numerology.meaning.7.personality|Others see you as mysterious, intellectual, and reserved.
+numerology.meaning.7.lifePath|Your journey involves spiritual growth and inner wisdom.
+numerology.meaning.7.expression|You express through analysis, research, and spirituality.
+numerology.meaning.8.destiny|Powerhouse, executive, manifester. You achieve material success.
+numerology.meaning.8.soulUrge|You desire power, success, and material accomplishment.
+numerology.meaning.8.personality|Others view you as powerful, ambitious, and authoritative.
+numerology.meaning.8.lifePath|Your path involves mastering material world and leadership.
+numerology.meaning.8.expression|You express through business, management, and achievement.
+numerology.meaning.9.destiny|Humanitarian, teacher, healer. You serve humanity.
+numerology.meaning.9.soulUrge|You desire to help humanity and create positive change.
+numerology.meaning.9.personality|Others see you as compassionate, wise, and selfless.
+numerology.meaning.9.lifePath|Your journey is about service, compassion, and completion.
+numerology.meaning.9.expression|You express through humanitarian work and universal love.
+numerology.meaning.11.destiny|Master teacher, spiritual messenger. You inspire and enlighten.
+numerology.meaning.11.soulUrge|You desire spiritual illumination and to inspire others.
+numerology.meaning.11.personality|Others see you as inspirational and spiritually gifted.
+numerology.meaning.11.lifePath|Your path is spiritual leadership and enlightenment.
+numerology.meaning.11.expression|You express through intuition and spiritual teaching.
+numerology.meaning.22.destiny|Master builder. You manifest dreams into reality on large scale.
+numerology.meaning.22.soulUrge|You desire to build something lasting and significant.
+numerology.meaning.22.personality|Others view you as capable of achieving the impossible.
+numerology.meaning.22.lifePath|Your path involves manifesting grand visions into reality.
+numerology.meaning.22.expression|You express through building systems that serve many.
+numerology.meaning.33.destiny|Master teacher, healer of healers. You uplift humanity.
+numerology.meaning.33.soulUrge|You desire to nurture and heal on a universal scale.
+numerology.meaning.33.personality|Others see you as a beacon of unconditional love.
+numerology.meaning.33.lifePath|Your path is about selfless service and universal love.
+numerology.meaning.33.expression|You express through compassionate service to all.
+numerology.meaning.default|Unique energy with special significance.
+astrology.match|✅ "{{name}}" starts with "{{syllable}}" - Perfect alignment with your Nakshatra!
+astrology.noMatch|ℹ️ For your birth date, names starting with {{syllables}} are considered auspicious.
+numerologyPage.n001|"Every number carries a unique vibration and meaning"
+numerologyPage.n002|Destiny Number
+numerologyPage.n003|Your life's purpose and path
+numerologyPage.n004|Life Path Number
+numerologyPage.n005|Your journey and lessons
+numerologyPage.n006|Soul Urge Number
+numerologyPage.n007|Your heart's deepest desires
+numerologyPage.n008|Personality Number
+numerologyPage.n009|How others see you
+numerologyPage.n010|Expression Number
+numerologyPage.n011|Your natural talents
+numerologyPage.n012|✨ Understanding Your Numbers
+numerologyPage.n013|These numbers reveal different aspects of your personality and life path. Use them as guidance to understand your strengths, challenges, and life purpose.
+numerologyPage.n014|Discover Your Numbers
+numerologyPage.n015|Enter details below to calculate your numerology profile
+numerologyPage.n016|This is for:
+numerologyPage.n017|First Name *
+numerologyPage.n018|Middle Name (Optional)
+numerologyPage.n019|Last Name *
+numerologyPage.n020|Birth Date (Optional - for Life Path Number)
+numerologyPage.n021|Calculate My Numbers
+numerologyPage.n022|📖 What You'll Discover
+numerologyPage.n023|Destiny Number:
+numerologyPage.n024|Your life purpose and mission
+numerologyPage.n025|Life Path Number:
+numerologyPage.n026|Your journey and key lessons
+numerologyPage.n027|Soul Urge Number:
+numerologyPage.n028|Your deepest desires
+numerologyPage.n029|Personality Number:
+numerologyPage.n030|How others perceive you
+numerologyPage.n031|Expression Number:
+numerologyPage.n032|Enter first name
+numerologyPage.n033|Enter middle name
+numerologyPage.n034|Enter last name
+numerologyPage.needName|Please enter at least first and last name
+zodiac.intro.western.heading|Discover a Name That Resonates with Your Zodiac Sign
+zodiac.intro.western.p1|In Western astrology, every zodiac sign is traditionally associated with distinct qualities, energies and personality traits.
+zodiac.intro.western.p2|Whether you're naming a newborn, starting a business or beginning something new, explore names and starting syllables traditionally associated with your zodiac sign.
+zodiac.intro.western.p3|According to astrological beliefs, choosing a name aligned with these qualities is thought to create a symbolic harmony between the name, the individual's identity and the universal energies represented by the zodiac.
+zodiac.intro.vedic.heading|Discover a Name That Resonates with Your Birth Star
+zodiac.intro.vedic.p1|In Vedic astrology, the moment of birth determines a child's Nakshatra (birth star) and Pada (quarter). Each of the 27 Nakshatras is traditionally associated with specific sounds and syllables believed to carry distinct cosmic vibrations.
+zodiac.intro.vedic.p2|For generations, families have used these auspicious syllables when naming newborns, believing that a name beginning with the recommended sound creates harmony with the cosmic energies associated with the child's birth star.
+zodiac.intro.vedic.p3|This traditional practice can also inspire the naming of businesses, ventures and new beginnings, with the belief that a thoughtfully chosen name symbolises harmony, positivity and auspicious beginnings.
+zodiac.western.aries.sign|Aries
+zodiac.western.aries.dates|Mar 21 - Apr 19
+zodiac.western.aries.element|Fire
+zodiac.western.aries.colors|Red, Scarlet
+zodiac.western.aries.traits|Bold, ambitious, confident, energetic
+zodiac.western.aries.bestFor|Leadership, entrepreneurship, sports
+zodiac.western.taurus.sign|Taurus
+zodiac.western.taurus.dates|Apr 20 - May 20
+zodiac.western.taurus.element|Earth
+zodiac.western.taurus.colors|Pink, Green
+zodiac.western.taurus.traits|Reliable, patient, practical, devoted
+zodiac.western.taurus.bestFor|Finance, art, fashion, agriculture
+zodiac.western.gemini.sign|Gemini
+zodiac.western.gemini.dates|May 21 - Jun 20
+zodiac.western.gemini.element|Air
+zodiac.western.gemini.colors|Yellow, Light Green
+zodiac.western.gemini.traits|Curious, adaptable, communicative, witty
+zodiac.western.gemini.bestFor|Media, teaching, sales, writing
+zodiac.western.cancer.sign|Cancer
+zodiac.western.cancer.dates|Jun 21 - Jul 22
+zodiac.western.cancer.element|Water
+zodiac.western.cancer.colors|White, Silver
+zodiac.western.cancer.traits|Nurturing, intuitive, emotional, protective
+zodiac.western.cancer.bestFor|Healthcare, hospitality, counseling
+zodiac.western.leo.sign|Leo
+zodiac.western.leo.dates|Jul 23 - Aug 22
+zodiac.western.leo.element|Fire
+zodiac.western.leo.colors|Gold, Orange
+zodiac.western.leo.traits|Confident, generous, charismatic, dramatic
+zodiac.western.leo.bestFor|Entertainment, politics, management
+zodiac.western.virgo.sign|Virgo
+zodiac.western.virgo.dates|Aug 23 - Sep 22
+zodiac.western.virgo.element|Earth
+zodiac.western.virgo.colors|Green, Brown
+zodiac.western.virgo.traits|Analytical, practical, perfectionist, helpful
+zodiac.western.virgo.bestFor|Healthcare, analysis, service industry
+zodiac.western.libra.sign|Libra
+zodiac.western.libra.dates|Sep 23 - Oct 22
+zodiac.western.libra.element|Air
+zodiac.western.libra.colors|Blue, Pink
+zodiac.western.libra.traits|Diplomatic, fair, social, harmonious
+zodiac.western.libra.bestFor|Law, diplomacy, design, partnerships
+zodiac.western.scorpio.sign|Scorpio
+zodiac.western.scorpio.dates|Oct 23 - Nov 21
+zodiac.western.scorpio.element|Water
+zodiac.western.scorpio.colors|Red, Maroon
+zodiac.western.scorpio.traits|Passionate, mysterious, intense, transformative
+zodiac.western.scorpio.bestFor|Research, psychology, investigation
+zodiac.western.sagittarius.sign|Sagittarius
+zodiac.western.sagittarius.dates|Nov 22 - Dec 21
+zodiac.western.sagittarius.element|Fire
+zodiac.western.sagittarius.colors|Purple, Yellow
+zodiac.western.sagittarius.traits|Optimistic, adventurous, philosophical, free
+zodiac.western.sagittarius.bestFor|Travel, education, publishing
+zodiac.western.capricorn.sign|Capricorn
+zodiac.western.capricorn.dates|Dec 22 - Jan 19
+zodiac.western.capricorn.element|Earth
+zodiac.western.capricorn.colors|Black, Brown
+zodiac.western.capricorn.traits|Disciplined, ambitious, responsible, patient
+zodiac.western.capricorn.bestFor|Business, real estate, governance
+zodiac.western.aquarius.sign|Aquarius
+zodiac.western.aquarius.dates|Jan 20 - Feb 18
+zodiac.western.aquarius.element|Air
+zodiac.western.aquarius.colors|Blue, Grey
+zodiac.western.aquarius.traits|Independent, innovative, humanitarian, eccentric
+zodiac.western.aquarius.bestFor|Technology, social work, innovation
+zodiac.western.pisces.sign|Pisces
+zodiac.western.pisces.dates|Feb 19 - Mar 20
+zodiac.western.pisces.element|Water
+zodiac.western.pisces.colors|Sea Green, Lavender
+zodiac.western.pisces.traits|Compassionate, artistic, intuitive, sensitive
+zodiac.western.pisces.bestFor|Arts, music, healing, spirituality
+zodiac.vedic.meshaAries.sign|Mesha (Aries)
+zodiac.vedic.meshaAries.dates|Apr 13 - May 14
+zodiac.vedic.meshaAries.element|Fire
+zodiac.vedic.meshaAries.colors|Red, Maroon
+zodiac.vedic.meshaAries.traits|Bold, ambitious, warrior spirit, leadership
+zodiac.vedic.meshaAries.bestFor|Defense, sports, entrepreneurship
+zodiac.vedic.vrishabhaTaurus.sign|Vrishabha (Taurus)
+zodiac.vedic.vrishabhaTaurus.dates|May 15 - Jun 14
+zodiac.vedic.vrishabhaTaurus.element|Earth
+zodiac.vedic.vrishabhaTaurus.colors|White, Pink
+zodiac.vedic.vrishabhaTaurus.traits|Stable, practical, artistic, luxury-loving
+zodiac.vedic.vrishabhaTaurus.bestFor|Finance, beauty, art, agriculture
+zodiac.vedic.mithunaGemini.sign|Mithuna (Gemini)
+zodiac.vedic.mithunaGemini.dates|Jun 15 - Jul 14
+zodiac.vedic.mithunaGemini.element|Air
+zodiac.vedic.mithunaGemini.colors|Green, Yellow
+zodiac.vedic.mithunaGemini.traits|Intelligent, communicative, dual nature
+zodiac.vedic.mithunaGemini.bestFor|Media, business, communication, trade
+zodiac.vedic.karkaCancer.sign|Karka (Cancer)
+zodiac.vedic.karkaCancer.dates|Jul 15 - Aug 14
+zodiac.vedic.karkaCancer.element|Water
+zodiac.vedic.karkaCancer.colors|White, Cream
+zodiac.vedic.karkaCancer.traits|Emotional, nurturing, protective, intuitive
+zodiac.vedic.karkaCancer.bestFor|Healthcare, hospitality, social work
+zodiac.vedic.simhaLeo.sign|Simha (Leo)
+zodiac.vedic.simhaLeo.dates|Aug 15 - Sep 15
+zodiac.vedic.simhaLeo.element|Fire
+zodiac.vedic.simhaLeo.colors|Gold, Orange
+zodiac.vedic.simhaLeo.traits|Royal, confident, generous, leadership
+zodiac.vedic.simhaLeo.bestFor|Politics, entertainment, authority roles
+zodiac.vedic.kanyaVirgo.sign|Kanya (Virgo)
+zodiac.vedic.kanyaVirgo.dates|Sep 16 - Oct 15
+zodiac.vedic.kanyaVirgo.element|Earth
+zodiac.vedic.kanyaVirgo.colors|Green, Brown
+zodiac.vedic.kanyaVirgo.traits|Analytical, perfectionist, service-oriented
+zodiac.vedic.kanyaVirgo.bestFor|Medicine, accounting, analysis
+zodiac.vedic.tulaLibra.sign|Tula (Libra)
+zodiac.vedic.tulaLibra.dates|Oct 16 - Nov 14
+zodiac.vedic.tulaLibra.element|Air
+zodiac.vedic.tulaLibra.colors|White, Pink
+zodiac.vedic.tulaLibra.traits|Balanced, diplomatic, artistic, fair
+zodiac.vedic.tulaLibra.bestFor|Law, arts, business, partnerships
+zodiac.vedic.vrishchikaScorpio.sign|Vrishchika (Scorpio)
+zodiac.vedic.vrishchikaScorpio.dates|Nov 15 - Dec 14
+zodiac.vedic.vrishchikaScorpio.element|Water
+zodiac.vedic.vrishchikaScorpio.colors|Red, Maroon
+zodiac.vedic.vrishchikaScorpio.traits|Intense, secretive, transformative, powerful
+zodiac.vedic.vrishchikaScorpio.bestFor|Research, occult, surgery, investigation
+zodiac.vedic.dhanuSagittarius.sign|Dhanu (Sagittarius)
+zodiac.vedic.dhanuSagittarius.dates|Dec 15 - Jan 13
+zodiac.vedic.dhanuSagittarius.element|Fire
+zodiac.vedic.dhanuSagittarius.colors|Yellow, Orange
+zodiac.vedic.dhanuSagittarius.traits|Philosophical, optimistic, spiritual, truthful
+zodiac.vedic.dhanuSagittarius.bestFor|Teaching, religion, travel, education
+zodiac.vedic.makaraCapricorn.sign|Makara (Capricorn)
+zodiac.vedic.makaraCapricorn.dates|Jan 14 - Feb 12
+zodiac.vedic.makaraCapricorn.element|Earth
+zodiac.vedic.makaraCapricorn.colors|Black, Dark Blue
+zodiac.vedic.makaraCapricorn.traits|Disciplined, hardworking, ambitious, practical
+zodiac.vedic.makaraCapricorn.bestFor|Administration, construction, governance
+zodiac.vedic.kumbhaAquarius.sign|Kumbha (Aquarius)
+zodiac.vedic.kumbhaAquarius.dates|Feb 13 - Mar 12
+zodiac.vedic.kumbhaAquarius.element|Air
+zodiac.vedic.kumbhaAquarius.colors|Blue, Grey
+zodiac.vedic.kumbhaAquarius.traits|Humanitarian, innovative, unconventional
+zodiac.vedic.kumbhaAquarius.bestFor|Technology, social reform, science
+zodiac.vedic.meenaPisces.sign|Meena (Pisces)
+zodiac.vedic.meenaPisces.dates|Mar 13 - Apr 12
+zodiac.vedic.meenaPisces.element|Water
+zodiac.vedic.meenaPisces.colors|Yellow, Light Green
+zodiac.vedic.meenaPisces.traits|Compassionate, spiritual, artistic, intuitive
+zodiac.vedic.meenaPisces.bestFor|Arts, healing, spirituality, charity
+zodiac.titleWestern|🌟 Western Zodiac
+zodiac.titleVedic|🕉️ Vedic Astrology
+zodiac.optWestern|Western Zodiac
+zodiac.optVedic|Vedic Astrology
+zodiac.hide|Tap to hide details
+zodiac.more|Tap to see more
+zodiacPage.n001|✨ Auspicious Syllables:
+zodiacPage.n002|📝 Example Names:
+zodiacPage.n003|🎲 Lucky Numbers:
+zodiacPage.n004|🎨 Lucky Colors:
+zodiacPage.n005|✨ Personality:
+zodiacPage.n006|💼 Best Career:
+zodiacPage.n007|💡 How to Use
+zodiacPage.n008|Find your zodiac sign based on birth date
+zodiacPage.n009|Choose names starting with the auspicious syllables
+zodiacPage.n010|Tap any card to see more details and examples
+zodiacPage.n011|Switch between Western and Vedic systems using dropdown above
+ai.yourApp|your AI app
+ai.reportTitle|Namasutra Family Report
+ai.title|Deepen Your Understanding with AI (Free)
+ai.subtitle|Uses your own AI account. Your full report is sent along.
+ai.subtitleReasons|Uses your own AI account. Your full report is sent along, including the reasons you selected.
+ai.sendPdf|Send PDF to my AI app
+ai.ask|Ask {{name}}
+ai.copied|✅ Your report has been copied. If it isn't already in the {{app}} chat box, paste it in (<b>Ctrl+V</b> on a computer, or <b>long-press → Paste</b> on a phone) and send.
+ai.hideHelp|Hide help
+ai.howWorks|How does this work?
+ai.help1|<b>Send PDF to my AI app:</b> opens your phone's share menu with the PDF report attached. Choose Claude, ChatGPT or Gemini and the report arrives ready to send.
+ai.help2|<b>Ask Claude / ChatGPT / Gemini:</b> opens the AI in a new tab with your full report (names, elements, meanings and harmony) already written as a question. It's also copied, so you can paste it if the box is empty. Gemini always needs a paste.
+ai.help3|<b>Want to attach the PDF too?</b> Use <i>Download PDF</i> at the top, then drag the file into the chat or use the AI's attach (paperclip) button.
+ai.help4|You'll need to be signed in to your AI account. Namasutra doesn't see your conversation.
+ai.promptIntro|I used Namasutra ({{host}}), which maps the letters of a name to periodic table elements. Here is my family report:
+ai.promptElement|  - {{name}} ({{symbol}}, atomic number {{number}}): {{meaning}}
+ai.promptHarmony|Harmony elements shared by everyone: {{elements}}
+ai.promptWhy|Why I'm exploring this: {{reasons}}
+ai.promptQuestion|Can you help me understand what these elements and the harmony between our names might signify, and how they connect us as a family?
+page.title|Namasutra - Your Elemental Identity
+page.description|Discover the hidden chemistry in your name through periodic elements, Chaldean numerology and Hindu astrology.

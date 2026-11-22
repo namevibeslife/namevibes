@@ -1,0 +1,25 @@
+TOP BAR
+  width 320: ok in 6 languages x 3 pages (one row, 44px globe, no overlap, no overflow)
+  width 360: ok in 6 languages x 3 pages (one row, 44px globe, no overlap, no overflow)
+  width 390: ok in 6 languages x 3 pages (one row, 44px globe, no overlap, no overflow)
+  width 1280: ok in 6 languages x 3 pages (one row, 44px globe, no overlap, no overflow)
+
+COMING SOON 390
+  switch default off: true
+  admin note: ⚠ Only Razorpay supports AED (PayPal does not), and Razorpay's International Payments is switched off, so customers here will see "payments not availa
+  card shows: Payment gateway None (checkout blocked) (auto) Referral
+  pricing: coming-soon notice: true | notify form: 1 | pay button present: 0
+  after notify: Thank you.
+  switch ON -> coming soon gone: true | button: 1 | gateway text: Razorpay
+  payment page gateway line: Gateway that would be used: Razorpay
+
+COMING SOON desktop
+  switch default off: true
+  admin note: ⚠ Only Razorpay supports AED (PayPal does not), and Razorpay's International Payments is switched off, so customers here will see "payments not availa
+  card shows: Payment gateway None (checkout blocked) (auto) Referral
+  pricing: coming-soon notice: true | notify form: 1 | pay button present: 0
+  after notify: Thank you.
+  switch ON -> coming soon gone: true | button: 1 | gateway text: Razorpay
+  payment page gateway line: Gateway that would be used: Razorpay
+
+errors: none

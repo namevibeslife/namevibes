@@ -1,0 +1,24 @@
+en single gold pdf pages 1 (vector pdf)
+en family gold pdf pages 1 (vector pdf)
+en single dark pdf pages 1 (vector pdf)
+en family dark pdf pages 1 (vector pdf)
+hi single gold pdf pages 1 (image pdf)
+hi family gold pdf pages 1 (image pdf)
+hi single dark pdf pages 1 (image pdf)
+hi family dark pdf pages 1 (image pdf)
+ta single gold pdf pages 1 (image pdf)
+ta family gold pdf pages 1 (image pdf)
+ta single dark pdf pages 1 (image pdf)
+ta family dark pdf pages 1 (image pdf)
+te single gold pdf pages 1 (image pdf)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.evaluate: Execution context was destroyed, most likely because of a navigation.
+    at C:\Users\sresq\Documents\namevibes\artifacts\annual-plan\i18n-posters.mjs:15:30 {
+  log: [],
+  name: 'Error'
+}
+
+Node.js v24.13.1

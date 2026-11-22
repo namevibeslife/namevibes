@@ -1,0 +1,113 @@
+hora.planet.Rahu|రాహువు
+hora.planet.Ketu|కేతువు
+numerology.interpretation.1|నాయకత్వం, స్వతంత్రత, నవీనత. మీరు సహజ మార్గదర్శకులు.
+numerology.interpretation.2|సామరస్యం, సహకారం, సమతుల్యత. భాగస్వామ్యాల్లో మీరు రాణిస్తారు.
+numerology.interpretation.3|సృజనాత్మకత, వ్యక్తీకరణ, ఆనందం. మీరు వెలుగును, ప్రేరణను తెస్తారు.
+numerology.interpretation.4|స్థిరత్వం, కష్టపడే తత్వం, పునాది. మీరు శాశ్వత నిర్మాణాలను నిర్మిస్తారు.
+numerology.interpretation.5|స్వేచ్ఛ, సాహసం, మార్పు. వైవిధ్యంలో, అన్వేషణలో మీరు వర్ధిల్లుతారు.
+numerology.interpretation.6|పోషణ, బాధ్యత, సామరస్యం. మీరు సహజంగానే ఇతరులను చూసుకుంటారు.
+numerology.interpretation.7|జ్ఞానం, ఆత్మపరిశీలన, ఆధ్యాత్మికత. మీరు లోతైన సత్యాలను వెతుకుతారు.
+numerology.interpretation.8|శక్తి, సమృద్ధి, సాధన. మీరు భౌతిక విజయాన్ని సాధిస్తారు.
+numerology.interpretation.9|కరుణ, పరిపూర్ణత, మానవతావాదం. మీరు గొప్ప మేలుకు సేవ చేస్తారు.
+numerology.interpretation.11|అంతర్ దృష్టి, జ్ఞానోదయం, ప్రేరణ. ఆధ్యాత్మిక అంతర్దృష్టికి మాస్టర్ సంఖ్య.
+numerology.interpretation.22|మాస్టర్ నిర్మాత, దార్శనికత, సాకారం. మీరు కలలను వాస్తవంగా మారుస్తారు.
+numerology.interpretation.33|మాస్టర్ గురువు, కరుణ, ఆశీర్వాదం. మీరు ఇతరులను ఉన్నతీకరించి నయం చేస్తారు.
+numerology.interpretation.default|ప్రత్యేక శక్తి రీతి
+numerology.meaning.1.destiny|సహజ నాయకుడు, స్వతంత్రుడు, ఆశయం గలవాడు. కొత్త మార్గాలను నిర్మించడానికే మీరు పుట్టారు.
+numerology.meaning.1.soulUrge|స్వతంత్రత, నాయకత్వం పట్ల లోతైన కోరిక. మీరు గుర్తింపును కోరుకుంటారు.
+numerology.meaning.1.personality|ఇతరులు మిమ్మల్ని ఆత్మవిశ్వాసం, దృఢత్వం, స్వయం సమృద్ధి గలవారిగా చూస్తారు.
+numerology.meaning.1.lifePath|మీ ప్రయాణం నాయకత్వాన్ని, స్వతంత్రతను పెంపొందించుకోవడం గురించి.
+numerology.meaning.1.expression|నవీనత, వ్యక్తిత్వం ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.2.destiny|శాంతి కారకుడు, రాయబారి, సహకారి. మీరు ప్రతి సందర్భంలో సామరస్యాన్ని తెస్తారు.
+numerology.meaning.2.soulUrge|మీరు శాంతి, భాగస్వామ్యం, భావోద్వేగ అనుబంధాలను కోరుకుంటారు.
+numerology.meaning.2.personality|ఇతరులు మిమ్మల్ని సౌమ్యుడు, చతురుడు, తోడ్పాటునిచ్చేవారిగా చూస్తారు.
+numerology.meaning.2.lifePath|మీ మార్గంలో సహకారం, సంబంధాలు, సమతుల్యత ఉన్నాయి.
+numerology.meaning.2.expression|సానుభూతి, మధ్యవర్తిత్వం, భాగస్వామ్యాల ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.3.destiny|సృజనాత్మక సంభాషణకర్త, కళాకారుడు, వినోదకారుడు. వ్యక్తీకరణ ద్వారా ప్రేరేపిస్తారు.
+numerology.meaning.3.soulUrge|మీరు సృజనాత్మక వ్యక్తీకరణను, ఆనందమయ అనుబంధాలను కోరుకుంటారు.
+numerology.meaning.3.personality|ఇతరులు మిమ్మల్ని ఆకర్షణీయుడు, సృజనశీలి, వ్యక్తీకరణశీలిగా చూస్తారు.
+numerology.meaning.3.lifePath|మీ ప్రయాణం సృజనాత్మకత, స్వీయ వ్యక్తీకరణపై కేంద్రీకృతమై ఉంది.
+numerology.meaning.3.expression|కళ, మాటలు, సృజనాత్మక పనుల ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.4.destiny|నిర్మాత, నిర్వాహకుడు, ఆచరణాత్మకుడు. మీరు స్థిరమైన పునాదులను నిర్మిస్తారు.
+numerology.meaning.4.soulUrge|మీరు భద్రత, క్రమం, కనిపించే విజయాలను కోరుకుంటారు.
+numerology.meaning.4.personality|ఇతరులు మిమ్మల్ని నమ్మదగినవారు, కష్టపడేవారు, నేలమీద నిలబడినవారిగా చూస్తారు.
+numerology.meaning.4.lifePath|మీ మార్గంలో శాశ్వత నిర్మాణాలను, వ్యవస్థలను నిర్మించడం ఉంది.
+numerology.meaning.4.expression|ఆచరణాత్మక పని, నిర్వహణ ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.5.destiny|స్వేచ్ఛ కోరేవారు, సాహసి, మార్పుకు చోదకుడు. మీరు వైవిధ్యంలో వర్ధిల్లుతారు.
+numerology.meaning.5.soulUrge|మీరు స్వేచ్ఛ, సాహసం, కొత్త అనుభవాలను కోరుకుంటారు.
+numerology.meaning.5.personality|ఇతరులు మిమ్మల్ని చైతన్యవంతుడు, సాహసి, ఊహించలేనివారిగా చూస్తారు.
+numerology.meaning.5.lifePath|మీ ప్రయాణం మార్పును, స్వేచ్ఛను ఆలింగనం చేసుకోవడం గురించి.
+numerology.meaning.5.expression|అన్వేషణ, అనుకూలత ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.6.destiny|పోషకుడు, సంరక్షకుడు, గురువు. మీరు సామరస్యాన్ని, అందాన్ని సృష్టిస్తారు.
+numerology.meaning.6.soulUrge|మీరు పోషించాలని, ప్రేమించాలని, అందమైన వాతావరణాలను సృష్టించాలని కోరుకుంటారు.
+numerology.meaning.6.personality|ఇతరులు మిమ్మల్ని శ్రద్ధగలవారు, బాధ్యతగలవారు, తోడ్పాటునిచ్చేవారిగా చూస్తారు.
+numerology.meaning.6.lifePath|మీ మార్గంలో సేవ, కుటుంబం, సమాజం ఉన్నాయి.
+numerology.meaning.6.expression|శ్రద్ధ, బోధన, నయం చేయడం ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.7.destiny|అన్వేషి, విశ్లేషకుడు, ఆధ్యాత్మికుడు. మీరు లోతైన సత్యాల కోసం వెతుకుతారు.
+numerology.meaning.7.soulUrge|మీరు జ్ఞానం, ఏకాంతం, ఆధ్యాత్మిక అవగాహనను కోరుకుంటారు.
+numerology.meaning.7.personality|ఇతరులు మిమ్మల్ని రహస్యమైనవారు, మేధావి, అంతర్ముఖులుగా చూస్తారు.
+numerology.meaning.7.lifePath|మీ ప్రయాణంలో ఆధ్యాత్మిక వృద్ధి, అంతర్గత జ్ఞానం ఉన్నాయి.
+numerology.meaning.7.expression|విశ్లేషణ, పరిశోధన, ఆధ్యాత్మికత ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.8.destiny|శక్తికేంద్రం, కార్యనిర్వాహకుడు, సాకారకుడు. మీరు భౌతిక విజయాన్ని సాధిస్తారు.
+numerology.meaning.8.soulUrge|మీరు అధికారం, విజయం, భౌతిక సాధనను కోరుకుంటారు.
+numerology.meaning.8.personality|ఇతరులు మిమ్మల్ని శక్తివంతుడు, ఆశయం గలవాడు, అధికారం గలవారిగా చూస్తారు.
+numerology.meaning.8.lifePath|మీ మార్గంలో భౌతిక ప్రపంచంలో నైపుణ్యం, నాయకత్వం ఉన్నాయి.
+numerology.meaning.8.expression|వ్యాపారం, నిర్వహణ, సాధన ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.9.destiny|మానవతావాది, గురువు, వైద్యుడు. మీరు మానవాళికి సేవ చేస్తారు.
+numerology.meaning.9.soulUrge|మీరు మానవాళికి సహాయం చేయాలని, సానుకూల మార్పు తేవాలని కోరుకుంటారు.
+numerology.meaning.9.personality|ఇతరులు మిమ్మల్ని కరుణామయుడు, జ్ఞాని, నిస్వార్థపరుడిగా చూస్తారు.
+numerology.meaning.9.lifePath|మీ ప్రయాణం సేవ, కరుణ, పరిపూర్ణత గురించి.
+numerology.meaning.9.expression|మానవతా కార్యం, విశ్వ ప్రేమ ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.11.destiny|మాస్టర్ గురువు, ఆధ్యాత్మిక సందేశహరుడు. మీరు ప్రేరేపించి వెలుగునిస్తారు.
+numerology.meaning.11.soulUrge|మీరు ఆధ్యాత్మిక జ్ఞానోదయాన్ని, ఇతరులను ప్రేరేపించడాన్ని కోరుకుంటారు.
+numerology.meaning.11.personality|ఇతరులు మిమ్మల్ని స్ఫూర్తిదాయకుడిగా, ఆధ్యాత్మిక ప్రతిభ గలవారిగా చూస్తారు.
+numerology.meaning.11.lifePath|మీ మార్గం ఆధ్యాత్మిక నాయకత్వం, జ్ఞానోదయం.
+numerology.meaning.11.expression|అంతర్ దృష్టి, ఆధ్యాత్మిక బోధన ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.22.destiny|మాస్టర్ నిర్మాత. మీరు పెద్ద స్థాయిలో కలలను వాస్తవంగా మారుస్తారు.
+numerology.meaning.22.soulUrge|మీరు శాశ్వతమైన, ముఖ్యమైనదాన్ని నిర్మించాలని కోరుకుంటారు.
+numerology.meaning.22.personality|అసాధ్యాన్ని సాధించగల సామర్థ్యం ఉన్నవారిగా ఇతరులు మిమ్మల్ని చూస్తారు.
+numerology.meaning.22.lifePath|మీ మార్గంలో గొప్ప దార్శనికతలను వాస్తవంగా మార్చడం ఉంది.
+numerology.meaning.22.expression|అనేకమందికి ఉపయోగపడే వ్యవస్థలను నిర్మించడం ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.33.destiny|మాస్టర్ గురువు, వైద్యులకే వైద్యుడు. మీరు మానవాళిని ఉన్నతీకరిస్తారు.
+numerology.meaning.33.soulUrge|మీరు విశ్వ స్థాయిలో పోషించాలని, నయం చేయాలని కోరుకుంటారు.
+numerology.meaning.33.personality|ఇతరులు మిమ్మల్ని షరతులు లేని ప్రేమకు దీపస్తంభంగా చూస్తారు.
+numerology.meaning.33.lifePath|మీ మార్గం నిస్వార్థ సేవ, విశ్వ ప్రేమ.
+numerology.meaning.33.expression|అందరికీ కరుణతో కూడిన సేవ ద్వారా మిమ్మల్ని మీరు వ్యక్తపరుస్తారు.
+numerology.meaning.default|ప్రత్యేక ప్రాధాన్యత గల ప్రత్యేక శక్తి.
+astrology.match|✅ "{{name}}" "{{syllable}}" తో మొదలవుతోంది - మీ నక్షత్రంతో సంపూర్ణ సమన్వయం!
+astrology.noMatch|ℹ️ మీ పుట్టిన తేదీకి, {{syllables}} తో మొదలయ్యే పేర్లు శుభంగా పరిగణించబడతాయి.
+numerologyPage.n001|"ప్రతి సంఖ్యకూ ఒక ప్రత్యేక కంపనం, అర్థం ఉన్నాయి"
+numerologyPage.n002|విధి సంఖ్య
+numerologyPage.n003|మీ జీవిత లక్ష్యం, మార్గం
+numerologyPage.n004|జీవన మార్గ సంఖ్య
+numerologyPage.n005|మీ ప్రయాణం, పాఠాలు
+numerologyPage.n006|ఆత్మ కోరిక సంఖ్య
+numerologyPage.n007|మీ హృదయంలోని లోతైన కోరికలు
+numerologyPage.n008|వ్యక్తిత్వ సంఖ్య
+numerologyPage.n009|ఇతరులు మిమ్మల్ని ఎలా చూస్తారు
+numerologyPage.n010|వ్యక్తీకరణ సంఖ్య
+numerologyPage.n011|మీ సహజ ప్రతిభలు
+numerologyPage.n012|✨ మీ సంఖ్యలను అర్థం చేసుకోండి
+numerologyPage.n013|ఈ సంఖ్యలు మీ వ్యక్తిత్వంలోని, జీవన మార్గంలోని వివిధ కోణాలను వెల్లడిస్తాయి. మీ బలాలు, సవాళ్లు, జీవిత లక్ష్యాన్ని అర్థం చేసుకోవడానికి వీటిని మార్గదర్శిగా ఉపయోగించండి.
+numerologyPage.n014|మీ సంఖ్యలను తెలుసుకోండి
+numerologyPage.n015|మీ సంఖ్యాశాస్త్ర ప్రొఫైల్‌ను లెక్కించడానికి కింద వివరాలు నమోదు చేయండి
+numerologyPage.n016|ఇది ఎవరి కోసం:
+numerologyPage.n017|మొదటి పేరు *
+numerologyPage.n018|మధ్య పేరు (ఐచ్ఛికం)
+numerologyPage.n019|చివరి పేరు *
+numerologyPage.n020|పుట్టిన తేదీ (ఐచ్ఛికం - జీవన మార్గ సంఖ్య కోసం)
+numerologyPage.n021|నా సంఖ్యలను లెక్కించు
+numerologyPage.n022|📖 మీరు తెలుసుకునేవి
+numerologyPage.n023|విధి సంఖ్య:
+numerologyPage.n024|మీ జీవిత లక్ష్యం, ధ్యేయం
+numerologyPage.n025|జీవన మార్గ సంఖ్య:
+numerologyPage.n026|మీ ప్రయాణం, ముఖ్య పాఠాలు
+numerologyPage.n027|ఆత్మ కోరిక సంఖ్య:
+numerologyPage.n028|మీ లోతైన కోరికలు
+numerologyPage.n029|వ్యక్తిత్వ సంఖ్య:
+numerologyPage.n030|ఇతరులు మిమ్మల్ని ఎలా భావిస్తారు
+numerologyPage.n031|వ్యక్తీకరణ సంఖ్య:
+numerologyPage.n032|మొదటి పేరు నమోదు చేయండి
+numerologyPage.n033|మధ్య పేరు నమోదు చేయండి
+numerologyPage.n034|చివరి పేరు నమోదు చేయండి
+numerologyPage.needName|కనీసం మొదటి పేరు, చివరి పేరు నమోదు చేయండి

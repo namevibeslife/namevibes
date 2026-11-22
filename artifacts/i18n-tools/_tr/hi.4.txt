@@ -1,0 +1,113 @@
+hora.planet.Rahu|राहु
+hora.planet.Ketu|केतु
+numerology.interpretation.1|नेतृत्व, स्वतंत्रता, नवाचार। आप स्वाभाविक अग्रणी हैं।
+numerology.interpretation.2|सामंजस्य, सहयोग, संतुलन। आप साझेदारी में उत्कृष्ट हैं।
+numerology.interpretation.3|रचनात्मकता, अभिव्यक्ति, आनंद। आप प्रकाश और प्रेरणा लाते हैं।
+numerology.interpretation.4|स्थिरता, कड़ी मेहनत, नींव। आप टिकाऊ ढाँचे बनाते हैं।
+numerology.interpretation.5|स्वतंत्रता, रोमांच, परिवर्तन। आप विविधता और खोज में फलते-फूलते हैं।
+numerology.interpretation.6|पालन-पोषण, ज़िम्मेदारी, सामंजस्य। आप स्वभाव से दूसरों की परवाह करते हैं।
+numerology.interpretation.7|बुद्धिमत्ता, आत्मचिंतन, आध्यात्मिकता। आप गहरे सत्य खोजते हैं।
+numerology.interpretation.8|शक्ति, समृद्धि, उपलब्धि। आप भौतिक सफलता प्राप्त करते हैं।
+numerology.interpretation.9|करुणा, पूर्णता, मानव-सेवा। आप बड़े हित की सेवा करते हैं।
+numerology.interpretation.11|अंतर्ज्ञान, ज्ञानोदय, प्रेरणा। आध्यात्मिक अंतर्दृष्टि की मास्टर संख्या।
+numerology.interpretation.22|महान निर्माता, दृष्टि, साकार करना। आप सपनों को हकीकत में बदलते हैं।
+numerology.interpretation.33|महान गुरु, करुणा, आशीर्वाद। आप दूसरों को ऊपर उठाते और स्वस्थ करते हैं।
+numerology.interpretation.default|अनोखा ऊर्जा स्वरूप
+numerology.meaning.1.destiny|जन्मजात नेता, स्वतंत्र, महत्वाकांक्षी। आप नए रास्ते बनाने के लिए बने हैं।
+numerology.meaning.1.soulUrge|स्वतंत्रता और नेतृत्व की गहरी चाह। आप पहचान पाना चाहते हैं।
+numerology.meaning.1.personality|दूसरे आपको आत्मविश्वासी, दृढ़ और आत्मनिर्भर मानते हैं।
+numerology.meaning.1.lifePath|आपकी यात्रा नेतृत्व और स्वतंत्रता को विकसित करने की है।
+numerology.meaning.1.expression|आप नवाचार और अपनी अलग पहचान के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.2.destiny|शांतिदूत, कूटनीतिज्ञ, सहयोगी। आप हर स्थिति में सामंजस्य लाते हैं।
+numerology.meaning.2.soulUrge|आप शांति, साझेदारी और भावनात्मक जुड़ाव चाहते हैं।
+numerology.meaning.2.personality|दूसरे आपको सौम्य, कूटनीतिक और सहयोगी मानते हैं।
+numerology.meaning.2.lifePath|आपके पथ में सहयोग, रिश्ते और संतुलन शामिल हैं।
+numerology.meaning.2.expression|आप सहानुभूति, मध्यस्थता और साझेदारी के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.3.destiny|रचनात्मक संवादक, कलाकार, मनोरंजक। आप अभिव्यक्ति से प्रेरित करते हैं।
+numerology.meaning.3.soulUrge|आप रचनात्मक अभिव्यक्ति और आनंदमय जुड़ाव चाहते हैं।
+numerology.meaning.3.personality|दूसरे आपको आकर्षक, रचनात्मक और अभिव्यक्तिशील मानते हैं।
+numerology.meaning.3.lifePath|आपकी यात्रा रचनात्मकता और आत्म-अभिव्यक्ति पर केंद्रित है।
+numerology.meaning.3.expression|आप कला, शब्दों और रचनात्मक कार्यों के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.4.destiny|निर्माता, संगठनकर्ता, व्यावहारिक। आप स्थिर नींव बनाते हैं।
+numerology.meaning.4.soulUrge|आप सुरक्षा, व्यवस्था और ठोस उपलब्धियाँ चाहते हैं।
+numerology.meaning.4.personality|दूसरे आपको भरोसेमंद, मेहनती और ज़मीन से जुड़ा मानते हैं।
+numerology.meaning.4.lifePath|आपके पथ में टिकाऊ ढाँचे और व्यवस्थाएँ बनाना शामिल है।
+numerology.meaning.4.expression|आप व्यावहारिक कार्य और संगठन के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.5.destiny|स्वतंत्रता खोजने वाले, साहसी, परिवर्तन के वाहक। आप विविधता में फलते-फूलते हैं।
+numerology.meaning.5.soulUrge|आप स्वतंत्रता, रोमांच और नए अनुभव चाहते हैं।
+numerology.meaning.5.personality|दूसरे आपको गतिशील, साहसी और अप्रत्याशित मानते हैं।
+numerology.meaning.5.lifePath|आपकी यात्रा परिवर्तन और स्वतंत्रता को अपनाने की है।
+numerology.meaning.5.expression|आप खोज और अनुकूलनशीलता के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.6.destiny|पालनकर्ता, देखभाल करने वाले, शिक्षक। आप सामंजस्य और सुंदरता रचते हैं।
+numerology.meaning.6.soulUrge|आप पालन-पोषण करना, प्रेम देना और सुंदर वातावरण बनाना चाहते हैं।
+numerology.meaning.6.personality|दूसरे आपको परवाह करने वाला, ज़िम्मेदार और सहयोगी मानते हैं।
+numerology.meaning.6.lifePath|आपके पथ में सेवा, परिवार और समुदाय शामिल हैं।
+numerology.meaning.6.expression|आप देखभाल, शिक्षण और उपचार के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.7.destiny|खोजी, विश्लेषक, रहस्यदर्शी। आप गहरे सत्य की खोज करते हैं।
+numerology.meaning.7.soulUrge|आप ज्ञान, एकांत और आध्यात्मिक समझ चाहते हैं।
+numerology.meaning.7.personality|दूसरे आपको रहस्यमय, बौद्धिक और संयमी मानते हैं।
+numerology.meaning.7.lifePath|आपकी यात्रा में आध्यात्मिक विकास और आंतरिक बुद्धिमत्ता शामिल है।
+numerology.meaning.7.expression|आप विश्लेषण, शोध और आध्यात्मिकता के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.8.destiny|शक्ति-केंद्र, कार्यकारी, साकारकर्ता। आप भौतिक सफलता प्राप्त करते हैं।
+numerology.meaning.8.soulUrge|आप शक्ति, सफलता और भौतिक उपलब्धि चाहते हैं।
+numerology.meaning.8.personality|दूसरे आपको शक्तिशाली, महत्वाकांक्षी और प्रभावशाली मानते हैं।
+numerology.meaning.8.lifePath|आपके पथ में भौतिक जगत में निपुणता और नेतृत्व शामिल है।
+numerology.meaning.8.expression|आप व्यापार, प्रबंधन और उपलब्धि के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.9.destiny|मानवता-प्रेमी, शिक्षक, उपचारक। आप मानवता की सेवा करते हैं।
+numerology.meaning.9.soulUrge|आप मानवता की मदद करना और सकारात्मक बदलाव लाना चाहते हैं।
+numerology.meaning.9.personality|दूसरे आपको करुणामय, बुद्धिमान और निःस्वार्थ मानते हैं।
+numerology.meaning.9.lifePath|आपकी यात्रा सेवा, करुणा और पूर्णता की है।
+numerology.meaning.9.expression|आप मानवीय कार्य और सार्वभौमिक प्रेम के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.11.destiny|महान गुरु, आध्यात्मिक संदेशवाहक। आप प्रेरित करते और प्रकाश देते हैं।
+numerology.meaning.11.soulUrge|आप आध्यात्मिक प्रकाश और दूसरों को प्रेरित करना चाहते हैं।
+numerology.meaning.11.personality|दूसरे आपको प्रेरणादायक और आध्यात्मिक रूप से प्रतिभाशाली मानते हैं।
+numerology.meaning.11.lifePath|आपका पथ आध्यात्मिक नेतृत्व और ज्ञानोदय का है।
+numerology.meaning.11.expression|आप अंतर्ज्ञान और आध्यात्मिक शिक्षण के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.22.destiny|महान निर्माता। आप बड़े पैमाने पर सपनों को हकीकत में बदलते हैं।
+numerology.meaning.22.soulUrge|आप कुछ स्थायी और महत्वपूर्ण बनाना चाहते हैं।
+numerology.meaning.22.personality|दूसरे आपको असंभव को संभव कर दिखाने में सक्षम मानते हैं।
+numerology.meaning.22.lifePath|आपके पथ में बड़े दृष्टिकोणों को साकार करना शामिल है।
+numerology.meaning.22.expression|आप ऐसी व्यवस्थाएँ बनाकर स्वयं को व्यक्त करते हैं जो बहुतों के काम आएँ।
+numerology.meaning.33.destiny|महान गुरु, उपचारकों के उपचारक। आप मानवता को ऊपर उठाते हैं।
+numerology.meaning.33.soulUrge|आप सार्वभौमिक स्तर पर पोषण और उपचार करना चाहते हैं।
+numerology.meaning.33.personality|दूसरे आपको निःशर्त प्रेम का प्रकाश-स्तंभ मानते हैं।
+numerology.meaning.33.lifePath|आपका पथ निःस्वार्थ सेवा और सार्वभौमिक प्रेम का है।
+numerology.meaning.33.expression|आप सबकी करुणामय सेवा के ज़रिए स्वयं को व्यक्त करते हैं।
+numerology.meaning.default|विशेष महत्व वाली अनोखी ऊर्जा।
+astrology.match|✅ "{{name}}" "{{syllable}}" से शुरू होता है - आपके नक्षत्र के साथ पूर्ण तालमेल!
+astrology.noMatch|ℹ️ आपकी जन्म तिथि के अनुसार, {{syllables}} से शुरू होने वाले नाम शुभ माने जाते हैं।
+numerologyPage.n001|"हर अंक का एक अनोखा कंपन और अर्थ होता है"
+numerologyPage.n002|भाग्य अंक
+numerologyPage.n003|आपके जीवन का उद्देश्य और पथ
+numerologyPage.n004|जीवन-पथ अंक
+numerologyPage.n005|आपकी यात्रा और सबक
+numerologyPage.n006|आत्मा की इच्छा का अंक
+numerologyPage.n007|आपके हृदय की सबसे गहरी इच्छाएँ
+numerologyPage.n008|व्यक्तित्व अंक
+numerologyPage.n009|दूसरे आपको कैसे देखते हैं
+numerologyPage.n010|अभिव्यक्ति अंक
+numerologyPage.n011|आपकी स्वाभाविक प्रतिभाएँ
+numerologyPage.n012|✨ अपने अंकों को समझें
+numerologyPage.n013|ये अंक आपके व्यक्तित्व और जीवन-पथ के अलग-अलग पहलू दिखाते हैं। इन्हें अपनी ताकत, चुनौतियों और जीवन के उद्देश्य को समझने के मार्गदर्शन के रूप में उपयोग करें।
+numerologyPage.n014|अपने अंक जानें
+numerologyPage.n015|अपनी अंकशास्त्र प्रोफ़ाइल निकालने के लिए नीचे विवरण भरें
+numerologyPage.n016|यह किसके लिए है:
+numerologyPage.n017|पहला नाम *
+numerologyPage.n018|मध्य नाम (वैकल्पिक)
+numerologyPage.n019|अंतिम नाम *
+numerologyPage.n020|जन्म तिथि (वैकल्पिक - जीवन-पथ अंक के लिए)
+numerologyPage.n021|मेरे अंक निकालें
+numerologyPage.n022|📖 आप क्या जानेंगे
+numerologyPage.n023|भाग्य अंक:
+numerologyPage.n024|आपके जीवन का उद्देश्य और लक्ष्य
+numerologyPage.n025|जीवन-पथ अंक:
+numerologyPage.n026|आपकी यात्रा और मुख्य सबक
+numerologyPage.n027|आत्मा की इच्छा का अंक:
+numerologyPage.n028|आपकी सबसे गहरी इच्छाएँ
+numerologyPage.n029|व्यक्तित्व अंक:
+numerologyPage.n030|दूसरे आपको कैसे समझते हैं
+numerologyPage.n031|अभिव्यक्ति अंक:
+numerologyPage.n032|पहला नाम लिखें
+numerologyPage.n033|मध्य नाम लिखें
+numerologyPage.n034|अंतिम नाम लिखें
+numerologyPage.needName|कृपया कम से कम पहला और अंतिम नाम लिखें

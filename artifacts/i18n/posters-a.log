@@ -1,0 +1,18 @@
+en single gold pdf pages 1 (vector pdf)
+node:internal/modules/run_main:107
+    triggerUncaughtException(
+    ^
+
+page.evaluate: ReferenceError: person is not defined
+    at http://localhost:5199/src/utils/familyPosterImage.js:241:33
+    at Array.forEach (<anonymous>)
+    at http://localhost:5199/src/utils/familyPosterImage.js:237:16
+    at Array.forEach (<anonymous>)
+    at buildCompactFamilyPosterImage (http://localhost:5199/src/utils/familyPosterImage.js:234:8)
+    at async eval (eval at evaluate (:370:30), <anonymous>:9:13)
+    at async <anonymous>:381:23
+    at C:\Users\sresq\Documents\namevibes\artifacts\annual-plan\i18n-posters.mjs:15:30 {
+  log: []
+}
+
+Node.js v24.13.1

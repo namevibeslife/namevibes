@@ -1,0 +1,17 @@
+import {chromium} from 'file:///C:/Users/sresq/AppData/Local/npm-cache/_npx/420ff84f11983ee5/node_modules/playwright/index.mjs';
+const b = await chromium.launch({ executablePath: 'C:/Users/sresq/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe' });
+const errs = [];
+const p = await (await b.newContext({ viewport: { width: 390, height: 900 }, locale: 'en-US' })).newPage();
+p.on('console', m => { if (m.type() === 'error') errs.push(m.text().slice(0, 120)); }); p.on('pageerror', e => errs.push(e.message));
+await p.goto('https://namasutra.life/', { waitUntil: 'networkidle' }); await p.waitForTimeout(1500);
+await p.getByRole('button', { name: 'Change country' }).click(); await p.getByRole('combobox', { name: 'Change country' }).click(); await p.waitForTimeout(300);
+console.log('picker (signed out, via /api/pricing):', (await p.getByRole('option').allInnerTexts()).map(s => s.replace(/\s+/g, ' ')));
+await p.getByRole('option', { name: /Germany/ }).click(); await p.waitForTimeout(1200);
+console.log('Germany:', (await p.locator('[data-testid="landing-price"]').innerText()).replace(/\s+/g, ' '));
+await p.getByRole('option').count();
+await p.locator('header .language-picker select').selectOption('ta'); await p.waitForTimeout(1500);
+console.log('Tamil:', (await p.locator('[data-testid="landing-price"]').innerText()).replace(/\s+/g, ' '), '| html lang', await p.evaluate(() => document.documentElement.lang));
+await p.goto('https://namasutra.life/learn-more', { waitUntil: 'networkidle' }); await p.waitForTimeout(1200);
+console.log('learn-more renders:', (await p.locator('h1').first().innerText()).slice(0, 60));
+console.log('errors:', errs.length ? errs : 'none');
+await b.close();

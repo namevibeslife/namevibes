@@ -1,0 +1,420 @@
+landing.headingLine1|உங்கள் பெயரின்
+landing.headingLine2|மறைந்திருக்கும் வேதியியலைக் கண்டறியுங்கள்
+landing.about4|<b>Namasutra</b> உங்கள் பெயருக்கும் தனிம அட்டவணையின் தனிமங்களுக்கும் இடையிலான சுவாரஸ்யமான தொடர்பை வெளிப்படுத்துகிறது.
+landing.copyright|© {{year}} Namasutra. அனைத்து உரிமைகளும் பாதுகாக்கப்பட்டவை.
+landing.kicker|உங்கள் பெயர் ஒரு ஆற்றல். அது உங்களைப் பிரபஞ்சத்துடன் எப்படி இணைக்கிறது என்பதைக் கண்டறியுங்கள்.
+landing.subheading|தனிம அட்டவணை அறிவியல், கால்டியன் எண் கணிதம், இந்து ஜோதிடம் வழியாக உங்கள் அடையாளத்தில் மறைந்திருக்கும் தனிமங்களை அறியுங்கள்
+landing.getStarted|தொடங்குங்கள்
+landing.learnMore|மேலும் அறிக
+landing.aboutHeading|வாழ்நாள் முழுவதும் துணை. உள்ளே ஒரு முழு உலகம்.
+landing.about1|பிறப்பு முதல் இறுதிவரை உங்கள் பெயர் உங்களுடன் இருக்கும் துணை; வாழ்க்கைப் பயணம் முழுவதும் உங்கள் அடையாளத்தை வடிவமைக்கிறது.
+landing.about2|ஒவ்வொரு பெயருக்கும் தனித்துவமான அதிர்வு உண்டு; அது நீங்கள் யார் என்பதுடன் இயைந்த ஒரு ஆற்றல்.
+landing.about3|உங்கள் பெயரின் எழுத்துகளுக்குள் என்ன இருக்கிறது என்று எப்போதாவது யோசித்திருக்கிறீர்களா?
+landing.about5|தனிமங்களைக் கண்டறியுங்கள். தொடர்புகளை ஆராயுங்கள். உங்கள் Namasutra-வை உணருங்கள்.
+landing.sampleAria|Vibes மாதிரி பகுப்பாய்வு
+landing.sampleLabel|இது எப்படி செயல்படுகிறது என்று பாருங்கள் / Vibes மாதிரி பகுப்பாய்வு
+landing.feature1Title|தனிமங்கள்
+landing.feature1Text|உங்கள் பெயரை வேதியியல் தனிமங்களாகப் பிரித்து அவற்றின் தனித்துவ பண்புகளையும் பொருளையும் அறியுங்கள்
+landing.feature2Title|கால்டியன் எண் கணிதம்
+landing.feature2Text|பண்டைய ஞானத்தின் மூலம் உங்கள் வாழ்க்கைப் பாதை எண், பெயர் எண், விதி ஆகியவற்றை அறியுங்கள்
+landing.feature3Title|இந்து ஜோதிடம்
+landing.feature3Text|உங்கள் பிறந்த தேதி மற்றும் நட்சத்திரத்தின் அடிப்படையில் எந்த எழுத்துகள் உங்களுக்கு நல்லவை என்பதை அறியுங்கள்
+landing.ctaHeading|உங்கள் Vibes-ஐ அறியத் தயாரா?
+landing.ctaText|பிரபஞ்சத்தின் எந்தத் தனிமங்கள் உங்கள் பெயரில் வாழ்கின்றன என்று பாருங்கள்
+landing.ctaButton|உங்கள் பயணத்தைத் தொடங்குங்கள்
+errors.auth.invalidEmail|இந்த மின்னஞ்சல் முகவரி சரியாகத் தெரியவில்லை.
+errors.auth.badCredentials|மின்னஞ்சல் அல்லது கடவுச்சொல் தவறு. நீங்கள் Google அல்லது Apple மூலம் பதிவு செய்திருந்தால், அந்தப் பொத்தானையே பயன்படுத்துங்கள்.
+errors.auth.emailInUse|இந்த மின்னஞ்சலுடன் ஏற்கனவே கணக்கு உள்ளது. உள்நுழைந்து பாருங்கள்.
+errors.auth.weakPassword|குறைந்தது 6 எழுத்துகள் கொண்ட கடவுச்சொல்லைத் தேர்ந்தெடுக்கவும்.
+errors.auth.tooMany|அதிக முயற்சிகள் நடந்துவிட்டன. சில நிமிடங்கள் காத்திருந்து மீண்டும் முயலுங்கள்.
+errors.auth.network|நெட்வொர்க் சிக்கல். உங்கள் இணைப்பைச் சரிபார்த்து மீண்டும் முயலுங்கள்.
+errors.auth.popupBlocked|உங்கள் உலாவி உள்நுழைவு சாளரத்தைத் தடுத்துவிட்டது. பாப்-அப்களை அனுமதித்து மீண்டும் முயலுங்கள்.
+errors.auth.differentMethod|இந்த மின்னஞ்சல் வேறு உள்நுழைவு முறையில் ஏற்கனவே பதிவாகியுள்ளது. Google அல்லது மின்னஞ்சல் மூலம் முயலுங்கள்.
+errors.auth.appleUnavailable|Apple மூலம் உள்நுழைவு இன்னும் கிடைக்கவில்லை. Google அல்லது மின்னஞ்சலைப் பயன்படுத்துங்கள்.
+errors.auth.methodUnavailable|இந்த உள்நுழைவு முறை இப்போது கிடைக்கவில்லை.
+errors.auth.failed|உள்நுழைய முடியவில்லை. மீண்டும் முயலுங்கள்.
+errors.signInFirst|முதலில் உள்நுழையுங்கள்
+errors.referralFormat|பரிந்துரைக் குறியீட்டில் 2 எழுத்து நாட்டுக் குறியீடும் அதன் பின் 6 இலக்கங்களும் இருக்க வேண்டும் (எ.கா. IN482913).
+errors.referralInvalid|இந்தப் பரிந்துரைக் குறியீடு செல்லாது. சரிபார்க்கவும், அல்லது குறியீடு இல்லாமல் தொடர காலியாக விடவும்.
+errors.profileSave|சுயவிவரத்தைச் சேமிப்பதில் பிழை. மீண்டும் முயலுங்கள்.
+errors.monthlyLimit|இந்த மாதத்தின் {{limit}} பகுப்பாய்வுகளையும் பயன்படுத்திவிட்டீர்கள். உங்கள் வரம்பு 1ஆம் தேதி புதுப்பிக்கப்படும்.
+errors.analysisNotFound|பகுப்பாய்வு கிடைக்கவில்லை
+errors.analysisLoad|பகுப்பாய்வை ஏற்றுவதில் பிழை
+errors.paymentFailed|பணம் செலுத்த முடியவில்லை. மீண்டும் முயலுங்கள்.
+errors.testPaymentFailed|சோதனைப் பணம் செலுத்த முடியவில்லை. மீண்டும் முயலுங்கள்.
+errors.paymentRecorded|பணம் செலுத்தியது பதிவாகிவிட்டது, ஆனால் சுயவிவரப் புதுப்பிப்பு தோல்வியடைந்தது. ஆதரவைத் தொடர்பு கொள்ளுங்கள்.
+errors.clearCache|தற்காலிக நினைவகத்தை அழிப்பதில் பிழை. மீண்டும் முயலுங்கள்.
+errors.signOut|வெளியேற முடியவில்லை. மீண்டும் முயலுங்கள்.
+auth.resetSent|இந்த மின்னஞ்சலுக்குக் கணக்கு இருந்தால், மீட்டமைப்பு இணைப்பு அனுப்பப்படுகிறது. உங்கள் இன்பாக்ஸ் மற்றும் ஸ்பேம் கோப்புறையைப் பாருங்கள்.
+auth.titleSignup|உங்கள் கணக்கை உருவாக்குங்கள்
+auth.titleReset|கடவுச்சொல்லை மீட்டமையுங்கள்
+auth.titleSignin|மீண்டும் வரவேற்கிறோம்
+auth.submitSignup|கணக்கை உருவாக்கு
+auth.submitReset|மீட்டமைப்பு இணைப்பை அனுப்பு
+auth.submitSignin|உள்நுழை
+auth.passwordPlaceholderNew|குறைந்தது 6 எழுத்துகள்
+auth.passwordPlaceholder|உங்கள் கடவுச்சொல்
+auth.hidePassword|கடவுச்சொல்லை மறை
+auth.showPassword|கடவுச்சொல்லைக் காட்டு
+auth.newHere|Namasutra-வுக்குப் புதியவரா?
+auth.haveAccount|ஏற்கனவே கணக்கு உள்ளதா?
+auth.or|அல்லது
+auth.tagline|உங்கள் பெயரின் வேதியியலைக் கண்டறியுங்கள்
+auth.orUseEmail|அல்லது மின்னஞ்சலைப் பயன்படுத்துங்கள்
+auth.email|மின்னஞ்சல்
+auth.password|கடவுச்சொல்
+auth.forgot|கடவுச்சொல் மறந்துவிட்டதா?
+auth.createAccountLink|கணக்கை உருவாக்குங்கள்
+auth.signInLink|உள்நுழையுங்கள்
+auth.backToSignin|← உள்நுழைவுக்குத் திரும்பு
+auth.continueGoogle|Google மூலம் தொடருங்கள்
+auth.continueApple|Apple மூலம் தொடருங்கள்
+common.pleaseWait|சற்றுக் காத்திருங்கள்...
+common.backToHome|← முகப்புக்குத் திரும்பு
+common.notAvailable|இல்லை
+common.backToHomeBtn|முகப்புக்குத் திரும்பு
+common.loading|ஏற்றுகிறது...
+common.select|தேர்ந்தெடுக்கவும்
+common.cancel|ரத்து செய்
+common.edit|திருத்து
+profileComplete.title|உங்கள் சுயவிவரத்தை நிறைவு செய்யுங்கள்
+profileComplete.subtitle|உங்களைப் பற்றி சிறிது சொல்லுங்கள்
+profileComplete.fullName|முழுப் பெயர் *
+profileComplete.fullNamePlaceholder|உங்கள் முழுப் பெயரை உள்ளிடுங்கள்
+profileComplete.dob|பிறந்த தேதி *
+profileComplete.gender|பாலினம் *
+profileComplete.selectGender|பாலினத்தைத் தேர்ந்தெடுக்கவும்
+profileComplete.male|ஆண்
+profileComplete.female|பெண்
+profileComplete.other|பிற
+profileComplete.country|நாடு *
+profileComplete.countryPlaceholder|நாட்டைத் தேட தட்டச்சு செய்யுங்கள்...
+profileComplete.noCountries|நாடுகள் எதுவும் இல்லை
+profileComplete.detected|உங்கள் இருப்பிடத்தின் அடிப்படையில் தானாகக் கண்டறியப்பட்டது — சரியில்லை என்றால் மாற்றுங்கள்.
+profileComplete.state|மாநிலம்/மாகாணம் *
+profileComplete.statePlaceholder|மாநிலத்தைத் தேட தட்டச்சு செய்யுங்கள்...
+profileComplete.noStates|மாநிலங்கள் எதுவும் இல்லை
+profileComplete.referral|பரிந்துரைக் குறியீடு (விருப்பம்)
+profileComplete.referralFromLink|உங்கள் அழைப்பு இணைப்பிலிருந்து சேர்க்கப்பட்டது — சரியில்லை என்றால் மாற்றுங்கள் அல்லது நீக்குங்கள்.
+profileComplete.referralFormat|வடிவம்: நாட்டுக் குறியீடு + 6 இலக்கங்கள் (எ.கா. IN482913)
+profileComplete.saving|சேமிக்கிறது...
+profileComplete.continue|விலை விவரத்துக்குத் தொடருங்கள்
+analyze.checking|உங்கள் மாதாந்திர வரம்பைச் சரிபார்க்கிறது...
+analyze.remaining_one|இந்த மாதம் {{limit}}-இல் {{count}} பகுப்பாய்வு மீதமுள்ளது
+analyze.remaining_other|இந்த மாதம் {{limit}}-இல் {{count}} பகுப்பாய்வுகள் மீதமுள்ளன
+analyze.chemistryOf|"{{name}}" பெயரின் வேதியியல்
+analyze.tagline|"உங்கள் பெயரில் காணப்படும் பிரபஞ்சத் தனிமங்கள்"
+analyze.title|பெயர் பகுப்பாய்வு
+analyze.enterName|பெயர் அல்லது சொல்லை உள்ளிடுங்கள்
+analyze.placeholder|எ.கா., ராகுல்
+analyze.button|வேதியியலைப் பகுப்பாய்வு செய்
+analyze.posterIncluded|போஸ்டர் படத்தைச் சேமிப்பதும் பகிர்வதும் உள்ளடங்கும்
+analyze.upgradePdf|PDF பதிவிறக்கங்களுக்கு ஆண்டுத் திட்டத்தைப் பெறுங்கள் →
+results.colorsMeanings|தனிமங்களின் நிறங்களும் பொருளும்
+results.element|தனிமம்
+results.atomicNumber|அணு எண்
+results.color|நிறம்
+results.lifeMeaning|வாழ்க்கைப் பொருள்
+results.unmatched|பொருந்தும் தனிமம் இல்லாத எழுத்துகள்:
+results.meaningsFor|{{name}} பெயருக்கான தனிமப் பொருள்கள்
+results.atomicNumberValue|அணு எண் {{number}}
+results.analyzedOn|பகுப்பாய்வு செய்த நாள்: {{date}}
+results.memberCount_one|{{count}} பெயர்
+results.memberCount_other|{{count}} குடும்ப உறுப்பினர்கள்
+results.loadingAnalysis|பகுப்பாய்வை ஏற்றுகிறது...
+results.loadingFamily|குடும்பப் பகுப்பாய்வை ஏற்றுகிறது...
+results.analyzeAnother|மற்றொரு பெயரைப் பகுப்பாய்வு செய்
+results.analyzeAnotherFamily|மற்றொரு குடும்பத்தைப் பகுப்பாய்வு செய்
+poster.sharedAll_one|அனைத்து {{count}} உறுப்பினர்களிடமும் பொதுவானது
+poster.sharedAll_other|அனைத்து {{count}} உறுப்பினர்களிடமும் பொதுவானது
+poster.sharedSome_one|{{count}} உறுப்பினர்களில் {{n}} பேரிடம் பொதுவானது
+poster.sharedSome_other|{{count}} உறுப்பினர்களில் {{n}} பேரிடம் பொதுவானது
+poster.eyebrow|ஒவ்வொரு பெயருக்கும் ஒரு வேதியியல் உண்டு
+poster.heading|உங்கள் தனிம அடையாளம், இயற்கையுடன் இயைந்து.
+poster.nameFallback|உங்கள் பெயர்
+poster.noElements|இந்தப் பெயரில் தனிம அட்டவணைத் தனிமங்கள் எதுவும் இல்லை.
+poster.noElementsShort|தனிமங்கள் எதுவும் இல்லை.
+poster.footerSingle|பெயரையும் தாண்டிய ஒன்று. உயர்ந்த நீங்கள்.
+poster.footerFamily|வெவ்வேறு தனிமங்கள். வலிமையான நாம்.
+poster.footerTagline|கண்டறி · ஆராய் · நீயாக இரு
+poster.commonTitle|பொதுத் தனிமங்களும் அவற்றின் பொருளும்
+poster.harmony|இணக்கம்
+poster.addMember|பொதுத் தனிமங்களை அறிய மற்றொரு குடும்ப உறுப்பினரைச் சேர்க்கவும்.
+poster.addMemberShort|பொதுத் தனிமங்களை அறிய மற்றொரு உறுப்பினரைச் சேர்க்கவும்.
+poster.noShared|இந்தப் பெயர்களுக்கு இடையே பொதுவான தனிமங்கள் இல்லை.
+poster.noSharedLong|இந்தப் பெயர்களுக்கு இடையே பொதுவான தனிமங்கள் இல்லை. ஒவ்வொரு உறுப்பினரும் தனித்துவமான தனிமக் கலவையைக் கொண்டு வருகிறார்கள்.
+poster.sharedSubtitle|இரண்டு அல்லது அதற்கு மேற்பட்ட குடும்ப உறுப்பினர்களிடம் பொதுவான தனிமங்கள்
+poster.sharedSubtitleCounts|இரண்டு அல்லது அதற்கு மேற்பட்ட குடும்ப உறுப்பினர்களிடம் பொதுவான தனிமங்கள். ஒவ்வொரு தனிமமும் எத்தனை பெயர்களில் உள்ளது என்பதை எண்கள் காட்டுகின்றன.
+poster.relationFallback|குடும்ப உறுப்பினர்
+poster.elementsInNames|நம் பெயர்களில் உள்ள தனிமங்கள்
+poster.yourProfile|உங்கள் தனிமச் சுயவிவரம்
+poster.totalElements|மொத்தத் தனிமங்கள்
+poster.uniqueElements|தனித்துவத் தனிமங்கள்
+poster.connectedNames|இணைந்த பெயர்கள்
+poster.elementsThatMake|உங்கள் பெயரை உருவாக்கும் தனிமங்கள்
+poster.ariaFamily|குடும்ப வேதியியல் போஸ்டர்
+poster.ariaSingle|தனிப்பட்ட வேதியியல் போஸ்டர்
+poster.pdfContinued|உங்கள் தனிமங்கள் / தொடர்ச்சி
+poster.pdfProfile|உங்கள் தனிமச் சுயவிவரம்
+poster.pdfTitle|உங்கள் பெயரின் வேதியியல்
+poster.pdfAll|அனைத்தும் {{count}}
+poster.pdfNOf|{{count}}-இல் {{n}}
+poster.noSharedTop|இந்தப் பெயர்களுக்கு இடையே பொதுவான தனிமங்கள் இல்லை. ஒவ்வொரு உறுப்பினரும் தங்களுக்கே உரிய தனிமக் கலவையைக் கொண்டு வருகிறார்கள்.
+poster.quoteShared|"இரண்டு அல்லது அதற்கு மேற்பட்ட குடும்ப உறுப்பினர்களிடம் பொதுவான தனிமங்கள்"
+poster.quoteUnique|"ஒவ்வொரு உறுப்பினரும் தனித்துவக் கலவையைக் கொண்டு வருகிறார்கள்"
+poster.sharedSubtitlePage2|இரண்டு அல்லது அதற்கு மேற்பட்ட குடும்ப உறுப்பினர்களிடம் பொதுவான தனிமங்கள். அவற்றின் பொருள் பக்கம் 2-இல் தொடர்கிறது.
+poster.frameProfileContinued|உங்கள் தனிமச் சுயவிவரம் / தொடர்ச்சி
+poster.frameCommonContinued|பொதுத் தனிமங்கள் / தொடர்ச்சி
+relations.father|தந்தை
+relations.mother|தாய்
+relations.son|மகன்
+relations.daughter|மகள்
+relations.brother|சகோதரர்
+relations.sister|சகோதரி
+relations.husband|கணவர்
+relations.wife|மனைவி
+relations.friend|நண்பர்
+relations.uncle|மாமா/சித்தப்பா
+relations.aunt|அத்தை/சித்தி
+relations.grandfather|தாத்தா
+relations.grandmother|பாட்டி
+relations.cousin|உறவினர் (சகோதர முறை)
+relations.inLaw|திருமண உறவினர்
+relations.companyName|நிறுவனத்தின் பெயர்
+relations.brandName|பிராண்டின் பெயர்
+relations.petName|செல்லப்பிராணியின் பெயர்
+relations.other|பிற
+relations.self|நான்
+relations.partner|துணை
+download.titleFamily|உங்கள் குடும்ப போஸ்டரைச் சேமித்துப் பகிருங்கள்
+download.titleSingle|உங்கள் போஸ்டரைச் சேமித்துப் பகிருங்கள்
+download.golden|தங்க நிறம்
+download.dark|அடர் நிறம்
+download.preparing|தயாராகிறது...
+download.saveShare|போஸ்டரைச் சேமித்துப் பகிரவும்
+download.hintFamily|முழுக் குடும்பம், பொதுத் தனிமங்கள் மற்றும் அவற்றின் பொருளுடன் ஒரே படம்.
+download.hintSingle|உங்கள் பெயரும் தனிம ஓடுகளும், படமாகச் சேமிக்க அல்லது பகிரத் தயார்.
+download.altFamily|பொதுத் தனிமங்களும் பொருளும் கொண்ட முழுக் குடும்ப போஸ்டர்
+download.altSingle|{{name}} பெயருக்கான பகிர்வு போஸ்டர்
+download.shareHint|உங்கள் சாதனப் பகிர்வு மெனுவில் இருந்தால் WhatsApp, Instagram அல்லது Facebook-ஐத் தேர்ந்தெடுங்கள். படத்தைப் பின்னர் பயன்படுத்தவும் சேமிக்கலாம்.
+download.saveHint|படத்தைச் சேமித்து, பிறகு WhatsApp செய்தி அல்லது Instagram, Facebook பதிவில் இணையுங்கள்.
+download.shareTitleFamily|எங்கள் குடும்ப Namasutra
+download.shareTitleSingle|என் Namasutra
+download.aria|உங்கள் போஸ்டரைப் பதிவிறக்கிப் பகிருங்கள்
+download.styleLegend|போஸ்டர் பாணியைத் தேர்ந்தெடுங்கள்
+download.pdfFailed|PDF-ஐப் பதிவிறக்க முடியவில்லை. மீண்டும் முயலுங்கள்.
+download.prepareFailed|போஸ்டரைத் தயாரிக்க முடியவில்லை. மீண்டும் முயலுங்கள்.
+download.shareUnavailable|பகிர்வு கிடைக்கவில்லை. "படத்தைச் சேமி"-ஐ அழுத்தி, பிறகு போஸ்டரை WhatsApp, Instagram அல்லது Facebook-இல் இணையுங்கள்.
+download.ready|உங்கள் போஸ்டர் தயார். அதைச் சேமியுங்கள் அல்லது பகிர ஒரு செயலியைத் தேர்ந்தெடுங்கள்.
+download.saveImage|படத்தைச் சேமி
+download.shareApps|செயலிகளில் பகிர்
+download.pdf|போஸ்டர் PDF-ஐப் பதிவிறக்கு
+family.needName|குறைந்தது ஒரு முழுப் பெயரை உள்ளிடுங்கள் (முதல் பெயரும் கடைசிப் பெயரும் தேவை)
+family.resultTitleSingle|பெயரின் வேதியியல்
+family.resultTitleFamily|குடும்ப வேதியியல் பகுப்பாய்வு
+family.resultTagline|"உங்கள் பெயர்களில் காணப்படும் பிரபஞ்சத் தனிமங்கள்"
+family.commonAcross|"அனைத்துக் குடும்ப உறுப்பினர்களிடமும் உள்ள பொதுத் தனிமங்கள்"
+family.harmonyIntro|உங்கள் இணக்கத் தனிமங்கள் <b>{{elements}}</b> அனைத்துப் பெயர்களுக்கும் இடையிலான பொதுவான தொடர்பையும் ஆற்றலையும் குறிக்கின்றன.
+family.subtitle|ஒரே நேரத்தில் {{max}} பெயர்கள் வரை பகுப்பாய்வு செய்யுங்கள்
+family.addName|மற்றொரு பெயரைச் சேர்க்கவும் ({{n}}/{{max}})
+family.limitNote|ஒரே நேரத்தில் {{max}} பெயர்கள் வரை ஒப்பிடலாம். மேலும் குடும்ப உறுப்பினர்களுக்கு புதிய பகுப்பாய்வைச் செய்யுங்கள்.
+family.context.health_stress|குடும்ப உடல்நலம் தொடர்பான மன அழுத்தம்
+family.context.emotional_imbalance|உணர்வு அல்லது உறவுகளில் சமநிலையின்மை
+family.context.financial_pressure|பணம் அல்லது தொழில் தொடர்பான சவால்கள்
+family.context.general_curiosity|பொதுவான ஆர்வம் / தன்னைப் புரிந்துகொள்ளுதல்
+family.title|குடும்பத் தொகுப்பு
+family.firstName|முதல் பெயர் *
+family.middleName|நடுப் பெயர்
+family.lastName|கடைசிப் பெயர் *
+family.relation|உறவு
+family.analyzeAll|அனைத்துப் பெயர்களையும் பகுப்பாய்வு செய்
+family.knowHarmony|உங்கள் இணக்கத்தை அறியுங்கள் - மேலும் அறிய அழுத்துங்கள்
+family.whyExploring|இதை ஏன் அறிய விரும்புகிறீர்கள்? (விருப்பம்)
+family.whyHelp|இது உங்களுக்கு மேலும் பொருள்மிக்க விளக்கத்தை வழங்க உதவுகிறது.
+family.getInterpretation|விளக்கத்தைப் பெறுங்கள்
+pricing.reasonFamily|குடும்பத் தொகுப்பு ஆண்டுத் திட்டத்தின் ஒரு பகுதி.
+pricing.reasonPlan|பெயர் பகுப்பாய்வுகளையும் நுண்ணறிவுகளையும் திறக்க ஆண்டுத் திட்டத்தைத் தேர்ந்தெடுங்கள்.
+pricing.referralApplied|🎉 பரிந்துரைக் குறியீடு சேர்க்கப்பட்டது: {{code}}
+pricing.percentOff|உங்கள் திட்டத்தில் {{percent}}% தள்ளுபடி
+pricing.perYear|/ ஆண்டு
+pricing.referralDiscount|{{percent}}% பரிந்துரைத் தள்ளுபடி பயன்படுத்தப்பட்டது
+pricing.featureFamily|குடும்பத் தொகுப்பு: ஒரே நேரத்தில் {{max}} பெயர்கள் வரை பகுப்பாய்வு
+pricing.title|NAMASUTRA ஆண்டுத் திட்டம்
+pricing.subtitle|பெயர்களின் வேதியியலைத் திறந்து பாருங்கள்
+pricing.badge|அனைத்தும் உள்ளடக்கம்
+pricing.feature1|மாதம் 8 பெயர் பகுப்பாய்வுகள்
+pricing.feature2|குடும்ப இணக்கப் பகுப்பாய்வு
+pricing.feature3|அழகான PDF மற்றும் PNG போஸ்டர்கள்
+pricing.feature4|ஹோரா மற்றும் முகூர்த்த நேரங்கள்
+pricing.feature5|கால்டியன் எண் கணித நுண்ணறிவுகள்
+pricing.feature6|ராசிப்படி பெயர் வழிகாட்டி
+pricing.feature7|தனிமம் மற்றும் நட்சத்திர நுண்ணறிவுகள்
+pricing.cta|ஆண்டுத் திட்டத்தைப் பெறுங்கள்
+pricing.billing|திட்டத்தின் கட்டணம் ஆண்டுக்கு ஒருமுறை. எப்போது வேண்டுமானாலும் ரத்து செய்யலாம்.
+pricing.subtitle2|பெயர் பகுப்பாய்வுகளையும் நுண்ணறிவுகளையும் திறக்கவும்
+payment.securePowered|🔒 பாதுகாப்பான கட்டணம்: {{gateway}}
+payment.planLine|NAMASUTRA ஆண்டுத் திட்டம் (1 ஆண்டு)
+payment.referralLine|பரிந்துரைக் குறியீடு <code>{{code}}</code> ({{percent}}% தள்ளுபடி)
+payment.includesGst|{{percent}}% GST உட்பட
+payment.includesTax|{{percent}}% வரி உட்பட
+payment.payTest|{{amount}} செலுத்துங்கள் (சோதனை)
+payment.poweredMock|🔒 பாதுகாப்பான கட்டணம்: எதுவுமில்லை (மாதிரி முறை)
+payment.poweredTest|🔒 பாதுகாப்பான கட்டணம்: எதுவுமில்லை (சோதனை முறை)
+payment.title|கட்டணத்தை நிறைவு செய்யுங்கள்
+payment.subtitle|உங்கள் NAMASUTRA ஆண்டுத் திட்டத்துக்கான பாதுகாப்பான கட்டணம்
+payment.total|மொத்தம்
+payment.backToPricing|விலை விவரத்துக்குத் திரும்பு
+payment.selectMethod|கட்டண முறையைத் தேர்ந்தெடுக்கவும்
+payment.success|கட்டணம் வெற்றிகரமாக முடிந்தது
+payment.active|உங்கள் திட்டம் இப்போது செயலில் உள்ளது.
+payment.taking|உங்களை டாஷ்போர்டுக்கு அழைத்துச் செல்கிறோம்...
+payment.mockNote|மாதிரி முறை: உண்மையான கட்டண நுழைவாயில் பயன்படுத்தப்படவில்லை.
+payment.simulateOk|வெற்றிகரமான கட்டணத்தைப் பாவனை செய்
+payment.simulateFail|தோல்வியுற்ற கட்டணத்தைப் பாவனை செய்
+payment.testNote|சோதனை முறை: அட்டை தேவையில்லை. வெற்றிகரமான கட்டணத்தைப் பாவனை செய்ய கீழே அழுத்துங்கள்.
+payment.loadingPaypal|PayPal ஏற்றுகிறது...
+payment.cancel|கட்டணத்தை ரத்து செய்
+payment.processing|செயலாக்குகிறது...
+payment.payRazorpay|Razorpay மூலம் செலுத்துங்கள்
+nav.backToDashboard|டாஷ்போர்டுக்குத் திரும்பு
+nav.settings|அமைப்புகள்
+nav.language|மொழி
+nav.home|முகப்பு
+nav.knowMore|மேலும் அறிக
+nav.dashboard|டாஷ்போர்டு
+nav.analyze|பெயர் பகுப்பாய்வு
+nav.family|குடும்பப் பகுப்பாய்வு
+nav.insights|தனிமம் மற்றும் நட்சத்திர நுண்ணறிவுகள்
+nav.numerology|எண் கணிதக் கணிப்பான்
+nav.zodiac|ராசிப்படி பெயர் வழிகாட்டி
+nav.hora|ஹோரா மற்றும் முகூர்த்தம்
+nav.pricing|திட்டங்களும் விலையும்
+nav.profile|என் சுயவிவரம்
+nav.signIn|உள்நுழை
+nav.ambassadorArea|தூதர் பகுதி
+nav.ambassadorLogin|தூதர் உள்நுழைவு
+nav.admin|நிர்வாகம்
+nav.accounts|கணக்குகள்
+nav.explore|Namasutra-வை ஆராயுங்கள்
+nav.account|உங்கள் கணக்கு
+nav.ambassadors|தூதர்கள்
+nav.homeAria|Namasutra முகப்பு
+nav.primary|முதன்மை வழிசெலுத்தல்
+nav.allPages|அனைத்துப் பக்கங்கள்
+nav.menu|மெனு
+nav.signOut|வெளியேறு
+dashboard.welcome|👋 வரவேற்கிறோம், {{name}}!
+dashboard.plan|திட்டம்:
+dashboard.annualPlan|ஆண்டுத் திட்டம்
+dashboard.renews|(புதுப்பிப்பு: {{date}})
+dashboard.expired|({{date}} அன்று முடிந்தது)
+dashboard.analysesUsed|பயன்படுத்திய பகுப்பாய்வுகள்:
+dashboard.usedOf|இந்த மாதம் {{used}}/{{total}}
+dashboard.choosePlan|திட்டத்தைத் தேர்ந்தெடுங்கள்
+dashboard.renewPlan|உங்கள் திட்டத்தைப் புதுப்பியுங்கள்
+dashboard.upgradeHint|குடும்ப இணக்கம், {{max}} பெயர்கள், PDF அறிக்கைகள் மற்றும் பல
+dashboard.familyEntry_one|குடும்பம் ({{count}} பெயர்)
+dashboard.familyEntry_other|குடும்பம் ({{count}} பெயர்கள்)
+dashboard.horaTitle|இன்றைய ஹோரா மற்றும் முகூர்த்தம்
+dashboard.elementTitle|தனிமம் மற்றும் நட்சத்திர வழிகாட்டி
+dashboard.analyzeNew|புதிய பெயரைப் பகுப்பாய்வு செய்
+dashboard.analyzeHint|எந்தப் பெயரின் வேதியியலையும் அறியுங்கள்
+dashboard.settingsHint|கணக்கு மற்றும் செயலி அமைப்புகள்
+dashboard.knowledgeBase|அறிவுக் களஞ்சியம்
+dashboard.zodiacTitle|ராசிப்படி பெயர் வழிகாட்டி
+dashboard.zodiacText|உங்கள் ராசி மற்றும் பிறப்பு விவரங்களின் அடிப்படையில், உங்கள் பெயருக்கு எந்தத் தொடக்க எழுத்துகளும் ஒலிகளும் மரபுப்படி நல்லவை என்று கருதப்படுகின்றன என்பதை அறியுங்கள்.
+dashboard.zodiacCta|பெயர் வழிகாட்டியை ஆராயுங்கள்
+dashboard.numerologyTitle|எண் கணிதக் கணிப்பான்
+dashboard.numerologyText|உங்கள் பெயர் மற்றும் பிறந்த தேதியிலுள்ள எண்கள் உங்கள் குணம், இயல்பான பலம், வாழ்க்கைப் பயணம் பற்றி மரபுப்படி என்ன சொல்கின்றன என்பதை அறியுங்கள்.
+dashboard.numerologyCta|உங்கள் எண்களை அறியுங்கள்
+dashboard.elementText|உங்கள் பெயரின் எழுத்துகளில் மறைந்திருக்கும் வேதியியல் தனிமங்களை ஆராயுங்கள்; உங்கள் பிறந்த நட்சத்திரம் பாரம்பரிய வேத நம்பிக்கைகளுடன் எப்படித் தொடர்புடையது என்பதையும் அறியுங்கள்.
+dashboard.elementCta|உங்கள் தொடர்புகளை ஆராயுங்கள்
+dashboard.horaText|நாளின் ஒவ்வொரு மணிநேரத்துக்குமான கிரக ஹோராவையும், உங்கள் நகரத்துக்கான நல்ல மற்றும் தவிர்க்க வேண்டிய நேரங்களையும் பாருங்கள்.
+dashboard.horaCta|இன்றைய நேரங்களைப் பாருங்கள்
+dashboard.recent|சமீபத்திய பகுப்பாய்வுகள்
+dashboard.noAnalyses|இன்னும் பகுப்பாய்வுகள் இல்லை. ஒரு பெயரைப் பகுப்பாய்வு செய்து தொடங்குங்கள்!
+settings.confirmSignOutAll|இது உங்களை எல்லாச் சாதனங்களிலிருந்தும் வெளியேற்றும். தொடரவா?
+settings.signedOutAll|✅ எல்லாச் சாதனங்களிலிருந்தும் வெற்றிகரமாக வெளியேறிவிட்டீர்கள்!
+settings.title|கணக்கு அமைப்புகள்
+settings.email|மின்னஞ்சல்
+settings.signOut|வெளியேறு
+settings.signOutDeviceHint|இந்தச் சாதனத்தில் மட்டும் வெளியேறுங்கள்.
+settings.signOutDevice|இந்தச் சாதனத்தில் வெளியேறு
+settings.clearTitle|வெளியேறி, இந்தச் சாதனத்தின் தரவை அழி
+settings.clearHint|எல்லாத் தற்காலிகத் தரவையும் அழித்து, நீங்கள் உள்நுழைந்துள்ள எல்லாச் சாதனங்களிலிருந்தும் வெளியேறுங்கள். எல்லாச் சாதனங்களிலும் மீண்டும் உள்நுழைய வேண்டும்.
+settings.warning|எச்சரிக்கை: இந்தச் செயலைத் திரும்பப் பெற முடியாது
+settings.warningText|இது உலாவியின் எல்லாத் தரவு, குக்கீகள், தற்காலிக நினைவகத்தை அழிக்கும். நீங்கள் உடனடியாக வெளியேற்றப்படுவீர்கள்.
+settings.clearing|அழிக்கிறது...
+settings.about|பற்றி
+settings.app|செயலி:
+settings.version|பதிப்பு:
+settings.support|ஆதரவு:
+profile.name|பெயர்
+profile.dob|பிறந்த தேதி
+profile.gender|பாலினம்
+profile.location|இடம்
+profile.referralUsed|பயன்படுத்திய பரிந்துரைக் குறியீடு
+profile.plan|திட்டம்
+profile.planActiveUntil|NAMASUTRA ஆண்டுத் திட்டம் - {{date}} வரை செயலில்
+profile.planActive|NAMASUTRA ஆண்டுத் திட்டம் - செயலில்
+profile.noPlan|செயலில் உள்ள திட்டம் இல்லை
+profile.title|என் சுயவிவரம்
+profile.complete|உங்கள் சுயவிவரத்தை நிறைவு செய்யுங்கள்
+profile.settings|கணக்கு அமைப்புகள்
+profile.pricing|திட்டங்களும் விலையும்
+notFound.title|பக்கம் கிடைக்கவில்லை
+notFound.text|இந்தத் தனிமம் எங்கள் தனிம அட்டவணையில் இல்லை.
+learn.science1|<b>Namasutra</b> அடையாளத்தை <b>வேதியியல், அமைப்பு, அதிர்வு</b> வழியாக எப்படிப் புரிந்துகொள்ளலாம் என்பதை ஆராய்கிறது.
+learn.science2|ஒவ்வொரு பெயரையும் இவற்றுடன் இணைக்கலாம்:
+learn.scienceItem1|தனிம அட்டவணையின் வேதியியல் தனிமங்கள்
+learn.scienceItem2|அணுப் பண்புகளும் தனிமங்களின் நிற அதிர்வெண்களும்
+learn.scienceItem3|ஒலி அடிப்படையிலான அதிர்வு வடிவங்கள்
+learn.example|எடுத்துக்காட்டு:
+learn.science3|இந்தத் தனிமங்கள் சேர்ந்து ஒரு <b>பெயர் வேதியியல் கையொப்பத்தை</b> உருவாக்குகின்றன; இது குணநலன்கள், உணர்வுச் சமநிலை, பொருத்தம் பற்றிய பார்வையைத் தருகிறது.
+learn.science4|சரியான அதிர்வுகள் சிறந்த இயைபை உருவாக்குகின்றன.
+learn.spiritual1|<b>Namasutra</b>-வில் நாங்கள் பிரபஞ்சத்தை இயக்கத்திலுள்ள ஆற்றலாகவும், ஒலியை அதன் முதல் வெளிப்பாடாகவும் காண்கிறோம்.
+learn.spiritual2a|பெயர் ஒலியைச் சுமக்கிறது.
+learn.spiritual2b|ஒலி அதிர்வைச் சுமக்கிறது.
+learn.spiritual2c|அதிர்வு அனுபவத்தை வடிவமைக்கிறது.
+learn.spiritual3|ஒவ்வொரு ஒலியும் ஒரு தனிமம், ஒரு நிறம், ஒரு பிரபஞ்ச அதிர்வெண்ணுடன் எதிரொலிக்கிறது — இதுவே உங்களுக்கே உரிய <b>ஆற்றல் கையொப்பம்</b>.
+learn.spiritual4|சரியான அதிர்வுகள் முக்கியம் — அது ஒரு பெயராக இருந்தாலும், குழந்தையாக இருந்தாலும், பிராண்டாக இருந்தாலும்.
+learn.tabScience|அறிவியல்
+learn.tabSpiritual|ஆன்மிகம்
+learn.tabExplainer|இது எப்படி செயல்படுகிறது
+learn.topicsAria|மேலும் அறிய வேண்டிய தலைப்புகள்
+learn.explainerAria|Namasutra எப்படி செயல்படுகிறது
+learn.explainerText|எழுத்துகளை ஆராயுங்கள், தனிமங்களைக் கண்டறியுங்கள், உங்கள் சொந்த Namasutra போஸ்டரை உருவாக்குங்கள்.
+learn.explainerAlt|Namasutra படவிளக்க வழிகாட்டி: Vibes என்பது Vanadium (V), Iodine (I), Beryllium (Be), Sulfur (S) ஆகிறது. உங்கள் பெயரின் தனிமங்களை அறிந்து, சேமிக்கவும் பகிரவும் போஸ்டர் உருவாக்குங்கள்.
+learn.explainerFull|விளக்கப் படத்தை முழு அளவில் பாருங்கள்
+ambassador.welcomeLine1|உங்கள்
+ambassador.welcomeLine2|தூதர் இடத்துக்கு வரவேற்கிறோம்.
+ambassador.tagline1|உங்கள் தனிம அடையாளம்,
+ambassador.tagline2|இயற்கையுடன் இயைந்து.
+ambassador.signingIn|உள்நுழைகிறது...
+ambassador.signInGoogle|Google மூலம் உள்நுழையுங்கள்
+ambassador.signInFailed|உள்நுழைய முடியவில்லை: {{message}}
+ambassador.kicker|NAMASUTRA / தூதர்கள்
+ambassador.invitationOnly|அழைப்பின் மூலம் மட்டும்
+ambassador.signInTitle|தூதர் உள்நுழைவு
+ambassador.signInText|மீண்டும் வரவேற்கிறோம். உங்கள் அழைப்பு அனுப்பப்பட்ட Google கணக்கின் மூலம் தொடருங்கள்.
+ambassador.helpNote|உங்கள் கணக்கை அணுக உதவி தேவையா? உங்களை அழைத்தவரைத் தொடர்பு கொள்ளுங்கள்.
+ambassador.checkInvitation|உங்கள் அழைப்பைச் சரிபாருங்கள்
+ambassador.notInvited|இந்த Google கணக்கு தூதராக அழைக்கப்படவில்லை. உங்களை அழைத்தவரைத் தொடர்பு கொள்ளுங்கள்.
+ambassador.signOut|வெளியேறு
+ambassador.field.firstName|முதல் பெயர்
+ambassador.field.middleName|நடுப் பெயர்
+ambassador.field.lastName|கடைசிப் பெயர்
+ambassador.field.motherName|தாயின் பெயர்
+ambassador.field.dob|பிறந்த தேதி
+ambassador.field.gender|பாலினம்
+ambassador.field.profession|தற்போதைய தொழில்
+ambassador.field.mobileNumber|கைபேசி எண்
+ambassador.field.alternateMobile|மாற்றுக் கைபேசி
+ambassador.field.email|மின்னஞ்சல் முகவரி
+ambassador.field.countryCode|நாடு
+ambassador.field.stateCode|மாநிலம்
+ambassador.field.city|நகரம்
+ambassador.field.zipCode|அஞ்சல் குறியீடு
+ambassador.field.addressLine1|முகவரி வரி 1
+ambassador.field.instagram|Instagram
+ambassador.field.facebook|Facebook

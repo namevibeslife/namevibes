@@ -1,0 +1,12 @@
+import {chromium} from 'file:///C:/Users/sresq/AppData/Local/npm-cache/_npx/420ff84f11983ee5/node_modules/playwright/index.mjs';
+const b = await chromium.launch({ executablePath: 'C:/Users/sresq/AppData/Local/ms-playwright/chromium-1248/chrome-win64/chrome.exe' });
+const p = await (await b.newContext()).newPage(); const errs=[];
+p.on('pageerror', e => errs.push(e.message)); p.on('dialog', d => d.accept());
+await p.addInitScript(() => localStorage.setItem('nv_mock_session', JSON.stringify({ uid: 'mock-unpaid', email: 'unpaid@namevibes.test', displayName: 'U' })));
+await p.goto('http://localhost:5199/pricing'); await p.waitForTimeout(1500);
+await p.locator('button:has-text("Get"), button:has-text("Activate"), button:has-text("Continue")').last().click().catch(async()=>{ await p.getByRole('button').last().click(); });
+await p.waitForTimeout(1200);
+console.log('on payment page:', p.url().includes('/payment'));
+await p.getByRole('button', { name: /simulate|Success/i }).first().click(); await p.waitForTimeout(1500);
+console.log('after simulated payment url:', p.url(), 'errors:', errs.length?errs:'none');
+await b.close();

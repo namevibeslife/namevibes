@@ -1,0 +1,14 @@
+ta 390 landing: overflow=false htmlLang=ta english=-
+ta 390 signin: overflow=false htmlLang=ta english=-
+ta 390 profile-complete: overflow=false htmlLang=ta english=-
+ta 390 pricing-nocode: overflow=false htmlLang=ta english=-
+ta 390 pricing-code: overflow=false htmlLang=ta english=-
+ta 390 payment: overflow=false htmlLang=ta english=-
+ta 390 dashboard: overflow=false htmlLang=ta english=-
+ta 390 analyze-result: overflow=false htmlLang=ta english=-
+ta 390 family-result: overflow=false htmlLang=ta english=-
+ta 390 hora: overflow=false htmlLang=ta english=-
+ta 390 profile: overflow=false htmlLang=ta english=-
+ta 390 settings: overflow=false htmlLang=ta english=-
+ta 390 menu: overflow=false htmlLang=ta english=-
+ta 390 ambassador: overflow=false htmlLang=ta english=-
