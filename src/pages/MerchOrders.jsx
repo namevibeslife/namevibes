@@ -10,7 +10,7 @@ import { formatMoney, formatDate } from '../i18n/format';
 
 const when = (v) => (v && typeof v.toDate === 'function' ? v.toDate() : v ? new Date(v) : null);
 // Customers see a simple status; "exception" is an internal holding state.
-const shown = (s) => (s === 'exception' ? 'in_review' : s);
+const shown = (s) => (s === 'exception' || s === 'held_provider_funds' ? 'in_review' : s);
 
 function Timeline({ order, t }) {
   return (
@@ -74,7 +74,7 @@ export function MerchOrderDetail() {
       {order.tracking && <p className="mb-4" data-testid="tracking">{t('merch.orders.tracking')}: {order.tracking.carrier} {order.tracking.number} {order.tracking.url && <a className="underline" href={order.tracking.url} target="_blank" rel="noopener noreferrer">{t('merch.orders.trackLink')}</a>}</p>}
       <h2 className="text-lg font-semibold mb-2">{t('merch.orders.timeline')}</h2>
       <Timeline order={order} t={t} />
-      <p className="text-xs text-gray-600 mt-4">{t('merch.orders.deliveryNote')}</p>
+      <p className="text-xs text-gray-600 mt-4">{t('merch.orders.deliveryNote')} <Link to="/merch/returns-policy" className="underline">{t('merch.policyLink')}</Link></p>
       <button onClick={reorder} className="mt-4 px-5 py-2 rounded-lg bg-brand-600 text-white" data-testid="reorder">{t('merch.orders.reorder')}</button>
     </div></main>
   );

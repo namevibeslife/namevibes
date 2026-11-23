@@ -18,6 +18,50 @@ export function gridFor(n, width, height, gap = 0.08) {
   return best;
 }
 
+// Exact heading strings for the Name Elements poster (never translated, never changed).
+export const POSTER_HEADING = 'THE CHEMISTRY OF YOUR NAME';
+export const POSTER_SECTION = 'ELEMENTS IN YOUR NAME';
+const fitFont = (text, maxWidth, maxSize) => Math.min(maxSize, maxWidth / (Math.max(text.length, 1) * 0.72)); // caps in a serif face are ~0.7 em wide
+
+function tileSvg(e, tx, ty, s) {
+  const color = ELEMENTS[e.symbol]?.color || '#CCCCCC';
+  const fg = textColorFor(color);
+  return `<g><rect x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" width="${s.toFixed(1)}" height="${s.toFixed(1)}" rx="${(s * 0.08).toFixed(1)}" fill="${color}" stroke="#B8860B" stroke-width="${(s * 0.025).toFixed(1)}"/>`
+    + `<text x="${(tx + s * 0.08).toFixed(1)}" y="${(ty + s * 0.2).toFixed(1)}" font-size="${(s * 0.15).toFixed(1)}" fill="${fg}">${e.atomicNumber}</text>`
+    + `<text x="${(tx + s / 2).toFixed(1)}" y="${(ty + s * 0.62).toFixed(1)}" font-size="${(s * 0.42).toFixed(1)}" font-weight="700" text-anchor="middle" fill="${fg}">${esc(e.symbol)}</text>`
+    + `<text x="${(tx + s / 2).toFixed(1)}" y="${(ty + s * 0.86).toFixed(1)}" font-size="${(s * 0.12).toFixed(1)}" text-anchor="middle" fill="${fg}">${esc(e.name)}</text></g>`;
+}
+
+// Framed-poster artwork: heading, the customer's name, section heading, then the real element tiles.
+function posterGroup(design, box, { ink }) {
+  const { x, y, width, height } = box;
+  const gold = '#8A6A12';
+  const cx = x + width / 2;
+  const hSize = fitFont(POSTER_HEADING, width * 0.9, height * 0.045);
+  const nameSize = fitFont(design.name, width * 0.86, height * 0.085);
+  const sSize = fitFont(POSTER_SECTION, width * 0.7, height * 0.03);
+  const yHead = y + height * 0.07;
+  const yName = y + height * 0.19;
+  const ySection = y + height * 0.285;
+  const gridTop = y + height * 0.32;
+  const gridArea = { x, y: gridTop, width, height: y + height * 0.97 - gridTop };
+  const g = gridFor(design.elements.length, gridArea.width, gridArea.height);
+  const gap = g.size * 0.08;
+  const rowW = (n) => n * g.size + (n - 1) * gap;
+  let out = `<g font-family="Georgia, 'Times New Roman', serif">`
+    + `<text x="${cx}" y="${yHead.toFixed(1)}" font-size="${hSize.toFixed(1)}" font-weight="700" letter-spacing="${(hSize * 0.06).toFixed(1)}" text-anchor="middle" fill="${gold}">${POSTER_HEADING}</text>`
+    + `<line x1="${x + width * 0.2}" y1="${(yHead + height * 0.015).toFixed(1)}" x2="${x + width * 0.8}" y2="${(yHead + height * 0.015).toFixed(1)}" stroke="#B8860B" stroke-width="${(height * 0.002).toFixed(1)}"/>`
+    + `<text x="${cx}" y="${yName.toFixed(1)}" font-size="${nameSize.toFixed(1)}" font-style="italic" text-anchor="middle" fill="${ink}">${esc(design.name)}</text>`
+    + `<text x="${cx}" y="${ySection.toFixed(1)}" font-size="${sSize.toFixed(1)}" letter-spacing="${(sSize * 0.12).toFixed(1)}" text-anchor="middle" fill="${gold}">${POSTER_SECTION}</text>`;
+  design.elements.forEach((e, i) => {
+    const row = Math.floor(i / g.cols);
+    const inRow = row === g.rows - 1 ? design.elements.length - row * g.cols : g.cols;
+    const col = i - row * g.cols;
+    out += tileSvg(e, gridArea.x + (gridArea.width - rowW(inRow)) / 2 + col * (g.size + gap), gridArea.y + (gridArea.height - (g.rows * g.size + (g.rows - 1) * gap)) / 2 + row * (g.size + gap), g.size);
+  });
+  return `${out}</g>`;
+}
+
 export const inkFor = (colorHex) => (textColorFor(colorHex) === '#ffffff' ? '#FFFFFF' : '#1F2937');
 
 /**
@@ -31,6 +75,7 @@ export function designGroup(design, box, { ink = '#1F2937' } = {}) {
     const href = asset ? asset.path : '';
     return `<g><image href="${esc(href)}" x="${x}" y="${y}" width="${width}" height="${height}" preserveAspectRatio="xMidYMid meet"/><title>${esc(bloodGroupLabel(design.bloodGroup))}</title></g>`;
   }
+  if (design.template === 'poster') return posterGroup(design, box, { ink });
   const els = design.elements;
   const nameH = height * 0.14;
   const gridH = height - nameH - height * 0.04;

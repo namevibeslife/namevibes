@@ -28,7 +28,7 @@ export function designAspect(design) {
     const a = BLOOD_ASSETS[bloodGroupSlug(design.bloodGroup)];
     return a ? a.width / a.height : 1312 / 1199;
   }
-  return 0.8;
+  return design?.template === 'poster' ? 210 / 297 : 0.8; // A-series paper for the poster template
 }
 
 // Accepts anything, returns a safe layout (also what the server stores).
@@ -63,27 +63,51 @@ export function fitRect(box, aspect) {
 }
 
 // ---- print spec (per product; a variant mapping may override the numbers) -----------------------------------
-// { printTypeId, allowedPlacements[], maxWidthInches, maxHeightInches, minDpi, verified? }
-export function specProblems(spec) {
+// { printTypeId, allowedPlacements[], minDpi, verified?, and EITHER maxWidthInches + maxHeightInches
+//   OR perSize: true with bySize: { A4: { maxWidthInches, maxHeightInches }, A3: {...} } }.
+// perSize is for products whose print area depends on the size (framed posters); apparel uses one area for all sizes.
+const dimsProblems = (d, label, p) => {
+  if (!(Number(d?.maxWidthInches) > 0)) p.push(label ? `${label}:maxWidthInches` : 'maxWidthInches');
+  if (!(Number(d?.maxHeightInches) > 0)) p.push(label ? `${label}:maxHeightInches` : 'maxHeightInches');
+};
+export function specProblems(spec, sizes) {
   const p = [];
   if (!spec || typeof spec !== 'object') return ['missing'];
   if (!PRINT_TYPE_IDS.includes(Number(spec.printTypeId))) p.push('printTypeId');
   if (!Array.isArray(spec.allowedPlacements) || spec.allowedPlacements.length === 0 || spec.allowedPlacements.some((x) => !PLACEMENT_CODES.includes(x))) p.push('allowedPlacements');
-  if (!(Number(spec.maxWidthInches) > 0)) p.push('maxWidthInches');
-  if (!(Number(spec.maxHeightInches) > 0)) p.push('maxHeightInches');
   if (!(Number(spec.minDpi) > 0)) p.push('minDpi');
   const lim = TYPE_LIMITS[Number(spec.printTypeId)];
-  if (lim && (Number(spec.maxWidthInches) > lim.width || Number(spec.maxHeightInches) > lim.height)) p.push('exceedsTypeLimit');
+  const over = (d) => lim && (Number(d.maxWidthInches) > lim.width || Number(d.maxHeightInches) > lim.height);
+  if (spec.perSize) {
+    const list = Array.isArray(sizes) && sizes.length ? sizes : Object.keys(spec.bySize || {});
+    if (!list.length) p.push('bySize');
+    for (const sz of list) {
+      const d = spec.bySize?.[sz];
+      const before = p.length;
+      dimsProblems(d, `size ${sz}`, p);
+      if (p.length === before && over(d)) p.push('exceedsTypeLimit');
+    }
+  } else {
+    const before = p.length;
+    dimsProblems(spec, '', p);
+    if (p.length === before && over(spec)) p.push('exceedsTypeLimit');
+  }
   return p;
 }
-export const specComplete = (spec) => specProblems(spec).length === 0;
+export const specComplete = (spec, sizes) => specProblems(spec, sizes).length === 0;
 
-// Product spec with any per-SKU numbers from the variant mapping laid over it.
-export function effectiveSpec(productSpec, mapping) {
+// The flat spec for ONE size: product spec, with the size's print area (perSize) and any per-SKU numbers from the variant mapping laid over it.
+export function effectiveSpec(productSpec, mapping, size) {
   const m = mapping && typeof mapping === 'object' ? mapping : {};
+  let base = { ...(productSpec || {}) };
+  if (base.perSize) {
+    const d = base.bySize?.[size];
+    base = { ...base, ...(d || {}), perSize: false };
+    delete base.bySize;
+  }
   const o = {};
   for (const k of ['printTypeId', 'allowedPlacements', 'maxWidthInches', 'maxHeightInches', 'minDpi']) if (m[k] !== undefined && m[k] !== null && m[k] !== '') o[k] = m[k];
-  return { ...(productSpec || {}), ...o };
+  return { ...base, ...o };
 }
 
 // ---- resolution ------------------------------------------------------------------------------------------------

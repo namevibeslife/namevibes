@@ -11,6 +11,7 @@
 //    therefore tested with fixtures only.
 import { PODProvider, unsupported } from './base.js';
 import { COUNTRIES } from '../../data/countries.js';
+import { refuseCod } from '../cod.js';
 
 export const QIKINK_BASES = { sandbox: 'https://sandbox.qikink.com', live: 'https://api.qikink.com' };
 // Documented limit is 60 requests per 60 seconds; stay a little under it.
@@ -101,6 +102,8 @@ export function buildShippingAddress(address, email) {
 // canvasInches { width, height }, placementSku, providerSku: { sku, printTypeId, plain? }, mockupUrl? }.
 // Returns { payload, orderNumber } or { error } (a permanent validation error: never retried blindly).
 export function buildOrderPayload(order) {
+  // Qikink orders are ALWAYS prepaid: a COD request is refused and `gateway` below is never anything but "Prepaid".
+  if (refuseCod(order)) return { error: 'cod-not-allowed' };
   if (String(order.address?.country || '').toUpperCase() !== 'IN') return { error: 'unsupported-country' };
   const orderNumber = qikinkOrderNumber(order.orderId);
   const addr = buildShippingAddress(order.address, order.email);
@@ -111,7 +114,7 @@ export function buildOrderPayload(order) {
     if (!m || typeof m !== 'object' || !m.sku) return { error: 'sku-mapping-incomplete' };
     if (String(m.sku).length > 50) return { error: 'sku-too-long' };
     if (!Number.isInteger(it.qty) || it.qty < 1 || it.qty > 100) return { error: 'bad-quantity' };
-    const printType = Number(m.printTypeId);
+    const printType = Number(it.printTypeId || m.printTypeId); // from the product print spec; the mapping value is the older fallback
     if (!PRINT_TYPES.includes(printType)) return { error: 'print-type-invalid' };
     const line = { search_from_my_products: 0, print_type_id: printType, quantity: it.qty, sku: String(m.sku), price: Number(it.unitPrice) };
     if (m.plain === true) {
@@ -159,12 +162,16 @@ export function hasMorePages(body, page) {
   return (body?.data || []).length >= 10;
 }
 
+// UNVERIFIED wording of an "insufficient wallet balance" error; override with the `fundsPattern` option / QIKINK_FUNDS_ERROR_PATTERN.
+export const DEFAULT_FUNDS_PATTERN = /(insufficient|wallet|balance|lows*fund)/i;
+
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const isRateLimitBody = (b) => /rate limit/i.test(String(b?.error || b?.message || ''));
 
 export class QikinkAdapter extends PODProvider {
-  constructor(id = 'qikink', { clientId, clientSecret, env = 'sandbox', fetch: f, now = () => Date.now(), sleep = realSleep } = {}) {
+  constructor(id = 'qikink', { clientId, clientSecret, env = 'sandbox', fetch: f, now = () => Date.now(), sleep = realSleep, fundsPattern = DEFAULT_FUNDS_PATTERN } = {}) {
     super(id);
+    this.fundsPattern = fundsPattern;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
     this.env = env === 'live' ? 'live' : 'sandbox';
@@ -254,6 +261,7 @@ export class QikinkAdapter extends PODProvider {
 
   // order: the fulfilment payload built by the engine. order.attempt > 1 means an earlier attempt may have reached Qikink.
   async submitOrder(order) {
+    const cod = refuseCod(order); if (cod) return cod;
     const built = buildOrderPayload({ ...order, orderId: order.orderId });
     if (built.error) return { ok: false, error: built.error, retryable: false };
     const { payload, orderNumber } = built;
@@ -272,6 +280,9 @@ export class QikinkAdapter extends PODProvider {
       if (id === undefined || id === null) return { ok: false, error: 'qikink-no-order-id', retryable: true, ambiguous: true };
       return { ok: true, providerOrderId: String(id), orderNumber };
     }
+    // Qikink is prepaid by wallet credit. The docs do not give the exact error text for an empty wallet, so this pattern is a
+    // configurable GUESS (unverified); any other 400 stays a permanent failure.
+    if (!res.retryable && this.fundsPattern.test(String(res.error || ''))) return { ok: false, error: res.error, retryable: false, heldFunds: true, orderNumber };
     return { ok: false, error: res.error, retryable: res.retryable, orderNumber };
   }
 

@@ -58,7 +58,7 @@ export default function MerchAdmin() {
       <h1 className="text-2xl font-bold mb-3">Merchandise administration</h1>
       <div role="tablist" className="flex flex-wrap gap-2 mb-4">{TABS.map((x) => <button key={x} role="tab" aria-selected={tab === x} onClick={() => setTab(x)} className={`px-3 py-1.5 rounded-lg border ${tab === x ? 'bg-brand-600 text-white' : 'bg-white'}`}>{x}</button>)}</div>
       {note && <p role="status" className="mb-3 text-sm" data-testid="admin-note">{note}</p>}
-      {tab === 'Overview' && <Overview data={data} />}
+      {tab === 'Overview' && <Overview data={data} act={act} />}
       {tab === 'Global & countries' && <Switches data={data} act={act} />}
       {tab === 'Providers' && <Providers data={data} act={act} />}
       {tab === 'Products' && <Products data={data} act={act} />}
@@ -70,11 +70,12 @@ export default function MerchAdmin() {
 }
 
 // ---- overview ---------------------------------------------------------------------------------------
-function Overview({ data }) {
+function Overview({ data, act }) {
   const paid = data.orders.filter((o) => o.transactionId && o.status !== 'refunded');
   const sum = (f) => paid.reduce((s, o) => s + f(o), 0);
   const byStatus = STATES.map((s) => [s, data.orders.filter((o) => o.status === s).length]).filter(([, n]) => n);
   const exceptions = data.orders.filter((o) => o.status === 'exception');
+  const held = data.orders.filter((o) => o.status === 'held_provider_funds');
   const stuck = data.orders.filter((o) => ['paid', 'fulfillment_pending'].includes(o.status));
   const byCountry = {};
   paid.forEach((o) => { byCountry[o.countryCode] = byCountry[o.countryCode] || { n: 0, rev: 0, cur: o.currency }; byCountry[o.countryCode].n++; byCountry[o.countryCode].rev += o.amount - (o.refundedAmount || 0); });
@@ -85,10 +86,13 @@ function Overview({ data }) {
         <tbody>{Object.entries(byCountry).map(([c, v]) => <tr key={c}><td className="p-2">{c}</td><td className="text-center">{v.n}</td><td className="text-center">{v.rev.toFixed(2)} {v.cur}</td></tr>)}</tbody></table>
       <p>Estimated margin on paid orders: {sum((o) => o.totals?.estimatedMargin || 0).toFixed(2)} (mixed currencies; see Orders for each)</p>
       <p>Status: {byStatus.map(([s, n]) => `${s} ${n}`).join(' · ') || 'no orders'}</p>
-      <div className={exceptions.length || stuck.length ? 'p-3 rounded-lg bg-red-50 border border-red-300' : ''} data-testid="alerts">
+      <div className="p-3 rounded-lg bg-white/70"><Btn data-testid="apply-preset" onClick={() => { if (window.confirm('Write the launch configuration (India, Qikink, poster + mug enabled, everything else off, global and India switches OFF, no prices)? Existing settings are not overwritten.')) act('applyLaunchPreset', {}, 'Launch configuration written'); }}>Apply launch configuration</Btn> <span className="text-xs">India, Qikink, framed posters and blood-group mugs; creates only what is missing.</span></div>
+      <p data-testid="held-count">Orders held for provider funds (Qikink wallet): <strong>{held.length}</strong></p>
+      <div className={exceptions.length || stuck.length || held.length ? 'p-3 rounded-lg bg-red-50 border border-red-300' : ''} data-testid="alerts">
+        {held.length > 0 && <p>⚠ {held.length} PAID order(s) are held because the Qikink wallet has too little credit. Top up the wallet, then press "Retry after wallet top-up" on each order (Orders tab).</p>}
         {exceptions.length > 0 && <p>⚠ {exceptions.length} paid order(s) need attention (exception queue): {exceptions.map((o) => `${o.id.slice(0, 8)} (${o.exceptionReason})`).join(', ')}</p>}
         {stuck.length > 0 && <p>⚠ {stuck.length} paid order(s) not yet with a provider.</p>}
-        {!exceptions.length && !stuck.length && <p>No paid-but-unsubmitted orders.</p>}
+        {!exceptions.length && !stuck.length && !held.length && <p>No paid-but-unsubmitted orders.</p>}
       </div>
     </section>
   );
@@ -99,7 +103,7 @@ function Switches({ data, act }) {
   const [message, setMessage] = useState(data.settings.message || '');
   const [cc, setCc] = useState(data.countries[0]?.countryCode || 'IN');
   const existing = data.countries.find((c) => c.countryCode === cc);
-  const blank = { countryCode: cc, enabled: false, currency: getCountry(cc)?.currency || 'USD', taxPercent: 0, taxIncluded: true, collections: { name_elements: false, blood_group: false }, prices: {}, costs: {}, disabledProducts: {}, shipping: { flat: 0, freeAbove: 0 }, paymentFeePercent: 0, providerPrimary: '', providerBackup: '', gatewayOverride: 'auto' };
+  const blank = { countryCode: cc, enabled: false, currency: getCountry(cc)?.currency || 'USD', taxPercent: 0, taxByProduct: {}, taxIncluded: true, collections: { name_elements: false, blood_group: false }, prices: {}, costs: {}, disabledProducts: {}, shipping: { flat: 0, freeAbove: 0 }, paymentFeePercent: 0, providerPrimary: '', providerBackup: '', gatewayOverride: 'auto' };
   const [form, setForm] = useState({ ...blank, ...existing });
   useEffect(() => { setForm({ ...blank, ...(data.countries.find((c) => c.countryCode === cc) || {}) }); }, [cc, data.countries]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
@@ -134,12 +138,14 @@ function Switches({ data, act }) {
             <label className="text-sm">Backup provider<select value={form.providerBackup || ''} onChange={(e) => set('providerBackup', e.target.value)} className="block border rounded px-2 py-1 w-full"><option value="">-</option>{data.providers.map((p) => <option key={p.id} value={p.id}>{p.name || p.id}</option>)}</select></label>
             <label className="text-sm">Payment gateway<select value={form.gatewayOverride || 'auto'} onChange={(e) => set('gatewayOverride', e.target.value)} className="block border rounded px-2 py-1 w-full"><option value="auto">Auto</option><option value="razorpay">Razorpay</option><option value="paypal">PayPal</option></select></label>
           </div>
-          <table className="w-full text-sm"><thead><tr><th className="text-left">Product</th><th>Sell price</th><th>Provider cost (est.)</th><th>Off here</th></tr></thead><tbody>
-            {products.map((p) => <tr key={p.id}><td>{p.id}</td>
-              <td><input aria-label={`${p.id} price`} value={form.prices?.[p.id] ?? ''} onChange={(e) => set('prices', { ...form.prices, [p.id]: e.target.value })} className="border rounded px-2 py-1 w-24" data-testid={`price-${p.id}`} /></td>
-              <td><input aria-label={`${p.id} cost`} value={form.costs?.[p.id] ?? ''} onChange={(e) => set('costs', { ...form.costs, [p.id]: e.target.value })} className="border rounded px-2 py-1 w-24" /></td>
-              <td className="text-center"><input type="checkbox" aria-label={`${p.id} off in this country`} checked={!!form.disabledProducts?.[p.id]} onChange={(e) => set('disabledProducts', { ...form.disabledProducts, [p.id]: e.target.checked })} /></td></tr>)}
+          <table className="w-full text-sm"><thead><tr><th className="text-left">Product / size</th><th>Sell price (tax {form.taxIncluded ? 'incl.' : 'excl.'})</th><th>Provider cost (est.)</th><th>Tax % (blank = country rate)</th><th>Off here</th></tr></thead><tbody>
+            {products.flatMap((p) => ((p.printSpec?.perSize || p.kind === 'wall-art') && p.sizes.length > 1 ? p.sizes.map((sz) => ({ p, key: `${p.id}:${sz}`, label: `${p.id} ${sz}`, first: sz === p.sizes[0] })) : [{ p, key: p.id, label: p.id, first: true }])).map(({ p, key, label, first }) => <tr key={key}><td>{label}</td>
+              <td><input aria-label={`${label} price`} value={form.prices?.[key] ?? ''} onChange={(e) => set('prices', { ...form.prices, [key]: e.target.value })} className="border rounded px-2 py-1 w-24" data-testid={`price-${key}`} /></td>
+              <td><input aria-label={`${label} cost`} value={form.costs?.[key] ?? ''} onChange={(e) => set('costs', { ...form.costs, [key]: e.target.value })} className="border rounded px-2 py-1 w-24" /></td>
+              <td>{first && <input aria-label={`${p.id} tax percent`} value={form.taxByProduct?.[p.id] ?? ''} onChange={(e) => set('taxByProduct', { ...form.taxByProduct, [p.id]: e.target.value })} className="border rounded px-2 py-1 w-20" data-testid={`tax-${p.id}`} />}</td>
+              <td className="text-center">{first && <input type="checkbox" aria-label={`${p.id} off in this country`} checked={!!form.disabledProducts?.[p.id]} onChange={(e) => set('disabledProducts', { ...form.disabledProducts, [p.id]: e.target.checked })} />}</td></tr>)}
           </tbody></table>
+          <p className="text-xs">Suggested GST (Qikink's table): posters and framed posters 18%, mugs 5%. Confirm your GST treatment with your accountant before launch.</p>
           <Btn onClick={() => act('setCountry', { ...form, countryCode: cc })} data-testid="save-country">Save country</Btn>
         </div>
       </div>
@@ -177,17 +183,76 @@ function Providers({ data, act }) {
 }
 
 // ---- products ---------------------------------------------------------------------------------------
+// ---- Product Management: switches per product, per country, per collection, and for the whole module -------------
+// Every change (single or bulk) is previewed by the server (dryRun), confirmed here, applied by the server, and audited with before/after.
+function ProductManagement({ data, act }) {
+  const products = Object.values(data.products);
+  const countries = data.countries;
+  const [sel, setSel] = useState({});
+  const [scope, setScope] = useState('');
+  const [collection, setCollection] = useState('name_elements');
+  const [countryCode, setCountryCode] = useState('all');
+  const ids = products.filter((p) => sel[p.id]).map((p) => p.id);
+  const on = (p, cc) => p.enabled !== false && (!cc || countries.find((c) => c.countryCode === cc)?.disabledProducts?.[p.id] !== true);
+
+  async function change(payload, okText) {
+    const dry = await callMerch('admin', { action: 'bulkSwitch', data: { ...payload, dryRun: true } });
+    if (dry.status !== 200) { window.alert(`Cannot apply: ${dry.body?.error || dry.status}`); return; }
+    const lines = dry.body.changes.map((c) => `${c.label}: ${c.before ? 'ON' : 'OFF'} -> ${c.after ? 'ON' : 'OFF'}${c.noop ? ' (no change)' : ''}`);
+    if (!window.confirm(`Confirm this change?\n\n${lines.join('\n')}\n\nDisabling only stops NEW quotes and checkouts; paid orders, tracking and refunds are not touched.`)) return;
+    await act('bulkSwitch', payload, okText || 'Saved');
+  }
+  const Pill = ({ ok, children }) => <span className={`px-2 py-0.5 rounded text-xs ${ok ? 'bg-green-100 text-green-900' : 'bg-gray-200 text-gray-700'}`}>{children}</span>;
+
+  return (
+    <div className="p-3 bg-white/70 rounded-lg space-y-3" data-testid="product-management">
+      <h2 className="font-semibold">Product Management</h2>
+      <p className="text-xs">A product is purchasable only when its own switch, its country switch, the collection switch and the global switch are ON <strong>and</strong> its print spec is complete. "Enabled but blocked" means the switch is on but the print spec is still missing.</p>
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="text-sm"><input type="checkbox" data-testid="select-all" checked={products.length > 0 && ids.length === products.length} onChange={(e) => setSel(Object.fromEntries(products.map((p) => [p.id, e.target.checked])))} /> Select All</label>
+        <select aria-label="Apply to" value={scope} onChange={(e) => setScope(e.target.value)} className="border rounded px-2 py-1 text-sm">
+          <option value="">Everywhere (product switch)</option>{countries.map((c) => <option key={c.countryCode} value={c.countryCode}>Only in {c.countryCode}</option>)}
+        </select>
+        <Btn disabled={!ids.length} data-testid="activate-selected" onClick={() => change({ scope: 'products', productIds: ids, countryCode: scope || undefined, enabled: true })}>Activate Selected</Btn>
+        <Btn disabled={!ids.length} data-testid="deactivate-selected" onClick={() => change({ scope: 'products', productIds: ids, countryCode: scope || undefined, enabled: false })}>Deactivate Selected</Btn>
+      </div>
+      <table className="w-full text-sm" data-testid="pm-table"><thead><tr><th /><th className="text-left">Product</th><th>Status</th><th>Everywhere</th>{countries.map((c) => <th key={c.countryCode}>{c.countryCode}</th>)}</tr></thead>
+        <tbody>{products.map((p) => {
+          const problems = specProblems(p.printSpec, p.sizes);
+          return (
+            <tr key={p.id} className="border-t" data-testid={`pm-row-${p.id}`}>
+              <td><input type="checkbox" aria-label={`Select ${p.id}`} checked={!!sel[p.id]} onChange={(e) => setSel({ ...sel, [p.id]: e.target.checked })} /></td>
+              <td>{p.id}<span className="block text-xs text-gray-500">{p.collections.join(', ')}</span></td>
+              <td className="text-center">{p.enabled === false ? <Pill ok={false}>OFF</Pill> : problems.length ? <span className="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-900" data-testid={`blocked-${p.id}`}>ENABLED BUT BLOCKED: print spec missing</span> : <Pill ok>ON</Pill>}</td>
+              <td className="text-center"><button type="button" className="underline" data-testid={`switch-${p.id}`} onClick={() => change({ scope: 'products', productIds: [p.id], enabled: p.enabled === false })}>{p.enabled === false ? 'Turn on' : 'Turn off'}</button></td>
+              {countries.map((c) => <td key={c.countryCode} className="text-center"><button type="button" className="underline" data-testid={`switch-${p.id}-${c.countryCode}`} onClick={() => change({ scope: 'products', productIds: [p.id], countryCode: c.countryCode, enabled: !on(p, c.countryCode) })}>{on(p, c.countryCode) ? 'ON' : 'OFF'}</button></td>)}
+            </tr>
+          );
+        })}</tbody></table>
+      <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+        <select aria-label="Country" value={countryCode} onChange={(e) => setCountryCode(e.target.value)} className="border rounded px-2 py-1 text-sm"><option value="all">All countries</option>{countries.map((c) => <option key={c.countryCode} value={c.countryCode}>{c.countryCode}</option>)}</select>
+        <select aria-label="Collection" value={collection} onChange={(e) => setCollection(e.target.value)} className="border rounded px-2 py-1 text-sm"><option value="name_elements">Name Elements</option><option value="blood_group">Blood Group</option></select>
+        <Btn onClick={() => change({ scope: 'collection', collection, countryCodes: countryCode === 'all' ? 'all' : [countryCode], enabled: true })}>Activate collection</Btn>
+        <Btn onClick={() => change({ scope: 'collection', collection, countryCodes: countryCode === 'all' ? 'all' : [countryCode], enabled: false })}>Deactivate collection</Btn>
+        <Btn onClick={() => change({ scope: 'country', countryCodes: countryCode === 'all' ? 'all' : [countryCode], enabled: true })}>Activate country</Btn>
+        <Btn onClick={() => change({ scope: 'country', countryCodes: countryCode === 'all' ? 'all' : [countryCode], enabled: false })}>Deactivate country</Btn>
+        <Btn data-testid="module-on" onClick={() => change({ scope: 'global', enabled: true })}>Activate whole module</Btn>
+        <Btn data-testid="module-off" onClick={() => change({ scope: 'global', enabled: false })}>Deactivate whole module</Btn>
+      </div>
+    </div>
+  );
+}
+
 function ProductCard({ x, act }) {
   const sp = x.printSpec || {};
   const [f, setF] = useState({ printTypeId: sp.printTypeId ?? '', allowedPlacements: (sp.allowedPlacements || []).join(','), maxWidthInches: sp.maxWidthInches ?? '', maxHeightInches: sp.maxHeightInches ?? '', minDpi: sp.minDpi ?? 150, dpiOverride: x.dpiOverride === true });
-  const problems = specProblems(x.printSpec);
+  const problems = specProblems(x.printSpec, x.sizes);
   const spec = () => ({ printTypeId: Number(f.printTypeId), allowedPlacements: f.allowedPlacements.split(',').map((p) => p.trim()).filter(Boolean), maxWidthInches: Number(f.maxWidthInches), maxHeightInches: Number(f.maxHeightInches), minDpi: Number(f.minDpi), verified: false });
   return (
     <div className="p-3 bg-white/70 rounded-lg" data-testid={`product-card-${x.id}`}>
       <strong>{x.id}</strong> · {x.kind} · sizes {x.sizes.join(', ')} · colours {x.colors.map((c) => c.id).join(', ')}
       {problems.length > 0 && <p className="text-sm text-red-700" data-testid={`blocked-${x.id}`}>BLOCKED: print area / print type / placement not set ({problems.join(', ')}). It cannot be sold until you fill these in from Qikink's guide.</p>}
       {x.printSpec && x.printSpec.verified !== true && problems.length === 0 && <p className="text-xs text-amber-800">Print spec is UNVERIFIED: confirm with a physical sample.</p>}
-      <div><Toggle label="Product enabled" checked={x.enabled !== false} onChange={(v) => act('setProduct', { ...x, enabled: v })} testid={`prod-${x.id}`} /></div>
       <div className="grid sm:grid-cols-6 gap-2 mt-2 text-sm">
         <input aria-label={`${x.id} print_type_id`} placeholder="print_type_id" value={f.printTypeId} onChange={(e) => setF({ ...f, printTypeId: e.target.value })} className="border rounded px-2 py-1" />
         <input aria-label={`${x.id} placements`} placeholder="placements e.g. fr" value={f.allowedPlacements} onChange={(e) => setF({ ...f, allowedPlacements: e.target.value })} className="border rounded px-2 py-1" />
@@ -206,6 +271,7 @@ function Products({ data, act }) {
   const p = data.products[sku.productId] || DEFAULT_PRODUCTS.tshirt;
   return (
     <section className="space-y-4">
+      <ProductManagement data={data} act={act} />
       {Object.values(data.products).map((x) => <ProductCard key={x.id} x={x} act={act} />)}
       <div className="p-3 bg-white/70 rounded-lg">
         <h2 className="font-semibold mb-2">Provider SKU mapping (per exact variant)</h2>
@@ -257,8 +323,9 @@ function Orders({ data, act, reload, setNote }) {
             {open === o.id && <tr><td colSpan={6} className="p-3 bg-white">
               <p className="text-xs mb-2">Provider {o.providerId} · gateway {o.gateway} · {o.items.map((i) => `${i.productId} ${i.size} x${i.qty}`).join(', ')} · ship to {o.address?.name}, {o.address?.city}, {o.address?.country}</p>
               <div className="flex flex-wrap gap-2">
-                {['exception', 'paid', 'fulfillment_pending'].includes(o.status) && <Btn onClick={() => act('retry', { orderId: o.id }, 'Retried')}>Retry submission</Btn>}
-                {['exception', 'paid', 'fulfillment_pending'].includes(o.status) && data.providers.filter((p) => p.active && p.id !== o.providerId && (p.countries || []).includes(o.countryCode)).map((p) => <Btn key={p.id} onClick={() => act('reroute', { orderId: o.id, providerId: p.id }, 'Rerouted')}>Reroute to {p.name || p.id}</Btn>)}
+                {['exception', 'paid', 'fulfillment_pending', 'held_provider_funds'].includes(o.status) && <Btn data-testid={`retry-${o.id}`} onClick={() => act('retry', { orderId: o.id }, 'Retried')}>{o.status === 'held_provider_funds' ? 'Retry after wallet top-up' : 'Retry submission'}</Btn>}
+                {['exception', 'paid', 'fulfillment_pending', 'held_provider_funds'].includes(o.status) && data.providers.filter((p) => p.active && p.id !== o.providerId && (p.countries || []).includes(o.countryCode)).map((p) => <Btn key={p.id} onClick={() => act('reroute', { orderId: o.id, providerId: p.id }, 'Rerouted')}>Reroute to {p.name || p.id}</Btn>)}
+                <OrderNote orderId={o.id} act={act} />
                 {o.transactionId && o.status !== 'refunded' && <Btn data-testid={`refund-${o.id}`} onClick={() => { if (window.confirm('Refund this order in full?')) act('refund', { orderId: o.id, reason: 'admin refund' }, 'Refunded'); }}>Refund in full</Btn>}
                 {IS_MOCK && ['submitted', 'in_production', 'shipped'].includes(o.status) && <>
                   <Btn onClick={() => mock(() => mockControls.advance(o.id, 'processing'), 'In production')}>Mock: in production</Btn>
@@ -268,6 +335,18 @@ function Orders({ data, act, reload, setNote }) {
               </div></td></tr>}
           </React.Fragment>))}</tbody></table>
     </section>
+  );
+}
+
+function OrderNote({ orderId, act }) {
+  const [type, setType] = useState('complaint');
+  const [text, setText] = useState('');
+  return (
+    <span className="inline-flex items-center gap-1">
+      <select aria-label="Note type" value={type} onChange={(e) => setType(e.target.value)} className="border rounded px-1 py-1 text-sm"><option value="complaint">Complaint</option><option value="replacement">Replacement</option><option value="note">Note</option></select>
+      <input aria-label="Note text" value={text} onChange={(e) => setText(e.target.value)} placeholder="Complaint / replacement / note (staff only)" className="border rounded px-2 py-1 text-sm w-56" />
+      <Btn disabled={!text.trim()} onClick={async () => { await act('addOrderNote', { orderId, type, text }, 'Note saved'); setText(''); }}>Save note</Btn>
+    </span>
   );
 }
 

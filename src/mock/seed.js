@@ -16,28 +16,30 @@ const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 const daysAhead = (n) => new Date(Date.now() + n * 24 * 60 * 60 * 1000);
 
 export const SEED_DATA = {
-  // Merchandise (print-on-demand) test configuration: India ON, USA OFF, simulated providers
+  // Merchandise (print-on-demand) TEST configuration for mock mode only. Launch scope: framed posters (A4/A3) and blood-group mugs are
+  // the enabled products; T-shirts and notebooks are off. Global and India are ON here so the flows can be exercised; the real launch
+  // configuration (admin -> Apply launch configuration) starts with the global and India switches OFF and no prices.
+  // The printSpec values on poster and mug below are MOCK TEST VALUES (not Qikink data) so the designer can be tried offline.
   'merch_settings/global': { enabled: true, message: '' },
   'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
+  'merch_products/poster': { id: 'poster', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, verified: false, mockOnly: true, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11 }, A3: { maxWidthInches: 11.5, maxHeightInches: 16 } } } },
+  'merch_products/mug': { id: 'mug', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: false, mockOnly: true } },
+  'merch_products/tshirt': { id: 'tshirt', enabled: false },
+  'merch_products/notebook': { id: 'notebook', enabled: false },
   'merch_countries/IN': {
-    countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true,
-    collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, notebook: 299, poster: 899 },
-    costs: { tshirt: 420, mug: 200, notebook: 150, poster: 450 }, shipping: { flat: 60, freeAbove: 1500 }, paymentFeePercent: 2.5,
+    countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxByProduct: { poster: 18, mug: 5 }, taxIncluded: true,
+    collections: { name_elements: true, blood_group: true }, prices: { 'poster:A4': 599, 'poster:A3': 899, mug: 399 }, disabledProducts: { tshirt: true, notebook: true },
+    costs: { 'poster:A4': 212, 'poster:A3': 326, mug: 115 }, shipping: { flat: 60, freeAbove: 1500 }, paymentFeePercent: 2.5,
     providerPrimary: 'mock', providerBackup: 'mock2', gatewayOverride: 'auto'
   },
   'merch_countries/US': {
     countryCode: 'US', enabled: false, currency: 'USD', taxPercent: 0, taxIncluded: false,
-    collections: { name_elements: true, blood_group: true }, prices: { tshirt: 25, mug: 15, notebook: 12, poster: 30 }, shipping: { flat: 5, freeAbove: 0 }, providerPrimary: 'mock'
+    collections: { name_elements: true, blood_group: true }, prices: { 'poster:A4': 25, 'poster:A3': 35, mug: 15 }, disabledProducts: { tshirt: true, notebook: true }, shipping: { flat: 5, freeAbove: 0 }, providerPrimary: 'mock'
   },
   'merch_providers/mock': { id: 'mock', name: 'Mock provider', adapter: 'mock', active: true, countries: ['IN', 'US'] },
   'merch_providers/mock2': { id: 'mock2', name: 'Mock backup', adapter: 'mock', active: true, countries: ['IN'] },
-  // PLACEHOLDER Qikink entries for the sandbox: inactive, and the SKU below is NOT a real Qikink SKU. Copy real ones from the dashboard.
-  'merch_providers/qikink': { id: 'qikink', name: 'Qikink (sandbox, placeholder)', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'] },
-  // UNVERIFIED starter SKUs from docs/qikink-sku-starter-products.md. print_type_id, print area and placement are unknown, so these products stay blocked until an admin fills them in.
-  'merch_variants/mug_white_330ml': { id: 'mug_white_330ml', productId: 'mug', color: 'white', size: '330ml', placeholder: true, providerSkus: { qikink: { sku: 'UWCM-Wh-11 OZ', unverified: true } } },
-  'merch_variants/notebook_ivory_A5': { id: 'notebook_ivory_A5', productId: 'notebook', color: 'ivory', size: 'A5', placeholder: true, providerSkus: { qikink: { sku: 'UNotebook-Wh-Notebook Ruled', unverified: true } } },
-  'merch_variants/poster_black-frame_A3': { id: 'poster_black-frame_A3', productId: 'poster', color: 'black-frame', size: 'A3', placeholder: true, providerSkus: { qikink: { sku: 'UFPos-Bk-A3 Frame poster', unverified: true } } },
-  'merch_variants/tshirt_white_M': { id: 'tshirt_white_M', productId: 'tshirt', color: 'white', size: 'M', placeholder: true, providerSkus: { qikink: { sku: 'MRnHs-Wh-M', printTypeId: 1, unverified: true } } },
+  // Inactive Qikink entry (sandbox). Real SKUs/print specs must be filled in admin; the launch preset writes unverified starter SKUs.
+  'merch_providers/qikink': { id: 'qikink', name: 'Qikink (sandbox)', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'] },
   // Country Pricing (admin) - the app shows prices from these records only
   'countrySettings/mock-in': { countryCode: 'IN', countryName: 'India', currency: 'INR', symbol: '₹', price: 399, referralDiscount: 10, taxPercent: 18, isActive: true },
   'countrySettings/mock-us': { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true },

@@ -8,26 +8,28 @@ export const COLLECTION_IDS = Object.values(COLLECTIONS);
 // (yet) with a provider, or something needs an admin decision.
 export const STATES = [
   'draft', 'quoted', 'payment_pending', 'paid', 'fulfillment_pending', 'submitted',
-  'in_production', 'shipped', 'delivered', 'cancelled', 'refunded', 'exception'
+  'in_production', 'shipped', 'delivered', 'cancelled', 'refunded', 'exception', 'held_provider_funds'
 ];
 
 export const TRANSITIONS = {
   draft: ['quoted', 'cancelled'],
   quoted: ['payment_pending', 'cancelled'],
   payment_pending: ['paid', 'cancelled'],
-  paid: ['fulfillment_pending', 'exception', 'refunded', 'cancelled'],
-  fulfillment_pending: ['submitted', 'exception', 'refunded', 'cancelled'],
+  paid: ['fulfillment_pending', 'exception', 'held_provider_funds', 'refunded', 'cancelled'],
+  fulfillment_pending: ['submitted', 'exception', 'held_provider_funds', 'refunded', 'cancelled'],
   submitted: ['in_production', 'shipped', 'cancelled', 'refunded', 'exception'],
   in_production: ['shipped', 'cancelled', 'refunded', 'exception'],
   shipped: ['delivered', 'refunded', 'exception'],
   delivered: ['refunded'],
   cancelled: ['refunded'],
   refunded: [],
-  exception: ['fulfillment_pending', 'submitted', 'cancelled', 'refunded']
+  exception: ['fulfillment_pending', 'submitted', 'cancelled', 'refunded'],
+  // Paid, but the provider (Qikink is prepaid by wallet credit) could not take the order for lack of funds: held until an admin tops up
+  held_provider_funds: ['fulfillment_pending', 'submitted', 'exception', 'cancelled', 'refunded']
 };
 
 // States in which the customer's money is held: still manageable even when merchandise is off.
-export const PAID_STATES = ['paid', 'fulfillment_pending', 'submitted', 'in_production', 'shipped', 'delivered', 'exception'];
+export const PAID_STATES = ['paid', 'fulfillment_pending', 'submitted', 'in_production', 'shipped', 'delivered', 'exception', 'held_provider_funds'];
 
 export const MAX_FULFILMENT_ATTEMPTS = 5;
 export const QUOTE_TTL_MS = 15 * 60 * 1000;

@@ -11,13 +11,14 @@
 //   ctx.now() / ctx.id()
 // Every handler returns { status, body } and never throws for expected failures.
 import { COLL, STATES, TRANSITIONS, PAID_STATES, QUOTE_TTL_MS, MAX_QTY_PER_ITEM, MAX_ITEMS_PER_ORDER, MAX_FULFILMENT_ATTEMPTS, COLLECTION_IDS, NAME_ALGORITHM_VERSION } from './constants.js';
-import { buildDesign, bloodGroupSlug } from './designs.js';
-import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS } from './catalog.js';
+import { buildDesign, bloodGroupSlug, applyTemplate } from './designs.js';
+import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS, starterSku } from './catalog.js';
 import { checkAvailability, routeProvider, validateAddress, normaliseAddress } from './availability.js';
 import { normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
-import { computeQuote } from './quoteMath.js';
+import { computeQuote, lookupBySize, taxRateFor } from './quoteMath.js';
 import { computeOrderCommission, reversalAmount } from './commission.js';
 import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
+import { findCod, isCod } from './cod.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
 import { resolveGateway, GATEWAY_OVERRIDES } from '../data/gatewayCurrencies.js';
 
@@ -68,7 +69,7 @@ export async function handleCatalogue(ctx, body) {
   out.products = Object.values(cfg.products)
     .filter((p) => COLLECTION_IDS.some((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok))
     .map((p) => ({
-      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, price: country.prices[p.id],
+      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, price: country.prices[p.id], prices: Object.fromEntries(p.sizes.map((sz) => [sz, lookupBySize(country.prices, p.id, sz)]).filter(([, v]) => v > 0)),
       collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
     }));
   return ok(out);
@@ -105,6 +106,7 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     if (!opts.colorOk || !opts.sizeOk) return fail(400, 'bad-variant');
     const built = skipDesign ? { design: raw.design } : buildDesign(collection, raw.design || {});
     if (built.error) return fail(400, built.error);
+    const design = skipDesign ? built.design : applyTemplate(built.design, product);
 
     const vdoc = (await ctx.db.get(`${COLL.variants}/${variantId(product.id, raw.color, raw.size)}`))?.data;
     const route = cfg.routes.find((r) => r.countryCode === country.countryCode && r.productId === product.id);
@@ -118,22 +120,24 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     // Print area for this SKU (product spec, with any per-SKU numbers from the mapping), the customer's layout, and the
     // resolution of the artwork at the chosen size. Nothing here is guessed: an incomplete spec blocks the sale.
     const mapping = vdoc?.providerSkus?.[providerId] || null;
-    const spec = effectiveSpec(product.printSpec, mapping);
+    const spec = effectiveSpec(product.printSpec, mapping, raw.size);
     if (specProblems(spec).length) return fail(409, 'merch-product-off', { reason: 'print-area-missing', problems: specProblems(spec) });
-    const layout = raw.layout ? normaliseLayout(raw.layout) : defaultLayoutFor(built.design, spec);
-    const res = designDpi({ design: built.design, spec, layout });
+    const layout = raw.layout ? normaliseLayout(raw.layout) : defaultLayoutFor(design, spec);
+    const res = designDpi({ design: design, spec, layout });
     const status = resolutionStatus(res.dpi, { minDpi: Number(spec.minDpi) });
     if (status === 'blocked' && product.dpiOverride !== true) {
-      return fail(409, 'resolution-too-low', { dpi: res.dpi, minDpi: Number(spec.minDpi), maxScale: +maxScaleForDpi({ design: built.design, spec, minDpi: Number(spec.minDpi) }).toFixed(2) });
+      return fail(409, 'resolution-too-low', { dpi: res.dpi, minDpi: Number(spec.minDpi), maxScale: +maxScaleForDpi({ design: design, spec, minDpi: Number(spec.minDpi) }).toFixed(2) });
     }
+    const unitPrice = lookupBySize(country.prices, product.id, raw.size);
+    if (!(unitPrice > 0)) return fail(409, 'merch-product-off', { reason: 'no-pricing' });
     items.push({
-      productId: product.id, collection, color: raw.color, size: raw.size, qty, design: built.design, layout,
+      productId: product.id, collection, color: raw.color, size: raw.size, qty, design: design, layout,
       canvasInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) },
-      placementSku: spec.allowedPlacements[0], dpi: res.dpi, resolution: status,
-      providerSku: mapping, unitPrice: Number(country.prices[product.id])
+      placementSku: spec.allowedPlacements[0], printTypeId: Number(spec.printTypeId), dpi: res.dpi, resolution: status,
+      providerSku: mapping, unitPrice, unitCost: lookupBySize(country.costs, product.id, raw.size) ?? 0, taxPercent: taxRateFor(country, product.id)
     });
   }
-  const quote = computeQuote({ lines: items.map((i) => ({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice })), country });
+  const quote = computeQuote({ lines: items.map((i) => ({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice, unitCost: i.unitCost, taxPercent: i.taxPercent })), country });
   // Costs and shipping are admin-configured (no provider quote API), and a sale below the configured margin floor is refused.
   quote.source = 'configured';
   const floor = Number(country.marginFloorPercent);
@@ -310,6 +314,7 @@ export async function handlePaymentWebhook(ctx, { eventId, event }) {
   catch { return ok({ ok: true, duplicate: true }); }
   if (event?.event !== 'payment.captured') return ok({ ok: true, ignored: true });
   const payment = event.payload?.payment?.entity;
+  if (isCod(payment?.method)) { await audit({ ...ctx, who: null }, 'alert.cod-rejected', 'payment-webhook', { method: payment.method }); return fail(400, 'cod-not-allowed'); }
   const [order] = payment?.order_id ? await ctx.db.query(COLL.orders, 'gatewayOrderId', payment.order_id) : [];
   if (!order) return ok({ ok: true, ignored: true });
   const res = await ctx.gateways.checkCaptured(order, payment);
@@ -354,8 +359,10 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
   if (!order || !ffound) return { error: 'not-found' };
   const ff = ffound.data;
   if (['submitted', 'in_production', 'shipped', 'delivered', 'cancelled', 'refunded'].includes(order.status) || ff.providerOrderId) return { skipped: order.status };
-  if (!['paid', 'fulfillment_pending', 'exception'].includes(order.status)) return { skipped: order.status };
-  if (order.status === 'exception' && !force) return { skipped: 'exception' };
+  if (!['paid', 'fulfillment_pending', 'exception', 'held_provider_funds'].includes(order.status)) return { skipped: order.status };
+  if (['exception', 'held_provider_funds'].includes(order.status) && !force) return { skipped: order.status };
+  // Payment must have been verified server-side before ANY submission; unverified or failed payments never reach a provider.
+  if (!order.transactionId || order.paidAt == null) { await raiseException(ctx, orderId, 'payment-not-verified'); return { exception: 'payment-not-verified' }; }
   if (!force && ms(ff.nextRetryAt) > ms(ctx.now())) return { skipped: 'not-due' };
 
   const missing = order.items.find((i) => !i.artwork);
@@ -372,10 +379,10 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
   const attempts = (ff.attempts || 0) + 1;
   const products = mergeProducts(await ctx.db.list(COLL.products));
   const payload = {
-    idempotencyKey: ff.idempotencyKey, orderId, attempt: attempts, address: order.address, email: order.email, currency: order.currency, totalValue: order.amount,
+    idempotencyKey: ff.idempotencyKey, orderId, attempt: attempts, paymentMethod: 'prepaid', address: order.address, email: order.email, currency: order.currency, totalValue: order.amount,
     items: await Promise.all(order.items.map(async (i) => ({
       index: i.index, productId: i.productId, color: i.color, size: i.size, qty: i.qty, unitPrice: i.unitPrice, providerSku: i.providerSku, placement: 'default',
-      layout: i.layout, canvasInches: i.canvasInches, placementSku: i.placementSku,
+      layout: i.layout, canvasInches: i.canvasInches, placementSku: i.placementSku, printTypeId: i.printTypeId,
       designUrl: await ctx.artworkUrl(order, i, 'print'), designSha256: i.artwork.sha256,
       // a real mock-up when the browser made one; otherwise the print file (recorded below as the fallback)
       mockupUrl: i.mockup ? await ctx.artworkUrl(order, i, 'mockup') : null
@@ -388,6 +395,13 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
     await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'submitted', providerOrderId: res.providerOrderId, providerOrderNumber: res.orderNumber || null, mockupSources: order.items.map((i) => (i.mockup ? 'mockup' : 'print-fallback')), attempts, submittedAt: ctx.now(), lastError: null });
     await setState(ctx, orderId, null, 'submitted', { providerOrderId: res.providerOrderId });
     return { submitted: true, providerOrderId: res.providerOrderId };
+  }
+  if (res.heldFunds) {
+    // Provider wallet is empty: hold the PAID order (no retry loop, no duplicate), alert admin once, wait for the admin's retry after a top-up.
+    await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'held', attempts, lastError: res.error });
+    await setState(ctx, orderId, null, 'held_provider_funds', { heldReason: 'provider-funds' }, { reason: 'provider-funds' });
+    if (order.status !== 'held_provider_funds') await audit({ ...ctx, who: null }, 'alert.provider-funds', orderId, { provider: order.providerId, error: String(res.error).slice(0, 200) });
+    return { held: true, error: res.error };
   }
   if (res.retryable && attempts < MAX_FULFILMENT_ATTEMPTS) {
     await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'pending', attempts, lastError: res.error, nextRetryAt: new Date(ms(ctx.now()) + backoffMs(attempts)) });
@@ -556,6 +570,7 @@ const ADMIN_ACTIONS = {
     const patch = {
       countryCode: cc, enabled: bool(b.enabled), currency: String(b.currency || '').toUpperCase(),
       taxPercent: num(b.taxPercent) ?? 0, taxIncluded: b.taxIncluded !== false,
+      taxByProduct: Object.fromEntries(Object.entries(b.taxByProduct || {}).filter(([, v]) => num(v) !== undefined).map(([k, v]) => [k, Number(v)])),
       collections: { name_elements: bool(col.name_elements), blood_group: bool(col.blood_group) },
       prices: Object.fromEntries(Object.entries(b.prices || {}).filter(([, v]) => num(v) !== undefined).map(([k, v]) => [k, Number(v)])),
       costs: Object.fromEntries(Object.entries(b.costs || {}).filter(([, v]) => num(v) !== undefined).map(([k, v]) => [k, Number(v)])),
@@ -577,10 +592,9 @@ const ADMIN_ACTIONS = {
   async setProduct(ctx, b) {
     if (!/^[a-z0-9_-]{2,30}$/.test(String(b.id || ''))) return { error: 'bad-product-id' };
     const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
-    // A product cannot be switched on without a complete, valid print spec (no guessed print areas).
-    const spec = b.printSpec || DEFAULT_PRODUCTS[b.id]?.printSpec;
-    if (patch.enabled && !specComplete(spec)) return { error: 'print-spec-incomplete', problems: specProblems(spec) };
-    if (spec && !b.printSpec) patch.printSpec = spec;
+    // The switch may be ON with the spec still missing: availability.js keeps such a product blocked ("enabled but blocked").
+    // A spec that IS given must be valid, though (documented DTG/DTF limits, known print type, placement codes).
+    if (b.printSpec && specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes).length) return { error: 'print-spec-invalid', problems: specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes) };
     return { path: `${COLL.products}/${b.id}`, patch };
   },
   async setRoute(ctx, b) {
@@ -599,6 +613,88 @@ const ADMIN_ACTIONS = {
   }
 };
 
+// ---- Product Management: single and bulk switches (product x country matrix, collections, countries, global) ----------
+// scope: 'products' { productIds[], countryCode? } | 'collection' { collection, countryCodes[]|'all' } | 'country' { countryCodes[] } | 'global'.
+// dryRun returns what WOULD change (the admin screen shows it in a confirmation); the real call applies it and writes ONE
+// audit entry holding every before/after. Disabling only blocks NEW quotes and checkouts: paid orders are never touched.
+export async function bulkSwitch(ctx, input) {
+  const enabled = input.enabled;
+  if (typeof enabled !== 'boolean') return { error: 'enabled-required' };
+  const cfg = await loadConfig(ctx.db);
+  const changes = [];
+  const countryDocs = Object.fromEntries(cfg.countries.map((c) => [c.countryCode, c]));
+  const pickCountries = (list) => (list === 'all' || !list ? Object.keys(countryDocs) : [].concat(list).map((c) => String(c).toUpperCase()));
+  const add = (path, label, field, before, after, patch) => changes.push({ path, label, field, before, after, noop: before === after, patch });
+
+  if (input.scope === 'products') {
+    const ids = [].concat(input.productIds || []);
+    if (!ids.length) return { error: 'nothing-selected' };
+    for (const id of ids) {
+      if (!cfg.products[id]) return { error: 'unknown-product' };
+      if (input.countryCode) {
+        const cc = String(input.countryCode).toUpperCase();
+        const c = countryDocs[cc];
+        if (!c) return { error: 'unknown-country' };
+        const off = { ...(c.disabledProducts || {}) };
+        const before = off[id] !== true;
+        if (enabled) delete off[id]; else off[id] = true;
+        add(`${COLL.countries}/${cc}`, `${id} in ${cc}`, 'product-in-country', before, enabled, { disabledProducts: off });
+        countryDocs[cc] = { ...c, disabledProducts: off };
+      } else {
+        add(`${COLL.products}/${id}`, `${id} (everywhere)`, 'product', cfg.products[id].enabled !== false, enabled, { id, enabled });
+      }
+    }
+  } else if (input.scope === 'collection') {
+    if (!COLLECTION_IDS.includes(input.collection)) return { error: 'unknown-collection' };
+    for (const cc of pickCountries(input.countryCodes)) {
+      const c = countryDocs[cc];
+      if (!c) return { error: 'unknown-country' };
+      add(`${COLL.countries}/${cc}`, `${input.collection} in ${cc}`, 'collection', c.collections?.[input.collection] === true, enabled, { collections: { name_elements: c.collections?.name_elements === true, blood_group: c.collections?.blood_group === true, [input.collection]: enabled } });
+    }
+  } else if (input.scope === 'country') {
+    const list = pickCountries(input.countryCodes);
+    if (!list.length) return { error: 'nothing-selected' };
+    for (const cc of list) {
+      const c = countryDocs[cc];
+      if (!c) return { error: 'unknown-country' };
+      add(`${COLL.countries}/${cc}`, `country ${cc}`, 'country', c.enabled === true, enabled, { enabled });
+    }
+  } else if (input.scope === 'global') {
+    add(`${COLL.settings}/global`, 'whole merchandise module', 'global', cfg.settings.enabled === true, enabled, { enabled, updatedAt: ctx.now() });
+  } else return { error: 'unknown-scope' };
+
+  const summary = changes.map(({ label, field, before, after, noop }) => ({ label, field, before, after, noop }));
+  if (input.dryRun) return { dryRun: true, changes: summary };
+  for (const ch of changes) { if (!ch.noop) await ctx.db.patch(ch.path, { ...ch.patch, updatedAt: ctx.now() }); }
+  await audit(ctx, 'admin.bulkSwitch', input.scope, { enabled, changes: summary });
+  return { applied: summary.filter((c) => !c.noop).length, changes: summary };
+}
+
+// Writes the launch configuration (India, Qikink, poster + mug enabled, everything else disabled) WITHOUT overwriting anything that exists.
+// The global switch and the India switch stay OFF; no prices are set (nothing can be sold until an admin prices it); every Qikink SKU is
+// marked unverified and has no print type, so the products stay blocked until the print spec is filled in.
+export async function applyLaunchPreset(ctx) {
+  const created = [];
+  const putIfAbsent = async (path, data) => { if (!(await ctx.db.get(path))) { await ctx.db.patch(path, { ...data, createdAt: ctx.now() }); created.push(path); } };
+  await putIfAbsent(`${COLL.settings}/global`, { enabled: false, message: '' });
+  await putIfAbsent(`${COLL.providers}/qikink`, { id: 'qikink', name: 'Qikink', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'], products: [] });
+  await putIfAbsent(`${COLL.countries}/IN`, {
+    countryCode: 'IN', enabled: false, currency: 'INR', taxPercent: 18, taxIncluded: true, taxByProduct: { poster: 18, mug: 5 },
+    collections: { name_elements: true, blood_group: true }, prices: {}, costs: {}, disabledProducts: { tshirt: true, notebook: true },
+    shipping: { flat: 0, freeAbove: 0 }, paymentFeePercent: 0, marginFloorPercent: 0, providerPrimary: 'qikink', providerBackup: null, gatewayOverride: 'auto'
+  });
+  for (const [id, on] of [['poster', true], ['mug', true], ['tshirt', false], ['notebook', false]]) await putIfAbsent(`${COLL.products}/${id}`, { id, enabled: on });
+  for (const p of ['poster', 'mug']) {
+    const prod = DEFAULT_PRODUCTS[p];
+    for (const c of prod.colors) for (const size of prod.sizes) {
+      const id = variantId(p, c.id, size);
+      await putIfAbsent(`${COLL.variants}/${id}`, { id, productId: p, color: c.id, size, enabled: true, providerSkus: { qikink: { sku: starterSku(p, c.id, size), unverified: true } } });
+    }
+  }
+  await audit(ctx, 'admin.applyLaunchPreset', 'launch', { created });
+  return { created };
+}
+
 export async function handleAdmin(ctx, body) {
   if (!ctx.who) return fail(401, 'not-signed-in');
   if (!(await requireAdmin(ctx))) return fail(403, 'not-admin');
@@ -613,12 +709,24 @@ export async function handleAdmin(ctx, body) {
     await audit(ctx, `admin.${action}`, r.path, { before, after: clone(r.patch) });
     return ok({ ok: true });
   }
+  if (action === 'bulkSwitch') { const r = await bulkSwitch(ctx, input); return r.error ? fail(400, r.error) : ok(r); }
+  if (action === 'applyLaunchPreset') return ok(await applyLaunchPreset(ctx));
+  if (action === 'addOrderNote') {
+    // Complaints, replacements and other notes live on the fulfilment record (admin-only), never on the order the customer can read.
+    const type = ['complaint', 'replacement', 'note'].includes(input.type) ? input.type : 'note';
+    const text = String(input.text || '').trim().slice(0, 500);
+    const ff = (await ctx.db.get(`${COLL.fulfillments}/${input.orderId}`))?.data;
+    if (!text || !ff) return fail(400, 'bad-note');
+    await ctx.db.patch(`${COLL.fulfillments}/${input.orderId}`, { notes: [...(ff.notes || []), { type, text, by: ctx.who.email, at: ctx.now() }] });
+    await audit(ctx, 'admin.orderNote', input.orderId, { type });
+    return ok({ ok: true });
+  }
   if (action === 'refund') { const r = await refundOrder(ctx, input.orderId, input); await audit(ctx, 'admin.refund', input.orderId, { amount: input.amount ?? 'full', reason: input.reason || '', result: r.body?.error || 'ok' }); return r; }
   if (action === 'retry') { const r = await runFulfilment(ctx, input.orderId, { force: true }); await audit(ctx, 'admin.retry', input.orderId, r); return ok(r); }
   if (action === 'reroute') {
     const found = await ctx.db.get(`${COLL.orders}/${input.orderId}`);
     const order = found?.data;
-    if (!order || !['exception', 'paid', 'fulfillment_pending'].includes(order.status)) return fail(409, 'cannot-reroute');
+    if (!order || !['exception', 'paid', 'fulfillment_pending', 'held_provider_funds'].includes(order.status)) return fail(409, 'cannot-reroute');
     const pdoc = (await ctx.db.list(COLL.providers)).find((p) => p.id === input.providerId);
     if (!pdoc || pdoc.active !== true || !(pdoc.countries || []).includes(order.countryCode)) return fail(409, 'provider-not-usable');
     const needsSku = pdoc.adapter !== 'mock';
@@ -651,6 +759,12 @@ export async function handleAdmin(ctx, body) {
 // ---- dispatcher -------------------------------------------------------------------------------------
 
 export async function handleMerch(ctx, action, body) {
+  // Cash on Delivery is prohibited everywhere: refuse it here, before any handler, and keep a record.
+  const cod = findCod(body);
+  if (cod) {
+    await audit(ctx, 'alert.cod-rejected', action, { key: cod.key, value: cod.value }).catch(() => {});
+    return fail(400, 'cod-not-allowed');
+  }
   switch (action) {
     case 'catalogue': return handleCatalogue(ctx, body);
     case 'quote': return handleQuote(ctx, body);

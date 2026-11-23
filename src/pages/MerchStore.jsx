@@ -5,10 +5,10 @@ import { ShoppingCart } from 'lucide-react';
 import { useAuthStore } from '../store/authStore';
 import { callMerch } from '../merch/client';
 import { loadCart, saveCart, newLineId } from '../merch/cart';
-import { buildDesign, BLOOD_GROUPS, bloodGroupLabel } from '../merch/designs';
+import { buildDesign, applyTemplate, BLOOD_GROUPS, bloodGroupLabel } from '../merch/designs';
 import ProductPreview from '../merch/ProductPreview';
 import { ALL_COUNTRIES } from '../data/countries';
-import { DEFAULT_LAYOUT, defaultLayoutFor, normaliseLayout, placementBox, designAspect, designDpi, resolutionStatus, maxScaleForDpi } from '../merch/layout';
+import { effectiveSpec, defaultLayoutFor, normaliseLayout, placementBox, designAspect, designDpi, resolutionStatus, maxScaleForDpi } from '../merch/layout';
 import { formatMoney } from '../i18n/format';
 
 const COLLECTIONS = ['name_elements', 'blood_group'];
@@ -24,7 +24,7 @@ export default function MerchStore() {
   const [catalogue, setCatalogue] = useState(null);
   const [loadError, setLoadError] = useState(false);
   const [collection, setCollection] = useState('name_elements');
-  const [productId, setProductId] = useState('');
+  const [productId, setProductId] = useState(incoming?.productId || ''); // "Frame My Elements" opens the framed poster directly
   const [name, setName] = useState(incoming?.names?.[0]?.name || profile?.fullName || '');
   const [bloodGroup, setBloodGroup] = useState('');
   const [confirmed, setConfirmed] = useState(false);
@@ -51,13 +51,16 @@ export default function MerchStore() {
   const product = products.find((p) => p.id === productId);
   useEffect(() => { if (product) { setColor(product.colors[0]?.id || ''); setSize(product.sizes[0] || ''); setLayout(null); } }, [productId, collection]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const built = collection === 'name_elements'
+  const baseBuilt = collection === 'name_elements'
     ? buildDesign('name_elements', { name })
     : buildDesign('blood_group', { bloodGroup, confirmed: true }); // preview only; the confirmation is required to add
+  // framed posters use the poster template (headings + name + tiles); the server applies the same template
+  const built = baseBuilt.design ? { ...baseBuilt, design: applyTemplate(baseBuilt.design, product) } : baseBuilt;
   const colorHex = product?.colors.find((c) => c.id === color)?.hex || '#FFFFFF';
   const symbols = built.design?.elements?.map((e) => e.symbol).join(' · ');
   // print area, position bounds and resolution (the server re-checks all of it)
-  const spec = product?.printSpec;
+  const spec0 = product?.printSpec ? effectiveSpec(product.printSpec, null, size) : undefined; // print area for the chosen size
+  const spec = spec0 && Number(spec0.maxWidthInches) > 0 && Number(spec0.maxHeightInches) > 0 ? spec0 : undefined; // none until the size is chosen
   const lay = normaliseLayout(layout || defaultLayoutFor(built.design, spec));
   const area = spec ? { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) } : null;
   const box = area && built.design ? placementBox(area, lay, designAspect(built.design)) : null;
@@ -75,12 +78,14 @@ export default function MerchStore() {
     if (collection === 'blood_group' && !confirmed) { setMsg(errorText('blood-group-not-confirmed')); return; }
     if (built.error) { setMsg(errorText(built.error)); return; }
     const design = collection === 'name_elements' ? { name: built.design.name, elements: built.design.elements.map((e) => e.symbol) } : { bloodGroup, confirmed: true };
+    const unitPrice = product.prices?.[size] ?? product.price;
+    if (!(unitPrice > 0)) { setMsg(errorText('merch-product-off')); return; }
     if (blocked) { setMsg(t('merch.err.resolution-too-low', { dpi: res?.dpi, minDpi: spec?.minDpi })); return; }
-    const next = [...cart, { id: newLineId(), collection, productId, color, size, qty: Number(qty), design, layout: normaliseLayout(layout) }];
+    const next = [...cart, { id: newLineId(), collection, productId, color, size, qty: Number(qty), design, layout: lay }];
     try { await saveCart(user.uid, next); setCart(next); setMsg(t('merch.added')); } catch { setMsg(t('merch.err.generic')); }
   }
 
-  const off = catalogue && (!catalogue.globalEnabled ? 'off' : !catalogue.countryEnabled ? 'countryOff' : products.length === 0 && !COLLECTIONS.some((c) => catalogue.collections[c]) ? 'countryOff' : null);
+  const off = catalogue && (!catalogue.globalEnabled ? 'off' : !catalogue.countryEnabled ? 'countryOff' : catalogue.products.length === 0 ? 'none' : null);
 
   return (
     <main className="min-h-screen site-background p-4">
@@ -97,7 +102,7 @@ export default function MerchStore() {
         </label>
         {loadError && <p role="alert" className="text-red-700">{t('merch.loadError')}</p>}
         {!catalogue && !loadError && <p>{t('merch.loading')}</p>}
-        {off && <p role="status" className="p-4 rounded-lg bg-amber-50 border border-amber-300 text-amber-900" data-testid="merch-off">{off === 'off' ? (catalogue.message || t('merch.off')) : t('merch.countryOff')}</p>}
+        {off && <p role="status" className="p-4 rounded-lg bg-amber-50 border border-amber-300 text-amber-900" data-testid="merch-off">{off === 'off' ? (catalogue.message || t('merch.off')) : off === 'none' ? t('merch.noProducts') : t('merch.countryOff')}</p>}
 
         {catalogue && !off && (
           <div className="grid md:grid-cols-2 gap-6">
@@ -112,7 +117,7 @@ export default function MerchStore() {
                 {products.map((p) => (
                   <button key={p.id} onClick={() => setProductId(p.id)} aria-pressed={productId === p.id} data-testid={`product-${p.id}`}
                     className={`px-3 py-2 rounded-lg border ${productId === p.id ? 'border-brand-600 ring-2 ring-brand-600' : ''} bg-white`}>
-                    {t(`merch.product.${p.id}`, { defaultValue: p.id })}<span className="block text-xs text-gray-500">{formatMoney(p.price, catalogue.currency)}</span>
+                    {t(`merch.product.${p.id}`, { defaultValue: p.id })}<span className="block text-xs text-gray-500">{formatMoney(Math.min(...Object.values(p.prices || {}).concat(p.price > 0 ? [p.price] : [Infinity])), catalogue.currency)}</span>
                   </button>
                 ))}
               </div>
@@ -155,7 +160,8 @@ export default function MerchStore() {
                     <input type="number" min="1" max="10" value={qty} onChange={(e) => setQty(Math.max(1, Math.min(10, Number(e.target.value) || 1)))} className="mt-1 block w-full border rounded-lg px-2 py-2" /></label>
                 </div>
               )}
-              {product && built.design && (
+              {product && <p className="mb-3 text-lg font-semibold" data-testid="unit-price">{formatMoney(product.prices?.[size] ?? product.price, catalogue.currency)}</p>}
+              {product && built.design && spec && (
                 <fieldset className="mb-4" data-testid="layout-controls">
                   <legend className="block text-sm font-medium text-gray-700">{t('merch.layoutTitle')}</legend>
                   <label className="block text-sm mt-1">{t('merch.layoutScale')}<input type="range" min="0.2" max="1" step="0.01" value={lay.scale} onChange={(e) => setLayout({ ...lay, scale: Number(e.target.value) })} className="block w-full" data-testid="layout-scale" /></label>

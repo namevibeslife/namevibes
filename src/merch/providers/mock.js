@@ -1,6 +1,7 @@
 // Simulated provider for tests and `npm run dev:mock`. Behaves like a real partner, including
 // duplicate-submission protection by idempotency key, and can be told to fail or time out.
 import { PODProvider, unsupported } from './base.js';
+import { refuseCod } from '../cod.js';
 
 const ORDER = ['received', 'processing', 'shipped', 'delivered'];
 
@@ -22,6 +23,7 @@ export class MockProviderAdapter extends PODProvider {
 
   async submitOrder(order) {
     this.submitCalls += 1;
+    const cod = refuseCod(order); if (cod) return cod;
     const fail = this.failures.shift();
     if (fail === 'timeout') return { ok: false, error: 'timeout', retryable: true };
     if (fail === 'error') return { ok: false, error: 'provider-5xx', retryable: true };

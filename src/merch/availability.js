@@ -13,9 +13,10 @@ export function checkAvailability({ settings, country, product, collection }) {
   if (!(product.collections || []).includes(collection)) return { ok: false, reason: 'product-collection' };
   if (country.disabledProducts && country.disabledProducts[product.id] === true) return { ok: false, reason: 'product-off' };
   // A product cannot be sold until its print area, print type and placement are known (never guessed).
-  if (!specComplete(product.printSpec)) return { ok: false, reason: 'print-area-missing' };
-  const price = Number(country.prices?.[product.id]);
-  if (!(price > 0)) return { ok: false, reason: 'no-pricing' };
+  if (!specComplete(product.printSpec, product.sizes)) return { ok: false, reason: 'print-area-missing' };
+  // A price may be set for the product or for individual sizes ("poster:A4")
+  const priced = Object.entries(country.prices || {}).some(([k, v]) => (k === product.id || k.startsWith(`${product.id}:`)) && Number(v) > 0);
+  if (!priced) return { ok: false, reason: 'no-pricing' };
   return { ok: true };
 }
 

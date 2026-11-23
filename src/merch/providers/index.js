@@ -7,7 +7,7 @@ export function createProvider(doc, env = {}, deps = {}) {
   if (doc.adapter === 'mock') return deps.mock || new MockProviderAdapter(doc.id);
   if (doc.adapter === 'qikink') {
     const live = env.QIKINK_ENV === 'live' && doc.liveEnabled === true;
-    return new QikinkAdapter(doc.id, { clientId: env.QIKINK_CLIENT_ID, clientSecret: env.QIKINK_CLIENT_SECRET, env: live ? 'live' : 'sandbox', ...deps.qikink });
+    return new QikinkAdapter(doc.id, { clientId: env.QIKINK_CLIENT_ID, clientSecret: env.QIKINK_CLIENT_SECRET, env: live ? 'live' : 'sandbox', ...(env.QIKINK_FUNDS_ERROR_PATTERN ? { fundsPattern: new RegExp(env.QIKINK_FUNDS_ERROR_PATTERN, 'i') } : {}), ...deps.qikink });
   }
   return null;
 }

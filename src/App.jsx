@@ -32,6 +32,7 @@ const MerchCart = lazy(() => import('./pages/MerchCart'));
 const MerchOrderList = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderList })));
 const MerchOrderDetail = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderDetail })));
 const MerchAdmin = lazy(() => import('./pages/MerchAdmin'));
+const MerchReturnsPolicy = lazy(() => import('./pages/MerchReturnsPolicy'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function Spinner() {
@@ -117,6 +118,7 @@ function App() {
           <Route path="/merch/cart" element={<ProtectedRoute requiresProfile><MerchCart /></ProtectedRoute>} />
           <Route path="/merch/orders" element={<ProtectedRoute requiresProfile><MerchOrderList /></ProtectedRoute>} />
           <Route path="/merch/orders/:id" element={<ProtectedRoute requiresProfile><MerchOrderDetail /></ProtectedRoute>} />
+          <Route path="/merch/returns-policy" element={<MerchReturnsPolicy />} />
           <Route path="/admin/merch" element={<ProtectedRoute><MerchAdmin /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/accounts" element={<AccountsDashboard />} />

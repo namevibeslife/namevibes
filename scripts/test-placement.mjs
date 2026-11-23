@@ -72,13 +72,25 @@ await test('moving the layout moves the preview and the print file consistently 
 });
 
 console.log('Print spec and blocked products');
-await test('only the T-shirt has a (UNVERIFIED) seed spec; mugs, notebooks and posters are blocked', () => {
+await test('launch defaults: poster and mug ON but BLOCKED (no spec); T-shirt and notebook OFF; only the T-shirt has a (UNVERIFIED) seed spec', () => {
   assert.equal(specComplete(DEFAULT_PRODUCTS.tshirt.printSpec), true);
   assert.equal(DEFAULT_PRODUCTS.tshirt.printSpec.verified, false);
+  assert.deepEqual(Object.values(DEFAULT_PRODUCTS).filter((p) => p.enabled).map((p) => p.id).sort(), ['mug', 'poster']);
   for (const id of ['mug', 'notebook', 'poster']) { assert.equal(DEFAULT_PRODUCTS[id].printSpec, undefined); assert.ok(specProblems(DEFAULT_PRODUCTS[id].printSpec).length > 0); }
-  const settings = { enabled: true }; const country = { enabled: true, collections: { name_elements: true }, prices: { tshirt: 799, mug: 399, notebook: 299, poster: 899 } };
-  assert.equal(checkAvailability({ settings, country, product: DEFAULT_PRODUCTS.tshirt, collection: 'name_elements' }).ok, true);
-  for (const id of ['mug', 'notebook', 'poster']) assert.equal(checkAvailability({ settings, country, product: DEFAULT_PRODUCTS[id], collection: 'name_elements' }).reason, 'print-area-missing');
+  const settings = { enabled: true }; const country = { enabled: true, collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, notebook: 299, poster: 899 } };
+  assert.equal(checkAvailability({ settings, country, product: DEFAULT_PRODUCTS.tshirt, collection: 'name_elements' }).reason, 'product-off');
+  assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS.tshirt, enabled: true }, collection: 'name_elements' }).ok, true);
+  assert.equal(checkAvailability({ settings, country, product: DEFAULT_PRODUCTS.poster, collection: 'name_elements' }).reason, 'print-area-missing');
+  assert.equal(checkAvailability({ settings, country, product: DEFAULT_PRODUCTS.mug, collection: 'blood_group' }).reason, 'print-area-missing');
+});
+await test('per-size print areas: a framed poster needs a complete area for EVERY size', () => {
+  const base = { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true };
+  assert.deepEqual(specProblems({ ...base, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11 } } }, ['A4', 'A3']), ['size A3:maxWidthInches', 'size A3:maxHeightInches']);
+  const ok = { ...base, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11 }, A3: { maxWidthInches: 11.5, maxHeightInches: 16 } } };
+  assert.deepEqual(specProblems(ok, ['A4', 'A3']), []);
+  assert.equal(effectiveSpec(ok, null, 'A3').maxHeightInches, 16);
+  assert.equal(effectiveSpec(ok, null, 'A4').maxWidthInches, 8);
+  assert.deepEqual(specProblems({ ...ok, bySize: { ...ok.bySize, A3: { maxWidthInches: 17, maxHeightInches: 16 } } }, ['A4', 'A3']), ['exceedsTypeLimit']);
 });
 await test('spec validation: type ids, placements, sizes, documented DTG 16x20 / DTF 18x20 limits', () => {
   const ok = { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 16, maxHeightInches: 20, minDpi: 150 };
@@ -116,7 +128,8 @@ await test('blood-group masters (1312 px) fail on big prints and pass when small
 console.log('Engine: print areas, resolution, mock-ups, payload to Qikink');
 const baseSeed = () => ({
   'merch_settings/global': { enabled: true },
-  'merch_countries/IN': { countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true, collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399 }, costs: { tshirt: 420 }, shipping: { flat: 60 }, providerPrimary: 'p' },
+  'merch_products/tshirt': { id: 'tshirt', enabled: true },
+  'merch_countries/IN': { countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true, collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, poster: 599 }, costs: { tshirt: 420 }, shipping: { flat: 60 }, providerPrimary: 'p' },
   'merch_providers/p': { id: 'p', adapter: 'mock', active: true, countries: ['IN'] },
   'admins/admin@x.test': { role: 'super' }, 'users/u1': { email: 'u1@x.test', countryCode: 'IN' }, 'paymentSettings/razorpay': {}
 });
@@ -134,21 +147,22 @@ const addr = { name: 'A B', phone: '9999999999', line1: '1 Road', city: 'Pune', 
 const nameItem = (extra = {}) => ({ productId: 'tshirt', collection: 'name_elements', color: 'white', size: 'M', qty: 1, design: { name: 'Vibes' }, ...extra });
 const bloodItem = (extra = {}) => ({ productId: 'tshirt', collection: 'blood_group', color: 'white', size: 'M', qty: 1, design: { bloodGroup: 'O+', confirmed: true }, ...extra });
 
-await test('products without a print spec are hidden and cannot be quoted; an admin cannot switch one on without a complete spec', async () => {
+await test('an enabled product with no print spec is hidden and cannot be quoted ("enabled but blocked"); an invalid spec is refused; a valid one unblocks it', async () => {
   const e = env();
   const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
-  assert.deepEqual(cat.body.products.map((p) => p.id), ['tshirt']);
-  const q = await handleMerch(e.ctx, 'quote', { items: [{ ...nameItem(), productId: 'mug', size: '330ml', color: 'white' }], address: addr });
+  assert.deepEqual(cat.body.products.map((p) => p.id), ['tshirt']); // poster and mug are enabled but blocked; tshirt only because this fixture switched it on
+  const q = await handleMerch(e.ctx, 'quote', { items: [{ ...bloodItem(), productId: 'mug', size: '11oz', color: 'white' }], address: addr });
   assert.equal(q.status, 409); assert.equal(q.body.error, 'merch-product-off'); assert.equal(q.body.reason, 'print-area-missing');
   const admin = env(baseSeed(), { uid: 'adm', email: 'admin@x.test', emailVerified: true });
-  const no = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'mug', enabled: true } });
-  assert.equal(no.status, 400); assert.equal(no.body.error, 'print-spec-incomplete');
+  const on = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'mug', enabled: true } });
+  assert.equal(on.status, 200); // the switch may be on while the spec is missing...
+  assert.equal((await handleMerch(admin.ctx, 'quote', { items: [{ ...bloodItem(), productId: 'mug', size: '11oz' }], address: addr })).body.reason, 'print-area-missing'); // ...the product stays blocked
   const tooBig = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'mug', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 17, maxHeightInches: 10, minDpi: 150 } } });
-  assert.equal(tooBig.status, 400);
+  assert.equal(tooBig.status, 400); assert.equal(tooBig.body.error, 'print-spec-invalid');
   const yes = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'mug', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150 } } });
   assert.equal(yes.status, 200);
-  const q2 = await handleMerch(admin.ctx, 'quote', { items: [{ ...nameItem(), productId: 'mug', size: '330ml' }], address: addr });
-  assert.equal(q2.status, 200);
+  const q2 = await handleMerch(admin.ctx, 'quote', { items: [{ ...bloodItem(), productId: 'mug', size: '11oz' }], address: addr });
+  assert.equal(q2.status, 200, JSON.stringify(q2.body));
   assert.ok((await admin.db.list('merch_audit_logs')).some((l) => l.action === 'admin.setProduct'));
 });
 await test('the layout is validated and clamped on the server and stored; default layout is chosen when none is sent', async () => {

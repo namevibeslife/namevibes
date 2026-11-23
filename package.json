@@ -13,7 +13,8 @@
     "scan:i18n": "node scripts/scan-hardcoded.mjs",
     "test:merch": "node scripts/test-merch.mjs",
     "test:qikink": "node scripts/test-qikink.mjs",
-    "test:placement": "node scripts/test-placement.mjs"
+    "test:placement": "node scripts/test-placement.mjs",
+    "test:launch": "node scripts/test-launch.mjs"
   },
   "dependencies": {
     "@fontsource/noto-sans-devanagari": "^5.3.0",

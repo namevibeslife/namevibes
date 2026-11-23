@@ -30,6 +30,8 @@ const seed = () => ({
     countryCode: 'US', enabled: false, currency: 'USD', taxPercent: 0, taxIncluded: false,
     collections: { name_elements: true, blood_group: true }, prices: { tshirt: 25 }, shipping: { flat: 5 }, providerPrimary: 'mock'
   },
+  // the T-shirt is DISABLED by default (launch scope); these generic engine tests switch it on
+  'merch_products/tshirt': { id: 'tshirt', enabled: true },
   // mug has a complete print spec in this fixture (the shipped default leaves it unset, which blocks it)
   'merch_products/mug': { id: 'mug', printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: false } },
   'merch_providers/mock': { id: 'mock', adapter: 'mock', active: true, countries: ['IN', 'US'] },
@@ -263,7 +265,7 @@ await test('a price change between quote and payment is caught (quote-changed)',
 });
 await test('blood-group order uses the fixed approved artwork reference and is never exposed to the ambassador commission row', async () => {
   const e = makeEnv();
-  const q = await handleMerch(e.ctx, 'quote', { items: [{ productId: 'mug', collection: 'blood_group', color: 'white', size: '330ml', qty: 1, design: { bloodGroup: 'AB-', confirmed: true } }], address: address() });
+  const q = await handleMerch(e.ctx, 'quote', { items: [{ productId: 'mug', collection: 'blood_group', color: 'white', size: '11oz', qty: 1, design: { bloodGroup: 'AB-', confirmed: true } }], address: address() });
   assert.equal(q.status, 200);
   const c = await handleMerch(e.ctx, 'checkout', { quoteId: q.body.quoteId });
   assert.equal(c.status, 200);

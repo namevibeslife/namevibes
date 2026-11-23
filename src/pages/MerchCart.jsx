@@ -110,7 +110,7 @@ export default function MerchCart() {
                   {Object.values(ALL_COUNTRIES).map((c) => <option key={c.code} value={c.code}>{c.name}</option>)}
                 </select></label>
             </div>
-            <p className="text-xs text-gray-600 mb-3">{t('merch.addr.privacy')}</p>
+            <p className="text-xs text-gray-600 mb-3">{t('merch.addr.privacy')} <Link to="/merch/returns-policy" className="underline">{t('merch.policyLink')}</Link></p>
             {error && <p role="alert" className="mb-3 text-red-700" data-testid="cart-error">{error}</p>}
             {!quote ? (
               <button onClick={getQuote} disabled={busy} className="px-5 py-2 rounded-lg bg-brand-600 text-white disabled:opacity-50" data-testid="get-quote">{t('merch.cart.getQuote')}</button>

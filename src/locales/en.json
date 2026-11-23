@@ -1314,16 +1314,16 @@
     "addToCart": "Add to cart",
     "added": "Added to your cart.",
     "viewCart": "View cart",
-    "makeMine": "Make My Merchandise",
+    "makeMine": "Frame My Elements",
     "collection": {
       "name_elements": "Name Elements",
       "blood_group": "Blood Group"
     },
     "product": {
       "tshirt": "T-shirt",
-      "mug": "Mug",
+      "mug": "Blood Group Mug (11 oz)",
       "notebook": "Notebook",
-      "poster": "Framed poster"
+      "poster": "Framed poster (A4 / A3)"
     },
     "color": {
       "white": "White",
@@ -1332,7 +1332,13 @@
       "forest": "Forest green",
       "ivory": "Ivory",
       "black-frame": "Black frame",
-      "wood-frame": "Wood frame"
+      "wood-frame": "Wood frame",
+      "frame-white": "White frame",
+      "frame-black": "Black frame",
+      "frame-yellow": "Yellow frame",
+      "frame-green": "Bottle green frame",
+      "frame-royal-blue": "Royal blue frame",
+      "frame-olive": "Olive green frame"
     },
     "err": {
       "generic": "Something went wrong. Please try again.",
@@ -1353,7 +1359,8 @@
       "gateway-unavailable": "Payments for this country are not available yet.",
       "paymentFailed": "The payment could not be completed. You have not been charged.",
       "paymentRecorded": "Your payment went through but we could not confirm it yet. Check My orders in a minute, or contact support.",
-      "resolution-too-low": "This design is too large to print sharply ({{dpi}} DPI; at least {{minDpi}} DPI is needed). Make it smaller."
+      "resolution-too-low": "This design is too large to print sharply ({{dpi}} DPI; at least {{minDpi}} DPI is needed). Make it smaller.",
+      "cod-not-allowed": "Cash on delivery is not available. Please pay online."
     },
     "cart": {
       "title": "Your cart",
@@ -1414,6 +1421,8 @@
     "printArea": "The dashed box is the printable area ({{w}} × {{h}} inches). The design cannot go outside it.",
     "dpiLow": "At this size the print will be a little soft ({{dpi}} DPI). Make the design smaller for a sharper result.",
     "dpiMaxSize": "The largest sharp size is about {{percent}}% of the print area.",
-    "dpiFix": "Use that size"
+    "dpiFix": "Use that size",
+    "policyLink": "Returns and refunds policy",
+    "noProducts": "No merchandise is available right now."
   }
 }
