@@ -266,7 +266,9 @@ await test('blood-group order uses the fixed approved artwork reference and is n
   assert.equal(q.status, 200);
   const c = await handleMerch(e.ctx, 'checkout', { quoteId: q.body.quoteId });
   assert.equal(c.status, 200);
-  assert.deepEqual(c.body.needsArtwork, c.body.needsArtwork); // blood assets: none until optimised copies are generated
+  assert.deepEqual(c.body.needsArtwork, []); // blood group uses the fixed approved file, no customer upload
+  const o = (await e.db.get(`merch_orders/${c.body.orderId}`)).data;
+  assert.equal(o.items[0].artwork.kind, 'static'); assert.match(o.items[0].artwork.path, /^\/merch\/blood\/ab-neg\.v1\./); assert.equal(o.items[0].artwork.sha256.length, 64);
   await handleMerch(e.ctx, 'verify', { orderId: c.body.orderId, proof: {} });
   const com = (await e.db.get(`merch_commissions/${c.body.orderId}`));
   if (com) { const s = JSON.stringify(com.data); assert.ok(!s.includes('AB-') && !s.includes('411001') && !s.includes('9999999999')); }
