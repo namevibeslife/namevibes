@@ -26,11 +26,12 @@ export async function attachArtwork({ orderId, uid, items, products, colorHexOf 
     const product = products[it.productId];
     const spec = { maxWidthInches: it.canvasInches.width, maxHeightInches: it.canvasInches.height };
     const colorHex = colorHexOf(it);
-    const print = await renderPrintFile({ design: it.design, spec, layout: it.layout, ink: inkFor(colorHex) });
+    const inset = { mm: it.designInsetMm, size: it.size }; // frame designs: the artwork is inset from the paper edge
+    const print = await renderPrintFile({ design: it.design, spec, layout: it.layout, ink: inkFor(colorHex), inset });
     const printPath = `merch/print/${uid}/${orderId}/${it.index}.png`;
     const entry = { index: it.index, sha256: await upload(printPath, print.blob), path: printPath, width: print.width, height: print.height };
     try {
-      const mock = await renderMockup({ product, colorHex, design: it.design, spec, layout: it.layout });
+      const mock = await renderMockup({ product, colorHex, design: it.design, spec, layout: it.layout, inset });
       const mockPath = `merch/mockup/${uid}/${orderId}/${it.index}.png`;
       entry.mockup = { path: mockPath, sha256: await upload(mockPath, mock.blob) };
     } catch { /* fall back to the print file for mockup_link */ }

@@ -22,7 +22,7 @@ export const SEED_DATA = {
   // The printSpec values on poster and mug below are MOCK TEST VALUES (not Qikink data) so the designer can be tried offline.
   'merch_settings/global': { enabled: true, message: '' },
   'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
-  'merch_products/poster': { id: 'poster', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, verified: false, mockOnly: true, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11 }, A3: { maxWidthInches: 11.5, maxHeightInches: 16 } } } },
+  'merch_products/poster': { id: 'poster', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, verified: false, mockOnly: true, bySize: { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69 }, A3: { maxWidthInches: 11.69, maxHeightInches: 16.54 } } } },
   'merch_products/mug': { id: 'mug', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: false, mockOnly: true } },
   'merch_products/tshirt': { id: 'tshirt', enabled: false },
   'merch_products/notebook': { id: 'notebook', enabled: false },

@@ -424,5 +424,36 @@ await test('the print file must reach the product minimum DPI over the print are
   assert.equal((await att3(3450)).status, 200); assert.equal((await att3(1500)).body.error, 'resolution-too-low');
 });
 
+console.log('Frame inset setting (designInsetMm)');
+await test('designInsetMm: default 10 mm recorded on each frame item; admin can set 0 to 30 (audited); invalid values refused; the quote follows the setting', async () => {
+  const e = env(); const a = e.as('admin@x.test');
+  const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
+  assert.equal(cat.body.products.find((p) => p.id === 'poster').designInsetMm, 10);
+  assert.equal(cat.body.products.find((p) => p.id === 'mug').designInsetMm, undefined);
+  const q = await handleMerch(e.ctx, 'quote', { items: [poster()], address: addr });
+  const it = (await e.db.get(`merch_quotes/${q.body.quoteId}`)).data.items[0];
+  assert.equal(it.designInsetMm, 10); assert.equal(it.insetApplied, 'frame-minus-inset');
+  assert.ok(Math.abs(it.artworkInches.width - (210 / 25.4 - 2 * 10 / 25.4)) < 1e-6); // fixture print area 8 x 11 in is a little smaller than A4: the stricter of the two applies per side
+  assert.deepEqual(it.canvasInches, { width: 8, height: 11 }); // the file stays the full print area
+  for (const bad of [-1, 31, 'abc']) assert.equal((await handleAdmin(a, { action: 'setProduct', data: { id: 'poster', enabled: true, designInsetMm: bad } })).body.error, 'bad-inset');
+  assert.equal((await handleAdmin(a, { action: 'setProduct', data: { id: 'poster', enabled: true, designInsetMm: 15 } })).status, 200);
+  assert.equal((await e.db.get('merch_products/poster')).data.designInsetMm, 15);
+  const q15 = await handleMerch(e.ctx, 'quote', { items: [poster()], address: addr });
+  assert.equal((await e.db.get(`merch_quotes/${q15.body.quoteId}`)).data.items[0].designInsetMm, 15);
+  assert.equal((await handleAdmin(a, { action: 'setProduct', data: { id: 'poster', enabled: true, designInsetMm: 0 } })).status, 200);
+  const q0 = await handleMerch(e.ctx, 'quote', { items: [poster()], address: addr });
+  assert.equal((await e.db.get(`merch_quotes/${q0.body.quoteId}`)).data.items[0].designInsetMm, 0);
+  assert.ok((await e.db.list('merch_audit_logs')).filter((l) => l.action === 'admin.setProduct').length >= 2);
+  // a customer cannot change it
+  assert.equal((await handleMerch(e.ctx, 'admin', { action: 'setProduct', data: { id: 'poster', designInsetMm: 5 } })).status, 403);
+  // an exact A4/A3 print area: artwork is 190 x 277 mm and 277 x 400 mm
+  const exact = env({ seed: { ...launchSeed(), 'merch_products/poster': { id: 'poster', enabled: true, printSpec: { ...POSTER_SPEC, bySize: { A4: { maxWidthInches: 210 / 25.4, maxHeightInches: 297 / 25.4 }, A3: { maxWidthInches: 297 / 25.4, maxHeightInches: 420 / 25.4 } } } } } });
+  for (const [size, w, h] of [['A4', 190, 277], ['A3', 277, 400]]) {
+    const qq = await handleMerch(exact.ctx, 'quote', { items: [poster({ size })], address: addr });
+    const x = (await exact.db.get(`merch_quotes/${qq.body.quoteId}`)).data.items[0];
+    assert.ok(Math.abs(x.artworkInches.width * 25.4 - w) < 1e-6 && Math.abs(x.artworkInches.height * 25.4 - h) < 1e-6, size);
+  }
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

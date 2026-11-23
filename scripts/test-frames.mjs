@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { buildDesign, buildFrameDesign } from '../src/merch/designs.js';
-import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS, HEADINGS, BRAND, layoutFrame, opBounds, categoryOf, personStats, elementBalance, sharedElements, frameData, FRAME_MAX_MEMBERS } from '../src/merch/frames.js';
+import { artworkInches, artworkBox, EDGE_COLORS, DEFAULT_INSET_MM, FRAME_MM, FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS, HEADINGS, BRAND, layoutFrame, opBounds, categoryOf, personStats, elementBalance, sharedElements, frameData, FRAME_MAX_MEMBERS } from '../src/merch/frames.js';
 import { SITE_URL, SITE_HOST } from '../src/config/site.js';
 import { ELEMENTS } from '../src/utils/elements.js';
 
@@ -116,6 +116,59 @@ await test('the layout code is plain data: no hard-coded domain, no UI-language 
   const code = src.replace(/\/\/.*$/gm, ''); // comments may mention the references
   assert.ok(!/merch-reference|frame-individual-dark\.png|frame-family-dark\.png|frame-elements-gold\.png/.test(code), 'the reference images are never printed');
   assert.ok(!/i18n|useTranslation/.test(readFileSync('src/merch/frames.js', 'utf8')));
+});
+
+console.log('Inset from the frame (designInsetMm)');
+const mmArea = (size) => ({ width: FRAME_MM[size][0] / 25.4, height: FRAME_MM[size][1] / 25.4 });
+await test('10 mm default: A4 artwork is 190 x 277 mm and A3 277 x 400 mm, centred, equal on all four sides', () => {
+  assert.equal(DEFAULT_INSET_MM, 10);
+  for (const [size, w, h] of [['A4', 190, 277], ['A3', 277, 400]]) {
+    const g = artworkInches({ areaInches: mmArea(size), size });
+    assert.ok(Math.abs(g.artworkInches.width * 25.4 - w) < 1e-6 && Math.abs(g.artworkInches.height * 25.4 - h) < 1e-6, size);
+    assert.ok(Math.abs(g.insetInches.x * 25.4 - 10) < 1e-6 && Math.abs(g.insetInches.y * 25.4 - 10) < 1e-6);
+    assert.equal(g.applied, 'frame-minus-inset');
+    const px = size === 'A4' ? [2480, 3508] : [3508, 4961];
+    const b = artworkBox({ width: px[0], height: px[1], areaInches: mmArea(size), size });
+    assert.equal(b.x, 118); assert.equal(b.y, 118); assert.equal(b.w, px[0] - 236); assert.equal(b.h, px[1] - 236); // 10 mm = 118 px at 300 DPI
+  }
+});
+await test('the setting is applied equally: 0 gives the full file, 15 mm a bigger border, out-of-range values are clamped', () => {
+  const area = mmArea('A4');
+  const a0 = artworkBox({ width: 2480, height: 3508, areaInches: area, size: 'A4', insetMm: 0 });
+  assert.deepEqual([a0.x, a0.y, a0.w, a0.h], [0, 0, 2480, 3508]);
+  const a15 = artworkBox({ width: 2480, height: 3508, areaInches: area, size: 'A4', insetMm: 15 });
+  assert.equal(a15.x, 177); assert.equal(a15.y, 177); assert.equal(a15.w, 2480 - 354);
+  assert.equal(artworkBox({ width: 2480, height: 3508, areaInches: area, size: 'A4', insetMm: 99 }).x, artworkBox({ width: 2480, height: 3508, areaInches: area, size: 'A4', insetMm: 30 }).x);
+  assert.equal(artworkBox({ width: 2480, height: 3508, areaInches: area, size: 'A4', insetMm: -5 }).x, 0);
+});
+await test('the stricter of (print area) and (frame minus inset) applies, and which one is recorded', () => {
+  const small = { width: 7, height: 10 }; // a print area smaller than A4 minus 10 mm (7.48 x 10.91 in)
+  const g = artworkInches({ areaInches: small, size: 'A4' });
+  assert.deepEqual(g.artworkInches, small); assert.equal(g.applied, 'print-area'); assert.equal(g.insetInches.x, 0);
+  const g2 = artworkInches({ areaInches: { width: 9, height: 12 }, size: 'A4' }); // a print area bigger than the frame: the frame minus inset wins
+  assert.equal(g2.applied, 'frame-minus-inset'); assert.ok(Math.abs(g2.artworkInches.width * 25.4 - 190) < 1e-6);
+  const unknown = artworkInches({ areaInches: { width: 8, height: 11 }, size: 'A5' }); // sizes without a nominal frame use the print area as the frame
+  assert.ok(Math.abs(unknown.artworkInches.width - (8 - 2 * 10 / 25.4)) < 1e-9);
+});
+await test('the design is re-laid out INSIDE the smaller area (not shrunk afterwards): every operation stays in the artwork safe area, text keeps its proportions', () => {
+  for (const frame of FRAME_IDS) {
+    const input = frame === 'family-dark' ? family(4) : { frame, name: 'Sreshan S Nair' };
+    const { design } = buildDesign('name_elements', input);
+    const heading = HEADINGS[frame === 'family-dark' ? 'family' : 'name'];
+    for (const size of ['A4', 'A3']) {
+      const full = { W: Math.round(FRAME_MM[size][0] / 25.4 * 300), H: Math.round(FRAME_MM[size][1] / 25.4 * 300) };
+      const b = artworkBox({ width: full.W, height: full.H, areaInches: mmArea(size), size });
+      const l = layoutFrame(design, b.w, b.h);
+      assert.equal(l.W, b.w); assert.equal(l.H, b.h);
+      for (const op of l.ops) { const o = opBounds(op); assert.ok(o.x >= l.safe.x - 1 && o.y >= l.safe.y - 1 && o.x + o.w <= l.safe.x + l.safe.w + 1 && o.y + o.h <= l.safe.y + l.safe.h + 1, `${frame} ${size} ${op.type}`); }
+      const t = layoutFrame(design, full.W, full.H).ops.find((o) => o.type === 'text' && o.text === heading);
+      const t2 = l.ops.find((o) => o.type === 'text' && o.text === heading);
+      assert.ok(Math.abs(t2.size / b.w - t.size / full.W) < 1e-3, 'heading proportion unchanged');
+    }
+  }
+});
+await test('the border colour is a per-design constant: ivory for gold, near-black for the dark designs', () => {
+  assert.deepEqual(EDGE_COLORS, { 'elements-gold': '#fbf2da', 'individual-dark': '#020204', 'family-dark': '#020204' });
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

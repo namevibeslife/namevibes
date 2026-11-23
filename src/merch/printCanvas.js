@@ -8,6 +8,7 @@ import { BLOOD_ASSETS } from './bloodAssets.js';
 import { bloodGroupSlug } from './designs.js';
 import { placementBox, designAspect, PRINT_DPI, FULL_LAYOUT } from './layout.js';
 import { renderFrameCanvas } from './framePaint.js';
+import { artworkBox, DEFAULT_INSET_MM } from './frames.js';
 
 const MAX_PIXELS = 16_000_000; // iOS Safari limits a canvas to about 16.7 MP
 
@@ -37,24 +38,26 @@ export async function drawDesign(ctx, design, box, ink) {
 // A frame design is a fully painted poster that fills the whole print area at 300 DPI. Big canvases (A3 is 17.4 MP) can exceed a
 // phone browser's limit, in which case the canvas silently stays blank: we check a painted pixel and retry smaller, and report the
 // DPI actually reached (the server refuses anything under the product's minimum).
-async function renderFramePrintFile({ design, spec }) {
+async function renderFramePrintFile({ design, spec, inset }) {
+  const areaInches = { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) };
   const wantW = Math.round(Number(spec.maxWidthInches) * PRINT_DPI); const wantH = Math.round(Number(spec.maxHeightInches) * PRINT_DPI);
   for (const scale of [1, 0.85, 0.7, 0.55, 0.42]) {
     const width = Math.round(wantW * scale); const height = Math.round(wantH * scale);
     try {
-      const { canvas, layout, metrics } = await renderFrameCanvas({ design, width, height });
+      const art = artworkBox({ width, height, areaInches, size: inset?.size, insetMm: inset?.mm ?? DEFAULT_INSET_MM });
+      const { canvas, metrics, safe } = await renderFrameCanvas({ design, width, height, art });
       const alpha = canvas.getContext('2d').getImageData(Math.floor(width / 2), Math.floor(height / 2), 1, 1).data[3];
       if (alpha !== 255) continue; // blank: over the device canvas limit
       const blob = await toBlob(canvas);
-      return { blob, width, height, box: { x: 0, y: 0, width, height }, dpi: Math.round(width / Number(spec.maxWidthInches)), metrics, safe: layout.safe };
+      return { blob, width, height, box: { x: 0, y: 0, width, height }, dpi: Math.round(width / Number(spec.maxWidthInches)), metrics, safe, art, artworkInches: art.artworkInches, insetApplied: art.applied };
     } catch { /* try a smaller canvas */ }
   }
   throw new Error('print-canvas-unavailable');
 }
 
 /** -> { blob, width, height, box } ; spec needs maxWidthInches/maxHeightInches. */
-export async function renderPrintFile({ design, spec, layout, ink }) {
-  if (design.template === 'frame') return renderFramePrintFile({ design, spec });
+export async function renderPrintFile({ design, spec, layout, ink, inset }) {
+  if (design.template === 'frame') return renderFramePrintFile({ design, spec, inset });
   const wantW = Number(spec.maxWidthInches) * PRINT_DPI; const wantH = Number(spec.maxHeightInches) * PRINT_DPI;
   const scale = Math.min(1, Math.sqrt(MAX_PIXELS / (wantW * wantH)));
   const width = Math.round(wantW * scale); const height = Math.round(wantH * scale);
@@ -66,7 +69,7 @@ export async function renderPrintFile({ design, spec, layout, ink }) {
 }
 
 /** -> { blob, width, height, designBox } ; the product image with the design at the customer's position. */
-export async function renderMockup({ product, colorHex, design, spec, layout }) {
+export async function renderMockup({ product, colorHex, design, spec, layout, inset }) {
   const m = productMockup(product, colorHex, design, { layout, spec });
   const k = 2; // 800 px wide
   const canvas = document.createElement('canvas');
@@ -76,7 +79,9 @@ export async function renderMockup({ product, colorHex, design, spec, layout }) 
   ctx.drawImage(await svgImage(`<svg xmlns="http://www.w3.org/2000/svg" width="${m.w * k}" height="${m.h * k}" viewBox="0 0 ${m.w} ${m.h}">${m.shapeSvg}</svg>`), 0, 0);
   const b = m.designBox;
   if (design.template === 'frame') {
-    const r = await renderFrameCanvas({ design, width: 700, height: Math.round(700 * b.height / b.width) });
+    const mh = Math.round(700 * b.height / b.width);
+    const art = artworkBox({ width: 700, height: mh, areaInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) }, size: inset?.size, insetMm: inset?.mm ?? DEFAULT_INSET_MM });
+    const r = await renderFrameCanvas({ design, width: 700, height: mh, art });
     ctx.drawImage(r.canvas, b.x * k, b.y * k, b.width * k, b.height * k);
   } else await drawDesign(ctx, design, { x: b.x * k, y: b.y * k, width: b.width * k, height: b.height * k }, m.ink);
   return { blob: await toBlob(canvas), width: canvas.width, height: canvas.height, designBox: b };

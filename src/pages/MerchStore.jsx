@@ -208,7 +208,7 @@ export default function MerchStore() {
               {msg && <p role="status" className="mt-2 text-sm text-gray-700" data-testid="merch-msg">{msg} {msg === t('merch.added') && <button className="underline" onClick={() => navigate('/merch/cart')}>{t('merch.viewCart')}</button>}</p>}
             </section>
             <section aria-label={t('merch.preview')} className="bg-white/60 rounded-xl p-4">
-              <ProductPreview product={product} colorHex={colorHex} design={built.design} label={t('merch.preview')} layout={lay} spec={spec} />
+              <ProductPreview product={product} colorHex={colorHex} design={built.design} label={t('merch.preview')} layout={lay} spec={spec} insetMm={product?.designInsetMm} size={size} />
               {isPoster && isFrameDesign && <p className="text-xs text-gray-600 mt-2">{t('merch.frameNote', { w: spec?.maxWidthInches, h: spec?.maxHeightInches })}</p>}
               {isPoster && (
                 <div className="mt-4" data-testid="samples">

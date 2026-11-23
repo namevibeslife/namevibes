@@ -18,6 +18,41 @@ import { SITE_HOST } from '../config/site.js';
 export const FRAME_IDS = ['elements-gold', 'individual-dark', 'family-dark'];
 export const DEFAULT_FRAME = 'elements-gold';
 export const DEFAULT_FRAME_DESIGNS = { 'elements-gold': true, 'individual-dark': false, 'family-dark': false }; // launch: gold only
+// The artwork is printed 10 mm smaller than the frame on every side (one setting, `designInsetMm` on the product, 0 to 30). The 10 mm
+// border is a FLAT colour (a mat), not artwork. Edge colours are per design so they are easy to change.
+export const DEFAULT_INSET_MM = 10;
+export const MAX_INSET_MM = 30;
+export const EDGE_COLORS = { 'elements-gold': '#fbf2da', 'individual-dark': '#020204', 'family-dark': '#020204' };
+// Paper sizes in mm (the frame). Sizes not listed use the print area itself as the frame.
+export const FRAME_MM = { A4: [210, 297], A3: [297, 420] };
+
+/**
+ * Where the artwork sits inside the print file, in inches. areaInches = the print area (the full file); the frame is the paper size;
+ * the artwork is the STRICTER of (print area) and (frame minus the inset on both sides), centred.
+ * -> { artworkInches, insetInches: { x, y }, applied: 'frame-minus-inset' | 'print-area' }
+ */
+export function artworkInches({ areaInches, size, insetMm = DEFAULT_INSET_MM }) {
+  const inset = Math.min(MAX_INSET_MM, Math.max(0, Number(insetMm) || 0)) / 25.4;
+  const f = FRAME_MM[size];
+  const frame = f ? { width: f[0] / 25.4, height: f[1] / 25.4 } : { width: areaInches.width, height: areaInches.height };
+  const byFrame = { width: frame.width - 2 * inset, height: frame.height - 2 * inset };
+  const art = { width: Math.min(areaInches.width, byFrame.width), height: Math.min(areaInches.height, byFrame.height) };
+  const applied = byFrame.width <= areaInches.width + 1e-9 && byFrame.height <= areaInches.height + 1e-9 ? 'frame-minus-inset' : 'print-area';
+  return { artworkInches: art, insetInches: { x: (areaInches.width - art.width) / 2, y: (areaInches.height - art.height) / 2 }, applied };
+}
+
+/** The same in pixels for a canvas of width x height px that covers areaInches. The border is the same on both sides. */
+export function artworkBox({ width, height, areaInches, size, insetMm = DEFAULT_INSET_MM }) {
+  const g = artworkInches({ areaInches, size, insetMm });
+  const sx = width / areaInches.width; const sy = height / areaInches.height;
+  // When the print area IS the frame (within 1.3 mm of rounding slack) the border is exactly the inset on every side.
+  const nominal = Math.min(MAX_INSET_MM, Math.max(0, Number(insetMm) || 0)) / 25.4;
+  const f = FRAME_MM[size];
+  const close = g.applied === 'frame-minus-inset' && f && Math.abs(areaInches.width - f[0] / 25.4) < 0.05 && Math.abs(areaInches.height - f[1] / 25.4) < 0.05;
+  const ix = Math.round((close ? nominal : g.insetInches.x) * sx); const iy = Math.round((close ? nominal : g.insetInches.y) * sy);
+  return { x: ix, y: iy, w: width - 2 * ix, h: height - 2 * iy, artworkInches: g.artworkInches, applied: g.applied };
+}
+
 export const FRAME_MAX_MEMBERS = 4;          // same limit as the Family analysis (FAMILY_MAX_NAMES)
 export const FRAME_MAX_ELEMENTS_SINGLE = 24;
 export const FRAME_MAX_ELEMENTS_FAMILY = 10; // per member (a card holds four tiles per row)

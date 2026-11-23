@@ -14,7 +14,7 @@ import { COLL, STATES, TRANSITIONS, PAID_STATES, QUOTE_TTL_MS, MAX_QTY_PER_ITEM,
 import { buildDesign, bloodGroupSlug, applyTemplate } from './designs.js';
 import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS, starterSku } from './catalog.js';
 import { checkAvailability, routeProvider, validateAddress, normaliseAddress } from './availability.js';
-import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS } from './frames.js';
+import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS, DEFAULT_INSET_MM, MAX_INSET_MM, artworkInches } from './frames.js';
 import { FULL_LAYOUT, normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
 import { computeQuote, lookupBySize, taxRateFor } from './quoteMath.js';
 import { computeOrderCommission, reversalAmount } from './commission.js';
@@ -70,7 +70,7 @@ export async function handleCatalogue(ctx, body) {
   out.products = Object.values(cfg.products)
     .filter((p) => COLLECTION_IDS.some((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok))
     .map((p) => ({
-      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, frames: p.kind === 'wall-art' ? { ...DEFAULT_FRAME_DESIGNS, ...(p.frameDesigns || {}) } : undefined, price: country.prices[p.id], prices: Object.fromEntries(p.sizes.map((sz) => [sz, lookupBySize(country.prices, p.id, sz)]).filter(([, v]) => v > 0)),
+      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, designInsetMm: p.kind === 'wall-art' ? (Number.isFinite(Number(p.designInsetMm)) ? Number(p.designInsetMm) : DEFAULT_INSET_MM) : undefined, frames: p.kind === 'wall-art' ? { ...DEFAULT_FRAME_DESIGNS, ...(p.frameDesigns || {}) } : undefined, price: country.prices[p.id], prices: Object.fromEntries(p.sizes.map((sz) => [sz, lookupBySize(country.prices, p.id, sz)]).filter(([, v]) => v > 0)),
       collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
     }));
   return ok(out);
@@ -139,9 +139,14 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     }
     const unitPrice = lookupBySize(country.prices, product.id, raw.size);
     if (!(unitPrice > 0)) return fail(409, 'merch-product-off', { reason: 'no-pricing' });
+    // Frame designs are printed inset from the frame on every side (product setting, default 10 mm). The print file stays the full print area;
+    // we record the artwork size, the inset and which rule applied (the stricter of the print area and the frame minus the inset).
+    const insetMm = design.template === 'frame' ? (Number.isFinite(Number(product.designInsetMm)) ? Number(product.designInsetMm) : DEFAULT_INSET_MM) : null;
+    const artwork = insetMm === null ? null : artworkInches({ areaInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) }, size: raw.size, insetMm });
     items.push({
       productId: product.id, collection, color: raw.color, size: raw.size, qty, design: design, layout,
       canvasInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) },
+      ...(artwork ? { designInsetMm: insetMm, artworkInches: artwork.artworkInches, insetApplied: artwork.applied } : {}),
       placementSku: spec.allowedPlacements[0], printTypeId: Number(spec.printTypeId), minDpi: Number(spec.minDpi), dpi: res.dpi, resolution: status,
       providerSku: mapping, unitPrice, unitCost: lookupBySize(country.costs, product.id, raw.size) ?? 0, taxPercent: taxRateFor(country, product.id)
     });
@@ -603,7 +608,9 @@ const ADMIN_ACTIONS = {
   },
   async setProduct(ctx, b) {
     if (!/^[a-z0-9_-]{2,30}$/.test(String(b.id || ''))) return { error: 'bad-product-id' };
-    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections', 'frameDesigns']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
+    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections', 'frameDesigns', 'designInsetMm']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
+    if (b.designInsetMm !== undefined && b.designInsetMm !== null && b.designInsetMm !== '' && !(Number(b.designInsetMm) >= 0 && Number(b.designInsetMm) <= MAX_INSET_MM)) return { error: 'bad-inset' };
+    if (patch.designInsetMm !== undefined) patch.designInsetMm = patch.designInsetMm === '' || patch.designInsetMm === null ? DEFAULT_INSET_MM : Number(patch.designInsetMm);
     // The switch may be ON with the spec still missing: availability.js keeps such a product blocked ("enabled but blocked").
     // A spec that IS given must be valid, though (documented DTG/DTF limits, known print type, placement codes).
     if (b.printSpec && specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes).length) return { error: 'print-spec-invalid', problems: specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes) };

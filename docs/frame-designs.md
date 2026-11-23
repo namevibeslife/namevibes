@@ -6,6 +6,22 @@ Reference looks: `merch-reference/` (never printed, never an input). Code: `src/
 
 The buyer's own data (names, relations, family title) goes to the server, which recomputes every person's elements with the existing element engine. The browser then paints the poster **fresh at print size** (`renderFrameCanvas`): the print area in inches x 300 DPI (A4 about 2480 x 3508, A3 about 3508 x 4961, or the Qikink print area once confirmed), opaque, with a code-painted background, border, crystal tiles and text. Preview and print file execute the same list of drawing operations. If a phone cannot make a canvas that large, it retries smaller and reports the DPI reached; the server refuses a file below the product's minimum DPI (default 150). The reference images are 1024 px wide and are never upscaled or printed.
 
+## Inset from the frame (designInsetMm)
+
+The artwork is printed smaller than the frame by the same amount on all four sides. One per-product setting, **`designInsetMm`** (default **10**, validated 0 to 30, Admin -> Products -> framed poster card, audited as `admin.setProduct`), applies to all three designs.
+
+| Size | Frame | Artwork at 10 mm |
+|---|---|---|
+| A4 | 210 x 297 mm | 190 x 277 mm |
+| A3 | 297 x 420 mm | 277 x 400 mm |
+
+- The print file stays the **full print area** (A4 about 2480 x 3508 px, A3 about 3508 x 4961 px at 300 DPI; 10 mm = 118 px), so `design_link`, `mockup_link` and the Qikink width/height inches keep describing the whole file. The artwork is centred in it and the border around it is a **flat colour, not artwork** (a mat): ivory `#fbf2da` for Elements Gold, near-black `#020204` for Individual Dark and Family Dark (`EDGE_COLORS` in `frames.js`).
+- The design is **re-laid out inside the smaller area** (`layoutFrame` is called with the artwork size), it is not a scaled-down copy: type keeps its proportions and every operation stays inside the artwork's safe area.
+- If the confirmed print area is smaller than the frame, the **stricter of (print area) and (frame minus inset)** is used per side; each order item records `designInsetMm`, `artworkInches` and `insetApplied` (`frame-minus-inset` or `print-area`). Sizes without a nominal frame (not A4/A3) use the print area as the frame.
+- Resolution: the artwork is vector and painted at the file's DPI, so it is measured on its printed size (190 x 277 mm and 277 x 400 mm); the server still refuses a file below the product's minimum DPI.
+- The customer preview, the product-page mock-up and the print file all use the same inset, so the proof the buyer sees is the file that is sent.
+- Open choice: the border colour is flat ivory / near-black so it reads as a mat. Say if you want white, or the background art to run to the edge (set the inset to 0 for that).
+
 ## The three designs
 
 | Design | Content | Default |

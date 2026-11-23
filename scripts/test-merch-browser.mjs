@@ -116,7 +116,7 @@ await step('REAL rendering of all three frame designs at A4 and A3 (300 DPI): si
       ['family 1 A4', fam(1), 'A4'], ['family 4 A4', fam(4), 'A4'], ['family 4 A3', fam(4), 'A3'],
       ['family Indic A4', { frame: 'family-dark', people: [{ name: 'Sreshan श्रेशन', relation: 'Father' }, { name: 'Anupama அனுபமா' }] }, 'A4']
     ];
-    const SPEC = { A4: { maxWidthInches: 8, maxHeightInches: 11 }, A3: { maxWidthInches: 11.5, maxHeightInches: 16 } };
+    const SPEC = { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69 }, A3: { maxWidthInches: 11.69, maxHeightInches: 16.54 } };
     const out = [];
     for (const [label, input, size] of cases) {
       const { design, error } = D.buildDesign('name_elements', input);
@@ -142,12 +142,68 @@ await step('REAL rendering of all three frame designs at A4 and A3 (300 DPI): si
   assert.ok(printed('gold Tamil A4').includes('நாயர்') && printed('indiv Tamil A4').includes('நாயர்'));
   assert.ok(printed('family Indic A4').includes('Anupama அனுபமா') && printed('family Indic A4').includes('Sreshan श्रेशन'));
 });
+await step('the artwork is inset by designInsetMm on all four sides: exact flat border in the real file (pixel check), centred, text inside, DPI kept; 0 and 15 mm change the file', async () => {
+  const r = await page.evaluate(async () => {
+    const D = await import('/src/merch/designs.js');
+    const P = await import('/src/merch/printCanvas.js');
+    const Fr = await import('/src/merch/frames.js');
+    const SPEC = { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69 }, A3: { maxWidthInches: 11.69, maxHeightInches: 16.54 } };
+    const designs = { 'elements-gold': { frame: 'elements-gold', name: 'Sreshan S Nair' }, 'individual-dark': { frame: 'individual-dark', name: 'Sreshan S Nair' }, 'family-dark': { frame: 'family-dark', familyName: 'Nair Family', people: [{ name: 'Sreshan S Nair', relation: 'Father' }, { name: 'Anupamaa B Nair', relation: 'Mother' }] } };
+    const hex = (c) => '#' + [c[0], c[1], c[2]].map((v) => v.toString(16).padStart(2, '0')).join('');
+    async function analyse(blob, edge) {
+      const bmp = await createImageBitmap(blob); const c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height;
+      const x = c.getContext('2d'); x.drawImage(bmp, 0, 0); const W = c.width; const H = c.height; const d = x.getImageData(0, 0, W, H).data;
+      const isEdge = (i) => hex([d[i], d[i + 1], d[i + 2]]) === edge && d[i + 3] === 255;
+      const col = (xx) => { for (let y = 0; y < H; y += 5) if (!isEdge((y * W + xx) * 4)) return false; return true; };
+      const row = (yy) => { for (let xx = 0; xx < W; xx += 5) if (!isEdge((yy * W + xx) * 4)) return false; return true; };
+      let left = 0; while (left < W / 2 && col(left)) left++;
+      let right = 0; while (right < W / 2 && col(W - 1 - right)) right++;
+      let top = 0; while (top < H / 2 && row(top)) top++;
+      let bottom = 0; while (bottom < H / 2 && row(H - 1 - bottom)) bottom++;
+      return { W, H, left, right, top, bottom };
+    }
+    const out = [];
+    for (const [id, input] of Object.entries(designs)) {
+      for (const [size, mm] of [['A4', 10], ['A3', 10], ['A4', 0], ['A4', 15]]) {
+        const { design } = D.buildDesign('name_elements', input);
+        const f = await P.renderPrintFile({ design, spec: SPEC[size], layout: { scale: 1, x: 0.5, y: 0.5 }, ink: '#000', inset: { mm, size } });
+        const a = await analyse(f.blob, Fr.EDGE_COLORS[id]);
+        const expected = Math.round((mm / 25.4) * f.dpi);
+        const outside = f.metrics.filter((m) => m.x < f.safe.x - 2 || m.y < f.safe.y - 2 || m.x + m.w > f.safe.x + f.safe.w + 2 || m.y + m.h > f.safe.y + f.safe.h + 2).map((m) => m.text);
+        out.push({ id, size, mm, expected, dpi: f.dpi, ...a, art: f.art, artworkMm: [f.artworkInches.width * 25.4, f.artworkInches.height * 25.4], applied: f.insetApplied, outside, texts: f.metrics.map((m) => m.text) });
+      }
+    }
+    return out;
+  });
+  for (const o of r) {
+    const tag = o.id + ' ' + o.size + ' ' + o.mm + 'mm';
+    assert.ok(o.dpi >= 300, tag + ' DPI ' + o.dpi);
+    for (const side of ['left', 'right', 'top', 'bottom']) assert.ok(Math.abs(o[side] - o.expected) <= 1, tag + ' ' + side + ' border ' + o[side] + ' px, expected ' + o.expected);
+    assert.ok(Math.abs(o.left - o.right) <= 1 && Math.abs(o.top - o.bottom) <= 1, tag + ' centred');
+    assert.equal(o.art.x, o.art.y); assert.equal(o.art.w, o.W - 2 * o.art.x); // equal on all four sides
+    assert.deepEqual(o.outside, [], tag + ' text outside the artwork area');
+    if (o.mm === 10 && o.size === 'A4') { assert.ok(Math.abs(o.artworkMm[0] - 190) < 0.3 && Math.abs(o.artworkMm[1] - 277) < 0.3, tag + ' artwork 190 x 277 mm'); assert.equal(o.applied, 'frame-minus-inset'); }
+    if (o.mm === 10 && o.size === 'A3') assert.ok(Math.abs(o.artworkMm[0] - 277) < 0.3 && Math.abs(o.artworkMm[1] - 400) < 0.4, tag + ' artwork 277 x 400 mm');
+    assert.ok(!o.texts.some((t) => /namevibes/i.test(t)));
+  }
+  for (const id of ['elements-gold', 'individual-dark', 'family-dark']) {
+    const a = r.filter((o) => o.id === id && o.size === 'A4');
+    const by = Object.fromEntries(a.map((o) => [o.mm, o]));
+    assert.equal(by[0].left, 0); assert.ok(by[10].left > 100 && by[15].left > by[10].left, id + ': changing the setting changes the file');
+    assert.equal(by[0].W, by[10].W); assert.equal(by[10].W, by[15].W); // the file stays the full frame size
+  }
+});
 await step('admin enables the dark frame designs; customers then see the design choice, the family inputs and a painted preview for each', async () => {
   await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin');
   await page.goto(`${BASE}/admin/merch`);
   await page.getByRole('tab', { name: 'Products' }).click();
   const box = page.getByTestId('frames-poster');
   await box.waitFor();
+  assert.equal(await page.getByTestId('inset-input-poster').inputValue(), '10'); // the inset setting is visible in Product Management
+  await page.getByTestId('inset-input-poster').fill('12'); await page.getByTestId('save-inset-poster').click();
+  await page.getByTestId('admin-note').getByText('Saved').waitFor();
+  await page.getByTestId('inset-input-poster').fill('10'); await page.getByTestId('save-inset-poster').click();
+  await page.waitForTimeout(400);
   assert.equal(await box.locator('input[data-testid="frame-toggle-elements-gold"]').isChecked(), true);
   assert.equal(await box.locator('input[data-testid="frame-toggle-individual-dark"]').isChecked(), false);
   assert.equal(await box.locator('input[data-testid="frame-toggle-family-dark"]').isChecked(), false);
@@ -270,7 +326,9 @@ await step('the paid poster order stores the layout, the poster template, the pr
     return { item: order.items[0], sources: ff.mockupSources, gateway: order.gateway };
   });
   assert.equal(o.item.productId, 'poster'); assert.equal(o.item.size, 'A4');
-  assert.deepEqual(o.item.canvasInches, { width: 8, height: 11 });
+  assert.deepEqual(o.item.canvasInches, { width: 8.27, height: 11.69 });
+  assert.equal(o.item.designInsetMm, 10); assert.equal(o.item.insetApplied, 'frame-minus-inset');
+  assert.ok(Math.abs(o.item.artworkInches.width * 25.4 - 190) < 0.5 && Math.abs(o.item.artworkInches.height * 25.4 - 277) < 0.5, 'A4 artwork is 190 x 277 mm');
   assert.equal(o.item.placementSku, 'fr'); assert.equal(o.item.design.template, 'frame'); assert.equal(o.item.design.frame, 'elements-gold');
   assert.deepEqual(o.item.layout, { scale: 1, x: 0.5, y: 0.5 }); // a frame design fills the whole print area
   assert.match(o.item.artwork.path, /^merch\/print\//); assert.match(o.item.mockup.path, /^merch\/mockup\//);

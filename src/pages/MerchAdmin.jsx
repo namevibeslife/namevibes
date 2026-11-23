@@ -248,6 +248,7 @@ function ProductCard({ x, act }) {
   const sp = x.printSpec || {};
   const [f, setF] = useState({ printTypeId: sp.printTypeId ?? '', allowedPlacements: (sp.allowedPlacements || []).join(','), maxWidthInches: sp.maxWidthInches ?? '', maxHeightInches: sp.maxHeightInches ?? '', minDpi: sp.minDpi ?? 150, dpiOverride: x.dpiOverride === true });
   const problems = specProblems(x.printSpec, x.sizes);
+  const [inset, setInset] = useState(String(x.designInsetMm ?? 10));
   const spec = () => ({ printTypeId: Number(f.printTypeId), allowedPlacements: f.allowedPlacements.split(',').map((p) => p.trim()).filter(Boolean), maxWidthInches: Number(f.maxWidthInches), maxHeightInches: Number(f.maxHeightInches), minDpi: Number(f.minDpi), verified: false });
   return (
     <div className="p-3 bg-white/70 rounded-lg" data-testid={`product-card-${x.id}`}>
@@ -262,6 +263,14 @@ function ProductCard({ x, act }) {
         <input aria-label={`${x.id} min dpi`} placeholder="min DPI" value={f.minDpi} onChange={(e) => setF({ ...f, minDpi: e.target.value })} className="border rounded px-2 py-1" />
         <Toggle label="Allow below min DPI" checked={f.dpiOverride} onChange={(v) => setF({ ...f, dpiOverride: v })} />
       </div>
+      {x.kind === 'wall-art' && (
+        <div className="mt-2 p-2 rounded bg-white/70" data-testid={`inset-${x.id}`}>
+          <label className="text-sm">Artwork inset from the frame, mm (all four sides, 0 to 30; default 10)
+            <input aria-label={`${x.id} design inset mm`} value={inset} onChange={(e) => setInset(e.target.value)} className="ml-2 border rounded px-2 py-1 w-20" data-testid={`inset-input-${x.id}`} /></label>
+          <Btn className="ml-2" data-testid={`save-inset-${x.id}`} onClick={() => act('setProduct', { ...x, designInsetMm: inset === '' ? 10 : Number(inset) }, 'Saved')}>Save inset</Btn>
+          <span className="text-xs ml-2">A4 is printed 190 x 277 mm and A3 277 x 400 mm at 10 mm. The border is a flat colour.</span>
+        </div>
+      )}
       {x.kind === 'wall-art' && (
         <div className="mt-2 p-2 rounded bg-white/70" data-testid={`frames-${x.id}`}>
           <strong className="text-sm">Frame designs customers can choose</strong> <span className="text-xs">(launch: Elements Gold only; the two dark designs stay off until you activate them)</span>
