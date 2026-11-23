@@ -22,11 +22,11 @@ const b64url = (data) => {
   return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
-async function accessToken(account) {
+export async function accessToken(account, scope = 'https://www.googleapis.com/auth/datastore') {
   const now = Math.floor(Date.now() / 1000);
   const unsigned = `${b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }))}.${b64url(JSON.stringify({
     iss: account.client_email,
-    scope: 'https://www.googleapis.com/auth/datastore',
+    scope,
     aud: 'https://oauth2.googleapis.com/token',
     iat: now,
     exp: now + 3600
@@ -55,7 +55,7 @@ export async function signedInUser(request) {
   });
   if (!res.ok) return null;
   const user = (await res.json()).users?.[0];
-  return user ? { uid: user.localId, email: user.email || '' } : null;
+  return user ? { uid: user.localId, email: user.email || '', emailVerified: user.emailVerified === true } : null;
 }
 
 // Firestore REST value <-> plain JS
@@ -107,6 +107,12 @@ export async function firestore(env) {
         pageToken = body.nextPageToken || '';
       } while (pageToken);
       return out;
+    },
+    // Documents of a top-level collection whose field equals a value (merchandise lookups)
+    async query(collectionPath, field, value) {
+      const res = await fetch(`${base}:runQuery`, { method: 'POST', headers, body: JSON.stringify({ structuredQuery: { from: [{ collectionId: collectionPath }], where: { fieldFilter: { field: { fieldPath: field }, op: 'EQUAL', value: encodeValue(value) } }, limit: 500 } }) });
+      if (!res.ok) throw new Error(`Firestore query failed (${res.status})`);
+      return (await res.json()).filter((r) => r.document).map((r) => decodeFields(r.document.fields || {}));
     },
     // Create a document; fails (409) if the id exists
     async create(collectionPath, id, data) {

@@ -197,6 +197,30 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ---- Merchandise (print-on-demand). Every write comes from the merchandise server functions
+    // (service account, which bypasses these rules), so the browser can never change a price, switch,
+    // order, payment state or commission. Customers read only their own quotes/orders (the order holds
+    // their address and any blood-group choice). Ambassadors may read ONLY their own commission rows,
+    // which contain no personal data; they can never read orders, addresses or blood groups.
+    match /merch_settings/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_countries/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_providers/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_routes/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_products/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_variants/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_designs/{docId} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_carts/{uid} {
+      allow read, delete: if signedIn() && request.auth.uid == uid;
+      allow create, update: if signedIn() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['uid', 'items', 'updatedAt']);
+    }
+    match /merch_quotes/{quoteId} { allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid); allow write: if false; }
+    match /merch_orders/{orderId} { allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid); allow write: if false; }
+    match /merch_fulfillments/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_webhook_events/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_commissions/{id} { allow read: if isAdmin() || isAmbassadorFor(resource.data); allow write: if false; }
+    match /merch_audit_logs/{id} { allow read: if isAdmin(); allow write: if false; }
+
     match /revenueReports/{reportId} {
       allow read, write: if isAdmin();
     }
@@ -211,7 +235,10 @@ service cloud.firestore {
     function hasOwnRules(collection) {
       return collection in ['users', 'payments', 'admins', 'ambassadors', 'referralCodes',
         'payoutRequests', 'countrySettings', 'revenueReports', 'ambassadorContent',
-        'ambassadorAccess', 'paymentSettings', 'waitlist'];
+        'ambassadorAccess', 'paymentSettings', 'waitlist',
+        'merch_settings', 'merch_countries', 'merch_providers', 'merch_routes', 'merch_products', 'merch_variants',
+        'merch_designs', 'merch_carts', 'merch_quotes', 'merch_orders', 'merch_fulfillments',
+        'merch_webhook_events', 'merch_commissions', 'merch_audit_logs'];
     }
     match /{collection}/{docId} {
       allow read, write: if isAdmin() && !hasOwnRules(collection);
