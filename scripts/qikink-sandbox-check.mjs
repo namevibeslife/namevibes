@@ -149,4 +149,4 @@ fs.writeFileSync(REPORT, mask(text));
 fs.mkdirSync('artifacts', { recursive: true });
 fs.writeFileSync('artifacts/qikink-sandbox-results.json', mask({ at: new Date().toISOString(), env: 'sandbox', token: tokenInfo, results: results.map(({ payload, ...r }) => r) }));
 console.log(`\nReport written to ${REPORT}`);
-process.exit(tokenInfo.fetched && results.length ? 0 : 1);
+process.exitCode = tokenInfo.fetched && results.length ? 0 : 1;

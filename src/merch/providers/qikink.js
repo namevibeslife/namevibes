@@ -202,8 +202,9 @@ export class QikinkAdapter extends PODProvider {
     try {
       res = await this.fetch(`${this.base}${QIKINK_PATHS.token}`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams({ ClientId: this.clientId, client_secret: this.clientSecret }).toString() });
     } catch { throw Object.assign(new Error('qikink-token-network'), { retryable: true }); }
-    if (!res.ok) throw Object.assign(new Error('qikink-token-failed'), { retryable: res.status >= 500 || res.status === 429 });
     const body = await res.json().catch(() => ({}));
+    // keep Qikink's own wording (e.g. "Invalid client_id or client_secret") so a failed sign-in can be explained; it never contains our secret
+    if (!res.ok) throw Object.assign(new Error(`qikink-token-failed: ${String(body?.error || `HTTP ${res.status}`).slice(0, 120)}`), { retryable: res.status >= 500 || res.status === 429 });
     if (!body.Accesstoken) throw Object.assign(new Error('qikink-token-missing'), { retryable: false });
     const ttl = Number(body.expires_in) > 0 ? Number(body.expires_in) * 1000 : 3600 * 1000;
     this.token = { value: body.Accesstoken, expiresAt: this.now() + ttl };
