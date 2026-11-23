@@ -124,6 +124,7 @@ function Switches({ data, act }) {
           <div className="grid sm:grid-cols-4 gap-2">
             <label className="text-sm">Currency<input value={form.currency} onChange={(e) => set('currency', e.target.value.toUpperCase())} className="block border rounded px-2 py-1 w-full" /></label>
             <label className="text-sm">Tax %<input value={form.taxPercent} onChange={num('taxPercent')} className="block border rounded px-2 py-1 w-full" /></label>
+            <label className="text-sm">Margin floor % (block sales below)<input value={form.marginFloorPercent ?? 0} onChange={num('marginFloorPercent')} className="block border rounded px-2 py-1 w-full" /></label>
             <label className="text-sm">Payment fee % (estimate)<input value={form.paymentFeePercent} onChange={num('paymentFeePercent')} className="block border rounded px-2 py-1 w-full" /></label>
             <Toggle label="Prices include tax" checked={form.taxIncluded} onChange={(v) => set('taxIncluded', v)} />
             <label className="text-sm">Shipping flat<input value={form.shipping?.flat} onChange={num('shipping', 'flat')} className="block border rounded px-2 py-1 w-full" /></label>
@@ -176,7 +177,7 @@ function Providers({ data, act }) {
 
 // ---- products ---------------------------------------------------------------------------------------
 function Products({ data, act }) {
-  const [sku, setSku] = useState({ productId: 'tshirt', color: 'white', size: 'M', provider: 'qikink', sku: '' });
+  const [sku, setSku] = useState({ productId: 'tshirt', color: 'white', size: 'M', provider: 'qikink', sku: '', printTypeId: '1', placementSku: 'fr', widthInches: '', heightInches: '', plain: false });
   const p = data.products[sku.productId] || DEFAULT_PRODUCTS.tshirt;
   return (
     <section className="space-y-4">
@@ -193,7 +194,15 @@ function Products({ data, act }) {
           <input placeholder="provider id" value={sku.provider} onChange={(e) => setSku({ ...sku, provider: e.target.value })} className="border rounded px-2 py-1" />
           <input placeholder="provider SKU" value={sku.sku} onChange={(e) => setSku({ ...sku, sku: e.target.value })} className="border rounded px-2 py-1" />
         </div>
-        <Btn className="mt-2" onClick={() => act('setVariant', { productId: sku.productId, color: sku.color, size: sku.size, providerSkus: { [sku.provider]: sku.sku } })}>Save mapping</Btn>
+        <div className="grid sm:grid-cols-5 gap-2 mt-2">
+          <input aria-label="print type id" placeholder="print_type_id (1 DTG, 17 DTF...)" value={sku.printTypeId} onChange={(e) => setSku({ ...sku, printTypeId: e.target.value })} className="border rounded px-2 py-1" />
+          <select aria-label="placement" value={sku.placementSku} onChange={(e) => setSku({ ...sku, placementSku: e.target.value })} className="border rounded px-2 py-1">{['fr', 'bk', 'lp', 'rp', 'rs', 'ls'].map((x) => <option key={x}>{x}</option>)}</select>
+          <input aria-label="design width inches" placeholder="width in (max DTG 16, DTF 18)" value={sku.widthInches} onChange={(e) => setSku({ ...sku, widthInches: e.target.value })} className="border rounded px-2 py-1" />
+          <input aria-label="design height inches" placeholder="height in (max 20)" value={sku.heightInches} onChange={(e) => setSku({ ...sku, heightInches: e.target.value })} className="border rounded px-2 py-1" />
+          <Toggle label="Plain product (no print)" checked={sku.plain} onChange={(v) => setSku({ ...sku, plain: v })} />
+        </div>
+        <p className="text-xs mt-1">Copy SKUs and print types from the "SKU Descriptions" page of your Qikink dashboard; the API has no SKU catalogue.</p>
+        <Btn className="mt-2" onClick={() => act('setVariant', { productId: sku.productId, color: sku.color, size: sku.size, providerSkus: { [sku.provider]: sku.provider === 'qikink' ? { sku: sku.sku, printTypeId: Number(sku.printTypeId), placementSku: sku.placementSku, widthInches: Number(sku.widthInches) || undefined, heightInches: Number(sku.heightInches) || undefined, plain: sku.plain } : sku.sku } })}>Save mapping</Btn>
       </div>
     </section>
   );

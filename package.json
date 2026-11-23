@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "check:i18n": "node scripts/check-i18n.mjs",
     "scan:i18n": "node scripts/scan-hardcoded.mjs",
-    "test:merch": "node scripts/test-merch.mjs"
+    "test:merch": "node scripts/test-merch.mjs",
+    "test:qikink": "node scripts/test-qikink.mjs"
   },
   "dependencies": {
     "@fontsource/noto-sans-devanagari": "^5.3.0",

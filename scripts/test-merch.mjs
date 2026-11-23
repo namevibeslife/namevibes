@@ -8,7 +8,6 @@ import { checkAvailability, routeProvider } from '../src/merch/availability.js';
 import { computeQuote } from '../src/merch/quoteMath.js';
 import { computeOrderCommission, reversalAmount } from '../src/merch/commission.js';
 import { MockProviderAdapter } from '../src/merch/providers/mock.js';
-import { QikinkAdapter, QIKINK_RATE_LIMIT } from '../src/merch/providers/qikink.js';
 import { handleMerch, handleAdmin, handlePaymentWebhook, handleProviderWebhook, runFulfilment, retryDue, applyProviderStatus, sweepCommissions } from '../src/merch/engine.js';
 import { analyzeName } from '../src/utils/elements.js';
 import { ELEMENTS } from '../src/utils/elements.js';
@@ -451,48 +450,6 @@ await test('new countries stay disabled by default', async () => {
   const e = makeEnv({ who: { uid: 'adm', email: 'admin@x.test', emailVerified: true } });
   await handleAdmin(e.ctx, { action: 'setCountry', data: { countryCode: 'FR', currency: 'EUR', prices: { tshirt: 25 }, collections: { name_elements: true } } });
   assert.equal((await e.db.get('merch_countries/FR')).data.enabled, false);
-});
-
-console.log('Qikink transport: token cache, throttle, back-off');
-await test('token is cached; 30 requests/minute are throttled (waits, never exceeds)', async () => {
-  let t = 0; const slept = [];
-  let tokenCalls = 0; let orderCalls = 0;
-  const fetch = async (url) => {
-    if (url.endsWith('/token')) { tokenCalls++; return new Response(JSON.stringify({ Accesstoken: 'T', expires_in: 3600 }), { status: 200 }); }
-    orderCalls++; return new Response('{}', { status: 200 });
-  };
-  const q = new QikinkAdapter('qikink', { clientId: 'c', clientSecret: 's', fetch, now: () => t, sleep: async (ms) => { slept.push(ms); t += ms; }, api: { verified: true, tokenPath: '/token' } });
-  for (let i = 0; i < 35; i++) assert.ok((await q.request('/x')).ok);
-  assert.equal(tokenCalls, 1);
-  assert.ok(slept.length > 0, 'had to wait for the window');
-  // never more than the limit inside any rolling minute
-  assert.ok(q.stamps.length <= QIKINK_RATE_LIMIT.max);
-});
-await test('429 backs off and retries; 5xx exhausts retries as retryable; 401 refreshes the token', async () => {
-  let t = 0; const slept = []; let n = 0; let tokens = 0;
-  const seq = [429, 429, 200];
-  const fetch = async (url) => {
-    if (url.endsWith('/token')) { tokens++; return new Response(JSON.stringify({ access_token: `T${tokens}`, expires_in: 3600 })); }
-    const s = seq[n++] ?? 200; return new Response('{}', { status: s });
-  };
-  const q = new QikinkAdapter('qikink', { clientId: 'c', clientSecret: 's', fetch, now: () => t, sleep: async (ms) => { slept.push(ms); t += ms; }, api: { verified: true, tokenPath: '/token' } });
-  assert.ok((await q.request('/x')).ok);
-  assert.deepEqual(slept.slice(0, 2), [1000, 2000]);
-  const dead = new QikinkAdapter('qikink', { clientId: 'c', clientSecret: 's', fetch: async (u) => (u.endsWith('/token') ? new Response(JSON.stringify({ access_token: 'T' })) : new Response('{}', { status: 503 })), now: () => t, sleep: async (ms) => { t += ms; }, api: { verified: true, tokenPath: '/token' } });
-  const r = await dead.request('/x');
-  assert.equal(r.ok, false); assert.equal(r.retryable, true);
-  let first = true;
-  const f401 = async (u) => (u.endsWith('/token') ? (tokens++, new Response(JSON.stringify({ access_token: `N${tokens}` }))) : first ? ((first = false), new Response('{}', { status: 401 })) : new Response('{}'));
-  const q3 = new QikinkAdapter('qikink', { clientId: 'c', clientSecret: 's', fetch: f401, now: () => t, sleep: async () => {}, api: { verified: true, tokenPath: '/token' } });
-  const before = tokens;
-  assert.ok((await q3.request('/x')).ok);
-  assert.equal(tokens - before, 2);
-});
-await test('until the docs are filled in, Qikink refuses to send orders (no invented fields)', async () => {
-  const q = new QikinkAdapter('qikink', { clientId: 'c', clientSecret: 's' });
-  const r = await q.submitOrder({ idempotencyKey: 'k', items: [] });
-  assert.equal(r.ok, false); assert.equal(r.retryable, false); assert.equal(r.error, 'qikink-endpoints-unverified');
-  assert.equal((await q.verifyWebhook()).unsupported, true);
 });
 
 console.log('Server adapter (Firestore REST fake) and print artwork');

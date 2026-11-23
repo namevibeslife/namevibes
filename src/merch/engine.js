@@ -120,6 +120,10 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     });
   }
   const quote = computeQuote({ lines: items.map((i) => ({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice })), country });
+  // Costs and shipping are admin-configured (no provider quote API), and a sale below the configured margin floor is refused.
+  quote.source = 'configured';
+  const floor = Number(country.marginFloorPercent);
+  if (floor > 0 && quote.total - quote.tax > 0 && (quote.estimatedMargin / (quote.total - quote.tax)) * 100 < floor) return fail(409, 'margin-below-floor');
   return { ok: true, items, quote, providerId, backups, country, shipTo };
 }
 
@@ -346,10 +350,12 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
 
   await setState(ctx, orderId, null, 'fulfillment_pending');
   const attempts = (ff.attempts || 0) + 1;
+  const products = mergeProducts(await ctx.db.list(COLL.products));
   const payload = {
-    idempotencyKey: ff.idempotencyKey, orderId, address: order.address, currency: order.currency,
+    idempotencyKey: ff.idempotencyKey, orderId, attempt: attempts, address: order.address, email: order.email, currency: order.currency, totalValue: order.amount,
     items: await Promise.all(order.items.map(async (i) => ({
-      index: i.index, productId: i.productId, color: i.color, size: i.size, qty: i.qty, providerSku: i.providerSku, placement: 'default',
+      index: i.index, productId: i.productId, color: i.color, size: i.size, qty: i.qty, unitPrice: i.unitPrice, providerSku: i.providerSku, placement: 'default',
+      printAreaPx: Object.values(products[i.productId]?.printArea || {})[0] || null,
       designUrl: await ctx.artworkUrl(order, i), designSha256: i.artwork.sha256
     })))
   };
@@ -357,7 +363,7 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
   try { res = await adapter.submitOrder(payload); } catch (e) { res = { ok: false, error: 'exception', retryable: true }; }
 
   if (res.ok) {
-    await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'submitted', providerOrderId: res.providerOrderId, attempts, submittedAt: ctx.now(), lastError: null });
+    await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'submitted', providerOrderId: res.providerOrderId, providerOrderNumber: res.orderNumber || null, attempts, submittedAt: ctx.now(), lastError: null });
     await setState(ctx, orderId, null, 'submitted', { providerOrderId: res.providerOrderId });
     return { submitted: true, providerOrderId: res.providerOrderId };
   }
@@ -380,22 +386,30 @@ export async function retryDue(ctx) {
 
 // ---- provider status / webhooks ----------------------------------------------------------------------
 
-export async function applyProviderStatus(ctx, orderId, { status, tracking }) {
+export async function applyProviderStatus(ctx, orderId, { status, tracking, raw, unmapped }) {
+  const shownRaw = raw || status;
+  const ffDoc = (await ctx.db.get(`${COLL.fulfillments}/${orderId}`))?.data;
+  // Remember the provider's own wording and alert only when it changes (polling repeats the same answer).
+  if (shownRaw && ffDoc && ffDoc.providerRawStatus !== shownRaw) {
+    await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { providerRawStatus: shownRaw });
+    if (unmapped || !PROVIDER_STATUS_TO_STATE[status]) await audit({ ...ctx, who: null }, 'alert.unmapped-provider-status', orderId, { raw: shownRaw });
+  }
+  if (tracking && ffDoc) await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { tracking });
   const target = PROVIDER_STATUS_TO_STATE[status];
-  if (!target) return { ignored: 'unknown-status' };
+  if (!target) return { ignored: 'unknown-status', raw: shownRaw };
   const order = (await ctx.db.get(`${COLL.orders}/${orderId}`))?.data;
   if (!order) return { ignored: 'no-order' };
   const rank = (s) => ['submitted', 'in_production', 'shipped', 'delivered'].indexOf(s);
   if (target === 'exception' || target === 'cancelled') {
-    const res = await setState(ctx, orderId, null, target, { providerStatus: status }, { providerStatus: status });
+    const res = await setState(ctx, orderId, null, target, { providerStatus: shownRaw }, { providerStatus: shownRaw });
     return { state: res?.status };
   }
   if (rank(target) <= rank(order.status)) return { ignored: 'not-forward' };
-  const patch = { providerStatus: status };
+  const patch = { providerStatus: shownRaw };
   if (tracking) patch.tracking = tracking;
   if (target === 'delivered') patch.deliveredAt = ctx.now();
-  const res = await setState(ctx, orderId, null, target, patch, { providerStatus: status });
-  if (tracking) await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { tracking, status: target });
+  const res = await setState(ctx, orderId, null, target, patch, { providerStatus: shownRaw });
+  if (tracking) await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: target });
   return { state: res?.status };
 }
 
@@ -416,14 +430,29 @@ export async function handleProviderWebhook(ctx, providerId, headers, rawBody) {
 // Poll providers for orders whose webhooks were missed or delayed.
 export async function syncTracking(ctx) {
   const out = [];
-  for (const st of ['submitted', 'in_production', 'shipped']) {
-    for (const order of await ctx.db.query(COLL.orders, 'status', st)) {
+  const providers = await ctx.db.list(COLL.providers);
+  const open = [];
+  for (const st of ['submitted', 'in_production', 'shipped']) open.push(...(await ctx.db.query(COLL.orders, 'status', st)));
+  const byProvider = {};
+  for (const order of open) (byProvider[order.providerId] = byProvider[order.providerId] || []).push(order);
+  for (const [pid, orders] of Object.entries(byProvider)) {
+    const pdoc = providers.find((p) => p.id === pid);
+    const adapter = pdoc && ctx.providerFor(pdoc);
+    if (!adapter) continue;
+    const jobs = [];
+    for (const order of orders) {
       const ff = (await ctx.db.get(`${COLL.fulfillments}/${order.id}`))?.data;
-      const pdoc = (await ctx.db.list(COLL.providers)).find((p) => p.id === order.providerId);
-      const adapter = pdoc && ctx.providerFor(pdoc);
-      if (!ff?.providerOrderId || !adapter) continue;
-      const s = await adapter.getOrderStatus(ff.providerOrderId);
-      if (s.ok) out.push({ orderId: order.id, ...(await applyProviderStatus(ctx, order.id, s)) });
+      if (ff?.providerOrderId) jobs.push({ order, providerOrderId: String(ff.providerOrderId) });
+    }
+    // Batch when the adapter can (Qikink: 10 orders per call, 60 calls/minute limit); else one call per order.
+    let statuses = null;
+    if (typeof adapter.getOrderStatuses === 'function' && jobs.length) {
+      const batch = await adapter.getOrderStatuses(jobs.map((j) => j.providerOrderId));
+      if (batch.ok) statuses = batch.orders;
+    }
+    for (const j of jobs) {
+      const s = statuses ? statuses[j.providerOrderId] && { ok: true, ...statuses[j.providerOrderId] } : await adapter.getOrderStatus(j.providerOrderId);
+      if (s?.ok) out.push({ orderId: j.order.id, ...(await applyProviderStatus(ctx, j.order.id, s)) });
     }
   }
   return out;
@@ -510,7 +539,7 @@ const ADMIN_ACTIONS = {
       costs: Object.fromEntries(Object.entries(b.costs || {}).filter(([, v]) => num(v) !== undefined).map(([k, v]) => [k, Number(v)])),
       disabledProducts: Object.fromEntries(Object.entries(b.disabledProducts || {}).filter(([, v]) => v === true)),
       shipping: { flat: num(b.shipping?.flat) ?? 0, freeAbove: num(b.shipping?.freeAbove) ?? 0 },
-      paymentFeePercent: num(b.paymentFeePercent) ?? 0,
+      paymentFeePercent: num(b.paymentFeePercent) ?? 0, marginFloorPercent: num(b.marginFloorPercent) ?? 0,
       providerPrimary: b.providerPrimary || null, providerBackup: b.providerBackup || null,
       gatewayOverride: GATEWAY_OVERRIDES.includes(b.gatewayOverride) ? b.gatewayOverride : 'auto',
       updatedAt: ctx.now()

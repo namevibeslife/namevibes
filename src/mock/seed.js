@@ -31,6 +31,9 @@ export const SEED_DATA = {
   },
   'merch_providers/mock': { id: 'mock', name: 'Mock provider', adapter: 'mock', active: true, countries: ['IN', 'US'] },
   'merch_providers/mock2': { id: 'mock2', name: 'Mock backup', adapter: 'mock', active: true, countries: ['IN'] },
+  // PLACEHOLDER Qikink entries for the sandbox: inactive, and the SKU below is NOT a real Qikink SKU. Copy real ones from the dashboard.
+  'merch_providers/qikink': { id: 'qikink', name: 'Qikink (sandbox, placeholder)', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'] },
+  'merch_variants/tshirt_white_M': { id: 'tshirt_white_M', productId: 'tshirt', color: 'white', size: 'M', placeholder: true, providerSkus: { qikink: { sku: 'PLACEHOLDER-REPLACE-ME', printTypeId: 1, placementSku: 'fr', widthInches: 12, heightInches: 16 } } },
   // Country Pricing (admin) - the app shows prices from these records only
   'countrySettings/mock-in': { countryCode: 'IN', countryName: 'India', currency: 'INR', symbol: '₹', price: 399, referralDiscount: 10, taxPercent: 18, isActive: true },
   'countrySettings/mock-us': { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true },

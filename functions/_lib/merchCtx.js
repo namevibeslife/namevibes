@@ -71,7 +71,7 @@ export function gatewaysFor(env) {
 
 // Short-lived signed link to a customer's generated print file. The file proxy (api/merch/file.js)
 // checks the signature and expiry before streaming it from Storage; the provider never gets Storage access.
-export async function signedArtworkUrl(env, order, item, ttlMs = 6 * 3600 * 1000) {
+export async function signedArtworkUrl(env, order, item, ttlMs = 72 * 3600 * 1000) {
   if (item.artwork.kind === 'static') return `${SITE_URL}${item.artwork.path}`;
   const exp = Date.now() + ttlMs;
   const sig = await hmacHex(env.MERCH_ARTWORK_SECRET || '', `${order.id}.${item.index}.${exp}`);
