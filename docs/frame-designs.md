@@ -46,7 +46,7 @@ Note: the reference tiles for "Sreshan S Nair" (S Re S H N Sn I) are NOT what th
 
 ## Samples
 
-`public/merch/samples/frame-*.jpg` (700 px JPEG copies of the references) are shown on the product page with a "Sample" label. They still carry the old NAMEVIBES branding and mock panels; replace them with renders of our own designs before launch if that matters (the page can use any three images at those paths). The live preview is always the buyer's own data.
+`public/merch/samples/frame-{elements-gold,individual-dark,family-dark}.jpg` are shown on the product page with a "Sample" label. They are now **renders of our own designs** (the real element engine, the real layouts and the 10 mm inset; 700 px JPEG, web size) made by `scripts/make-frame-samples.mjs` (start `npm run dev:mock -- --port 5190`, then run it). Elements Gold and Individual Dark use the name "Vibes"; Family Dark uses a made-up "Sample Family" (Sam, Alex, Jamie and Robin Rivers, labelled Parent / Parent / Child / Child), so no real person appears. The script refuses to write a sample that contains `namevibes` text or lacks the Namasutra domain. The old reference-based samples (NAMEVIBES branding, mock panels) are gone; `merch-reference/` is not committed. The live preview is always the buyer's own data.
 
 ## Open questions
 

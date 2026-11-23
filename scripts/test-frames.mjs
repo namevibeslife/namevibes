@@ -171,5 +171,22 @@ await test('the border colour is a per-design constant: ivory for gold, near-bla
   assert.deepEqual(EDGE_COLORS, { 'elements-gold': '#fbf2da', 'individual-dark': '#020204', 'family-dark': '#020204' });
 });
 
+console.log('Product-page samples');
+await test('the three Sample images are our own web-sized renders (A4 shape), not the old reference files', async () => {
+  const { createHash } = await import('node:crypto');
+  const oldHashes = new Set(['frame-elements-gold', 'frame-individual-dark', 'frame-family-dark'].map((n) => createHash('sha256').update(readFileSync(`merch-reference/${n}.png`)).digest('hex')));
+  for (const id of FRAME_IDS) {
+    const buf = readFileSync(`public/merch/samples/frame-${id}.jpg`);
+    assert.equal(buf[0], 0xff); assert.equal(buf[1], 0xd8); // a JPEG
+    assert.ok(buf.length < 250 * 1024, id + ' is web size (' + Math.round(buf.length / 1024) + ' KB)');
+    let w = 0; let h = 0; // SOF marker holds the size
+    for (let p = 2; p < buf.length - 9; p += 2 + buf.readUInt16BE(p + 2)) { if (buf[p] !== 0xff) break; if ([0xc0, 0xc1, 0xc2].includes(buf[p + 1])) { h = buf.readUInt16BE(p + 5); w = buf.readUInt16BE(p + 7); break; } }
+    assert.ok(w >= 600 && Math.abs(h / w - 297 / 210) < 0.01, id + ' is A4-shaped: ' + w + 'x' + h);
+    assert.ok(!oldHashes.has(createHash('sha256').update(buf).digest('hex')));
+  }
+  const store = readFileSync('src/pages/MerchStore.jsx', 'utf8');
+  assert.ok(store.includes('/merch/samples/frame-') && store.includes("merch.sampleLabel"), 'the page still reads the same paths and keeps the Sample label');
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
