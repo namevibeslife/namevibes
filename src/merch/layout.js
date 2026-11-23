@@ -23,12 +23,15 @@ const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 const num = (v, d) => (Number.isFinite(Number(v)) ? Number(v) : d);
 
 // Natural width/height of a design (raster blood-group art keeps its own shape; the name tile grid is 4:5).
-export function designAspect(design) {
+// A frame design (framed poster) is drawn over the WHOLE print area, so its aspect is the area's own.
+export const FULL_LAYOUT = { scale: 1, x: 0.5, y: 0.5 };
+export function designAspect(design, area) {
+  if (design?.template === 'frame') return area ? area.width / area.height : 210 / 297;
   if (design?.collection === 'blood_group') {
     const a = BLOOD_ASSETS[bloodGroupSlug(design.bloodGroup)];
     return a ? a.width / a.height : 1312 / 1199;
   }
-  return design?.template === 'poster' ? 210 / 297 : 0.8; // A-series paper for the poster template
+  return 0.8;
 }
 
 // Accepts anything, returns a safe layout (also what the server stores).
@@ -115,12 +118,13 @@ export function effectiveSpec(productSpec, mapping, size) {
 // raster designs (blood-group art) are limited by their pixels.
 export function designDpi({ design, spec, layout }) {
   const area = { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) };
-  const box = placementBox(area, layout, designAspect(design));
+  const box = placementBox(area, layout, designAspect(design, area));
   if (design.collection === 'blood_group') {
     const a = BLOOD_ASSETS[bloodGroupSlug(design.bloodGroup)];
     const px = a ? a.width : 1312;
     return { dpi: Math.round(px / box.width), widthInches: +box.width.toFixed(2), heightInches: +box.height.toFixed(2), vector: false };
   }
+  // Vector designs (name tiles, frame designs) are drawn fresh at print size; frame designs fill the whole area.
   return { dpi: PRINT_DPI, widthInches: +box.width.toFixed(2), heightInches: +box.height.toFixed(2), vector: true };
 }
 
@@ -142,6 +146,7 @@ export function maxScaleForDpi({ design, spec, minDpi }) {
 // The layout used when the customer has not moved anything: centred, at 80% of the print area, but never so large that a
 // raster design drops below the minimum DPI.
 export function defaultLayoutFor(design, spec) {
+  if (design?.template === 'frame') return { ...FULL_LAYOUT };
   if (!design || !spec) return { ...DEFAULT_LAYOUT };
   const cap = Math.floor(maxScaleForDpi({ design, spec, minDpi: Number(spec.minDpi) || DEFAULT_MIN_DPI }) * 100) / 100;
   return { scale: Math.max(MIN_SCALE, Math.min(DEFAULT_LAYOUT.scale, cap)), x: 0.5, y: 0.5 };

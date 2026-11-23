@@ -11,7 +11,7 @@
     "preview": "vite preview",
     "check:i18n": "node scripts/check-i18n.mjs",
     "scan:i18n": "node scripts/scan-hardcoded.mjs",
-    "test:merch": "node scripts/test-merch.mjs",
+    "test:merch": "node scripts/test-merch.mjs && node scripts/test-frames.mjs",
     "test:qikink": "node scripts/test-qikink.mjs",
     "test:placement": "node scripts/test-placement.mjs",
     "test:launch": "node scripts/test-launch.mjs"

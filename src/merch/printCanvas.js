@@ -6,7 +6,8 @@ import { designGroup } from './render.js';
 import { productMockup } from './render.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
 import { bloodGroupSlug } from './designs.js';
-import { placementBox, designAspect, PRINT_DPI } from './layout.js';
+import { placementBox, designAspect, PRINT_DPI, FULL_LAYOUT } from './layout.js';
+import { renderFrameCanvas } from './framePaint.js';
 
 const MAX_PIXELS = 16_000_000; // iOS Safari limits a canvas to about 16.7 MP
 
@@ -33,14 +34,33 @@ export async function drawDesign(ctx, design, box, ink) {
   ctx.drawImage(await svgImage(svg), box.x, box.y, box.width, box.height);
 }
 
+// A frame design is a fully painted poster that fills the whole print area at 300 DPI. Big canvases (A3 is 17.4 MP) can exceed a
+// phone browser's limit, in which case the canvas silently stays blank: we check a painted pixel and retry smaller, and report the
+// DPI actually reached (the server refuses anything under the product's minimum).
+async function renderFramePrintFile({ design, spec }) {
+  const wantW = Math.round(Number(spec.maxWidthInches) * PRINT_DPI); const wantH = Math.round(Number(spec.maxHeightInches) * PRINT_DPI);
+  for (const scale of [1, 0.85, 0.7, 0.55, 0.42]) {
+    const width = Math.round(wantW * scale); const height = Math.round(wantH * scale);
+    try {
+      const { canvas, layout, metrics } = await renderFrameCanvas({ design, width, height });
+      const alpha = canvas.getContext('2d').getImageData(Math.floor(width / 2), Math.floor(height / 2), 1, 1).data[3];
+      if (alpha !== 255) continue; // blank: over the device canvas limit
+      const blob = await toBlob(canvas);
+      return { blob, width, height, box: { x: 0, y: 0, width, height }, dpi: Math.round(width / Number(spec.maxWidthInches)), metrics, safe: layout.safe };
+    } catch { /* try a smaller canvas */ }
+  }
+  throw new Error('print-canvas-unavailable');
+}
+
 /** -> { blob, width, height, box } ; spec needs maxWidthInches/maxHeightInches. */
 export async function renderPrintFile({ design, spec, layout, ink }) {
+  if (design.template === 'frame') return renderFramePrintFile({ design, spec });
   const wantW = Number(spec.maxWidthInches) * PRINT_DPI; const wantH = Number(spec.maxHeightInches) * PRINT_DPI;
   const scale = Math.min(1, Math.sqrt(MAX_PIXELS / (wantW * wantH)));
   const width = Math.round(wantW * scale); const height = Math.round(wantH * scale);
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height; // transparent: nothing is painted behind the design
-  const box = placementBox({ width, height }, layout, designAspect(design));
+  const box = placementBox({ width, height }, layout, designAspect(design, { width, height }));
   await drawDesign(canvas.getContext('2d'), design, box, ink);
   return { blob: await toBlob(canvas), width, height, box };
 }
@@ -55,6 +75,9 @@ export async function renderMockup({ product, colorHex, design, spec, layout }) 
   ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(await svgImage(`<svg xmlns="http://www.w3.org/2000/svg" width="${m.w * k}" height="${m.h * k}" viewBox="0 0 ${m.w} ${m.h}">${m.shapeSvg}</svg>`), 0, 0);
   const b = m.designBox;
-  await drawDesign(ctx, design, { x: b.x * k, y: b.y * k, width: b.width * k, height: b.height * k }, m.ink);
+  if (design.template === 'frame') {
+    const r = await renderFrameCanvas({ design, width: 700, height: Math.round(700 * b.height / b.width) });
+    ctx.drawImage(r.canvas, b.x * k, b.y * k, b.width * k, b.height * k);
+  } else await drawDesign(ctx, design, { x: b.x * k, y: b.y * k, width: b.width * k, height: b.height * k }, m.ink);
   return { blob: await toBlob(canvas), width: canvas.width, height: canvas.height, designBox: b };
 }

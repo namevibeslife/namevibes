@@ -7,6 +7,7 @@ import { callMerch, mockControls, IS_MOCK } from '../merch/client';
 import { DEFAULT_PRODUCTS, mergeProducts } from '../merch/catalog';
 import { COLLECTION_IDS, STATES } from '../merch/constants';
 import { specProblems } from '../merch/layout';
+import { FRAME_IDS, DEFAULT_FRAME_DESIGNS } from '../merch/frames';
 import { ALL_COUNTRIES, getCountry } from '../data/countries';
 
 // Staff screen (English only, like the other admin screens). Every write goes through the server
@@ -261,6 +262,12 @@ function ProductCard({ x, act }) {
         <input aria-label={`${x.id} min dpi`} placeholder="min DPI" value={f.minDpi} onChange={(e) => setF({ ...f, minDpi: e.target.value })} className="border rounded px-2 py-1" />
         <Toggle label="Allow below min DPI" checked={f.dpiOverride} onChange={(v) => setF({ ...f, dpiOverride: v })} />
       </div>
+      {x.kind === 'wall-art' && (
+        <div className="mt-2 p-2 rounded bg-white/70" data-testid={`frames-${x.id}`}>
+          <strong className="text-sm">Frame designs customers can choose</strong> <span className="text-xs">(launch: Elements Gold only; the two dark designs stay off until you activate them)</span>
+          <div>{FRAME_IDS.map((fid) => <Toggle key={fid} label={fid === 'elements-gold' ? 'Elements Gold' : fid === 'individual-dark' ? 'Individual Dark' : 'Family Dark'} checked={{ ...DEFAULT_FRAME_DESIGNS, ...(x.frameDesigns || {}) }[fid]} onChange={(v) => act('setFrameDesign', { productId: x.id, frame: fid, enabled: v }, 'Saved')} testid={`frame-toggle-${fid}`} />)}</div>
+        </div>
+      )}
       <Btn className="mt-2" data-testid={`save-spec-${x.id}`} onClick={() => act('setProduct', { ...x, printSpec: spec(), dpiOverride: f.dpiOverride })}>Save print spec</Btn>
     </div>
   );

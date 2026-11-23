@@ -94,7 +94,7 @@ export default function MerchCart() {
               {cart.map((l) => (
                 <li key={l.id} className="flex items-center justify-between gap-3 bg-white/70 rounded-lg p-3">
                   <span>{t(`merch.product.${l.productId}`, { defaultValue: l.productId })} · {t(`merch.color.${l.color}`, { defaultValue: l.color })} · {l.size} × {l.qty}
-                    <span className="block text-sm text-gray-600">{l.collection === 'blood_group' ? bloodGroupLabel(l.design.bloodGroup) : `${l.design.name} (${(l.design.elements || []).join(' ')})`}</span></span>
+                    <span className="block text-sm text-gray-600">{l.collection === 'blood_group' ? bloodGroupLabel(l.design.bloodGroup) : l.design.people ? l.design.people.map((p) => p.name).join(', ') : `${l.design.name} (${(l.design.elements || []).join(' ')})`}</span></span>
                   <button className="text-sm underline" onClick={() => persist(cart.filter((x) => x.id !== l.id))}>{t('merch.cart.remove')}</button>
                 </li>
               ))}

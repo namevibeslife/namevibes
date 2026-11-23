@@ -43,7 +43,7 @@ await step('changing the language keeps the element symbols unchanged', async ()
   assert.match(txt, /V · I · Be · S/);
   assert.ok(!/Your elements/.test(txt), 'label should be translated');
   assert.notEqual((await page.getByTestId('product-poster').innerText()).split('\n')[0], 'Framed poster (A4 / A3)', 'product name is translated');
-  const heads = await page.evaluate(() => [...document.querySelectorAll('[role=img] svg text')].map((x) => x.textContent));
+  const heads = await page.evaluate(async () => { const D = await import('/src/merch/designs.js'); const F = await import('/src/merch/framePaint.js'); const r = await F.renderFrameCanvas({ design: D.buildDesign('name_elements', { frame: 'elements-gold', name: 'Vibes' }).design, width: 600, height: 848 }); return r.metrics.map((m) => m.text); });
   assert.ok(heads.includes('THE CHEMISTRY OF YOUR NAME') && heads.includes('ELEMENTS IN YOUR NAME'), 'poster headings stay exactly as specified in a translated UI');
   await page.evaluate(() => localStorage.setItem('nv_lang', 'en'));
   await page.reload();
@@ -56,41 +56,129 @@ await step('only the eight blood groups are offered and confirmation is required
   assert.match(await page.getByTestId('merch-msg').innerText(), /confirm/i);
   await page.getByTestId('tab-name_elements').click();
 });
-await step('designer (framed poster): frame colours, A4/A3 prices, exact headings, and position/size controls keep the design inside the print area; only the two launch products are offered', async () => {
+await step('designer (framed poster): Elements Gold only by default, painted preview, three Sample images, colours/sizes/prices; no position sliders (the design fills the paper)', async () => {
   await page.getByTestId('tab-name_elements').click();
   await page.getByTestId('merch-name').fill('Vibes');
   assert.equal(await page.getByTestId('product-tshirt').count(), 0, 'T-shirts are disabled at launch');
   assert.equal(await page.getByTestId('product-notebook').count(), 0, 'notebooks are disabled at launch');
   assert.equal(await page.getByTestId('product-poster').count(), 1);
   assert.equal(await page.getByTestId('product-mug').count(), 0, 'the mug belongs to the Blood Group collection');
-  // six frame colours and two sizes; each size has its own price
+  assert.equal(await page.getByTestId('frame-designs').count(), 0, 'only Elements Gold is on, so there is nothing to choose');
+  assert.equal(await page.getByTestId('layout-scale').count(), 0, 'a frame design fills the whole print area: no position/size sliders');
   assert.equal(await page.locator('select').filter({ has: page.locator('option[value="frame-olive"]') }).locator('option').count(), 6);
   assert.match(await page.getByTestId('unit-price').innerText(), /599/);
   await page.locator('select').filter({ has: page.locator('option[value="A3"]') }).selectOption('A3');
   assert.match(await page.getByTestId('unit-price').innerText(), /899/);
   await page.locator('select').filter({ has: page.locator('option[value="A3"]') }).selectOption('A4');
-  const texts = await page.evaluate(() => [...document.querySelectorAll('[role=img] svg text')].map((t) => t.textContent));
-  assert.equal(texts[0], 'THE CHEMISTRY OF YOUR NAME'); assert.equal(texts[1], 'Vibes'); assert.equal(texts[2], 'ELEMENTS IN YOUR NAME');
-  for (const s of ['V', 'Vanadium', '23', 'I', 'Iodine', '53', 'Be', 'Beryllium', '4', 'S', 'Sulfur', '16']) assert.ok(texts.includes(s), s);
+  // the preview is the painted design (same operations as the print file) inside the print area of the frame
+  await page.locator('[data-frame-ready="true"]').waitFor();
+  const img = await page.evaluate(() => { const svg = document.querySelector('[role=img] svg'); const i = svg.querySelector('image[data-frame-image]').getBoundingClientRect(); const a = svg.querySelector('[data-print-area]').getBoundingClientRect(); return { i: [i.x, i.y, i.width, i.height], a: [a.x, a.y, a.width, a.height] }; });
+  assert.ok(Math.abs(img.i[0] - img.a[0]) < 1.5 && Math.abs(img.i[2] - img.a[2]) < 1.5, 'the painted poster covers exactly the print area');
+  // samples: the three reference looks, labelled Sample, never used for printing
+  assert.equal(await page.locator('[data-testid="samples"] img').count(), 3);
+  assert.equal(await page.locator('[data-testid="samples"] span', { hasText: 'Sample' }).count(), 3);
+  await page.locator('[data-testid="samples"] img').first().waitFor();
+  assert.ok((await page.evaluate(() => [...document.querySelectorAll('[data-testid="samples"] img')].every((i) => i.complete && i.naturalWidth > 100))), 'sample images load');
+});
+await step('designer (blood-group mug): position and size controls keep the design inside the print area', async () => {
+  await page.getByTestId('tab-blood_group').click();
+  await page.locator('[data-testid="blood-groups"] label').nth(6).click();
+  await page.getByTestId('blood-confirm').check();
   const rect = async () => page.evaluate(() => {
     const svg = document.querySelector('[role=img] svg');
     const area = svg.querySelector('[data-print-area]').getBoundingClientRect();
-    const els = [...svg.querySelectorAll('rect[rx], text')].map((r) => r.getBoundingClientRect());
-    return { area: { x: area.x, y: area.y, w: area.width, h: area.height }, left: Math.min(...els.map((r) => r.left)), top: Math.min(...els.map((r) => r.top)), right: Math.max(...els.map((r) => r.right)), bottom: Math.max(...els.map((r) => r.bottom)) };
+    const i = svg.querySelector('image').getBoundingClientRect();
+    return { area: { x: area.x, y: area.y, w: area.width, h: area.height }, left: i.left, top: i.top, right: i.right, bottom: i.bottom };
   });
   const inside = (r) => r.left >= r.area.x - 2 && r.top >= r.area.y - 2 && r.right <= r.area.x + r.area.w + 2 && r.bottom <= r.area.y + r.area.h + 2;
-  const centred = await rect(); assert.ok(inside(centred), 'design inside the print area');
-  await page.getByTestId('layout-scale').fill('0.4');
+  const centred = await rect(); assert.ok(inside(centred));
+  await page.getByTestId('layout-scale').fill('0.5');
   await page.getByTestId('layout-x').fill('0');
-  await page.getByTestId('layout-y').fill('0');
-  const corner = await rect(); assert.ok(inside(corner));
-  assert.ok(corner.left < centred.left - 5 && corner.top < centred.top - 5, 'design moved to the top-left');
-  assert.ok(corner.right - corner.left < centred.right - centred.left, 'design is smaller');
-  assert.ok(corner.left - corner.area.x < 8 && corner.top - corner.area.y < 8, 'sits in the corner of the print area, not outside it');
+  const left = await rect(); assert.ok(inside(left));
+  assert.ok(left.left < centred.left - 3, 'moved left');
+  assert.ok(left.left - left.area.x < 4, 'touches the left edge of the print area but not beyond');
   await page.getByTestId('layout-scale').fill('1');
-  await page.getByTestId('layout-x').fill('1').catch(() => {}); // disabled when the design spans the full width: it cannot be moved out
-  assert.ok(inside(await rect()), 'even at full size and moved, the design stays inside the print area');
+  assert.ok(inside(await rect()), 'even at full size the design stays inside the print area');
   await page.getByTestId('layout-centre').click();
+  await page.getByTestId('tab-name_elements').click();
+});
+await step('REAL rendering of all three frame designs at A4 and A3 (300 DPI): size, opaque paint, text inside the safe area, NAMASUTRA branding and the domain from SITE_URL', async () => {
+  const r = await page.evaluate(async () => {
+    const D = await import('/src/merch/designs.js');
+    const P = await import('/src/merch/printCanvas.js');
+    const S = await import('/src/config/site.js');
+    const fam = (n) => ({ frame: 'family-dark', familyName: 'Nair Family', people: ['Sreshan S Nair', 'Anupamaa B Nair', 'Vipasha S Nair', 'Ashvika S Nair'].slice(0, n).map((name, i) => ({ name, relation: ['Father', 'Mother', 'Daughter', 'Daughter'][i] })) });
+    const cases = [
+      ['gold one name A4', { frame: 'elements-gold', name: 'Sreshan S Nair' }, 'A4'], ['gold long name A4', { frame: 'elements-gold', name: 'Venkatasubramaniam Radhakrishnan' }, 'A4'],
+      ['gold Devanagari A4', { frame: 'elements-gold', name: 'Sreshan श्रेशन' }, 'A4'], ['gold Tamil A4', { frame: 'elements-gold', name: 'Sreshan நாயர்' }, 'A4'], ['gold one name A3', { frame: 'elements-gold', name: 'Sreshan S Nair' }, 'A3'],
+      ['indiv one name A4', { frame: 'individual-dark', name: 'Sreshan S Nair' }, 'A4'], ['indiv long name A4', { frame: 'individual-dark', name: 'Venkatasubramaniam Radhakrishnan' }, 'A4'],
+      ['indiv Devanagari A4', { frame: 'individual-dark', name: 'Sreshan श्रेशन' }, 'A4'], ['indiv Tamil A4', { frame: 'individual-dark', name: 'Sreshan நாயர்' }, 'A4'], ['indiv one name A3', { frame: 'individual-dark', name: 'Sreshan S Nair' }, 'A3'],
+      ['family 1 A4', fam(1), 'A4'], ['family 4 A4', fam(4), 'A4'], ['family 4 A3', fam(4), 'A3'],
+      ['family Indic A4', { frame: 'family-dark', people: [{ name: 'Sreshan श्रेशन', relation: 'Father' }, { name: 'Anupama அனுபமா' }] }, 'A4']
+    ];
+    const SPEC = { A4: { maxWidthInches: 8, maxHeightInches: 11 }, A3: { maxWidthInches: 11.5, maxHeightInches: 16 } };
+    const out = [];
+    for (const [label, input, size] of cases) {
+      const { design, error } = D.buildDesign('name_elements', input);
+      if (error) { out.push({ label, error }); continue; }
+      const f = await P.renderPrintFile({ design, spec: SPEC[size], layout: { scale: 1, x: 0.5, y: 0.5 }, ink: '#000' });
+      const outside = f.metrics.filter((m) => m.x < f.safe.x - 2 || m.y < f.safe.y - 2 || m.x + m.w > f.safe.x + f.safe.w + 2 || m.y + m.h > f.safe.y + f.safe.h + 2).map((m) => m.text);
+      out.push({ label, w: f.width, h: f.height, dpi: f.dpi, bytes: f.blob.size, outside, texts: f.metrics.map((m) => m.text), host: S.SITE_HOST, exp: [Math.round(SPEC[size].maxWidthInches * 300), Math.round(SPEC[size].maxHeightInches * 300)] });
+    }
+    return out;
+  });
+  for (const o of r) {
+    assert.ok(!o.error, `${o.label}: ${o.error}`);
+    assert.deepEqual([o.w, o.h], o.exp, `${o.label}: canvas size`);
+    assert.ok(o.dpi >= 300, `${o.label}: ${o.dpi} DPI`);
+    assert.ok(o.bytes > 50000, `${o.label}: painted (${o.bytes} bytes)`);
+    assert.deepEqual(o.outside, [], `${o.label}: text outside the safe area`);
+    assert.ok(o.texts.includes(o.host), `${o.label}: domain ${o.host}`);
+    assert.ok(!o.texts.some((t) => /namevibes/i.test(t)), `${o.label}: old brand name`);
+    assert.ok(o.texts.some((t) => t === 'MORE THAN A NAME'));
+  }
+  const printed = (label) => r.find((o) => o.label === label).texts.join(' '); // a long name may be wrapped over two lines
+  assert.ok(printed('gold Devanagari A4').includes('श्रेशन') && printed('gold Devanagari A4').includes('Sreshan'));
+  assert.ok(printed('gold Tamil A4').includes('நாயர்') && printed('indiv Tamil A4').includes('நாயர்'));
+  assert.ok(printed('family Indic A4').includes('Anupama அனுபமா') && printed('family Indic A4').includes('Sreshan श्रेशन'));
+});
+await step('admin enables the dark frame designs; customers then see the design choice, the family inputs and a painted preview for each', async () => {
+  await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin');
+  await page.goto(`${BASE}/admin/merch`);
+  await page.getByRole('tab', { name: 'Products' }).click();
+  const box = page.getByTestId('frames-poster');
+  await box.waitFor();
+  assert.equal(await box.locator('input[data-testid="frame-toggle-elements-gold"]').isChecked(), true);
+  assert.equal(await box.locator('input[data-testid="frame-toggle-individual-dark"]').isChecked(), false);
+  assert.equal(await box.locator('input[data-testid="frame-toggle-family-dark"]').isChecked(), false);
+  await box.locator('input[data-testid="frame-toggle-individual-dark"]').click();
+  await page.getByTestId('admin-note').getByText('Saved').waitFor();
+  await box.locator('input[data-testid="frame-toggle-family-dark"]').click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="frames-poster"] input[data-testid="frame-toggle-family-dark"]')?.checked === true);
+  await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
+  await page.goto(`${BASE}/merch`, { waitUntil: 'load' });
+  await page.getByTestId('product-poster').click();
+  await page.getByTestId('merch-name').fill('Sreshan S Nair');
+  await page.getByTestId('frame-designs').waitFor();
+  assert.equal(await page.locator('[data-testid="frame-designs"] input').count(), 3);
+  await page.getByTestId('frame-individual-dark').check({ force: true });
+  await page.locator('[data-frame-ready="true"]').waitFor();
+  await page.getByTestId('frame-family-dark').check({ force: true });
+  await page.getByTestId('family-inputs').waitFor();
+  await page.getByTestId('member-name-0').fill('Sreshan S Nair');
+  await page.getByTestId('family-name').fill('Nair Family');
+  await page.locator('[data-frame-ready="true"]').waitFor();
+  // back to launch defaults
+  await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin');
+  await page.goto(`${BASE}/admin/merch`);
+  await page.getByRole('tab', { name: 'Products' }).click();
+  const b2 = page.getByTestId('frames-poster');
+  await b2.locator('input[data-testid="frame-toggle-individual-dark"]').click();
+  await page.getByTestId('admin-note').getByText('Saved').waitFor();
+  await b2.locator('input[data-testid="frame-toggle-family-dark"]').click();
+  await page.waitForFunction(() => document.querySelector('[data-testid="frames-poster"] input[data-testid="frame-toggle-family-dark"]')?.checked === false);
+  await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
+  await page.goto(`${BASE}/merch`);
 });
 await step('designer (blood-group mug): a design too large for its resolution is blocked with a message, and "use that size" fixes it', async () => {
   // the mock mug print area is small and never blocks; make it large for this check, then put it back
@@ -183,8 +271,8 @@ await step('the paid poster order stores the layout, the poster template, the pr
   });
   assert.equal(o.item.productId, 'poster'); assert.equal(o.item.size, 'A4');
   assert.deepEqual(o.item.canvasInches, { width: 8, height: 11 });
-  assert.equal(o.item.placementSku, 'fr'); assert.equal(o.item.design.template, 'poster');
-  assert.ok(o.item.layout && o.item.layout.scale > 0);
+  assert.equal(o.item.placementSku, 'fr'); assert.equal(o.item.design.template, 'frame'); assert.equal(o.item.design.frame, 'elements-gold');
+  assert.deepEqual(o.item.layout, { scale: 1, x: 0.5, y: 0.5 }); // a frame design fills the whole print area
   assert.match(o.item.artwork.path, /^merch\/print\//); assert.match(o.item.mockup.path, /^merch\/mockup\//);
   assert.deepEqual(o.sources, ['mockup']);
   assert.equal(o.gateway, 'razorpay'); // India is paid online through Razorpay; there is no COD option anywhere

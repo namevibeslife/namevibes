@@ -4,8 +4,11 @@ import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createMemoryDb } from '../src/merch/memoryDb.js';
 import { handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset } from '../src/merch/engine.js';
-import { BLOOD_GROUPS, buildNameElementsDesign, applyTemplate, bloodGroupSlug, bloodGroupLabel } from '../src/merch/designs.js';
-import { printSvg, productPreviewSvg, POSTER_HEADING, POSTER_SECTION } from '../src/merch/render.js';
+import { BLOOD_GROUPS, bloodGroupSlug, bloodGroupLabel } from '../src/merch/designs.js';
+import { productPreviewSvg } from '../src/merch/render.js';
+import { HEADINGS, layoutFrame, opBounds } from '../src/merch/frames.js';
+import { SITE_HOST } from '../src/config/site.js';
+import { buildDesign } from '../src/merch/designs.js';
 import { DEFAULT_PRODUCTS, FRAME_COLORS, starterSku } from '../src/merch/catalog.js';
 import { computeQuote } from '../src/merch/quoteMath.js';
 import { findCod, isCod } from '../src/merch/cod.js';
@@ -117,45 +120,35 @@ await test('posters and mugs with NO print spec are enabled but blocked: hidden 
 
 console.log('Framed poster artwork text');
 const exactTexts = (svg) => [...svg.matchAll(/<text[^>]*>([^<]*)<\/text>/g)].map((m) => m[1]);
-await test('poster artwork has the exact headings, the name, every symbol, element name and atomic number', () => {
-  assert.equal(POSTER_HEADING, 'THE CHEMISTRY OF YOUR NAME'); assert.equal(POSTER_SECTION, 'ELEMENTS IN YOUR NAME');
-  const { design } = buildNameElementsDesign('Vibes'); const d = applyTemplate(design, { kind: 'wall-art' });
-  assert.equal(d.template, 'poster');
-  const svg = printSvg(d, { width: 2480, height: 3508 }, { ink: '#1F2937' });
-  const texts = exactTexts(svg);
-  assert.equal(texts[0], 'THE CHEMISTRY OF YOUR NAME'); assert.equal(texts[1], 'Vibes'); assert.equal(texts[2], 'ELEMENTS IN YOUR NAME');
-  for (const e of d.elements) { assert.ok(texts.includes(e.symbol), e.symbol); assert.ok(texts.includes(e.name), e.name); assert.ok(texts.includes(String(e.atomicNumber)), String(e.atomicNumber)); assert.equal(ELEMENTS[e.symbol].name, e.name); }
-  assert.deepEqual(d.elements.map((e) => e.symbol), ['V', 'I', 'Be', 'S']);
-  assert.equal(texts.filter((t) => t === 'THE CHEMISTRY OF YOUR NAME').length, 1);
-  // the compact template (not for posters) has no headings
-  assert.ok(!printSvg(applyTemplate(design, { kind: 'apparel' }), { width: 100, height: 100 }, {}).includes('THE CHEMISTRY'));
+await test('poster artwork (Elements Gold, the launch default) has the exact headings, the name, every symbol, element name and atomic number', async () => {
+  assert.equal(HEADINGS.name, 'THE CHEMISTRY OF YOUR NAME'); assert.equal(HEADINGS.section, 'ELEMENTS IN YOUR NAME');
+  const { design } = buildDesign('name_elements', { frame: 'elements-gold', name: 'Vibes' });
+  assert.equal(design.template, 'frame'); assert.equal(design.frame, 'elements-gold');
+  const l = layoutFrame(design, 2480, 3508);
+  const texts = l.ops.filter((o) => o.type === 'text').map((o) => o.text);
+  assert.ok(texts.includes('THE CHEMISTRY OF YOUR NAME')); assert.ok(texts.includes('Vibes')); assert.ok(texts.includes('ELEMENTS IN YOUR NAME'));
+  const tiles = l.ops.filter((o) => o.type === 'tile');
+  assert.deepEqual(tiles.map((t) => t.el.symbol), ['V', 'I', 'Be', 'S']); assert.deepEqual(tiles.map((t) => t.el.number), [23, 53, 4, 16]);
+  for (const t of tiles) assert.equal(ELEMENTS[t.el.symbol].name, t.el.name);
+  assert.ok(!JSON.stringify(l.ops).toLowerCase().includes('namevibes'));
+  assert.ok(texts.includes(SITE_HOST));
 });
-await test('long names and every element fit: text never wider than the artwork, name is escaped, at least 12 tiles fit', () => {
-  const name = 'Venkatasubramaniam Radhakrishnan'; // 32 letters
-  const built = buildNameElementsDesign(name);
+await test('long names scale or wrap inside the safe area and are escaped; the headings never depend on the UI language', async () => {
+  const built = buildDesign('name_elements', { frame: 'elements-gold', name: 'Venkatasubramaniam Radhakrishnan' });
   assert.ok(!built.error, built.error);
-  assert.ok(built.design.elements.length >= 12, `a long name gives many tiles: ${built.design.elements.length}`);
-  assert.equal(buildNameElementsDesign('x'.repeat(41)).error, 'name-too-long');
-  const d = applyTemplate(built.design, { kind: 'wall-art' });
-  const W = 2480; const H = 3508;
-  const svg = printSvg(d, { width: W, height: H }, { ink: '#000' });
-  for (const m of svg.matchAll(/<text[^>]*font-size="([\d.]+)"[^>]*>([^<]*)<\/text>/g)) {
-    const [size, text] = [Number(m[1]), m[2]];
-    if (text.length > 6) assert.ok(size * text.length * 0.5 <= W, `${text} too wide at ${size}`);
-  }
-  assert.equal(exactTexts(svg)[1], d.name);
-  const evil = applyTemplate({ ...built.design, name: 'A<b>&"\'' }, { kind: 'wall-art' });
-  const s2 = printSvg(evil, { width: W, height: H }, {});
-  assert.ok(!s2.includes('<b>')); assert.ok(s2.includes('&lt;b&gt;'));
-  // the headings are constants: nothing in the poster path depends on the UI language
-  assert.ok(!/i18n|useTranslation|\bt\(/.test(readFileSync('src/merch/render.js', 'utf8')));
+  assert.ok(built.design.elements.length >= 12, 'a long name gives many tiles: ' + built.design.elements.length);
+  assert.equal(buildDesign('name_elements', { frame: 'elements-gold', name: 'x'.repeat(41) }).error, 'name-too-long');
+  const l = layoutFrame(built.design, 2480, 3508);
+  for (const o of l.ops) { const b = opBounds(o); assert.ok(b.x >= l.safe.x - 1 && b.y >= l.safe.y - 1 && b.x + b.w <= l.safe.x + l.safe.w + 1 && b.y + b.h <= l.safe.y + l.safe.h + 1, o.type + ' ' + (o.text || '') + ' outside the safe area'); }
+  assert.ok(!/i18n|useTranslation|\bt\(/.test(readFileSync('src/merch/frames.js', 'utf8')));
 });
-await test('server applies the poster template; frame colours, A4/A3 and the A4 aspect are used', async () => {
+await test('server builds the frame design; frame colours, A4/A3 sizes and the print-area canvas are used; frames are an admin option', async () => {
   const e = env();
   const q = await handleMerch(e.ctx, 'quote', { items: [poster({ size: 'A3', color: 'frame-olive' })], address: addr });
   assert.equal(q.status, 200, JSON.stringify(q.body));
   const it = (await e.db.get(`merch_quotes/${q.body.quoteId}`)).data.items[0];
-  assert.equal(it.design.template, 'poster'); assert.deepEqual(it.canvasInches, { width: 11.5, height: 16 }); assert.equal(it.unitPrice, 899);
+  assert.equal(it.design.template, 'frame'); assert.equal(it.design.frame, 'elements-gold'); assert.deepEqual(it.canvasInches, { width: 11.5, height: 16 }); assert.equal(it.unitPrice, 899);
+  assert.deepEqual(it.layout, { scale: 1, x: 0.5, y: 0.5 });
   assert.deepEqual((await handleMerch(e.ctx, 'quote', { items: [poster({ size: 'A5' })], address: addr })).body.error, 'bad-variant');
   assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ color: 'frame-pink' })], address: addr })).body.error, 'bad-variant');
   for (const f of FRAME_COLORS) assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ color: f.id })], address: addr })).status, 200, f.id);
@@ -380,6 +373,55 @@ await test('a draft returns policy page exists, clearly marked as a draft for le
   const page = readFileSync('src/pages/MerchReturnsPolicy.jsx', 'utf8');
   assert.match(page, /DRAFT for legal review/); assert.match(page, /Cash on delivery is not available/); assert.match(page, /personalised/i);
   assert.match(readFileSync('src/App.jsx', 'utf8'), /merch\/returns-policy/);
+});
+
+console.log('Frame designs (admin option, family, print resolution)');
+await test('launch default: only Elements Gold is selectable; the dark designs are refused until an admin enables them (audited)', async () => {
+  const e = env(); const a = e.as('admin@x.test');
+  const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
+  assert.deepEqual(cat.body.products.find((p) => p.id === 'poster').frames, { 'elements-gold': true, 'individual-dark': false, 'family-dark': false });
+  assert.equal(cat.body.products.find((p) => p.id === 'mug').frames, undefined);
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster()], address: addr })).status, 200); // no frame sent = Elements Gold
+  const dark = await handleMerch(e.ctx, 'quote', { items: [poster({ design: { frame: 'individual-dark', name: 'Vibes' } })], address: addr });
+  assert.equal(dark.status, 409); assert.equal(dark.body.error, 'frame-design-off');
+  const fam = { frame: 'family-dark', familyName: 'Nair Family', people: [{ name: 'Vibes', relation: 'Father' }, { name: 'Ajay', relation: 'Son' }] };
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ design: fam })], address: addr })).body.error, 'frame-design-off');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ design: { frame: 'bogus', name: 'Vibes' } })], address: addr })).body.error, 'unknown-frame');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug('O+', { design: { frame: 'elements-gold', name: 'Vibes' } })], address: addr })).body.error, 'frame-design-unavailable');
+  // admin enables the two dark designs
+  assert.equal((await handleAdmin(a, { action: 'setFrameDesign', data: { productId: 'poster', frame: 'individual-dark', enabled: true } })).status, 200);
+  assert.equal((await handleAdmin(a, { action: 'setFrameDesign', data: { productId: 'poster', frame: 'family-dark', enabled: true } })).status, 200);
+  const log = (await e.db.list('merch_audit_logs')).filter((l) => l.action === 'admin.setFrameDesign');
+  assert.equal(log.length, 2); assert.equal(log[0].detail.before['individual-dark'], false); assert.equal(log[0].detail.after['individual-dark'], true);
+  const q = await handleMerch(e.ctx, 'quote', { items: [poster({ design: { frame: 'individual-dark', name: 'Vibes' } })], address: addr });
+  assert.equal(q.status, 200, JSON.stringify(q.body));
+  const it = (await e.db.get(`merch_quotes/${q.body.quoteId}`)).data.items[0];
+  assert.equal(it.design.frame, 'individual-dark'); assert.deepEqual(it.layout, { scale: 1, x: 0.5, y: 0.5 });
+  const fq = await handleMerch(e.ctx, 'quote', { items: [poster({ design: fam })], address: addr });
+  assert.equal(fq.status, 200, JSON.stringify(fq.body));
+  const fi = (await e.db.get(`merch_quotes/${fq.body.quoteId}`)).data.items[0];
+  assert.equal(fi.design.people.length, 2); assert.equal(fi.design.people[0].relation, 'Father'); assert.equal(fi.design.familyName, 'Nair Family');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ design: { ...fam, people: [...fam.people, ...fam.people, { name: 'Asha' }] } })], address: addr })).body.error, 'too-many-people');
+  // not for mugs, and only admins
+  assert.equal((await handleAdmin(a, { action: 'setFrameDesign', data: { productId: 'mug', frame: 'family-dark', enabled: true } })).status, 400);
+  assert.equal((await handleMerch(e.ctx, 'admin', { action: 'setFrameDesign', data: { productId: 'poster', frame: 'family-dark', enabled: false } })).status, 403);
+  // a switch back off blocks new quotes again
+  await handleAdmin(a, { action: 'setFrameDesign', data: { productId: 'poster', frame: 'individual-dark', enabled: false } });
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ design: { frame: 'individual-dark', name: 'Vibes' } })], address: addr })).body.error, 'frame-design-off');
+});
+await test('the print file must reach the product minimum DPI over the print area (A4 and A3); the reference images are never an input', async () => {
+  const e = env();
+  const a4 = await order(e, [poster()], { artwork: false });
+  const o = (await e.db.get(`merch_orders/${a4.id}`)).data;
+  assert.deepEqual(o.items[0].canvasInches, { width: 8, height: 11 });
+  const att = (width, extra = {}) => handleMerch(e.ctx, 'artwork', { orderId: a4.id, items: [{ index: 0, sha256: 'a'.repeat(64), path: `merch/print/u1/${a4.id}/0.png`, width, height: Math.round(width * 11 / 8), ...extra }] });
+  const low = await att(1024); // the size of the reference images: only 128 DPI over 8 inches
+  assert.equal(low.status, 400); assert.equal(low.body.error, 'resolution-too-low'); assert.equal(low.body.dpi, 128);
+  assert.equal((await att(2400)).status, 200); // 300 DPI
+  assert.equal((await att(1200)).status, 200); // exactly the 150 DPI minimum
+  const a3 = await order(e, [poster({ size: 'A3' })], { artwork: false });
+  const att3 = (width) => handleMerch(e.ctx, 'artwork', { orderId: a3.id, items: [{ index: 0, sha256: 'b'.repeat(64), path: `merch/print/u1/${a3.id}/0.png`, width, height: Math.round(width * 16 / 11.5) }] });
+  assert.equal((await att3(3450)).status, 200); assert.equal((await att3(1500)).body.error, 'resolution-too-low');
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

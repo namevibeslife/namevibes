@@ -14,7 +14,8 @@ import { COLL, STATES, TRANSITIONS, PAID_STATES, QUOTE_TTL_MS, MAX_QTY_PER_ITEM,
 import { buildDesign, bloodGroupSlug, applyTemplate } from './designs.js';
 import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS, starterSku } from './catalog.js';
 import { checkAvailability, routeProvider, validateAddress, normaliseAddress } from './availability.js';
-import { normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
+import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS } from './frames.js';
+import { FULL_LAYOUT, normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
 import { computeQuote, lookupBySize, taxRateFor } from './quoteMath.js';
 import { computeOrderCommission, reversalAmount } from './commission.js';
 import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
@@ -69,7 +70,7 @@ export async function handleCatalogue(ctx, body) {
   out.products = Object.values(cfg.products)
     .filter((p) => COLLECTION_IDS.some((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok))
     .map((p) => ({
-      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, price: country.prices[p.id], prices: Object.fromEntries(p.sizes.map((sz) => [sz, lookupBySize(country.prices, p.id, sz)]).filter(([, v]) => v > 0)),
+      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, frames: p.kind === 'wall-art' ? { ...DEFAULT_FRAME_DESIGNS, ...(p.frameDesigns || {}) } : undefined, price: country.prices[p.id], prices: Object.fromEntries(p.sizes.map((sz) => [sz, lookupBySize(country.prices, p.id, sz)]).filter(([, v]) => v > 0)),
       collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
     }));
   return ok(out);
@@ -104,7 +105,14 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     if (!avail.ok) return fail(409, ERRORS_BLOCKED[avail.reason] || 'merch-unavailable', { reason: avail.reason });
     const opts = findVariantOptions(product, raw);
     if (!opts.colorOk || !opts.sizeOk) return fail(400, 'bad-variant');
-    const built = skipDesign ? { design: raw.design } : buildDesign(collection, raw.design || {});
+    // Framed posters use a "frame design" (Elements Gold by default). Which ones are on is a per-product admin option.
+    let input = raw.design || {};
+    if (!skipDesign && product.kind === 'wall-art' && collection === 'name_elements') input = { frame: DEFAULT_FRAME, ...input };
+    if (!skipDesign && input.frame) {
+      if (product.kind !== 'wall-art') return fail(400, 'frame-design-unavailable');
+      if (FRAME_IDS.includes(input.frame) && !(product.frameDesigns?.[input.frame] ?? DEFAULT_FRAME_DESIGNS[input.frame])) return fail(409, 'frame-design-off', { frame: input.frame });
+    }
+    const built = skipDesign ? { design: raw.design } : buildDesign(collection, input);
     if (built.error) return fail(400, built.error);
     const design = skipDesign ? built.design : applyTemplate(built.design, product);
 
@@ -122,7 +130,8 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     const mapping = vdoc?.providerSkus?.[providerId] || null;
     const spec = effectiveSpec(product.printSpec, mapping, raw.size);
     if (specProblems(spec).length) return fail(409, 'merch-product-off', { reason: 'print-area-missing', problems: specProblems(spec) });
-    const layout = raw.layout ? normaliseLayout(raw.layout) : defaultLayoutFor(design, spec);
+    // a frame design fills the whole print area: its position and size are fixed
+    const layout = design.template === 'frame' ? { ...FULL_LAYOUT } : raw.layout ? normaliseLayout(raw.layout) : defaultLayoutFor(design, spec);
     const res = designDpi({ design: design, spec, layout });
     const status = resolutionStatus(res.dpi, { minDpi: Number(spec.minDpi) });
     if (status === 'blocked' && product.dpiOverride !== true) {
@@ -133,7 +142,7 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     items.push({
       productId: product.id, collection, color: raw.color, size: raw.size, qty, design: design, layout,
       canvasInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) },
-      placementSku: spec.allowedPlacements[0], printTypeId: Number(spec.printTypeId), dpi: res.dpi, resolution: status,
+      placementSku: spec.allowedPlacements[0], printTypeId: Number(spec.printTypeId), minDpi: Number(spec.minDpi), dpi: res.dpi, resolution: status,
       providerSku: mapping, unitPrice, unitCost: lookupBySize(country.costs, product.id, raw.size) ?? 0, taxPercent: taxRateFor(country, product.id)
     });
   }
@@ -234,6 +243,9 @@ export async function handleAttachArtwork(ctx, body) {
     if (!it) return fail(400, 'bad-artwork-index');
     if (!/^[a-f0-9]{64}$/.test(String(a.sha256 || ''))) return fail(400, 'bad-checksum');
     if (!a.path || !String(a.path).startsWith(`merch/print/${ctx.who.uid}/${order.id}/`)) return fail(400, 'bad-artwork-path');
+    // the declared pixel size must reach the product's minimum DPI over the print area (a phone may have had to render smaller)
+    const dpi = Number(a.width) && it.canvasInches?.width ? Number(a.width) / it.canvasInches.width : null;
+    if (dpi !== null && it.minDpi && dpi < it.minDpi * 0.99) return fail(400, 'resolution-too-low', { dpi: Math.round(dpi), minDpi: it.minDpi });
     it.artwork = { kind: 'upload', path: a.path, sha256: a.sha256, version: it.design.templateVersion, width: Number(a.width) || null, height: Number(a.height) || null, layout: it.layout };
     // Optional mock-up image (product with the design at the customer's position) for Qikink's mockup_link
     if (a.mockup) {
@@ -591,7 +603,7 @@ const ADMIN_ACTIONS = {
   },
   async setProduct(ctx, b) {
     if (!/^[a-z0-9_-]{2,30}$/.test(String(b.id || ''))) return { error: 'bad-product-id' };
-    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
+    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections', 'frameDesigns']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
     // The switch may be ON with the spec still missing: availability.js keeps such a product blocked ("enabled but blocked").
     // A spec that IS given must be valid, though (documented DTG/DTF limits, known print type, placement codes).
     if (b.printSpec && specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes).length) return { error: 'print-spec-invalid', problems: specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes) };
@@ -683,7 +695,7 @@ export async function applyLaunchPreset(ctx) {
     collections: { name_elements: true, blood_group: true }, prices: {}, costs: {}, disabledProducts: { tshirt: true, notebook: true },
     shipping: { flat: 0, freeAbove: 0 }, paymentFeePercent: 0, marginFloorPercent: 0, providerPrimary: 'qikink', providerBackup: null, gatewayOverride: 'auto'
   });
-  for (const [id, on] of [['poster', true], ['mug', true], ['tshirt', false], ['notebook', false]]) await putIfAbsent(`${COLL.products}/${id}`, { id, enabled: on });
+  for (const [id, on] of [['poster', true], ['mug', true], ['tshirt', false], ['notebook', false]]) await putIfAbsent(`${COLL.products}/${id}`, { id, enabled: on, ...(id === 'poster' ? { frameDesigns: { ...DEFAULT_FRAME_DESIGNS } } : {}) });
   for (const p of ['poster', 'mug']) {
     const prod = DEFAULT_PRODUCTS[p];
     for (const c of prod.colors) for (const size of prod.sizes) {
@@ -694,6 +706,8 @@ export async function applyLaunchPreset(ctx) {
   await audit(ctx, 'admin.applyLaunchPreset', 'launch', { created });
   return { created };
 }
+
+const cfgProductIsWallArt = (cfg, id) => cfg.products[id]?.kind === 'wall-art';
 
 export async function handleAdmin(ctx, body) {
   if (!ctx.who) return fail(401, 'not-signed-in');
@@ -707,6 +721,16 @@ export async function handleAdmin(ctx, body) {
     const before = (await ctx.db.get(r.path))?.data || null;
     await ctx.db.patch(r.path, r.patch);
     await audit(ctx, `admin.${action}`, r.path, { before, after: clone(r.patch) });
+    return ok({ ok: true });
+  }
+  if (action === 'setFrameDesign') {
+    // per-product option: which frame designs customers may choose (launch: Elements Gold only)
+    if (!FRAME_IDS.includes(input.frame) || typeof input.enabled !== 'boolean' || !cfgProductIsWallArt(await loadConfig(ctx.db), input.productId)) return fail(400, 'bad-frame-design');
+    const doc = (await ctx.db.get(`${COLL.products}/${input.productId}`))?.data || {};
+    const before = { ...DEFAULT_FRAME_DESIGNS, ...(doc.frameDesigns || {}) };
+    const after = { ...before, [input.frame]: input.enabled };
+    await ctx.db.patch(`${COLL.products}/${input.productId}`, { id: input.productId, frameDesigns: after, updatedAt: ctx.now() });
+    await audit(ctx, 'admin.setFrameDesign', input.productId, { before, after });
     return ok({ ok: true });
   }
   if (action === 'bulkSwitch') { const r = await bulkSwitch(ctx, input); return r.error ? fail(400, r.error) : ok(r); }

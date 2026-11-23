@@ -1360,7 +1360,11 @@
       "paymentFailed": "The payment could not be completed. You have not been charged.",
       "paymentRecorded": "Your payment went through but we could not confirm it yet. Check My orders in a minute, or contact support.",
       "resolution-too-low": "This design is too large to print sharply ({{dpi}} DPI; at least {{minDpi}} DPI is needed). Make it smaller.",
-      "cod-not-allowed": "Cash on delivery is not available. Please pay online."
+      "cod-not-allowed": "Cash on delivery is not available. Please pay online.",
+      "frame-design-off": "This poster design is not available right now.",
+      "frame-design-unavailable": "This design is only for framed posters.",
+      "people-required": "Enter at least one name.",
+      "too-many-people": "A family poster holds at most 4 members."
     },
     "cart": {
       "title": "Your cart",
@@ -1423,6 +1427,19 @@
     "dpiMaxSize": "The largest sharp size is about {{percent}}% of the print area.",
     "dpiFix": "Use that size",
     "policyLink": "Returns and refunds policy",
-    "noProducts": "No merchandise is available right now."
+    "noProducts": "No merchandise is available right now.",
+    "frameTitle": "Poster design",
+    "frame": {
+      "elements-gold": "Elements Gold",
+      "individual-dark": "Individual Dark",
+      "family-dark": "Family Dark"
+    },
+    "frameNote": "The poster is printed edge to edge at {{w}} × {{h}} inches using your own names.",
+    "samplesTitle": "Example designs (sample name)",
+    "sampleLabel": "Sample",
+    "familyName": "Family name (optional)",
+    "memberName": "Member {{n}} name",
+    "memberRelation": "Relation (optional)",
+    "addMember": "Add a family member"
   }
 }

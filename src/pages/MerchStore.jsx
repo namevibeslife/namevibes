@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { callMerch } from '../merch/client';
 import { loadCart, saveCart, newLineId } from '../merch/cart';
 import { buildDesign, applyTemplate, BLOOD_GROUPS, bloodGroupLabel } from '../merch/designs';
+import { FRAME_IDS, DEFAULT_FRAME, FRAME_MAX_MEMBERS } from '../merch/frames';
 import ProductPreview from '../merch/ProductPreview';
 import { ALL_COUNTRIES } from '../data/countries';
 import { effectiveSpec, defaultLayoutFor, normaliseLayout, placementBox, designAspect, designDpi, resolutionStatus, maxScaleForDpi } from '../merch/layout';
@@ -26,6 +27,10 @@ export default function MerchStore() {
   const [collection, setCollection] = useState('name_elements');
   const [productId, setProductId] = useState(incoming?.productId || ''); // "Frame My Elements" opens the framed poster directly
   const [name, setName] = useState(incoming?.names?.[0]?.name || profile?.fullName || '');
+  const [frame, setFrame] = useState(DEFAULT_FRAME);
+  // family design: members come from the family result (name + relation the buyer entered), editable, up to FRAME_MAX_MEMBERS
+  const [members, setMembers] = useState(() => (incoming?.names?.length ? incoming.names.slice(0, FRAME_MAX_MEMBERS) : [{ name: profile?.fullName || '', relation: '' }]).map((n) => ({ name: n.name || '', relation: n.relation || '' })));
+  const [familyName, setFamilyName] = useState('');
   const [bloodGroup, setBloodGroup] = useState('');
   const [confirmed, setConfirmed] = useState(false);
   const [color, setColor] = useState('');
@@ -51,12 +56,18 @@ export default function MerchStore() {
   const product = products.find((p) => p.id === productId);
   useEffect(() => { if (product) { setColor(product.colors[0]?.id || ''); setSize(product.sizes[0] || ''); setLayout(null); } }, [productId, collection]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const isPoster = product?.kind === 'wall-art';
+  const frames = isPoster ? FRAME_IDS.filter((f) => product.frames?.[f]) : [];
+  const activeFrame = frames.includes(frame) ? frame : frames[0];
+  useEffect(() => { if (isPoster && activeFrame && activeFrame !== frame) setFrame(activeFrame); }, [isPoster, activeFrame, frame]);
+  const frameInput = activeFrame === 'family-dark' ? { frame: activeFrame, people: members.filter((m) => m.name.trim()).map((m) => ({ name: m.name, relation: m.relation })), familyName } : { frame: activeFrame, name };
   const baseBuilt = collection === 'name_elements'
-    ? buildDesign('name_elements', { name })
+    ? buildDesign('name_elements', isPoster && activeFrame ? frameInput : { name })
     : buildDesign('blood_group', { bloodGroup, confirmed: true }); // preview only; the confirmation is required to add
-  // framed posters use the poster template (headings + name + tiles); the server applies the same template
+  // the server builds the same design again from the names; the preview and the print file use exactly this definition
   const built = baseBuilt.design ? { ...baseBuilt, design: applyTemplate(baseBuilt.design, product) } : baseBuilt;
   const colorHex = product?.colors.find((c) => c.id === color)?.hex || '#FFFFFF';
+  const isFrameDesign = built.design?.template === 'frame';
   const symbols = built.design?.elements?.map((e) => e.symbol).join(' · ');
   // print area, position bounds and resolution (the server re-checks all of it)
   const spec0 = product?.printSpec ? effectiveSpec(product.printSpec, null, size) : undefined; // print area for the chosen size
@@ -77,7 +88,9 @@ export default function MerchStore() {
     if (!product) return;
     if (collection === 'blood_group' && !confirmed) { setMsg(errorText('blood-group-not-confirmed')); return; }
     if (built.error) { setMsg(errorText(built.error)); return; }
-    const design = collection === 'name_elements' ? { name: built.design.name, elements: built.design.elements.map((e) => e.symbol) } : { bloodGroup, confirmed: true };
+    const design = collection === 'blood_group' ? { bloodGroup, confirmed: true }
+      : isFrameDesign ? (activeFrame === 'family-dark' ? { frame: activeFrame, familyName: built.design.familyName, people: built.design.people.map((p) => ({ name: p.name, relation: p.relation, elements: p.elements.map((e) => e.symbol) })) } : { frame: activeFrame, name: built.design.name, elements: built.design.elements.map((e) => e.symbol) })
+      : { name: built.design.name, elements: built.design.elements.map((e) => e.symbol) };
     const unitPrice = product.prices?.[size] ?? product.price;
     if (!(unitPrice > 0)) { setMsg(errorText('merch-product-off')); return; }
     if (blocked) { setMsg(t('merch.err.resolution-too-low', { dpi: res?.dpi, minDpi: spec?.minDpi })); return; }
@@ -124,13 +137,31 @@ export default function MerchStore() {
 
               {collection === 'name_elements' ? (
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700" htmlFor="merch-name">{t('merch.nameLabel')}</label>
+                  {frames.length > 1 && (
+                    <fieldset className="mb-3" data-testid="frame-designs">
+                      <legend className="block text-sm font-medium text-gray-700">{t('merch.frameTitle')}</legend>
+                      <div className="flex flex-wrap gap-2 mt-1">{frames.map((f) => <label key={f} className={`px-3 py-1 rounded-lg border cursor-pointer ${activeFrame === f ? 'bg-brand-600 text-white' : 'bg-white'}`}><input type="radio" name="frame" value={f} checked={activeFrame === f} onChange={() => setFrame(f)} className="sr-only" data-testid={`frame-${f}`} />{t(`merch.frame.${f}`)}</label>)}</div>
+                    </fieldset>
+                  )}
+                  {activeFrame === 'family-dark' && (
+                    <div className="mb-3 space-y-2" data-testid="family-inputs">
+                      <label className="block text-sm font-medium text-gray-700">{t('merch.familyName')}<input value={familyName} maxLength={30} onChange={(e) => setFamilyName(e.target.value)} className="mt-1 block w-full border rounded-lg px-3 py-2" data-testid="family-name" /></label>
+                      {members.map((m, i) => (
+                        <div key={i} className="grid grid-cols-5 gap-2 items-end">
+                          <label className="col-span-3 text-sm text-gray-700">{t('merch.memberName', { n: i + 1 })}<input value={m.name} maxLength={40} onChange={(e) => setMembers(members.map((x, j) => (j === i ? { ...x, name: e.target.value } : x)))} className="mt-1 block w-full border rounded-lg px-2 py-2" data-testid={`member-name-${i}`} /></label>
+                          <label className="col-span-2 text-sm text-gray-700">{t('merch.memberRelation')}<input value={m.relation} maxLength={20} onChange={(e) => setMembers(members.map((x, j) => (j === i ? { ...x, relation: e.target.value } : x)))} className="mt-1 block w-full border rounded-lg px-2 py-2" /></label>
+                        </div>
+                      ))}
+                      {members.length < FRAME_MAX_MEMBERS && <button type="button" className="text-sm underline" onClick={() => setMembers([...members, { name: '', relation: '' }])}>{t('merch.addMember')}</button>}
+                    </div>
+                  )}
+                  <label className={`block text-sm font-medium text-gray-700 ${activeFrame === 'family-dark' ? 'hidden' : ''}`} htmlFor="merch-name">{t('merch.nameLabel')}</label>
                   {incoming?.names?.length > 1 && (
                     <select aria-label={t('merch.pickName')} className="mt-1 mb-2 block w-full border rounded-lg px-3 py-2" value={name} onChange={(e) => setName(e.target.value)}>
                       {incoming.names.map((n) => <option key={n.name} value={n.name}>{n.name}</option>)}
                     </select>
                   )}
-                  <input id="merch-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} className="mt-1 block w-full border rounded-lg px-3 py-2" data-testid="merch-name" />
+                  <input id="merch-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} className={`mt-1 block w-full border rounded-lg px-3 py-2 ${activeFrame === 'family-dark' ? 'hidden' : ''}`} data-testid="merch-name" />
                   {built.error ? <p role="alert" className="text-sm text-red-700 mt-1">{errorText(built.error)}</p>
                     : <p className="text-sm text-gray-600 mt-1" data-testid="merch-symbols"><span className="font-medium">{t('merch.yourElements')}:</span> {symbols}</p>}
                   {built.design?.unmatched?.length > 0 && <p className="text-xs text-gray-500">{t('merch.unmatched', { letters: built.design.unmatched.join(' ') })}</p>}
@@ -161,7 +192,7 @@ export default function MerchStore() {
                 </div>
               )}
               {product && <p className="mb-3 text-lg font-semibold" data-testid="unit-price">{formatMoney(product.prices?.[size] ?? product.price, catalogue.currency)}</p>}
-              {product && built.design && spec && (
+              {product && built.design && spec && !isFrameDesign && (
                 <fieldset className="mb-4" data-testid="layout-controls">
                   <legend className="block text-sm font-medium text-gray-700">{t('merch.layoutTitle')}</legend>
                   <label className="block text-sm mt-1">{t('merch.layoutScale')}<input type="range" min="0.2" max="1" step="0.01" value={lay.scale} onChange={(e) => setLayout({ ...lay, scale: Number(e.target.value) })} className="block w-full" data-testid="layout-scale" /></label>
@@ -178,6 +209,13 @@ export default function MerchStore() {
             </section>
             <section aria-label={t('merch.preview')} className="bg-white/60 rounded-xl p-4">
               <ProductPreview product={product} colorHex={colorHex} design={built.design} label={t('merch.preview')} layout={lay} spec={spec} />
+              {isPoster && isFrameDesign && <p className="text-xs text-gray-600 mt-2">{t('merch.frameNote', { w: spec?.maxWidthInches, h: spec?.maxHeightInches })}</p>}
+              {isPoster && (
+                <div className="mt-4" data-testid="samples">
+                  <h3 className="text-sm font-semibold text-gray-700">{t('merch.samplesTitle')}</h3>
+                  <div className="grid grid-cols-3 gap-2 mt-2">{FRAME_IDS.map((f) => <figure key={f} className="text-center"><div className="relative"><img src={`/merch/samples/frame-${f}.jpg`} alt={t(`merch.frame.${f}`)} loading="lazy" className="w-full rounded border" /><span className="absolute top-1 left-1 text-[10px] px-1 rounded bg-black/70 text-white">{t('merch.sampleLabel')}</span></div><figcaption className="text-xs mt-1">{t(`merch.frame.${f}`)}</figcaption></figure>)}</div>
+                </div>
+              )}
             </section>
           </div>
         )}

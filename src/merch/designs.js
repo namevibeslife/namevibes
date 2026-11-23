@@ -2,6 +2,7 @@
 // engine; blood-group designs are one of exactly eight fixed choices.
 import { ELEMENTS, analyzeName } from '../utils/elements.js';
 import { NAME_ALGORITHM_VERSION, DESIGN_TEMPLATE_VERSION } from './constants.js';
+import { FRAME_IDS, DEFAULT_FRAME, FRAME_MAX_MEMBERS, FRAME_MAX_ELEMENTS_SINGLE, FRAME_MAX_ELEMENTS_FAMILY } from './frames.js';
 
 export const MAX_NAME_LENGTH = 40;
 export const MAX_DESIGN_ELEMENTS = 24; // long names must still fit a framed poster; tiles shrink to fit
@@ -66,15 +67,45 @@ export function buildBloodGroupDesign(code, { confirmed } = {}) {
   return { design: { collection: 'blood_group', bloodGroup: normalised, templateVersion: DESIGN_TEMPLATE_VERSION } };
 }
 
+// ---- Framed-poster designs (Elements Gold, Individual Dark, Family Dark) --------------------------------------------------
+const cleanLabel = (s, max) => String(s || '').normalize('NFC').replace(/[<>]/g, '').replace(/\s+/g, ' ').trim().slice(0, max);
+
+/**
+ * input: { frame, name, elements } for the single designs, or { frame: 'family-dark', people: [{ name, relation, elements }], familyName }.
+ * Every person's symbols are recomputed from their name by the element engine (what the client sent is only cross-checked).
+ */
+export function buildFrameDesign(input = {}) {
+  const frame = input.frame || DEFAULT_FRAME;
+  if (!FRAME_IDS.includes(frame)) return { error: 'unknown-frame' };
+  const family = frame === 'family-dark';
+  const source = family ? input.people : [{ name: input.name, elements: input.elements }];
+  if (!Array.isArray(source) || source.length < 1) return { error: 'people-required' };
+  if (source.length > (family ? FRAME_MAX_MEMBERS : 1)) return { error: 'too-many-people' };
+  const people = [];
+  for (const p of source) {
+    const built = verifyClientElements(p?.name, p?.elements);
+    if (built.error) return built;
+    if (built.design.elements.length > (family ? FRAME_MAX_ELEMENTS_FAMILY : FRAME_MAX_ELEMENTS_SINGLE)) return { error: 'too-many-elements' };
+    people.push({ name: built.design.name, relation: family ? cleanLabel(p.relation, 20) : '', elements: built.design.elements });
+  }
+  const familyName = family ? cleanLabel(input.familyName, 30) : '';
+  return {
+    design: {
+      collection: 'name_elements', frame, template: 'frame', name: familyName || people[0].name, elements: people[0].elements,
+      people, familyName, algorithmVersion: NAME_ALGORITHM_VERSION, templateVersion: DESIGN_TEMPLATE_VERSION, unmatched: []
+    }
+  };
+}
+
 // Validate one line's design input. Returns { design } or { error }.
 export function buildDesign(collection, input = {}) {
-  if (collection === 'name_elements') return verifyClientElements(input.name, input.elements);
+  if (collection === 'name_elements') return input.frame || input.people ? buildFrameDesign(input) : verifyClientElements(input.name, input.elements);
   if (collection === 'blood_group') return buildBloodGroupDesign(input.bloodGroup, { confirmed: input.confirmed });
   return { error: 'unknown-collection' };
 }
 
-// Name designs are drawn with the poster template on wall art (headings + name + element tiles) and the compact template elsewhere.
+// Wall art always uses a frame design (built by buildFrameDesign); other products use the compact name template.
 export function applyTemplate(design, product) {
-  if (!design || design.collection !== 'name_elements') return design;
-  return { ...design, template: product?.kind === 'wall-art' ? 'poster' : 'compact' };
+  if (!design || design.collection !== 'name_elements' || design.template === 'frame') return design;
+  return { ...design, template: 'compact' };
 }

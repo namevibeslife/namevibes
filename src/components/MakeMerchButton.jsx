@@ -8,7 +8,7 @@ import { Shirt } from 'lucide-react';
 export default function MakeMerchButton({ people }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const names = (people || []).filter((p) => p?.fullName).map((p) => ({ name: p.fullName, elements: (p.elements || []).map((e) => e.symbol) }));
+  const names = (people || []).filter((p) => p?.fullName).slice(0, 4).map((p) => ({ name: p.fullName, relation: p.relation || '', elements: (p.elements || []).map((e) => e.symbol) }));
   if (names.length === 0) return null;
   return (
     <div className="my-6 text-center">
