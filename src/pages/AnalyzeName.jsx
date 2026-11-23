@@ -1,4 +1,5 @@
 import PosterDownload from '../components/PosterDownload';
+import MakeMerchButton from '../components/MakeMerchButton';
 import { elementMeaning } from '../i18n/elements';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -136,6 +137,7 @@ export default function AnalyzeName() {
             </div>
 
             <PosterDownload person={{ fullName: result.name, elements: result.elements }} showPreparedPreview={false} />
+            <MakeMerchButton people={[{ fullName: result.name, elements: result.elements }]} />
 
             <div className="overflow-x-auto">
               <h2 className="text-2xl font-bold text-gray-800 mb-4">{t('results.colorsMeanings')}</h2>

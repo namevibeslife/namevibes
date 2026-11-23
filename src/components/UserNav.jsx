@@ -15,6 +15,7 @@ const explore = [
   ['nav.insights', '/element-insights'],
   ['nav.numerology', '/numerology-calculator'],
   ['nav.zodiac', '/zodiac-syllables'], ['nav.hora', '/hora-muhurat'],
+  ['nav.merch', '/merch'],
   ['nav.pricing', '/pricing'],
 ];
 
@@ -56,7 +57,7 @@ export default function UserNav() {
   // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
   // One link to the ambassador sign-in page; it reads "Ambassador area" for a signed-in ambassador.
   const partners = [[isAmbassador ? 'nav.ambassadorArea' : 'nav.ambassadorLogin', '/ambassador']];
-  if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['nav.admin', '/admin'], ['nav.accounts', '/accounts']);
+  if (['/admin', '/accounts', '/admin/merch'].includes(location.pathname)) partners.push(['nav.admin', '/admin'], ['nav.accounts', '/accounts'], ['nav.adminMerch', '/admin/merch']);
   async function signOut() {
     try { await logout(); setOpen(false); navigate('/'); }
     catch { setError(t('errors.signOut')); }

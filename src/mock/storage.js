@@ -2,3 +2,9 @@
 export function getStorage() {
   return {};
 }
+export function ref(storage, path) {
+  return { path };
+}
+export async function uploadBytes(reference) {
+  return { ref: reference };
+}

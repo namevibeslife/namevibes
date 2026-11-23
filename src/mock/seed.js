@@ -16,6 +16,21 @@ const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 const daysAhead = (n) => new Date(Date.now() + n * 24 * 60 * 60 * 1000);
 
 export const SEED_DATA = {
+  // Merchandise (print-on-demand) test configuration: India ON, USA OFF, simulated providers
+  'merch_settings/global': { enabled: true, message: '' },
+  'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
+  'merch_countries/IN': {
+    countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true,
+    collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, notebook: 299, poster: 899 },
+    costs: { tshirt: 420, mug: 200, notebook: 150, poster: 450 }, shipping: { flat: 60, freeAbove: 1500 }, paymentFeePercent: 2.5,
+    providerPrimary: 'mock', providerBackup: 'mock2', gatewayOverride: 'auto'
+  },
+  'merch_countries/US': {
+    countryCode: 'US', enabled: false, currency: 'USD', taxPercent: 0, taxIncluded: false,
+    collections: { name_elements: true, blood_group: true }, prices: { tshirt: 25, mug: 15, notebook: 12, poster: 30 }, shipping: { flat: 5, freeAbove: 0 }, providerPrimary: 'mock'
+  },
+  'merch_providers/mock': { id: 'mock', name: 'Mock provider', adapter: 'mock', active: true, countries: ['IN', 'US'] },
+  'merch_providers/mock2': { id: 'mock2', name: 'Mock backup', adapter: 'mock', active: true, countries: ['IN'] },
   // Country Pricing (admin) - the app shows prices from these records only
   'countrySettings/mock-in': { countryCode: 'IN', countryName: 'India', currency: 'INR', symbol: '₹', price: 399, referralDiscount: 10, taxPercent: 18, isActive: true },
   'countrySettings/mock-us': { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true },

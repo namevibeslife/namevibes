@@ -1,4 +1,5 @@
 import PosterDownload from '../components/PosterDownload';
+import MakeMerchButton from '../components/MakeMerchButton';
 import ElementMeanings from '../components/ElementMeanings';
 import { formatDate } from '../i18n/format';
 import React, { useState, useEffect } from 'react';
@@ -75,6 +76,7 @@ export default function AnalysisView() {
           </div>
 
           <PosterDownload person={{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }} />
+          <MakeMerchButton people={[{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }]} />
           <ElementMeanings people={[{ fullName: analysis.fullName, elements: parseNameToElements(analysis.fullName || '') }]} />
 
           <div className="mt-8 text-center">

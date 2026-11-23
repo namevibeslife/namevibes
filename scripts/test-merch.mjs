@@ -495,5 +495,54 @@ await test('until the docs are filled in, Qikink refuses to send orders (no inve
   assert.equal((await q.verifyWebhook()).unsupported, true);
 });
 
+console.log('Server adapter (Firestore REST fake) and print artwork');
+await test('REST adapter round-trips nested orders (maps, arrays, dates), enforces updateTime, and queries by field', async () => {
+  const { generateKeyPairSync } = await import('node:crypto');
+  const { firestore } = await import('../functions/_lib/server.js');
+  const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048, privateKeyEncoding: { type: 'pkcs8', format: 'pem' }, publicKeyEncoding: { type: 'spki', format: 'pem' } });
+  const env = { FIREBASE_SERVICE_ACCOUNT: JSON.stringify({ project_id: 'p', client_email: 'x@p.iam', private_key: privateKey }) };
+  const docs = new Map(); const times = new Map(); let tick = 0;
+  const dec = (v) => ('stringValue' in v ? v.stringValue : 'integerValue' in v ? Number(v.integerValue) : 'doubleValue' in v ? v.doubleValue : 'booleanValue' in v ? v.booleanValue : 'timestampValue' in v ? v.timestampValue : 'nullValue' in v ? null : 'mapValue' in v ? Object.fromEntries(Object.entries(v.mapValue.fields || {}).map(([k, x]) => [k, dec(x)])) : (v.arrayValue.values || []).map(dec));
+  const realFetch = globalThis.fetch;
+  globalThis.fetch = async (url, init = {}) => {
+    url = String(url); const res = (o, st = 200) => new Response(JSON.stringify(o), { status: st });
+    if (url.includes('oauth2.googleapis.com')) return res({ access_token: 't' });
+    const body = init.body ? JSON.parse(init.body) : null;
+    if (url.endsWith(':runQuery')) {
+      const f = body.structuredQuery.where.fieldFilter; const want = dec(f.value);
+      return res([...docs.entries()].filter(([k, v]) => k.startsWith(body.structuredQuery.from[0].collectionId + '/') && dec({ mapValue: { fields: v } })[f.field.fieldPath] === want).map(([k, v]) => ({ document: { name: k, fields: v } })));
+    }
+    const m = url.match(/documents\/([^?]*)(\?(.*))?$/); const path = decodeURIComponent(m[1]); const qs = new URLSearchParams(m[3] || '');
+    if (init.method === 'POST') { const full = path + '/' + qs.get('documentId'); if (docs.has(full)) return res({}, 409); docs.set(full, body.fields); times.set(full, 't' + ++tick); return res({}); }
+    if (init.method === 'PATCH') { const pre = qs.get('currentDocument.updateTime'); if (pre && times.get(path) !== pre) return res({}, 409); docs.set(path, { ...(docs.get(path) || {}), ...body.fields }); times.set(path, 't' + ++tick); return res({}); }
+    return docs.has(path) ? res({ fields: docs.get(path), updateTime: times.get(path) }) : res({}, 404);
+  };
+  try {
+    const db = await firestore(env);
+    const order = { id: 'o1', status: 'paid', items: [{ design: { elements: [{ symbol: 'V', atomicNumber: 23 }] }, qty: 2 }], totals: { total: 859, tax: 131.03 }, timeline: [{ state: 'paid', at: new Date('2026-11-23T10:00:00Z') }], empty: [], flag: true, none: null };
+    await db.create('merch_orders', 'o1', order);
+    const back = (await db.get('merch_orders/o1')).data;
+    assert.deepEqual(back.items, order.items); assert.deepEqual(back.totals, order.totals); assert.equal(back.timeline[0].state, 'paid'); assert.deepEqual(back.empty, []); assert.equal(back.none, null);
+    const first = await db.get('merch_orders/o1');
+    await db.patch('merch_orders/o1', { status: 'submitted' }, { ifUpdateTime: first.updateTime });
+    await assert.rejects(db.patch('merch_orders/o1', { status: 'x' }, { ifUpdateTime: first.updateTime })); // stale precondition loses
+    assert.equal((await db.query('merch_orders', 'status', 'submitted')).length, 1);
+    assert.equal((await db.query('merch_orders', 'status', 'paid')).length, 0);
+    await assert.rejects(db.create('merch_orders', 'o1', order)); // second create of the same id fails
+  } finally { globalThis.fetch = realFetch; }
+});
+await test('print artwork comes from the same design: symbols only, escaped name, transparent, print-area sized', async () => {
+  const { printSvg, productPreviewSvg } = await import('../src/merch/render.js');
+  const { design } = buildNameElementsDesign('Vibes');
+  const svg = printSvg(design, { width: 3600, height: 4800 }, { ink: '#FFFFFF' });
+  assert.match(svg, /width="3600" height="4800"/);
+  for (const sym of ['V', 'I', 'Be', 'S']) assert.ok(svg.includes('>' + sym + '</text>'), sym);
+  assert.ok(!svg.includes('<rect width="3600"')); // no opaque background
+  const evil = productPreviewSvg({ kind: 'apparel' }, '#FFFFFF', { ...design, name: '<script>x</script>' });
+  assert.ok(!evil.includes('<script>'));
+  const bg = printSvg({ collection: 'blood_group', bloodGroup: 'O+' }, { width: 1500, height: 1500 }, {});
+  assert.match(bg, /\/merch\/blood\/o-pos\.v1\./);
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);

@@ -27,6 +27,11 @@ const AmbassadorHome = lazy(() => import('./pages/AmbassadorHome'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ElementInsightsPage = lazy(() => import('./pages/ElementInsightsPage'));
 const AccountsDashboard = lazy(() => import('./pages/AccountsDashboard'));
+const MerchStore = lazy(() => import('./pages/MerchStore'));
+const MerchCart = lazy(() => import('./pages/MerchCart'));
+const MerchOrderList = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderList })));
+const MerchOrderDetail = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderDetail })));
+const MerchAdmin = lazy(() => import('./pages/MerchAdmin'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function Spinner() {
@@ -107,6 +112,12 @@ function App() {
           <Route path="/ambassador" element={<AmbassadorHome />} />
           <Route path="/ambassador/register" element={<Navigate to="/ambassador" replace />} />
           <Route path="/ambassador/dashboard" element={<Navigate to="/ambassador?tab=followers" replace />} />
+          {/* Merchandise: any signed-in user with a completed profile; availability is decided by the server */}
+          <Route path="/merch" element={<ProtectedRoute requiresProfile><MerchStore /></ProtectedRoute>} />
+          <Route path="/merch/cart" element={<ProtectedRoute requiresProfile><MerchCart /></ProtectedRoute>} />
+          <Route path="/merch/orders" element={<ProtectedRoute requiresProfile><MerchOrderList /></ProtectedRoute>} />
+          <Route path="/merch/orders/:id" element={<ProtectedRoute requiresProfile><MerchOrderDetail /></ProtectedRoute>} />
+          <Route path="/admin/merch" element={<ProtectedRoute><MerchAdmin /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/accounts" element={<AccountsDashboard />} />
           <Route path="*" element={<NotFound />} />

@@ -67,7 +67,7 @@ export async function handleCatalogue(ctx, body) {
   out.products = Object.values(cfg.products)
     .filter((p) => COLLECTION_IDS.some((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok))
     .map((p) => ({
-      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, price: country.prices[p.id],
+      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printArea: p.printArea, price: country.prices[p.id],
       collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
     }));
   return ok(out);
