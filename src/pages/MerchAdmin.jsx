@@ -6,6 +6,7 @@ import { useAuthStore } from '../store/authStore';
 import { callMerch, mockControls, IS_MOCK } from '../merch/client';
 import { DEFAULT_PRODUCTS, mergeProducts } from '../merch/catalog';
 import { COLLECTION_IDS, STATES } from '../merch/constants';
+import { specProblems } from '../merch/layout';
 import { ALL_COUNTRIES, getCountry } from '../data/countries';
 
 // Staff screen (English only, like the other admin screens). Every write goes through the server
@@ -176,15 +177,36 @@ function Providers({ data, act }) {
 }
 
 // ---- products ---------------------------------------------------------------------------------------
+function ProductCard({ x, act }) {
+  const sp = x.printSpec || {};
+  const [f, setF] = useState({ printTypeId: sp.printTypeId ?? '', allowedPlacements: (sp.allowedPlacements || []).join(','), maxWidthInches: sp.maxWidthInches ?? '', maxHeightInches: sp.maxHeightInches ?? '', minDpi: sp.minDpi ?? 150, dpiOverride: x.dpiOverride === true });
+  const problems = specProblems(x.printSpec);
+  const spec = () => ({ printTypeId: Number(f.printTypeId), allowedPlacements: f.allowedPlacements.split(',').map((p) => p.trim()).filter(Boolean), maxWidthInches: Number(f.maxWidthInches), maxHeightInches: Number(f.maxHeightInches), minDpi: Number(f.minDpi), verified: false });
+  return (
+    <div className="p-3 bg-white/70 rounded-lg" data-testid={`product-card-${x.id}`}>
+      <strong>{x.id}</strong> · {x.kind} · sizes {x.sizes.join(', ')} · colours {x.colors.map((c) => c.id).join(', ')}
+      {problems.length > 0 && <p className="text-sm text-red-700" data-testid={`blocked-${x.id}`}>BLOCKED: print area / print type / placement not set ({problems.join(', ')}). It cannot be sold until you fill these in from Qikink's guide.</p>}
+      {x.printSpec && x.printSpec.verified !== true && problems.length === 0 && <p className="text-xs text-amber-800">Print spec is UNVERIFIED: confirm with a physical sample.</p>}
+      <div><Toggle label="Product enabled" checked={x.enabled !== false} onChange={(v) => act('setProduct', { ...x, enabled: v })} testid={`prod-${x.id}`} /></div>
+      <div className="grid sm:grid-cols-6 gap-2 mt-2 text-sm">
+        <input aria-label={`${x.id} print_type_id`} placeholder="print_type_id" value={f.printTypeId} onChange={(e) => setF({ ...f, printTypeId: e.target.value })} className="border rounded px-2 py-1" />
+        <input aria-label={`${x.id} placements`} placeholder="placements e.g. fr" value={f.allowedPlacements} onChange={(e) => setF({ ...f, allowedPlacements: e.target.value })} className="border rounded px-2 py-1" />
+        <input aria-label={`${x.id} max width in`} placeholder="max width in" value={f.maxWidthInches} onChange={(e) => setF({ ...f, maxWidthInches: e.target.value })} className="border rounded px-2 py-1" />
+        <input aria-label={`${x.id} max height in`} placeholder="max height in" value={f.maxHeightInches} onChange={(e) => setF({ ...f, maxHeightInches: e.target.value })} className="border rounded px-2 py-1" />
+        <input aria-label={`${x.id} min dpi`} placeholder="min DPI" value={f.minDpi} onChange={(e) => setF({ ...f, minDpi: e.target.value })} className="border rounded px-2 py-1" />
+        <Toggle label="Allow below min DPI" checked={f.dpiOverride} onChange={(v) => setF({ ...f, dpiOverride: v })} />
+      </div>
+      <Btn className="mt-2" data-testid={`save-spec-${x.id}`} onClick={() => act('setProduct', { ...x, printSpec: spec(), dpiOverride: f.dpiOverride })}>Save print spec</Btn>
+    </div>
+  );
+}
+
 function Products({ data, act }) {
   const [sku, setSku] = useState({ productId: 'tshirt', color: 'white', size: 'M', provider: 'qikink', sku: '', printTypeId: '1', placementSku: 'fr', widthInches: '', heightInches: '', plain: false });
   const p = data.products[sku.productId] || DEFAULT_PRODUCTS.tshirt;
   return (
     <section className="space-y-4">
-      {Object.values(data.products).map((x) => (
-        <div key={x.id} className="p-3 bg-white/70 rounded-lg"><strong>{x.id}</strong> · {x.kind} · sizes {x.sizes.join(', ')} · colours {x.colors.map((c) => c.id).join(', ')}
-          <div><Toggle label="Product enabled" checked={x.enabled !== false} onChange={(v) => act('setProduct', { ...x, enabled: v })} testid={`prod-${x.id}`} /></div></div>
-      ))}
+      {Object.values(data.products).map((x) => <ProductCard key={x.id} x={x} act={act} />)}
       <div className="p-3 bg-white/70 rounded-lg">
         <h2 className="font-semibold mb-2">Provider SKU mapping (per exact variant)</h2>
         <div className="grid sm:grid-cols-5 gap-2">

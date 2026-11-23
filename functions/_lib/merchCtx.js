@@ -71,11 +71,11 @@ export function gatewaysFor(env) {
 
 // Short-lived signed link to a customer's generated print file. The file proxy (api/merch/file.js)
 // checks the signature and expiry before streaming it from Storage; the provider never gets Storage access.
-export async function signedArtworkUrl(env, order, item, ttlMs = 72 * 3600 * 1000) {
-  if (item.artwork.kind === 'static') return `${SITE_URL}${item.artwork.path}`;
+export async function signedArtworkUrl(env, order, item, kind = 'print', ttlMs = 72 * 3600 * 1000) {
+  const k = kind === 'mockup' ? 'm' : 'p';
   const exp = Date.now() + ttlMs;
-  const sig = await hmacHex(env.MERCH_ARTWORK_SECRET || '', `${order.id}.${item.index}.${exp}`);
-  return `${SITE_URL}/api/merch/file?o=${encodeURIComponent(order.id)}&i=${item.index}&e=${exp}&s=${sig}`;
+  const sig = await hmacHex(env.MERCH_ARTWORK_SECRET || '', `${order.id}.${item.index}.${k}.${exp}`);
+  return `${SITE_URL}/api/merch/file?o=${encodeURIComponent(order.id)}&i=${item.index}&k=${k}&e=${exp}&s=${sig}`;
 }
 
 export async function buildCtx(env, request) {
@@ -87,7 +87,7 @@ export async function buildCtx(env, request) {
     id: () => crypto.randomUUID().replace(/-/g, '').slice(0, 20),
     gateways: gatewaysFor(env),
     providerFor: (doc) => createProvider(doc, env),
-    artworkUrl: (order, item) => signedArtworkUrl(env, order, item)
+    artworkUrl: (order, item, kind) => signedArtworkUrl(env, order, item, kind)
   };
 }
 

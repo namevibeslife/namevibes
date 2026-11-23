@@ -12,8 +12,9 @@
 // Every handler returns { status, body } and never throws for expected failures.
 import { COLL, STATES, TRANSITIONS, PAID_STATES, QUOTE_TTL_MS, MAX_QTY_PER_ITEM, MAX_ITEMS_PER_ORDER, MAX_FULFILMENT_ATTEMPTS, COLLECTION_IDS, NAME_ALGORITHM_VERSION } from './constants.js';
 import { buildDesign, bloodGroupSlug } from './designs.js';
-import { mergeProducts, findVariantOptions, variantId } from './catalog.js';
+import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS } from './catalog.js';
 import { checkAvailability, routeProvider, validateAddress, normaliseAddress } from './availability.js';
+import { normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
 import { computeQuote } from './quoteMath.js';
 import { computeOrderCommission, reversalAmount } from './commission.js';
 import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
@@ -67,7 +68,7 @@ export async function handleCatalogue(ctx, body) {
   out.products = Object.values(cfg.products)
     .filter((p) => COLLECTION_IDS.some((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok))
     .map((p) => ({
-      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printArea: p.printArea, price: country.prices[p.id],
+      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, price: country.prices[p.id],
       collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
     }));
   return ok(out);
@@ -75,7 +76,7 @@ export async function handleCatalogue(ctx, body) {
 
 // ---- quote ------------------------------------------------------------------------------------------
 
-const ERRORS_BLOCKED = { 'global-off': 'merch-off', 'country-off': 'merch-country-off', 'collection-off': 'merch-collection-off', 'product-off': 'merch-product-off', 'product-collection': 'merch-product-off', 'no-pricing': 'merch-product-off' };
+const ERRORS_BLOCKED = { 'global-off': 'merch-off', 'country-off': 'merch-country-off', 'collection-off': 'merch-collection-off', 'product-off': 'merch-product-off', 'product-collection': 'merch-product-off', 'no-pricing': 'merch-product-off', 'print-area-missing': 'merch-product-off' };
 
 // Validates every line, routes one provider for the whole order, recomputes the price. Used by quote AND
 // re-run at checkout and before fulfilment, so the answer is never taken from the browser.
@@ -114,9 +115,22 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
       const same = routeProvider({ providers: cfg.providers, country, product, variantMap: vdoc, route: { primary: providerId } });
       if (!same.provider || same.provider.id !== providerId) return fail(409, 'mixed-providers');
     } else if (!providerId) { providerId = routed.provider.id; backups = routed.backup; }
+    // Print area for this SKU (product spec, with any per-SKU numbers from the mapping), the customer's layout, and the
+    // resolution of the artwork at the chosen size. Nothing here is guessed: an incomplete spec blocks the sale.
+    const mapping = vdoc?.providerSkus?.[providerId] || null;
+    const spec = effectiveSpec(product.printSpec, mapping);
+    if (specProblems(spec).length) return fail(409, 'merch-product-off', { reason: 'print-area-missing', problems: specProblems(spec) });
+    const layout = raw.layout ? normaliseLayout(raw.layout) : defaultLayoutFor(built.design, spec);
+    const res = designDpi({ design: built.design, spec, layout });
+    const status = resolutionStatus(res.dpi, { minDpi: Number(spec.minDpi) });
+    if (status === 'blocked' && product.dpiOverride !== true) {
+      return fail(409, 'resolution-too-low', { dpi: res.dpi, minDpi: Number(spec.minDpi), maxScale: +maxScaleForDpi({ design: built.design, spec, minDpi: Number(spec.minDpi) }).toFixed(2) });
+    }
     items.push({
-      productId: product.id, collection, color: raw.color, size: raw.size, qty, design: built.design,
-      providerSku: vdoc?.providerSkus?.[providerId] || null, unitPrice: Number(country.prices[product.id])
+      productId: product.id, collection, color: raw.color, size: raw.size, qty, design: built.design, layout,
+      canvasInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) },
+      placementSku: spec.allowedPlacements[0], dpi: res.dpi, resolution: status,
+      providerSku: mapping, unitPrice: Number(country.prices[product.id])
     });
   }
   const quote = computeQuote({ lines: items.map((i) => ({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice })), country });
@@ -140,7 +154,7 @@ export async function handleQuote(ctx, body) {
     id, uid: ctx.who.uid, status: 'open', items: priced.items, address: priced.shipTo, countryCode: priced.shipTo.country,
     providerId: priced.providerId, backups: priced.backups, totals: priced.quote, createdAt: now, expiresAt: new Date(ms(now) + QUOTE_TTL_MS)
   });
-  return ok({ quoteId: id, expiresAt: new Date(ms(now) + QUOTE_TTL_MS).toISOString(), quote: publicQuote(priced.quote), providerId: priced.providerId });
+  return ok({ resolution: priced.items.map((i, n) => ({ index: n, dpi: i.dpi, status: i.resolution })), quoteId: id, expiresAt: new Date(ms(now) + QUOTE_TTL_MS).toISOString(), quote: publicQuote(priced.quote), providerId: priced.providerId });
 }
 
 // ---- checkout ---------------------------------------------------------------------------------------
@@ -179,7 +193,7 @@ export async function handleCheckout(ctx, body) {
   // Lock the snapshot: price, shipping, provider, destination, design and algorithm versions.
   const order = {
     id: orderId, uid: ctx.who.uid, email: ctx.who.email || '', status: 'payment_pending', quoteId: quote.id,
-    items: priced.items.map((i, n) => ({ ...i, index: n, artwork: i.collection === 'blood_group' ? bloodArtwork(i.design.bloodGroup) : null })),
+    items: priced.items.map((i, n) => ({ ...i, index: n, artwork: null, mockup: null, sourceAsset: i.collection === 'blood_group' ? bloodSourceAsset(i.design.bloodGroup) : null })),
     address: priced.shipTo, countryCode: priced.shipTo.country, currency: country.currency,
     totals: priced.quote, amount: priced.quote.total, providerId: priced.providerId, backups: priced.backups,
     gateway: choice.gateway, referral, algorithmVersion: NAME_ALGORITHM_VERSION,
@@ -194,10 +208,11 @@ export async function handleCheckout(ctx, body) {
   return ok({ orderId, gateway: choice.gateway, gatewayOrder: gw.client, total: order.amount, currency: order.currency, needsArtwork });
 }
 
-// Approved blood-group artwork is a fixed, versioned, checksummed file (never a customer upload).
-function bloodArtwork(code) {
+// Blood-group designs are composited by the browser too (the customer chooses the position), but only ever from the
+// approved, versioned, checksummed master; we record which one so a reprint can be traced.
+function bloodSourceAsset(code) {
   const a = BLOOD_ASSETS[bloodGroupSlug(code)];
-  return a ? { kind: 'static', path: a.path, sha256: a.sha256, version: a.version, width: a.width, height: a.height } : null;
+  return a ? { path: a.path, sha256: a.sha256, version: a.version, width: a.width, height: a.height } : null;
 }
 
 // The browser renders the personalised print PNG from the SAME design definition, uploads it, and tells
@@ -212,10 +227,15 @@ export async function handleAttachArtwork(ctx, body) {
   const items = clone(order.items);
   for (const a of body.items || []) {
     const it = items[a.index];
-    if (!it || it.collection !== 'name_elements') return fail(400, 'bad-artwork-index');
+    if (!it) return fail(400, 'bad-artwork-index');
     if (!/^[a-f0-9]{64}$/.test(String(a.sha256 || ''))) return fail(400, 'bad-checksum');
     if (!a.path || !String(a.path).startsWith(`merch/print/${ctx.who.uid}/${order.id}/`)) return fail(400, 'bad-artwork-path');
-    it.artwork = { kind: 'upload', path: a.path, sha256: a.sha256, version: it.design.templateVersion, width: Number(a.width) || null, height: Number(a.height) || null };
+    it.artwork = { kind: 'upload', path: a.path, sha256: a.sha256, version: it.design.templateVersion, width: Number(a.width) || null, height: Number(a.height) || null, layout: it.layout };
+    // Optional mock-up image (product with the design at the customer's position) for Qikink's mockup_link
+    if (a.mockup) {
+      if (!/^[a-f0-9]{64}$/.test(String(a.mockup.sha256 || '')) || !String(a.mockup.path || '').startsWith(`merch/mockup/${ctx.who.uid}/${order.id}/`)) return fail(400, 'bad-mockup');
+      it.mockup = { path: a.mockup.path, sha256: a.mockup.sha256 };
+    }
   }
   await ctx.db.patch(`${COLL.orders}/${order.id}`, { items });
   return ok({ ok: true });
@@ -274,7 +294,7 @@ export async function handleVerify(ctx, body) {
   const order = found?.data;
   if (!order || order.uid !== ctx.who.uid) return fail(404, 'order-not-found');
   if (order.status !== 'payment_pending') return ok({ ok: true, already: true });
-  if (order.items.some((i) => i.collection === 'name_elements' && !i.artwork)) return fail(409, 'artwork-missing');
+  if (order.items.some((i) => !i.artwork)) return fail(409, 'artwork-missing');
   const res = await ctx.gateways.verify({ ...order, orderId: order.gatewayOrderId, uid: order.uid }, body.proof || {});
   if (res.error) return fail(res.status || 400, res.error);
   const paid = await markPaid(ctx, order.id, { transactionId: res.transactionId, via: 'verify' });
@@ -355,15 +375,17 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
     idempotencyKey: ff.idempotencyKey, orderId, attempt: attempts, address: order.address, email: order.email, currency: order.currency, totalValue: order.amount,
     items: await Promise.all(order.items.map(async (i) => ({
       index: i.index, productId: i.productId, color: i.color, size: i.size, qty: i.qty, unitPrice: i.unitPrice, providerSku: i.providerSku, placement: 'default',
-      printAreaPx: Object.values(products[i.productId]?.printArea || {})[0] || null,
-      designUrl: await ctx.artworkUrl(order, i), designSha256: i.artwork.sha256
+      layout: i.layout, canvasInches: i.canvasInches, placementSku: i.placementSku,
+      designUrl: await ctx.artworkUrl(order, i, 'print'), designSha256: i.artwork.sha256,
+      // a real mock-up when the browser made one; otherwise the print file (recorded below as the fallback)
+      mockupUrl: i.mockup ? await ctx.artworkUrl(order, i, 'mockup') : null
     })))
   };
   let res;
   try { res = await adapter.submitOrder(payload); } catch (e) { res = { ok: false, error: 'exception', retryable: true }; }
 
   if (res.ok) {
-    await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'submitted', providerOrderId: res.providerOrderId, providerOrderNumber: res.orderNumber || null, attempts, submittedAt: ctx.now(), lastError: null });
+    await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'submitted', providerOrderId: res.providerOrderId, providerOrderNumber: res.orderNumber || null, mockupSources: order.items.map((i) => (i.mockup ? 'mockup' : 'print-fallback')), attempts, submittedAt: ctx.now(), lastError: null });
     await setState(ctx, orderId, null, 'submitted', { providerOrderId: res.providerOrderId });
     return { submitted: true, providerOrderId: res.providerOrderId };
   }
@@ -554,7 +576,11 @@ const ADMIN_ACTIONS = {
   },
   async setProduct(ctx, b) {
     if (!/^[a-z0-9_-]{2,30}$/.test(String(b.id || ''))) return { error: 'bad-product-id' };
-    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printArea', 'collections']), enabled: b.enabled !== false, updatedAt: ctx.now() };
+    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
+    // A product cannot be switched on without a complete, valid print spec (no guessed print areas).
+    const spec = b.printSpec || DEFAULT_PRODUCTS[b.id]?.printSpec;
+    if (patch.enabled && !specComplete(spec)) return { error: 'print-spec-incomplete', problems: specProblems(spec) };
+    if (spec && !b.printSpec) patch.printSpec = spec;
     return { path: `${COLL.products}/${b.id}`, patch };
   },
   async setRoute(ctx, b) {

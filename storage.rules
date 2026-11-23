@@ -11,6 +11,12 @@ service firebase.storage {
         && request.resource.contentType == 'image/png';
       allow read, update, delete: if false;
     }
+    match /merch/mockup/{uid}/{orderId}/{file} {
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.size < 5 * 1024 * 1024
+        && request.resource.contentType == 'image/png';
+      allow read, update, delete: if false;
+    }
     match /{allPaths=**} {
       allow read, write: if false;
     }

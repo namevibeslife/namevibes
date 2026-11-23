@@ -98,7 +98,7 @@ export function buildShippingAddress(address, email) {
 
 // ---- create-order payload ------------------------------------------------------------------------------------
 // order: { orderId, items[], address, email, totalValue, currency }. Each item: { qty, unitPrice, designUrl, designSha256,
-// printAreaPx?, providerSku: { sku, printTypeId, placementSku, widthInches?, heightInches?, plain? }, mockupUrl? }.
+// canvasInches { width, height }, placementSku, providerSku: { sku, printTypeId, plain? }, mockupUrl? }.
 // Returns { payload, orderNumber } or { error } (a permanent validation error: never retried blindly).
 export function buildOrderPayload(order) {
   if (String(order.address?.country || '').toUpperCase() !== 'IN') return { error: 'unsupported-country' };
@@ -117,17 +117,20 @@ export function buildOrderPayload(order) {
     if (m.plain === true) {
       line.print_type_id = 1; line.designs = [];
     } else {
-      if (!PLACEMENTS.includes(m.placementSku)) return { error: 'placement-invalid' };
+      const placement = it.placementSku || m.placementSku; // from the product print spec; a mapping value is the older fallback
+      if (!PLACEMENTS.includes(placement)) return { error: 'placement-invalid' };
       if (!it.designUrl || String(it.designUrl).length > 512) return { error: 'design-link-invalid' };
       const mockup = it.mockupUrl || it.designUrl;
       if (String(mockup).length > 512) return { error: 'mockup-link-invalid' };
-      const wIn = Number(m.widthInches) || (it.printAreaPx ? it.printAreaPx.width / 300 : 0);
-      const hIn = Number(m.heightInches) || (it.printAreaPx ? it.printAreaPx.height / 300 : 0);
+      // The print file is a canvas the size of the whole print area (the design sits at the customer's position inside it),
+      // so the declared size is the canvas size.
+      const wIn = Number(it.canvasInches?.width) || Number(m.widthInches) || 0;
+      const hIn = Number(it.canvasInches?.height) || Number(m.heightInches) || 0;
       if (!(wIn > 0 && hIn > 0)) return { error: 'design-size-missing' };
       const max = MAX_PRINT_INCHES[printType];
       if (max && (wIn > max.width || hIn > max.height)) return { error: 'design-too-large' };
       const code = `d${it.index ?? 0}_${String(it.designSha256 || '').slice(0, 12)}`.slice(0, 20);
-      line.designs = [{ design_code: code, width_inches: +wIn.toFixed(2), height_inches: +hIn.toFixed(2), placement_sku: m.placementSku, design_link: it.designUrl, mockup_link: mockup }];
+      line.designs = [{ design_code: code, width_inches: +wIn.toFixed(2), height_inches: +hIn.toFixed(2), placement_sku: placement, design_link: it.designUrl, mockup_link: mockup }];
     }
     lines.push(line);
   }
@@ -144,6 +147,16 @@ export function unknownFields(payload) {
   check(payload.shipping_address || {}, ALLOWED_FIELDS.address, 'shipping_address');
   (payload.line_items || []).forEach((l, i) => { check(l, ALLOWED_FIELDS.line, `line_items[${i}]`); (l.designs || []).forEach((d, j) => check(d, ALLOWED_FIELDS.design, `line_items[${i}].designs[${j}]`)); });
   return bad;
+}
+
+// UNVERIFIED: the docs show a `pagination` object in the list response but not its fields. This is the ONLY place that
+// guesses: it follows total_pages / last_page when present, and otherwise stops when a page has fewer than 10 rows (the
+// documented page size). Replace it once a real response has been seen.
+export function hasMorePages(body, page) {
+  const pg = body?.pagination || {};
+  const last = Number(pg.total_pages ?? pg.last_page ?? 0);
+  if (last > 0) return page < last;
+  return (body?.data || []).length >= 10;
 }
 
 const realSleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -298,9 +311,7 @@ export class QikinkAdapter extends PODProvider {
         const res = await this.list({ ids: chunk.join(','), page_no: String(page) });
         if (!res.ok) return res;
         for (const o of res.body?.data || []) orders[String(o.order_id)] = QikinkAdapter.normalise(o);
-        const pg = res.body?.pagination || {};
-        const last = Number(pg.total_pages ?? pg.last_page ?? 1) || 1;
-        if (page >= last || (res.body?.data || []).length < 10) break;
+        if (!hasMorePages(res.body, page)) break;
       }
     }
     return { ok: true, orders };

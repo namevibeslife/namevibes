@@ -56,7 +56,7 @@ export function MerchOrderDetail() {
 
   async function reorder() {
     const cart = await loadCart(user.uid);
-    const lines = order.items.map((i) => ({ id: newLineId(), collection: i.collection, productId: i.productId, color: i.color, size: i.size, qty: i.qty,
+    const lines = order.items.map((i) => ({ id: newLineId(), collection: i.collection, productId: i.productId, color: i.color, size: i.size, qty: i.qty, layout: i.layout,
       design: i.collection === 'blood_group' ? { bloodGroup: i.design.bloodGroup, confirmed: true } : { name: i.design.name, elements: i.design.elements.map((e) => e.symbol) } }));
     await saveCart(user.uid, [...cart, ...lines]);
     navigate('/merch/cart');

@@ -8,6 +8,7 @@ import { loadCart, saveCart, newLineId } from '../merch/cart';
 import { buildDesign, BLOOD_GROUPS, bloodGroupLabel } from '../merch/designs';
 import ProductPreview from '../merch/ProductPreview';
 import { ALL_COUNTRIES } from '../data/countries';
+import { DEFAULT_LAYOUT, defaultLayoutFor, normaliseLayout, placementBox, designAspect, designDpi, resolutionStatus, maxScaleForDpi } from '../merch/layout';
 import { formatMoney } from '../i18n/format';
 
 const COLLECTIONS = ['name_elements', 'blood_group'];
@@ -30,6 +31,7 @@ export default function MerchStore() {
   const [color, setColor] = useState('');
   const [size, setSize] = useState('');
   const [qty, setQty] = useState(1);
+  const [layout, setLayout] = useState(null); // null = automatic (centred, sharp-safe size) until the customer moves something
   const [cart, setCart] = useState([]);
   const [msg, setMsg] = useState('');
 
@@ -47,13 +49,24 @@ export default function MerchStore() {
     if (!products.find((p) => p.id === productId)) setProductId(first?.id || '');
   }, [products, productId]);
   const product = products.find((p) => p.id === productId);
-  useEffect(() => { if (product) { setColor(product.colors[0]?.id || ''); setSize(product.sizes[0] || ''); } }, [productId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (product) { setColor(product.colors[0]?.id || ''); setSize(product.sizes[0] || ''); setLayout(null); } }, [productId, collection]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const built = collection === 'name_elements'
     ? buildDesign('name_elements', { name })
     : buildDesign('blood_group', { bloodGroup, confirmed: true }); // preview only; the confirmation is required to add
   const colorHex = product?.colors.find((c) => c.id === color)?.hex || '#FFFFFF';
   const symbols = built.design?.elements?.map((e) => e.symbol).join(' · ');
+  // print area, position bounds and resolution (the server re-checks all of it)
+  const spec = product?.printSpec;
+  const lay = normaliseLayout(layout || defaultLayoutFor(built.design, spec));
+  const area = spec ? { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) } : null;
+  const box = area && built.design ? placementBox(area, lay, designAspect(built.design)) : null;
+  const halfW = box ? box.width / 2 / area.width : 0;
+  const halfH = box ? box.height / 2 / area.height : 0;
+  const res = area && built.design ? designDpi({ design: built.design, spec, layout: lay }) : null;
+  const resStatus = res ? resolutionStatus(res.dpi, { minDpi: Number(spec.minDpi) }) : 'ok';
+  const blocked = resStatus === 'blocked' && !product?.dpiOverride;
+  const maxScale = res && built.design ? maxScaleForDpi({ design: built.design, spec, minDpi: Number(spec.minDpi) }) : 1;
   const errorText = (code) => t(`merch.err.${code}`, { defaultValue: t('merch.err.generic') });
 
   async function add() {
@@ -62,7 +75,8 @@ export default function MerchStore() {
     if (collection === 'blood_group' && !confirmed) { setMsg(errorText('blood-group-not-confirmed')); return; }
     if (built.error) { setMsg(errorText(built.error)); return; }
     const design = collection === 'name_elements' ? { name: built.design.name, elements: built.design.elements.map((e) => e.symbol) } : { bloodGroup, confirmed: true };
-    const next = [...cart, { id: newLineId(), collection, productId, color, size, qty: Number(qty), design }];
+    if (blocked) { setMsg(t('merch.err.resolution-too-low', { dpi: res?.dpi, minDpi: spec?.minDpi })); return; }
+    const next = [...cart, { id: newLineId(), collection, productId, color, size, qty: Number(qty), design, layout: normaliseLayout(layout) }];
     try { await saveCart(user.uid, next); setCart(next); setMsg(t('merch.added')); } catch { setMsg(t('merch.err.generic')); }
   }
 
@@ -141,11 +155,23 @@ export default function MerchStore() {
                     <input type="number" min="1" max="10" value={qty} onChange={(e) => setQty(Math.max(1, Math.min(10, Number(e.target.value) || 1)))} className="mt-1 block w-full border rounded-lg px-2 py-2" /></label>
                 </div>
               )}
-              <button onClick={add} disabled={!product || (collection === 'name_elements' ? !!built.error : !bloodGroup)} className="px-5 py-2 rounded-lg bg-brand-600 text-white disabled:opacity-50" data-testid="add-to-cart">{t('merch.addToCart')}</button>
+              {product && built.design && (
+                <fieldset className="mb-4" data-testid="layout-controls">
+                  <legend className="block text-sm font-medium text-gray-700">{t('merch.layoutTitle')}</legend>
+                  <label className="block text-sm mt-1">{t('merch.layoutScale')}<input type="range" min="0.2" max="1" step="0.01" value={lay.scale} onChange={(e) => setLayout({ ...lay, scale: Number(e.target.value) })} className="block w-full" data-testid="layout-scale" /></label>
+                  <label className="block text-sm mt-1">{t('merch.layoutX')}<input type="range" min={halfW} max={1 - halfW} step="0.01" value={Math.min(1 - halfW, Math.max(halfW, lay.x))} onChange={(e) => setLayout({ ...lay, x: Number(e.target.value) })} disabled={halfW >= 0.5} className="block w-full" data-testid="layout-x" /></label>
+                  <label className="block text-sm mt-1">{t('merch.layoutY')}<input type="range" min={halfH} max={1 - halfH} step="0.01" value={Math.min(1 - halfH, Math.max(halfH, lay.y))} onChange={(e) => setLayout({ ...lay, y: Number(e.target.value) })} disabled={halfH >= 0.5} className="block w-full" data-testid="layout-y" /></label>
+                  <button type="button" className="mt-1 text-sm underline" onClick={() => setLayout({ ...lay, x: 0.5, y: 0.5 })} data-testid="layout-centre">{t('merch.layoutCentre')}</button>
+                  <p className="text-xs text-gray-600 mt-1">{t('merch.printArea', { w: spec.maxWidthInches, h: spec.maxHeightInches })}</p>
+                  {resStatus === 'low' && <p role="status" className="text-xs text-amber-800" data-testid="dpi-warning">{t('merch.dpiLow', { dpi: res.dpi })}</p>}
+                  {resStatus === 'blocked' && <p role="alert" className="text-xs text-red-700" data-testid="dpi-blocked">{t('merch.err.resolution-too-low', { dpi: res.dpi, minDpi: spec.minDpi })} {t('merch.dpiMaxSize', { percent: Math.floor(maxScale * 100) })} <button type="button" className="underline" onClick={() => setLayout({ ...lay, scale: Math.max(0.2, Math.floor(maxScale * 100) / 100) })}>{t('merch.dpiFix')}</button></p>}
+                </fieldset>
+              )}
+              <button onClick={add} disabled={blocked || !product || (collection === 'name_elements' ? !!built.error : !bloodGroup)} className="px-5 py-2 rounded-lg bg-brand-600 text-white disabled:opacity-50" data-testid="add-to-cart">{t('merch.addToCart')}</button>
               {msg && <p role="status" className="mt-2 text-sm text-gray-700" data-testid="merch-msg">{msg} {msg === t('merch.added') && <button className="underline" onClick={() => navigate('/merch/cart')}>{t('merch.viewCart')}</button>}</p>}
             </section>
             <section aria-label={t('merch.preview')} className="bg-white/60 rounded-xl p-4">
-              <ProductPreview product={product} colorHex={colorHex} design={built.design} label={t('merch.preview')} />
+              <ProductPreview product={product} colorHex={colorHex} design={built.design} label={t('merch.preview')} layout={lay} spec={spec} />
             </section>
           </div>
         )}

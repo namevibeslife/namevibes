@@ -98,9 +98,9 @@ await test('DTG max 16x20 in, DTF max 18x20 in', () => {
   assert.equal(big(17, 18.5, 20).error, 'design-too-large');
   assert.equal(big(99, 5, 5).error, 'print-type-invalid');
 });
-await test('size falls back to the product print area at 300 DPI; missing size is an error', () => {
+await test('the declared size is the print-area canvas; missing size is an error', () => {
   const noInches = { sku: 'S', printTypeId: 1, placementSku: 'fr' };
-  assert.equal(buildOrderPayload(order({ items: [item({ providerSku: noInches, printAreaPx: { width: 3600, height: 4800 } })] })).payload.line_items[0].designs[0].width_inches, 12);
+  assert.equal(buildOrderPayload(order({ items: [item({ providerSku: noInches, canvasInches: { width: 12, height: 16 } })] })).payload.line_items[0].designs[0].width_inches, 12);
   assert.equal(buildOrderPayload(order({ items: [item({ providerSku: noInches })] })).error, 'design-size-missing');
 });
 await test('plain (non-printed) product: print_type_id 1 and no designs; incomplete SKU mapping is refused', () => {

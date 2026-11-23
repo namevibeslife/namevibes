@@ -7,14 +7,16 @@ import { hmacHex, sameString } from '../../_lib/merchCtx.js';
 export async function onRequestGet({ request, env }) {
   const q = new URL(request.url).searchParams;
   const [o, i, e, s] = ['o', 'i', 'e', 's'].map((k) => q.get(k) || '');
+  const k = q.get('k') === 'm' ? 'm' : 'p'; // p = print file, m = mock-up
   const notFound = () => new Response('Not found', { status: 404 });
   if (!env.MERCH_ARTWORK_SECRET || !/^[A-Za-z0-9_-]{6,64}$/.test(o) || !/^\d{1,2}$/.test(i) || !(Number(e) > Date.now())) return notFound();
-  if (!sameString(await hmacHex(env.MERCH_ARTWORK_SECRET, `${o}.${i}.${e}`), s.toLowerCase())) return notFound();
+  if (!sameString(await hmacHex(env.MERCH_ARTWORK_SECRET, `${o}.${i}.${k}.${e}`), s.toLowerCase())) return notFound();
   try {
     const db = await firestore(env);
     const order = (await db.get(`merch_orders/${o}`))?.data;
-    const art = order?.items?.[Number(i)]?.artwork;
-    if (!art || art.kind !== 'upload' || !String(art.path).startsWith('merch/print/')) return notFound();
+    const it = order?.items?.[Number(i)];
+    const art = k === 'm' ? it?.mockup : it?.artwork;
+    if (!art || !String(art.path).startsWith(k === 'm' ? 'merch/mockup/' : 'merch/print/')) return notFound();
     const account = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
     const token = await accessToken(account, 'https://www.googleapis.com/auth/devstorage.read_only');
     const bucket = env.FIREBASE_STORAGE_BUCKET || `${account.project_id}.firebasestorage.app`;

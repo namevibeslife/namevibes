@@ -1352,7 +1352,8 @@
       "mixed-providers": "These items cannot ship together. Order them separately.",
       "gateway-unavailable": "Payments for this country are not available yet.",
       "paymentFailed": "The payment could not be completed. You have not been charged.",
-      "paymentRecorded": "Your payment went through but we could not confirm it yet. Check My orders in a minute, or contact support."
+      "paymentRecorded": "Your payment went through but we could not confirm it yet. Check My orders in a minute, or contact support.",
+      "resolution-too-low": "This design is too large to print sharply ({{dpi}} DPI; at least {{minDpi}} DPI is needed). Make it smaller."
     },
     "cart": {
       "title": "Your cart",
@@ -1404,6 +1405,15 @@
       "cancelled": "Cancelled",
       "refunded": "Refunded",
       "in_review": "Being checked by our team"
-    }
+    },
+    "layoutTitle": "Position and size",
+    "layoutScale": "Size of the design",
+    "layoutX": "Left and right",
+    "layoutY": "Up and down",
+    "layoutCentre": "Centre it",
+    "printArea": "The dashed box is the printable area ({{w}} × {{h}} inches). The design cannot go outside it.",
+    "dpiLow": "At this size the print will be a little soft ({{dpi}} DPI). Make the design smaller for a sharper result.",
+    "dpiMaxSize": "The largest sharp size is about {{percent}}% of the print area.",
+    "dpiFix": "Use that size"
   }
 }

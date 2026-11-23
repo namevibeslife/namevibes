@@ -33,7 +33,11 @@ export const SEED_DATA = {
   'merch_providers/mock2': { id: 'mock2', name: 'Mock backup', adapter: 'mock', active: true, countries: ['IN'] },
   // PLACEHOLDER Qikink entries for the sandbox: inactive, and the SKU below is NOT a real Qikink SKU. Copy real ones from the dashboard.
   'merch_providers/qikink': { id: 'qikink', name: 'Qikink (sandbox, placeholder)', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'] },
-  'merch_variants/tshirt_white_M': { id: 'tshirt_white_M', productId: 'tshirt', color: 'white', size: 'M', placeholder: true, providerSkus: { qikink: { sku: 'PLACEHOLDER-REPLACE-ME', printTypeId: 1, placementSku: 'fr', widthInches: 12, heightInches: 16 } } },
+  // UNVERIFIED starter SKUs from docs/qikink-sku-starter-products.md. print_type_id, print area and placement are unknown, so these products stay blocked until an admin fills them in.
+  'merch_variants/mug_white_330ml': { id: 'mug_white_330ml', productId: 'mug', color: 'white', size: '330ml', placeholder: true, providerSkus: { qikink: { sku: 'UWCM-Wh-11 OZ', unverified: true } } },
+  'merch_variants/notebook_ivory_A5': { id: 'notebook_ivory_A5', productId: 'notebook', color: 'ivory', size: 'A5', placeholder: true, providerSkus: { qikink: { sku: 'UNotebook-Wh-Notebook Ruled', unverified: true } } },
+  'merch_variants/poster_black-frame_A3': { id: 'poster_black-frame_A3', productId: 'poster', color: 'black-frame', size: 'A3', placeholder: true, providerSkus: { qikink: { sku: 'UFPos-Bk-A3 Frame poster', unverified: true } } },
+  'merch_variants/tshirt_white_M': { id: 'tshirt_white_M', productId: 'tshirt', color: 'white', size: 'M', placeholder: true, providerSkus: { qikink: { sku: 'MRnHs-Wh-M', printTypeId: 1, unverified: true } } },
   // Country Pricing (admin) - the app shows prices from these records only
   'countrySettings/mock-in': { countryCode: 'IN', countryName: 'India', currency: 'INR', symbol: '₹', price: 399, referralDiscount: 10, taxPercent: 18, isActive: true },
   'countrySettings/mock-us': { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true },

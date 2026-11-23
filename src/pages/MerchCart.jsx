@@ -34,8 +34,8 @@ export default function MerchCart() {
   const products = mergeProducts();
 
   useEffect(() => { if (user) loadCart(user.uid).then(setCart); }, [user]);
-  const errorText = (body) => (body?.error === 'merch-off' && body.message ? body.message : t(`merch.err.${body?.error}`, { defaultValue: t('merch.err.generic') }));
-  const items = (cart || []).map((l) => ({ productId: l.productId, collection: l.collection, color: l.color, size: l.size, qty: l.qty, design: l.design }));
+  const errorText = (body) => (body?.error === 'merch-off' && body.message ? body.message : t(`merch.err.${body?.error}`, { ...body, defaultValue: t('merch.err.generic') }));
+  const items = (cart || []).map((l) => ({ productId: l.productId, collection: l.collection, color: l.color, size: l.size, qty: l.qty, design: l.design, layout: l.layout }));
 
   async function persist(next) { setCart(next); setQuote(null); await saveCart(user.uid, next); }
   const setField = (k, v) => { setAddress((a) => ({ ...a, [k]: v })); setQuote(null); }; // an address change invalidates the quote

@@ -30,6 +30,8 @@ const seed = () => ({
     countryCode: 'US', enabled: false, currency: 'USD', taxPercent: 0, taxIncluded: false,
     collections: { name_elements: true, blood_group: true }, prices: { tshirt: 25 }, shipping: { flat: 5 }, providerPrimary: 'mock'
   },
+  // mug has a complete print spec in this fixture (the shipped default leaves it unset, which blocks it)
+  'merch_products/mug': { id: 'mug', printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: false } },
   'merch_providers/mock': { id: 'mock', adapter: 'mock', active: true, countries: ['IN', 'US'] },
   'merch_providers/mock2': { id: 'mock2', adapter: 'mock', active: true, countries: ['IN'] },
   'admins/admin@x.test': { role: 'super' },
@@ -62,7 +64,7 @@ function makeEnv({ db = createMemoryDb(seed()), who = { uid: 'u1', email: 'u1@x.
 const tshirtItem = (name = 'Vibes') => ({ productId: 'tshirt', collection: 'name_elements', color: 'white', size: 'M', qty: 1, design: { name } });
 const withArtwork = async (e, orderId, uid = 'u1') => {
   const order = (await e.db.get(`merch_orders/${orderId}`)).data;
-  return handleMerch(e.ctx, 'artwork', { orderId, items: order.items.filter((i) => i.collection === 'name_elements').map((i) => ({ index: i.index, sha256: 'a'.repeat(64), path: `merch/print/${uid}/${orderId}/${i.index}.png`, width: 3600, height: 4800 })) });
+  return handleMerch(e.ctx, 'artwork', { orderId, items: order.items.map((i) => ({ index: i.index, sha256: 'a'.repeat(64), path: `merch/print/${uid}/${orderId}/${i.index}.png`, width: 3600, height: 4800 })) });
 };
 async function placeOrder(e, items = [tshirtItem()], addr = address()) {
   const q = await handleMerch(e.ctx, 'quote', { items, address: addr });
@@ -114,7 +116,7 @@ const cfgFromSeed = async () => {
 };
 await test('switches cascade global -> country -> collection -> product', async () => {
   const c = await cfgFromSeed();
-  const product = { id: 'tshirt', enabled: true, collections: ['name_elements', 'blood_group'] };
+  const product = { id: 'tshirt', enabled: true, collections: ['name_elements', 'blood_group'], printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150 } };
   assert.equal(checkAvailability({ settings: c.settings, country: c.india, product, collection: 'name_elements' }).ok, true);
   assert.equal(checkAvailability({ settings: { enabled: false }, country: c.india, product, collection: 'name_elements' }).reason, 'global-off');
   assert.equal(checkAvailability({ settings: c.settings, country: c.us, product, collection: 'name_elements' }).reason, 'country-off');
@@ -265,9 +267,10 @@ await test('blood-group order uses the fixed approved artwork reference and is n
   assert.equal(q.status, 200);
   const c = await handleMerch(e.ctx, 'checkout', { quoteId: q.body.quoteId });
   assert.equal(c.status, 200);
-  assert.deepEqual(c.body.needsArtwork, []); // blood group uses the fixed approved file, no customer upload
+  assert.deepEqual(c.body.needsArtwork, [0]); // the browser composites the approved master at the customer's position
   const o = (await e.db.get(`merch_orders/${c.body.orderId}`)).data;
-  assert.equal(o.items[0].artwork.kind, 'static'); assert.match(o.items[0].artwork.path, /^\/merch\/blood\/ab-neg\.v1\./); assert.equal(o.items[0].artwork.sha256.length, 64);
+  assert.match(o.items[0].sourceAsset.path, /^\/merch\/blood\/ab-neg\.v1\./); assert.equal(o.items[0].sourceAsset.sha256.length, 64);
+  assert.equal((await withArtwork(e, c.body.orderId)).status, 200);
   await handleMerch(e.ctx, 'verify', { orderId: c.body.orderId, proof: {} });
   const com = (await e.db.get(`merch_commissions/${c.body.orderId}`));
   if (com) { const s = JSON.stringify(com.data); assert.ok(!s.includes('AB-') && !s.includes('411001') && !s.includes('9999999999')); }

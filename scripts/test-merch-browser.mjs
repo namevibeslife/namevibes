@@ -50,6 +50,90 @@ await step('only the eight blood groups are offered and confirmation is required
   assert.match(await page.getByTestId('merch-msg').innerText(), /confirm/i);
   await page.getByTestId('tab-name_elements').click();
 });
+await step('designer: position and size controls move the design inside the shown print area; products without a print spec are not offered', async () => {
+  await page.getByTestId('tab-name_elements').click();
+  await page.getByTestId('merch-name').fill('Vibes');
+  assert.equal(await page.getByTestId('product-mug').count(), 0, 'mug has no print spec, so it must not be offered');
+  assert.equal(await page.getByTestId('product-tshirt').count(), 1);
+  const rect = async () => page.evaluate(() => {
+    const svg = document.querySelector('[role=img] svg');
+    const area = svg.querySelector('[data-print-area]').getBoundingClientRect();
+    const tiles = [...svg.querySelectorAll('rect')].filter((r) => !r.hasAttribute('data-print-area') && r.getAttribute('rx'));
+    const xs = tiles.map((r) => r.getBoundingClientRect());
+    return { area: { x: area.x, y: area.y, w: area.width, h: area.height }, left: Math.min(...xs.map((r) => r.left)), top: Math.min(...xs.map((r) => r.top)), right: Math.max(...xs.map((r) => r.right)), bottom: Math.max(...xs.map((r) => r.bottom)) };
+  });
+  const inside = (r) => r.left >= r.area.x - 1 && r.top >= r.area.y - 1 && r.right <= r.area.x + r.area.w + 1 && r.bottom <= r.area.y + r.area.h + 1;
+  const centred = await rect(); assert.ok(inside(centred), 'design inside the print area');
+  await page.getByTestId('layout-scale').fill('0.4');
+  await page.getByTestId('layout-x').fill('0');
+  await page.getByTestId('layout-y').fill('0');
+  const corner = await rect(); assert.ok(inside(corner));
+  assert.ok(corner.left < centred.left - 5 && corner.top < centred.top - 5, 'design moved to the top-left');
+  assert.ok(corner.right - corner.left < centred.right - centred.left, 'design is smaller');
+  assert.ok(Math.abs(corner.left - corner.area.x) < 2 && Math.abs(corner.top - corner.area.y) < 2, 'sits in the corner of the print area, not outside it');
+  await page.getByTestId('layout-scale').fill('1');
+  await page.getByTestId('layout-x').fill('1').catch(() => {}); // disabled when the design spans the full width: it cannot be moved out
+  assert.ok(inside(await rect()), 'even at full size and moved, the design stays inside the print area');
+  await page.getByTestId('layout-centre').click();
+});
+await step('designer: a blood-group design too large for its resolution is blocked with a message, and "use that size" fixes it', async () => {
+  await page.getByTestId('tab-blood_group').click();
+  await page.locator('[data-testid="blood-groups"] label').nth(6).click();
+  await page.getByTestId('blood-confirm').check();
+  await page.getByTestId('layout-scale').fill('1');
+  await page.getByTestId('dpi-blocked').waitFor();
+  assert.equal(await page.getByTestId('add-to-cart').isDisabled(), true);
+  await page.getByTestId('dpi-blocked').getByRole('button').click();
+  assert.equal(await page.getByTestId('dpi-blocked').count(), 0);
+  assert.equal(await page.getByTestId('add-to-cart').isDisabled(), false);
+  await page.getByTestId('tab-name_elements').click();
+});
+await step('the real canvas renderer puts the design at the chosen pixels in a transparent print-area canvas (centre, corner, scaled)', async () => {
+  const r = await page.evaluate(async () => {
+    const pc = await import('/src/merch/printCanvas.js');
+    const L = await import('/src/merch/layout.js');
+    const D = await import('/src/merch/designs.js');
+    const spec = { maxWidthInches: 12, maxHeightInches: 16 };
+    const bbox = async (blob) => {
+      const bmp = await createImageBitmap(blob); const c = document.createElement('canvas'); c.width = bmp.width; c.height = bmp.height;
+      const x = c.getContext('2d'); x.drawImage(bmp, 0, 0); const d = x.getImageData(0, 0, c.width, c.height).data;
+      let l = c.width; let t = c.height; let rr = 0; let b = 0; let corner = d[3];
+      for (let y = 0; y < c.height; y++) for (let xx = 0; xx < c.width; xx++) { if (d[(y * c.width + xx) * 4 + 3] > 8) { if (xx < l) l = xx; if (xx > rr) rr = xx; if (y < t) t = y; if (y > b) b = y; } }
+      return { w: c.width, h: c.height, left: l, top: t, right: rr, bottom: b, cornerAlpha: corner };
+    };
+    const out = {};
+    for (const [name, design] of [['name', D.buildNameElementsDesign('Vibes').design], ['blood', { collection: 'blood_group', bloodGroup: 'O+' }]]) {
+      for (const [key, layout] of Object.entries({ centre: { scale: 0.5, x: 0.5, y: 0.5 }, corner: { scale: 0.4, x: 0, y: 0 }, br: { scale: 0.4, x: 1, y: 1 }, half: { scale: 0.25, x: 0.5, y: 0.5 } })) {
+        const f = await pc.renderPrintFile({ design, spec, layout, ink: '#000' });
+        out[`${name}-${key}`] = { ...(await bbox(f.blob)), box: f.box, canvas: [f.width, f.height] };
+      }
+    }
+    const m = await pc.renderMockup({ product: (await import('/src/merch/catalog.js')).DEFAULT_PRODUCTS.tshirt, colorHex: '#FFFFFF', design: D.buildNameElementsDesign('Vibes').design, spec, layout: { scale: 0.5, x: 0.5, y: 0.5 } });
+    out.mockup = { w: m.width, h: m.height, size: m.blob.size };
+    return out;
+  });
+  for (const name of ['name', 'blood']) {
+    for (const key of ['centre', 'corner', 'br', 'half']) {
+      const o = r[`${name}-${key}`];
+      assert.ok(o.right > o.left && o.bottom > o.top, `${name}-${key}: something was drawn`);
+      assert.equal(o.cornerAlpha, 0, `${name}-${key}: canvas is transparent (nothing behind the design)`);
+      // the aspect of the canvas is the print area (12 x 16 in)
+      assert.ok(Math.abs(o.w / o.h - 0.75) < 0.01);
+      const tol = 3;
+      assert.ok(o.left >= o.box.x - tol && o.top >= o.box.y - tol && o.right <= o.box.x + o.box.width + tol && o.bottom <= o.box.y + o.box.height + tol, `${name}-${key}: pixels inside the layout box`);
+    }
+    const c = r[`${name}-centre`]; const k = r[`${name}-corner`]; const br = r[`${name}-br`]; const h = r[`${name}-half`];
+    // centre: bounding box is centred on the canvas
+    assert.ok(Math.abs((c.left + c.right) / 2 - c.w / 2) < c.w * 0.03 && Math.abs((c.top + c.bottom) / 2 - c.h / 2) < c.h * 0.06, `${name}: centred`);
+    // corner: touches the top-left region; bottom-right: the opposite one
+    assert.ok(k.left < k.w * 0.08 && k.top < k.h * 0.08, `${name}: top-left corner`);
+    assert.ok(br.right > br.w * 0.92 && br.bottom > br.h * 0.92, `${name}: bottom-right corner`);
+    // scaled: half the scale gives about half the width
+    const ratio = (h.right - h.left) / (c.right - c.left);
+    assert.ok(ratio > 0.42 && ratio < 0.58, `${name}: scaled ratio ${ratio}`);
+  }
+  assert.equal(r.mockup.w, 800); assert.equal(r.mockup.h, 880); assert.ok(r.mockup.size > 2000);
+});
 await step('add a T-shirt, get a server-calculated quote, pay (simulated), order is confirmed and sent to the provider', async () => {
   await page.getByTestId('merch-name').fill('Vibes');
   await page.getByTestId('add-to-cart').click();
@@ -65,6 +149,21 @@ await step('add a T-shirt, get a server-calculated quote, pay (simulated), order
   await page.waitForURL('**/merch/orders/**', { timeout: 15000 });
   assert.match(await page.getByTestId('order-status').innerText(), /Sent to production/);
   await noOverflow('order 390');
+});
+await step('the paid T-shirt order stores the layout, the print-area size, a print file and a mock-up', async () => {
+  const o = await page.evaluate(async () => {
+    const { collection, getDocs, query, where } = await import('/src/mock/firestore.js');
+    const { db } = await import('/src/firebase.js');
+    const snap = await getDocs(query(collection(db, 'merch_orders'), where('uid', '==', 'mock-individual')));
+    const order = snap.docs.map((d) => d.data()).find((x) => x.status === 'submitted');
+    const ff = (await getDocs(collection(db, 'merch_fulfillments'))).docs.map((d) => d.data()).find((x) => x.orderId === order.id);
+    return { item: order.items[0], sources: ff.mockupSources };
+  });
+  assert.deepEqual(o.item.canvasInches, { width: 12, height: 16 });
+  assert.equal(o.item.placementSku, 'fr');
+  assert.ok(o.item.layout && o.item.layout.scale > 0);
+  assert.match(o.item.artwork.path, /^merch\/print\//); assert.match(o.item.mockup.path, /^merch\/mockup\//);
+  assert.deepEqual(o.sources, ['mockup']);
 });
 await step('order history lists the order and Order again refills the cart', async () => {
   await page.goto(`${BASE}/merch/orders`);
