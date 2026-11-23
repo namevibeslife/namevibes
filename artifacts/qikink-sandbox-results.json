@@ -1,0 +1,40 @@
+{
+  "at": "2026-11-23T21:01:22.194Z",
+  "env": "sandbox",
+  "token": {
+    "fetched": true,
+    "refreshed": true,
+    "same": false,
+    "error": null
+  },
+  "results": [
+    {
+      "key": "mug-centred",
+      "title": "Mug 8.5 x 3.5 in, design centred, print type 5, placement fr",
+      "type": 5,
+      "design": "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png",
+      "orderNumber": "nv1jq63ynvwgi",
+      "ok": true,
+      "providerOrderId": "45868704"
+    },
+    {
+      "key": "mug-offcentre",
+      "title": "Mug 8.5 x 3.5 in, design off-centre, print type 5, placement fr",
+      "type": 5,
+      "design": "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png",
+      "orderNumber": "nv0y7jd7lg2v9",
+      "ok": true,
+      "providerOrderId": "45873408"
+    },
+    {
+      "key": "control-type-1",
+      "title": "Control: same mug with print type 1 (to learn which type Qikink accepts)",
+      "type": 1,
+      "design": "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png",
+      "orderNumber": "nv0s7tkr7pma9",
+      "ok": false,
+      "error": "Invalid Print Type ID for This SKU",
+      "retryable": false
+    }
+  ]
+}
