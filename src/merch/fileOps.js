@@ -99,13 +99,19 @@ export function dueFor(order, item, settings) {
 
 /** Delete every file that is due. Idempotent; one failure never blocks the others; dryRun lists without deleting. */
 export async function sweepFiles(ctx, { dryRun = false } = {}) {
-  const out = { dryRun, due: 0, deleted: 0, failed: 0, items: [] };
+  // byRule = how many files are due per rule; skippedOpenCase = files that WOULD be due but are kept because the order has an open case
+  const out = { dryRun, due: 0, deleted: 0, failed: 0, items: [], byRule: { unpaid48h: 0, cancelledOrRefunded7d: 0, delivered30d: 0 }, skippedOpenCase: 0 };
+  const ruleName = (r) => (r === 'unconfirmed' ? 'unpaid48h' : r === 'delivered' ? 'delivered30d' : 'cancelledOrRefunded7d');
   if (!ctx.files) return { ...out, error: 'storage-not-configured' };
   const settings = retentionSettings((await ctx.db.get(`${COLL.settings}/storage`))?.data);
   const now = ms(ctx.now());
   for (const order of await ctx.db.list(COLL.orders)) {
     try {
       const todo = [];
+      const openCase = order.openCase === true || ['exception', 'held_provider_funds'].includes(order.status);
+      if (openCase && ['delivered', 'cancelled', 'refunded', 'exception', 'held_provider_funds'].includes(order.status)) {
+        for (const item of order.items || []) for (const kind of ['artwork', 'mockup']) if (item[kind]?.key && !item[kind].fileDeletedAt) out.skippedOpenCase++;
+      }
       (order.items || []).forEach((item, idx) => {
         for (const kind of ['artwork', 'mockup']) {
           const rec = item[kind];
@@ -116,13 +122,14 @@ export async function sweepFiles(ctx, { dryRun = false } = {}) {
       });
       if (todo.length === 0) continue;
       out.due += todo.length;
-      if (dryRun) { out.items.push(...todo.map((t) => ({ orderId: order.id, index: t.idx, kind: t.kind, reason: t.reason, key: t.rec.key }))); continue; }
+      for (const t of todo) out.byRule[ruleName(t.reason)]++;
+      if (dryRun) { out.items.push(...todo.map((t) => ({ orderId: order.id, index: t.idx, kind: t.kind, reason: t.reason }))); continue; }
       const gone = [];
       for (const t of todo) {
         let res;
         try { res = await ctx.files.delete(t.rec); } catch (e) { res = { ok: false, results: [{ ok: false, error: e.message }] }; }
         const logId = ctx.id();
-        await ctx.db.create(FILE_COLL, logId, { id: logId, orderId: order.id, index: t.idx, kind: t.kind, key: t.rec.key, reason: t.reason, ok: res.ok, results: res.results, at: ctx.now() }).catch(() => {});
+        await ctx.db.create(FILE_COLL, logId, { id: logId, orderId: order.id, index: t.idx, kind: t.kind, rule: ruleName(t.reason), ok: res.ok, results: (res.results || []).map((r) => ({ backend: r.backend, ok: r.ok, error: r.error ? String(r.error).slice(0, 40) : undefined })), at: ctx.now() }).catch(() => {});
         if (res.ok) { out.deleted++; gone.push(t); } else out.failed++;
       }
       if (gone.length) { // the order keeps its record, the hash and a timestamp; the page shows "print file removed"

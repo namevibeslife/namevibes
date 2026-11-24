@@ -5,6 +5,8 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { createMemoryDb } from '../src/merch/memoryDb.js';
 import { handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset, handleUpload, sweepFiles, fileReport } from '../src/merch/engine.js';
 import { createFileStore } from '../src/merch/storage/stores.js';
+import { runCron } from '../src/merch/cronRun.js';
+import { secretMatches } from '../functions/api/merch/cron.js';
 import { makeFakeCloud, fakePng } from './fake-storage.mjs';
 import { BLOOD_GROUPS, bloodGroupSlug, bloodGroupLabel } from '../src/merch/designs.js';
 import { productPreviewSvg } from '../src/merch/render.js';
@@ -700,6 +702,34 @@ await test('admin health: each backend ok/failing/not configured, last failover,
   assert.equal((await handleAdmin(e.ctx, { action: 'storageHealth', data: {} })).status, 403);
   await e.db.patch('merch_settings/global', { visibleTo: 'nobody' }); // the upload route obeys the visibility setting like every customer action
   assert.equal((await upl(e, 'x')).status, 404);
+});
+
+console.log('Daily cron');
+await test('cron: the secret check is constant-time-style (hashed, equal length) and refuses missing, wrong and empty secrets', async () => {
+  assert.equal(await secretMatches('s3cret-value', 's3cret-value'), true);
+  for (const [a, b] of [['s3cret-value', 's3cret-valuf'], ['s3cret-value', 's3cret'], ['s3cret-value', ''], ['', ''], [undefined, 'x'], ['s3cret-value', 's3cret-value-and-more']]) assert.equal(await secretMatches(a, b), false, `${a}/${b}`);
+});
+await test('cron: nothing to delete -> a short JSON result with counts only; dry run reports per rule and deletes/changes nothing; log rows hold order id and rule only', async () => {
+  const e = envF(); const empty = await runCron(e.ctx);
+  assert.equal(empty.status, 200); assert.deepEqual(Object.keys(empty.body).sort(), ['eligible', 'files', 'retried', 'synced']); assert.deepEqual(empty.body.files, { due: 0, deleted: 0, failed: 0 });
+  const mk = async (status, ageMs, extra = {}) => { const id = await stored(e); await settle(e, id, status, ageMs, extra); return id; };
+  await mk('payment_pending', 49 * HOUR, { createdAt: new Date(e.cloud.clock.t - 49 * HOUR) });
+  await mk('cancelled', 8 * DAY); await mk('refunded', 9 * DAY); await mk('delivered', 31 * DAY);
+  const open = await mk('delivered', 90 * DAY, { openCase: true }); await mk('exception', 90 * DAY); await mk('delivered', 5 * DAY);
+  const before = e.cloud.state.r2.size + e.cloud.state.sb.size;
+  const dry = await runCron(e.ctx, { dryRun: true });
+  assert.equal(dry.status, 200); assert.equal(dry.body.dryRun, true); assert.equal(dry.body.deleted, 0);
+  assert.deepEqual(dry.body.byRule, { unpaid48h: 2, cancelledOrRefunded7d: 4, delivered30d: 2 }); assert.equal(dry.body.wouldDelete, 8);
+  assert.equal(dry.body.skippedOpenCase, 4, 'open delivered case + exception order are kept (print + mock-up each)');
+  assert.equal(e.cloud.state.r2.size + e.cloud.state.sb.size, before, 'a dry run deletes nothing');
+  assert.equal((await e.db.list('merch_file_logs')).length, 0, 'and writes no deletion log');
+  assert.ok(!JSON.stringify(dry.body).includes('merch/'), 'counts only: no keys or file names in the response');
+  const real = await runCron(e.ctx); assert.deepEqual(real.body.files, { due: 8, deleted: 8, failed: 0 });
+  const logs = await e.db.list('merch_file_logs'); assert.equal(logs.length, 8);
+  for (const l of logs) { assert.deepEqual(Object.keys(l).sort(), ['at', 'id', 'index', 'kind', 'ok', 'orderId', 'results', 'rule']); assert.match(l.rule, /^(unpaid48h|cancelledOrRefunded7d|delivered30d)$/); assert.ok(!JSON.stringify(l).includes('merch/') && !JSON.stringify(l).includes('https://')); }
+  assert.ok(e.cloud.state.r2.size + e.cloud.state.sb.size > 0, 'the open case and the recent order keep their files');
+  assert.ok((await orderOf(e, open)).items[0].artwork.key);
+  const again = await runCron(e.ctx); assert.deepEqual(again.body.files, { due: 0, deleted: 0, failed: 0 });
 });
 
 console.log('Qikink written answers (ticket 136313)');

@@ -394,3 +394,6 @@ The user explicitly authorized pushing to GitHub and deploying the existing prod
 
 ## Storage live + daily cron - 24 November 2026 (merged to main as d0a2b21, deployed)
 - Supabase adapter handles the `sb_secret_` key (apikey header only); admin Test upload now checks write/read/signed download/private bucket/delete/gone per backend; R2 missing = "backup storage not configured". Daily deletion: `.github/workflows/merch-cron.yml`, secret `MERCH_CRON_SECRET` in GitHub AND Cloudflare (owner creates both). The owner still has to publish `firestore.rules` (collections `merch_*` incl. `merch_file_logs`). Merchandise stays visibleTo Admins only; live checks as admin were not run by Claude (no admin login).
+
+## Cron hardening - 24 November 2026
+- `functions/api/merch/cron.js` (constant-time-style secret check, `?dryRun=1`), `src/merch/cronRun.js`, log rows without keys (`rule` instead of `reason`/`key`); workflow `merch-cron.yml` has a dry_run input and fails on non-2xx. Open Qikink questions: `docs/qikink-open-questions.md`. test-launch 47.

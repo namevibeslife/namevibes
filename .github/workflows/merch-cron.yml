@@ -1,11 +1,17 @@
 # Daily call to the merchandise cron endpoint: retries stuck orders, syncs tracking and deletes print files that are due
 # (unpaid 48 h, cancelled/refunded 7 days, delivered 30 days, open cases never). Needs ONE secret in GitHub named MERCH_CRON_SECRET,
-# with exactly the same value as the Cloudflare Pages secret MERCH_CRON_SECRET. The value is never printed.
+# with exactly the same value as the Cloudflare Pages secret MERCH_CRON_SECRET. The secret travels in a header (never in the URL)
+# and is never printed. Run it by hand from the Actions tab; tick "dry_run" to list what WOULD be deleted without deleting anything.
 name: Merchandise daily cron
 on:
   schedule:
-    - cron: '17 3 * * *'   # 03:17 UTC every day
-  workflow_dispatch: {}
+    - cron: '17 3 * * *'   # once a day, 03:17 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: report what would be deleted, change nothing'
+        type: boolean
+        default: true
 permissions: {}
 jobs:
   call-cron:
@@ -15,10 +21,13 @@ jobs:
       - name: Call /api/merch/cron
         env:
           MERCH_CRON_SECRET: ${{ secrets.MERCH_CRON_SECRET }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
         run: |
           if [ -z "$MERCH_CRON_SECRET" ]; then echo "MERCH_CRON_SECRET is not set in GitHub secrets"; exit 1; fi
-          code=$(curl -sS -o response.json -w '%{http_code}' -X POST https://namasutra.life/api/merch/cron -H "x-cron-secret: $MERCH_CRON_SECRET" -H 'content-type: application/json' -d '{}' --max-time 120)
+          url="https://namasutra.life/api/merch/cron"
+          if [ "$DRY_RUN" = "true" ]; then url="$url?dryRun=1"; echo "DRY RUN: nothing will be deleted"; fi
+          code=$(curl -sS -o response.json -w '%{http_code}' -X POST "$url" -H "x-cron-secret: $MERCH_CRON_SECRET" -H 'content-type: application/json' -d '{}' --max-time 120)
           echo "HTTP $code"
           cat response.json
           echo
-          [ "$code" = "200" ]
+          case "$code" in 2??) exit 0 ;; *) echo "Cron call failed (HTTP $code)"; exit 1 ;; esac
