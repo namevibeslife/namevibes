@@ -12,6 +12,7 @@ import { verificationLevels } from '../merch/layout';
 import { BLOOD_GROUPS, bloodGroupSlug } from '../merch/designs';
 import { FRAME_IDS, DEFAULT_FRAME_DESIGNS } from '../merch/frames';
 import { ALL_COUNTRIES, getCountry } from '../data/countries';
+import { explainReason } from '../merch/reasons';
 
 // Staff screen (English only, like the other admin screens). Every write goes through the server
 // (POST /api/merch/admin), which re-checks that the caller is an admin and writes an audit entry.
@@ -529,11 +530,12 @@ function Orders({ data, act, reload, setNote }) {
       <table className="w-full text-sm bg-white/70" data-testid="orders-table"><thead><tr><th className="text-left p-2">Order</th><th>Status</th><th>Country</th><th>Total</th><th>Est. margin</th><th /></tr></thead>
         <tbody>{rows.map((o) => (
           <React.Fragment key={o.id}>
-            <tr className="border-t"><td className="p-2">{o.id.slice(0, 10)}</td><td data-testid={`status-${o.id}`}>{o.status}{o.exceptionReason ? ` (${o.exceptionReason})` : ''}</td><td className="text-center">{o.countryCode}</td>
+            <tr className="border-t"><td className="p-2">{o.id.slice(0, 10)}</td><td data-testid={`status-${o.id}`}>{o.status}{o.exceptionReason ? ` (${o.exceptionReason}: ${explainReason(o.exceptionReason).slice(0, 70)}...)` : ''}</td><td className="text-center">{o.countryCode}</td>
               <td className="text-center">{o.amount} {o.currency}{o.refundedAmount ? ` (−${o.refundedAmount})` : ''}</td><td className="text-center">{o.totals?.estimatedMargin}</td>
               <td><Btn onClick={() => setOpen(open === o.id ? null : o.id)}>Manage</Btn></td></tr>
             {open === o.id && <tr><td colSpan={6} className="p-3 bg-white">
               <p className="text-xs mb-2">Provider {o.providerId} · gateway {o.gateway} · {o.items.map((i) => `${i.productId} ${i.size} x${i.qty}`).join(', ')} · ship to {o.address?.name}, {o.address?.city}, {o.address?.country}</p>
+              <OrderDiagnostics order={o} data={data} act={act} />
               <div className="flex flex-wrap gap-2">
                 {['exception', 'paid', 'fulfillment_pending', 'held_provider_funds'].includes(o.status) && <Btn data-testid={`retry-${o.id}`} onClick={() => act('retry', { orderId: o.id }, 'Retried')}>{o.status === 'held_provider_funds' ? 'Retry after wallet top-up' : 'Retry submission'}</Btn>}
                 {['exception', 'paid', 'fulfillment_pending', 'held_provider_funds'].includes(o.status) && data.providers.filter((p) => p.active && p.id !== o.providerId && (p.countries || []).includes(o.countryCode)).map((p) => <Btn key={p.id} onClick={() => act('reroute', { orderId: o.id, providerId: p.id }, 'Rerouted')}>Reroute to {p.name || p.id}</Btn>)}
@@ -547,6 +549,37 @@ function Orders({ data, act, reload, setNote }) {
               </div></td></tr>}
           </React.Fragment>))}</tbody></table>
     </section>
+  );
+}
+
+// The real reason an order stopped, and whether its print file exists (yes/no, size, in storage). Never a link or a key.
+function OrderDiagnostics({ order, data, act }) {
+  const [d, setD] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [msg, setMsg] = useState('');
+  const load = useCallback(async () => { const r = await callMerch('admin', { action: 'orderDiagnostics', data: { orderId: order.id } }); if (r.status === 200) setD(r.body); }, [order.id]);
+  useEffect(() => { load().catch(() => {}); }, [load, order.status]);
+  if (!d) return <p className="text-xs" data-testid={`diag-${order.id}`}>Checking the order files...</p>;
+  const yn = (v) => (v === true ? 'yes' : v === false ? 'NO' : 'unknown');
+  const needFile = d.items.some((i) => !i.print.keyPresent || i.print.deleted || i.print.existsInStorage === false);
+  async function recreate() {
+    if (!window.confirm('Re-create the print file for this same order from its saved design and retry? No new order and no new payment.')) return;
+    setBusy(true); setMsg('Re-creating the print file...');
+    try {
+      const { attachArtwork } = await import('../merch/artworkUpload');
+      const colorHexOf = (it) => data.products[it.productId]?.colors.find((x) => x.id === it.color)?.hex || '#FFFFFF';
+      await attachArtwork({ orderId: order.id, items: order.items, products: data.products, colorHexOf });
+      setMsg('Print file stored. Retrying...'); await act('retry', { orderId: order.id }, 'Print file re-created and submission retried'); await load(); setMsg('');
+    } catch (e) { setMsg(`Could not re-create the print file (${String(e?.code || e?.message || e).slice(0, 80)}).`); }
+    setBusy(false);
+  }
+  return (
+    <div className="text-sm mb-2 p-2 rounded border bg-gray-50" data-testid={`diag-${order.id}`}>
+      {d.reason ? <p><strong data-testid={`diag-reason-${order.id}`}>{d.reason}</strong>: {d.explanation}</p> : <p>No problem recorded for this order.</p>}
+      <ul className="text-xs list-disc ml-5">{d.items.map((i) => <li key={i.index} data-testid={`diag-item-${order.id}-${i.index}`}>Item {i.index + 1} print file: file key present {yn(i.print.keyPresent)}; size {i.print.bytes != null ? `${i.print.bytes} bytes` : 'unknown'}; in storage {yn(i.print.existsInStorage)}{i.print.deleted ? ' (deleted by retention)' : ''}. Mock-up: key present {yn(i.mockup.keyPresent)}, in storage {yn(i.mockup.existsInStorage)}.</li>)}</ul>
+      {needFile && ['exception', 'paid', 'fulfillment_pending'].includes(order.status) && <Btn className="mt-1" disabled={busy} onClick={recreate} data-testid={`recreate-${order.id}`}>Re-create print file and retry</Btn>}
+      {msg && <p className="text-xs" role="status">{msg}</p>}
+    </div>
   );
 }
 

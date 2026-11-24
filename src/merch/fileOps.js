@@ -17,7 +17,7 @@ export const DEFAULT_RETENTION = { unconfirmedHours: 48, closedDays: 7, delivere
 const UNPAID = ['draft', 'quoted', 'payment_pending'];
 
 /** Store one print file or mock-up for an item of the caller's own order. The server checks everything; the browser is not trusted. */
-export async function uploadFile(ctx, { orderId, index, kind, bytes }) {
+export async function uploadFile(ctx, { orderId, index, kind, bytes, asAdmin = false }) {
   if (!ctx.who) return fail(401, 'not-signed-in');
   if (!ctx.files) return fail(503, 'storage-not-configured');
   if (!(bytes instanceof Uint8Array) || !['print', 'mockup'].includes(kind)) return fail(400, 'bad-upload');
@@ -26,7 +26,7 @@ export async function uploadFile(ctx, { orderId, index, kind, bytes }) {
   if (!png) return fail(400, 'not-a-png');
   const found = await ctx.db.get(`${COLL.orders}/${orderId}`);
   const order = found?.data;
-  if (!order || order.uid !== ctx.who.uid) return fail(404, 'order-not-found');
+  if (!order || (order.uid !== ctx.who.uid && !(asAdmin && ['paid', 'fulfillment_pending', 'exception'].includes(order.status)))) return fail(404, 'order-not-found'); // an admin may re-create the file of a paid order stuck before the provider
   if (!['payment_pending', 'paid', 'fulfillment_pending', 'exception'].includes(order.status)) return fail(409, 'order-locked');
   const idx = Number(index);
   const item = order.items?.[idx];
@@ -36,7 +36,7 @@ export async function uploadFile(ctx, { orderId, index, kind, bytes }) {
     const dpi = item.canvasInches?.width ? png.width / item.canvasInches.width : null;
     if (dpi !== null && item.minDpi && dpi < item.minDpi * 0.99) return fail(400, 'resolution-too-low', { dpi: Math.round(dpi), minDpi: item.minDpi });
   }
-  const key = `merch/${kind}/${ctx.who.uid}/${order.id}/${idx}-${ctx.id()}.png`; // never guessable, never listable
+  const key = `merch/${kind}/${order.uid}/${order.id}/${idx}-${ctx.id()}.png`; // never guessable, never listable
   let rec;
   try { rec = await ctx.files.put(key, bytes, 'image/png'); }
   catch (e) { return fail(503, e?.code === 'storage-not-configured' ? 'storage-not-configured' : 'storage-unavailable'); }
@@ -55,6 +55,16 @@ export async function uploadFile(ctx, { orderId, index, kind, bytes }) {
  * Before an order goes to the print provider: fetch the signed link exactly as the provider will (no login) and check
  * status, PNG type, size and the byte-for-byte hash. Returns { ok, url } or { error }.
  */
+export const MAX_LINK_CHARS = 480; // Qikink accepts at most 512 characters in design_link / mockup_link; a Supabase signed link is longer than that
+
+// Why a fetch of a stored file failed: not in storage, refused (expired / not allowed) or simply not reachable.
+async function whyNotFetched(ctx, rec, r) {
+  if (!r || !r.status) return 'artwork-unreachable';
+  let there = null; try { there = await ctx.files.exists(rec); } catch { there = null; }
+  if (there === false) return 'artwork-missing-in-storage';
+  return [400, 401, 403, 404, 410].includes(r.status) ? 'artwork-link-rejected' : 'artwork-unreachable';
+}
+
 export async function checkFileReachable(ctx, order, item, kind) {
   const rec = kind === 'mockup' ? item.mockup : item.artwork;
   if (!rec?.key || rec.fileDeletedAt) return { error: 'artwork-missing' };
@@ -63,11 +73,33 @@ export async function checkFileReachable(ctx, order, item, kind) {
     if (typeof ctx.files.firstReachable === 'function') { r = await ctx.files.firstReachable(rec); url = r.url; } // tries every backend that holds a copy
     else { url = await ctx.artworkUrl(order, item, kind); r = await ctx.files.fetchUrl(url); }
   } catch { return { error: 'artwork-unreachable' }; }
-  if (!url || r.status !== 200 || !r.bytes) return { error: 'artwork-unreachable' };
+  if (!url || r.status !== 200 || !r.bytes) return { error: await whyNotFetched(ctx, rec, r) };
   if (!/image\/png/i.test(r.contentType)) return { error: 'artwork-bad-type' };
   if (rec.bytes && r.bytes.length !== rec.bytes) return { error: 'artwork-size-mismatch' };
   if (rec.sha256 && (await sha256Bytes(r.bytes)) !== rec.sha256) return { error: 'artwork-hash-mismatch' };
-  return { ok: true, url };
+  let linkKind = 'storage';
+  if (String(url).length > MAX_LINK_CHARS) { // too long for the provider: use our own short signed link, and check IT is reachable too
+    if (typeof ctx.shortUrl !== 'function') return { error: 'link-too-long' };
+    let short = null; try { short = await ctx.shortUrl(order, item, kind); } catch { short = null; }
+    if (!short || String(short).length > MAX_LINK_CHARS) return { error: 'link-too-long' };
+    let r2; try { r2 = await ctx.files.fetchUrl(short); } catch { return { error: 'short-link-unreachable' }; }
+    if (!r2 || r2.status !== 200 || !r2.bytes || r2.bytes.length !== r.bytes.length) return { error: 'short-link-unreachable' };
+    url = short; linkKind = 'short';
+  }
+  return { ok: true, url, linkKind, linkLength: String(url).length };
+}
+
+/** Admin view of an order's files: present? how big? still in storage? (never a key or a link). */
+export async function orderFileDiagnostics(ctx, order) {
+  const items = [];
+  for (const i of order.items || []) items.push({ index: i.index, print: await fileState(ctx, i.artwork), mockup: await fileState(ctx, i.mockup) });
+  return items;
+}
+async function fileState(ctx, rec) {
+  if (!rec) return { keyPresent: false, bytes: null, existsInStorage: null, deleted: false };
+  const s = { keyPresent: !!rec.key, bytes: rec.bytes ?? null, existsInStorage: null, deleted: !!rec.fileDeletedAt, backends: rec.backends || (rec.backend ? [rec.backend] : []) };
+  if (rec.key && !rec.fileDeletedAt && ctx.files) { try { s.existsInStorage = await ctx.files.exists(rec); } catch { s.existsInStorage = null; } }
+  return s;
 }
 
 // ---- automatic deletion -----------------------------------------------------------------------------

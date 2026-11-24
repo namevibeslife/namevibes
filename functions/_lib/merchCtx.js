@@ -93,10 +93,13 @@ export function gatewaysFor(env) {
 
 // Short-lived signed link to a customer's generated print file. The file proxy (api/merch/file.js)
 // checks the signature and expiry before streaming it from Storage; the provider never gets Storage access.
+// The signing secret of the short file link: MERCH_ARTWORK_SECRET, or (so no extra secret is needed) MERCH_CRON_SECRET.
+export const artworkSecret = (env) => env.MERCH_ARTWORK_SECRET || env.MERCH_CRON_SECRET || '';
 export async function signedArtworkUrl(env, order, item, kind = 'print', ttlMs = 72 * 3600 * 1000) {
+  if (!artworkSecret(env)) throw new Error('no-artwork-secret');
   const k = kind === 'mockup' ? 'm' : 'p';
   const exp = Date.now() + ttlMs;
-  const sig = await hmacHex(env.MERCH_ARTWORK_SECRET || '', `${order.id}.${item.index}.${k}.${exp}`);
+  const sig = await hmacHex(artworkSecret(env), `${order.id}.${item.index}.${k}.${exp}`);
   return `${SITE_URL}/api/merch/file?o=${encodeURIComponent(order.id)}&i=${item.index}&k=${k}&e=${exp}&s=${sig}`;
 }
 
@@ -117,6 +120,8 @@ export async function buildCtx(env, request) {
     id: () => crypto.randomUUID().replace(/-/g, '').slice(0, 20),
     gateways: gatewaysFor(env), sandbox: isSandbox(env), paymentsSimulated: paymentsSimulated(env),
     providerFor: (doc) => createProvider(doc, env),
+    // Our own short signed link (about 130 characters) for providers that limit the link length (Qikink: 512).
+    shortUrl: (order, item, kind) => signedArtworkUrl(env, order, item, kind),
     // A short-lived public HTTPS link the print provider can fetch without logging in (Supabase signed URL or R2 presigned URL).
     artworkUrl: (order, item, kind) => {
       const rec = kind === 'mockup' ? item.mockup : item.artwork;

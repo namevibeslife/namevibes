@@ -24,7 +24,8 @@ import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
 import { findCod, isCod } from './cod.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
 import { resolveGateway, GATEWAY_OVERRIDES } from '../data/gatewayCurrencies.js';
-import { uploadFile, checkFileReachable, sweepFiles, fileReport, storageDiagnostics } from './fileOps.js';
+import { uploadFile, checkFileReachable, sweepFiles, fileReport, storageDiagnostics, orderFileDiagnostics } from './fileOps.js';
+import { explainReason } from './reasons.js';
 import { sha256Bytes, redact } from './storage/stores.js';
 // The real reason a storage call failed (error name + message), with any secret removed. Never contains a key.
 const whyFailed = (e, store) => redact(`${e.message}${e.causeName ? ` - ${e.causeName}: ${e.causeMessage}` : ''}`, [store.serviceKey, store.secretAccessKey, store.accessKeyId]).slice(0, 200);
@@ -418,6 +419,7 @@ async function setState(ctx, orderId, from, to, patch = {}, extra = {}) {
 
 async function raiseException(ctx, orderId, reason) {
   await setState(ctx, orderId, null, 'exception', { exceptionReason: reason }, { reason });
+  await ctx.db.patch(`${COLL.orders}/${orderId}`, { exceptionReason: reason }); // a repeated retry must show the NEW reason, not the first one
   await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'exception', lastError: reason });
   // Alert: paid but not with a provider. The admin Orders view lists these first.
   await audit({ ...ctx, who: null }, 'alert.paid-not-submitted', orderId, { reason });
@@ -976,6 +978,12 @@ export async function handleAdmin(ctx, body) {
     await audit(ctx, 'admin.storageTest', 'storage', { results });
     return ok({ results });
   }
+  if (action === 'orderDiagnostics') {
+    const order = (await ctx.db.get(`${COLL.orders}/${input.orderId}`))?.data; if (!order) return fail(404, 'order-not-found');
+    const ff = (await ctx.db.get(`${COLL.fulfillments}/${input.orderId}`))?.data || {};
+    const reason = order.exceptionReason || ff.lastError || null;
+    return ok({ status: order.status, reason, explanation: explainReason(reason), attempts: ff.attempts || 0, items: await orderFileDiagnostics(ctx, order) });
+  }
   if (action === 'fileReport') return ok(await fileReport(ctx));
   if (action === 'sweepFiles') {
     const r = await sweepFiles(ctx, { dryRun: input.dryRun !== false }); // dry run unless explicitly turned off
@@ -1062,7 +1070,7 @@ export async function handleAdmin(ctx, body) {
 export async function handleUpload(ctx, params) {
   const v = await merchVisibility(ctx);
   if (!v.visible) return fail(404, 'not-found');
-  return uploadFile(ctx, params);
+  return uploadFile(ctx, { ...params, asAdmin: await requireAdmin(ctx) });
 }
 
 export const VISIBLE_TO = ['nobody', 'admins', 'everyone'];

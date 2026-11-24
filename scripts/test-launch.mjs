@@ -3,6 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createMemoryDb } from '../src/merch/memoryDb.js';
+import { explainReason } from '../src/merch/reasons.js';
 import { priceFromCost, launchDefaults, handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset, handleUpload, sweepFiles, fileReport } from '../src/merch/engine.js';
 import { createFileStore } from '../src/merch/storage/stores.js';
 import { runCron } from '../src/merch/cronRun.js';
@@ -686,11 +687,68 @@ await test('before submitting, the signed link is fetched like the provider woul
   // vanished file
   const v = envF(); const sent3 = []; v.ctx.providerFor = () => ({ submitOrder: async (p) => { sent3.push(p); return { ok: true }; } });
   const vid = await stored(v); v.cloud.state.r2.clear(); await pay(v, vid);
-  assert.equal(sent3.length, 0); assert.equal((await orderOf(v, vid)).exceptionReason, 'artwork-unreachable');
+  assert.equal(sent3.length, 0); assert.equal((await orderOf(v, vid)).exceptionReason, 'artwork-missing-in-storage');
   // primary outage at submission with mirror on: the link comes from the other backend
   const m = envF(); await m.db.patch('merch_settings/storage', { mirror: true }); const sent4 = []; m.ctx.providerFor = () => ({ submitOrder: async (p) => { sent4.push(p); return { ok: true, providerOrderId: 'P' }; } });
   const mid = await stored(m); m.cloud.state.r2Down = true; await pay(m, mid);
   assert.equal(sent4.length, 1); assert.match(sent4[0].items[0].designUrl, /^https:\/\/sb\.test\//);
+});
+
+console.log('Print-file link problems (order stopped with design-link-invalid)');
+const seen = (e) => { const sent = []; e.ctx.providerFor = () => ({ submitOrder: async (p) => { sent.push(p); return { ok: true, providerOrderId: 'P' }; } }); return sent; };
+await test('print file present: the order is submitted with the storage link when it is short enough', async () => {
+  const e = envF(); const sent = seen(e); const id = await stored(e); await pay(e, id);
+  assert.equal(sent.length, 1); assert.ok(sent[0].items[0].designUrl.length <= 480);
+  const d = await handleAdmin(e.as('admin@x.test'), { action: 'orderDiagnostics', data: { orderId: id } });
+  assert.equal(d.status, 200); assert.equal(d.body.items[0].print.keyPresent, true); assert.equal(d.body.items[0].print.existsInStorage, true); assert.ok(d.body.items[0].print.bytes > 0);
+  assert.ok(!JSON.stringify(d.body).includes('merch/print/'), 'no file key or link in the diagnostics');
+});
+await test('storage link longer than 512 characters (the real cause): a short signed link on our own site is used and checked, the order is submitted', async () => {
+  const e = envF(); const sent = seen(e); const id = await stored(e); const rec = (await orderOf(e, id)).items[0].artwork;
+  const store = e.ctx.files.stores[rec.backend]; const orig = store.getSignedUrl.bind(store);
+  store.getSignedUrl = async (...a) => (await orig(...a)) + '&pad=' + 'x'.repeat(600);
+  const fetchOrig = e.ctx.files.fetchUrl.bind(e.ctx.files); const SHORT = 'https://namasutra.life/api/merch/file?o=' + id + '&i=0&k=p&e=1&s=abc';
+  e.ctx.files.fetchUrl = async (u) => (u === SHORT ? { status: 200, contentType: 'image/png', bytes: (await e.ctx.files.get(rec)).bytes } : fetchOrig(String(u).split('&pad=')[0]));
+  e.ctx.shortUrl = async () => SHORT;
+  await pay(e, id);
+  assert.equal(sent.length, 1); assert.equal(sent[0].items[0].designUrl, SHORT); assert.ok(sent[0].items[0].designUrl.length <= 512);
+  assert.equal((await orderOf(e, id)).status, 'submitted');
+  // no short link possible -> a clear reason, nothing sent, and a retry after the problem is fixed works for the SAME order
+  const n = envF(); const sent2 = seen(n); const nid = await stored(n); const nrec = (await orderOf(n, nid)).items[0].artwork;
+  const ns = n.ctx.files.stores[nrec.backend]; const no = ns.getSignedUrl.bind(ns); ns.getSignedUrl = async (...a) => (await no(...a)) + '&pad=' + 'x'.repeat(600);
+  const nf = n.ctx.files.fetchUrl.bind(n.ctx.files); n.ctx.files.fetchUrl = async (u) => nf(String(u).split('&pad=')[0]);
+  await pay(n, nid); assert.equal(sent2.length, 0); assert.equal((await orderOf(n, nid)).exceptionReason, 'link-too-long');
+  n.ctx.shortUrl = async () => 'https://namasutra.life/s'; const nf2 = n.ctx.files.fetchUrl; n.ctx.files.fetchUrl = async (u) => (u === 'https://namasutra.life/s' ? { status: 200, contentType: 'image/png', bytes: (await n.ctx.files.get(nrec)).bytes } : nf2(u));
+  const again = await handleAdmin(n.as('admin@x.test'), { action: 'retry', data: { orderId: nid } }); assert.equal(again.status, 200);
+  assert.equal(sent2.length, 1); assert.equal((await orderOf(n, nid)).status, 'submitted'); assert.equal((await n.db.list('merch_orders')).length, 1, 'no second order');
+});
+await test('print file missing: never uploaded -> artwork-missing; gone from storage -> artwork-missing-in-storage; diagnostics say so; an admin can re-upload for the same order and retry', async () => {
+  const e = envF(); const sent = seen(e);
+  const { id } = await order(e, [poster()], { artwork: false });
+  assert.equal((await pay(e, id)).body.error, 'artwork-missing');
+  const g = envF(); const sentG = seen(g); const gid = await stored(g); g.cloud.state.r2.clear(); g.cloud.state.sb.clear();
+  await pay(g, gid); const o = await orderOf(g, gid); assert.equal(o.exceptionReason, 'artwork-missing-in-storage'); assert.equal(sentG.length, 0);
+  const admin = g.as('admin@x.test');
+  const d = (await handleAdmin(admin, { action: 'orderDiagnostics', data: { orderId: gid } })).body;
+  assert.equal(d.reason, 'artwork-missing-in-storage'); assert.match(d.explanation, /no longer in storage/); assert.equal(d.items[0].print.keyPresent, true); assert.equal(d.items[0].print.existsInStorage, false);
+  assert.equal((await handleAdmin(g.ctx, { action: 'orderDiagnostics', data: { orderId: gid } })).status, 403, 'a non-admin cannot read the diagnostics');
+  // re-create: an admin uploads a fresh file for the same (paid, stuck) order; a different customer still cannot
+  assert.equal((await upl(g, gid, 'print', fakePng(), 0, { ...g.ctx, who: { uid: 'u2', email: 'u2@x.test', emailVerified: true } })).status, 404);
+  assert.equal((await upl(g, gid, 'print', fakePng(), 0, admin)).status, 200);
+  assert.equal((await handleAdmin(admin, { action: 'retry', data: { orderId: gid } })).status, 200);
+  assert.equal(sentG.length, 1); assert.equal((await orderOf(g, gid)).status, 'submitted'); assert.equal((await g.db.list('merch_orders')).length, 1);
+});
+await test('link expired / refused by storage, and storage not reachable: separate reasons; a retry makes a fresh link', async () => {
+  const e = envF(); const sent = seen(e); const id = await stored(e);
+  const real = e.ctx.files.fetchUrl.bind(e.ctx.files);
+  e.ctx.files.fetchUrl = async () => ({ status: 403, contentType: '', bytes: null }); // the signed link is refused (expired / not allowed)
+  await pay(e, id); assert.equal((await orderOf(e, id)).exceptionReason, 'artwork-link-rejected'); assert.equal(sent.length, 0);
+  e.ctx.files.fetchUrl = async () => { throw new Error('network'); }; // storage cannot be reached at all
+  await handleAdmin(e.as('admin@x.test'), { action: 'retry', data: { orderId: id } }); assert.equal((await orderOf(e, id)).exceptionReason, 'artwork-unreachable'); assert.equal(sent.length, 0);
+  e.ctx.files.fetchUrl = real; // storage is back: the SAME order goes through
+  await handleAdmin(e.as('admin@x.test'), { action: 'retry', data: { orderId: id } });
+  assert.equal(sent.length, 1); assert.equal((await orderOf(e, id)).status, 'submitted');
+  for (const code of ['design-link-invalid', 'artwork-link-rejected', 'artwork-unreachable', 'artwork-missing-in-storage', 'link-too-long']) assert.ok(explainReason(code).length > 20 && !/https?:/.test(explainReason(code)), code);
 });
 
 console.log('Automatic deletion of print files');
