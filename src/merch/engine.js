@@ -12,9 +12,11 @@
 // Every handler returns { status, body } and never throws for expected failures.
 import { COLL, STATES, TRANSITIONS, PAID_STATES, QUOTE_TTL_MS, MAX_QTY_PER_ITEM, MAX_ITEMS_PER_ORDER, MAX_FULFILMENT_ATTEMPTS, COLLECTION_IDS, NAME_ALGORITHM_VERSION } from './constants.js';
 import { buildDesign, bloodGroupSlug, applyTemplate, BLOOD_GROUPS } from './designs.js';
+import { SHIPPING_COST_PLACEHOLDER } from './catalog.js';
 import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS, starterSku, baseCost, colorsFor, isFrameKind, ACRYLIC_STAND } from './catalog.js';
 import { checkAvailability, routeProvider, validateAddress, normaliseAddress } from './availability.js';
 import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS, DEFAULT_INSET_MM, MAX_INSET_MM, artworkInches, minTextMm, MIN_TEXT_MM } from './frames.js';
+import { sampleApproved, verificationLevels } from './layout.js';
 import { FULL_LAYOUT, normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, sizeReady, readySizes, readiness, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
 import { computeQuote, lookupBySize, taxRateFor } from './quoteMath.js';
 import { computeOrderCommission, reversalAmount } from './commission.js';
@@ -22,6 +24,8 @@ import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
 import { findCod, isCod } from './cod.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
 import { resolveGateway, GATEWAY_OVERRIDES } from '../data/gatewayCurrencies.js';
+import { uploadFile, checkFileReachable, sweepFiles, fileReport } from './fileOps.js';
+import { sha256Bytes } from './storage/stores.js';
 
 const ok = (body = {}) => ({ status: 200, body });
 const fail = (status, code, extra = {}) => ({ status, body: { error: code, ...extra } });
@@ -74,7 +78,8 @@ export async function handleCatalogue(ctx, body) {
     .map((p) => {
       // only sizes with a verified print area, and within them only the colours that are switched on and priced
       const colorsBySize = {}; const variantPrices = {}; const prices = {};
-      for (const sz of readySizes(p)) {
+      const everyone = cfg.settings.visibleTo === 'everyone';
+      for (const sz of readySizes(p).filter((s) => !everyone || sampleApproved(p, s))) { // Everyone: only sizes whose physical sample the owner approved
         const cols = colorsFor(p, sz, cfg.variants).filter((c) => lookupBySize(country.prices, p.id, sz, c.id) > 0);
         if (!cols.length) continue;
         colorsBySize[sz] = cols.map(({ id, hex }) => ({ id, hex }));
@@ -147,6 +152,7 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     if ((vdoc?.enabled ?? colorOn) === false) return fail(409, 'merch-product-off', { reason: 'variant-off' });
     const ready = sizeReady(product, raw.size);
     if (!ready.ok) return fail(409, 'merch-product-off', { reason: ready.reason, problems: ready.problems });
+    if (cfg.settings.visibleTo === 'everyone' && !sampleApproved(product, raw.size)) return fail(409, 'merch-product-off', { reason: 'sample-not-approved' });
     if (product.taxUnverified && lookupBySize(country.taxByProduct, product.id, raw.size, raw.color) === undefined) return fail(409, 'merch-product-off', { reason: 'tax-not-set' });
     const route = cfg.routes.find((r) => r.countryCode === country.countryCode && r.productId === product.id);
     const routed = routeProvider({ providers: cfg.providers, country, product, variantMap: vdoc, route, exclude: providerId ? [] : [] });
@@ -178,7 +184,7 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     let stand = null;
     if (raw.addStand === true) {
       const standPrice = product.standSku ? lookupBySize(country.prices, `${product.id}-stand`) : undefined;
-      if (!product.standSku || !(standPrice > 0)) return fail(409, 'stand-unavailable');
+      if (!product.standSku || product.standAsLine !== true || !(standPrice > 0)) return fail(409, 'stand-unavailable'); // two-line-item stand only behind the flag
       stand = { standSku: product.standSku, standPrice, standCost: lookupBySize(country.costs, `${product.id}-stand`) ?? 0, standTaxPercent: taxRateFor(country, `${product.id}-stand`, undefined, undefined) };
       if (country.taxByProduct?.[`${product.id}-stand`] === undefined) stand.standTaxPercent = taxRateFor(country, product.id, raw.size, raw.color);
     }
@@ -286,6 +292,7 @@ function bloodSourceAsset(code) {
 // customer saw in the preview. Allowed only while the order has not been submitted to a provider.
 export async function handleAttachArtwork(ctx, body) {
   if (!ctx.who) return fail(401, 'not-signed-in');
+  if (ctx.files) return fail(400, 'use-upload'); // with a file store the server records the metadata itself while storing the file
   const found = await ctx.db.get(`${COLL.orders}/${body?.orderId}`);
   const order = found?.data;
   if (!order || order.uid !== ctx.who.uid) return fail(404, 'order-not-found');
@@ -431,8 +438,18 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
   if (!order.transactionId || order.paidAt == null) { await raiseException(ctx, orderId, 'payment-not-verified'); return { exception: 'payment-not-verified' }; }
   if (!force && ms(ff.nextRetryAt) > ms(ctx.now())) return { skipped: 'not-due' };
 
-  const missing = order.items.find((i) => !i.artwork);
+  const missing = order.items.find((i) => !i.artwork || i.artwork.fileDeletedAt);
   if (missing) { await raiseException(ctx, orderId, 'artwork-missing'); return { exception: 'artwork-missing' }; }
+  // With a file store: GET each signed link as the provider will (no login) and check status, PNG type, size and hash BEFORE submitting.
+  const urls = {};
+  if (ctx.files) {
+    for (const i of order.items) {
+      const p = i.artwork.key ? await checkFileReachable(ctx, order, i, 'print') : { ok: true };
+      if (p.error) { await raiseException(ctx, orderId, p.error); return { exception: p.error }; }
+      urls[i.index] = { print: p.url };
+      if (i.mockup?.key && !i.mockup.fileDeletedAt) { const m = await checkFileReachable(ctx, order, i, 'mockup'); if (m.ok) urls[i.index].mockup = m.url; }
+    }
+  }
 
   const cfgProviders = await ctx.db.list(COLL.providers);
   const pdoc = cfgProviders.find((p) => p.id === order.providerId);
@@ -449,9 +466,9 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
     items: (await Promise.all(order.items.map(async (i) => [{
       index: i.index, productId: i.productId, color: i.color, size: i.size, qty: i.qty, unitPrice: i.unitPrice, providerSku: i.providerSku, placement: 'default',
       layout: i.layout, canvasInches: i.canvasInches, placementSku: i.placementSku, printTypeId: i.printTypeId,
-      designUrl: await ctx.artworkUrl(order, i, 'print'), designSha256: i.artwork.sha256,
+      designUrl: urls[i.index]?.print || await ctx.artworkUrl(order, i, 'print'), designSha256: i.artwork.sha256,
       // a real mock-up when the browser made one; otherwise the print file (recorded below as the fallback)
-      mockupUrl: i.mockup ? await ctx.artworkUrl(order, i, 'mockup') : null
+      mockupUrl: urls[i.index]?.mockup || (i.mockup && !ctx.files ? await ctx.artworkUrl(order, i, 'mockup') : null)
     }, ...(i.addStand ? [{ index: `${i.index}s`, productId: `${i.productId}-stand`, qty: i.qty, unitPrice: i.standPrice, printTypeId: 1, providerSku: { sku: i.standSku, printTypeId: 1, plain: true } }] : [])]))).flat()
   };
   let res;
@@ -625,6 +642,36 @@ const bool = (v) => v === true;
 const num = (v) => (Number.isFinite(Number(v)) && Number(v) >= 0 ? Number(v) : undefined);
 
 const ADMIN_ACTIONS = {
+  async setStorage(ctx, b) {
+    const patch = { updatedAt: ctx.now() };
+    if (b.primary !== undefined) { if (!['r2', 'supabase'].includes(b.primary)) return { error: 'bad-storage-primary' }; patch.primary = b.primary; }
+    if (b.mirror !== undefined) patch.mirror = b.mirror === true;
+    if (b.ttlHours !== undefined) { const n = Number(b.ttlHours); if (!(n >= 1 && n <= 168)) return { error: 'bad-ttl' }; patch.ttlHours = n; }
+    if (b.retentionDays !== undefined) { const n = Number(b.retentionDays); if (!(Number.isInteger(n) && n >= 0 && n <= 365)) return { error: 'bad-retention' }; patch.retentionDays = n; }
+    if (b.retentionByProduct !== undefined) {
+      const entries = Object.entries(b.retentionByProduct || {});
+      if (entries.some(([, v]) => !(Number.isInteger(Number(v)) && Number(v) >= 0 && Number(v) <= 365))) return { error: 'bad-retention' };
+      patch.retentionByProduct = Object.fromEntries(entries.map(([k, v]) => [k, Number(v)]));
+    }
+    return { path: `${COLL.settings}/storage`, patch };
+  },
+  // Verification levels: specConfirmed (Qikink in writing) / sandboxAccepted / sampleApproved (owner approved a physical sample). Audited.
+  async setVerification(ctx, b) {
+    if (!['specConfirmed', 'sandboxAccepted', 'sampleApproved'].includes(b.level) || typeof b.value !== 'boolean') return { error: 'bad-verification' };
+    const found = await ctx.db.get(`${COLL.products}/${b.productId}`);
+    const product = mergeProducts(found ? [found.data] : [])[b.productId];
+    if (!product) return { error: 'product-not-found' };
+    const cur = clone(product.verification || {});
+    const source = String(b.source || '').slice(0, 200);
+    if (b.size) { cur.bySize = cur.bySize || {}; cur.bySize[b.size] = { ...(cur.bySize[b.size] || {}), [b.level]: b.value }; } else cur[b.level] = b.value;
+    if (source) cur.source = source;
+    return { path: `${COLL.products}/${b.productId}`, patch: { id: b.productId, verification: cur, updatedAt: ctx.now() } };
+  },
+  async setOpenCase(ctx, b) {
+    const found = await ctx.db.get(`${COLL.orders}/${b.orderId}`);
+    if (!found) return { error: 'order-not-found' };
+    return { path: `${COLL.orders}/${b.orderId}`, patch: b.open === true ? { openCase: true } : { openCase: false, caseClosedAt: ctx.now() } };
+  },
   async setVisibility(ctx, b) {
     if (!VISIBLE_TO.includes(b.visibleTo)) return { error: 'bad-visibility' };
     return { path: `${COLL.settings}/global`, patch: { visibleTo: b.visibleTo, updatedAt: ctx.now() } };
@@ -646,6 +693,10 @@ const ADMIN_ACTIONS = {
       costs: Object.fromEntries(Object.entries(b.costs || {}).filter(([, v]) => num(v) !== undefined).map(([k, v]) => [k, Number(v)])),
       disabledProducts: Object.fromEntries(Object.entries(b.disabledProducts || {}).filter(([, v]) => v === true)),
       shipping: { flat: num(b.shipping?.flat) ?? 0, freeAbove: num(b.shipping?.freeAbove) ?? 0 },
+      ...(b.shippingCost ? { shippingCost: {
+        slabs: (b.shippingCost.slabs || []).filter((s) => num(s.upToGrams) > 0 && num(s.amount) !== undefined).slice(0, 12)
+          .map((s) => ({ upToGrams: Number(s.upToGrams), amount: Number(s.amount), method: String(s.method || 'surface').slice(0, 12), confirmed: s.confirmed === true })),
+        note: String(b.shippingCost.note || '').slice(0, 300) } } : {}),
       paymentFeePercent: num(b.paymentFeePercent) ?? 0, marginFloorPercent: num(b.marginFloorPercent) ?? 0,
       providerPrimary: b.providerPrimary || null, providerBackup: b.providerBackup || null,
       gatewayOverride: GATEWAY_OVERRIDES.includes(b.gatewayOverride) ? b.gatewayOverride : 'auto',
@@ -765,7 +816,7 @@ export async function applyLaunchPreset(ctx) {
   await putIfAbsent(`${COLL.countries}/IN`, {
     countryCode: 'IN', enabled: false, currency: 'INR', taxPercent: 18, taxIncluded: true, taxByProduct,
     collections: { name_elements: true, blood_group: true }, prices: {}, costs, disabledProducts: {},
-    shipping: { flat: 0, freeAbove: 0 }, paymentFeePercent: 0, marginFloorPercent: 0, providerPrimary: 'qikink', providerBackup: null, gatewayOverride: 'auto'
+    shipping: { flat: 0, freeAbove: 0 }, shippingCost: SHIPPING_COST_PLACEHOLDER, paymentFeePercent: 0, marginFloorPercent: 0, providerPrimary: 'qikink', providerBackup: null, gatewayOverride: 'auto'
   });
   for (const p of Object.values(DEFAULT_PRODUCTS)) await putIfAbsent(`${COLL.products}/${p.id}`, { id: p.id, enabled: false, ...(isFrameKind(p.kind) ? { frameDesigns: { ...DEFAULT_FRAME_DESIGNS } } : {}) });
   for (const p of Object.values(DEFAULT_PRODUCTS)) {
@@ -795,6 +846,41 @@ export async function handleAdmin(ctx, body) {
     await ctx.db.patch(r.path, r.patch);
     await audit(ctx, `admin.${action}`, r.path, { before, after: clone(r.patch) });
     return ok({ ok: true });
+  }
+  if (action === 'storageHealth') {
+    const settings = (await ctx.db.get(`${COLL.settings}/storage`))?.data || {};
+    const status = (await ctx.db.get(`${COLL.settings}/storageStatus`))?.data || {};
+    return ok({ backends: ctx.files ? await ctx.files.health() : {}, primary: settings.primary || null, mirror: settings.mirror === true, ttlHours: settings.ttlHours || 24, retentionDays: settings.retentionDays ?? 30, retentionByProduct: settings.retentionByProduct || {}, lastFailover: status.lastFailover || null, configured: ctx.files ? ctx.files.names() : [] });
+  }
+  if (action === 'storageTest') {
+    if (!ctx.files) return fail(503, 'storage-not-configured');
+    const results = {};
+    for (const name of ctx.files.names()) {
+      const store = ctx.files.stores[name]; const key = `merch/print/healthcheck/test/${ctx.id()}.png`;
+      const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52, 0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0, 0x1f, 0x15, 0xc4, 0x89]);
+      // Each step is reported as pass/fail; no key and no link is ever returned or logged.
+      const steps = {};
+      try {
+        await store.put(key, png, 'image/png'); steps.write = true;
+        const back = await store.get(key);
+        steps.read = !!back && back.bytes.length === png.length && (await sha256Bytes(back.bytes)) === (await sha256Bytes(png));
+        const dl = await ctx.files.fetchUrl(await store.getSignedUrl(key, 120));
+        steps.signedDownload = dl.status === 200 && !!dl.bytes && dl.bytes.length === png.length && /image\/png/i.test(dl.contentType);
+        const open = await ctx.files.fetchUrl(store.publicUrl(key)).catch(() => ({ status: 0 }));
+        steps.privateBucket = open.status !== 200; // the plain address without a signature must be refused
+      } catch (e) { steps.error = String(e.message).slice(0, 80); }
+      try { await store.delete(key); steps.deleted = true; steps.gone = (await store.exists(key)) === false; } catch (e) { steps.deleted = false; steps.error = steps.error || String(e.message).slice(0, 80); }
+      results[name] = { ok: steps.write === true && steps.read === true && steps.signedDownload === true && steps.privateBucket === true && steps.deleted === true && steps.gone === true, ...steps };
+    }
+    await audit(ctx, 'admin.storageTest', 'storage', { results });
+    return ok({ results });
+  }
+  if (action === 'fileReport') return ok(await fileReport(ctx));
+  if (action === 'sweepFiles') {
+    const r = await sweepFiles(ctx, { dryRun: input.dryRun !== false }); // dry run unless explicitly turned off
+    if (r.error) return fail(503, r.error);
+    await audit(ctx, input.dryRun === false ? 'admin.sweepFiles' : 'admin.sweepFilesDryRun', 'storage', { due: r.due, deleted: r.deleted, failed: r.failed });
+    return ok(r);
   }
   if (action === 'setFrameDesign') {
     // per-product option: which frame designs customers may choose (launch: Elements Gold only)
@@ -871,6 +957,13 @@ export async function handleAdmin(ctx, body) {
 
 // ---- dispatcher -------------------------------------------------------------------------------------
 
+/** POST /api/merch/upload (binary body). Same visibility rule as every customer action. */
+export async function handleUpload(ctx, params) {
+  const v = await merchVisibility(ctx);
+  if (!v.visible) return fail(404, 'not-found');
+  return uploadFile(ctx, params);
+}
+
 export const VISIBLE_TO = ['nobody', 'admins', 'everyone'];
 export async function merchVisibility(ctx) {
   const s = (await ctx.db.get(`${COLL.settings}/global`))?.data || {};
@@ -906,4 +999,4 @@ export async function handleMerch(ctx, action, body) {
   }
 }
 
-export { STATES, PAID_STATES };
+export { STATES, PAID_STATES, sweepFiles, fileReport };

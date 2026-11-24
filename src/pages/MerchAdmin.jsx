@@ -7,7 +7,8 @@ import { callMerch, mockControls, IS_MOCK } from '../merch/client';
 import { DEFAULT_PRODUCTS, mergeProducts } from '../merch/catalog';
 import { COLLECTION_IDS, STATES } from '../merch/constants';
 import { specProblems, readiness, readySizes } from '../merch/layout';
-import { baseCost, starterSku, variantId } from '../merch/catalog';
+import { baseCost, starterSku, variantId, shippingCostFor } from '../merch/catalog';
+import { verificationLevels } from '../merch/layout';
 import { BLOOD_GROUPS, bloodGroupSlug } from '../merch/designs';
 import { FRAME_IDS, DEFAULT_FRAME_DESIGNS } from '../merch/frames';
 import { ALL_COUNTRIES, getCountry } from '../data/countries';
@@ -36,6 +37,54 @@ function VisibilityControl({ settings, act }) {
       </select>
       <p className="text-xs mt-1">Nobody: the menu link, pages and every merchandise address behave as if the feature does not exist (normal 404). Takes effect at once; no deploy needed.</p>
       {info?.sandbox && <p className="mt-2 p-2 rounded bg-amber-100 border border-amber-400 text-amber-900 text-sm font-semibold" data-testid="sandbox-banner-admin">SANDBOX: no real order will be printed or shipped. {info.paymentsSimulated ? 'Payments are simulated (nobody is charged).' : 'Checkout is blocked until test payments are switched on (TEST_PAYMENTS).'}</p>}
+    </div>
+  );
+}
+
+const admin = (action, data) => callMerch('admin', { action, data });
+const BACKEND_LABEL = { r2: 'Cloudflare R2', supabase: 'Supabase Storage' };
+const STATUS_LABEL = { ok: 'OK', failing: 'FAILING', 'not-configured': 'not configured' };
+
+// Where customers' print files are kept (R2 / Supabase with automatic failover) and when they are deleted.
+function StoragePanel({ act }) {
+  const [info, setInfo] = useState(null);
+  const [report, setReport] = useState(null);
+  const [testResult, setTestResult] = useState(null);
+  const [days, setDays] = useState('30');
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => {
+    const r = await admin('storageHealth', {});
+    if (r.status === 200) { setInfo(r.body); setDays(String(r.body.retentionDays)); }
+  }, []);
+  useEffect(() => { load().catch(() => {}); }, [load]);
+  const run = async (fn) => { setBusy(true); try { await fn(); } finally { setBusy(false); } };
+  if (!info) return <div className="p-3 bg-white/70 rounded-lg" data-testid="storage-panel">Print-file storage: loading...</div>;
+  const names = Object.keys(info.backends);
+  return (
+    <div className="p-3 bg-white/70 rounded-lg space-y-2" data-testid="storage-panel">
+      <h2 className="font-semibold">Print-file storage</h2>
+      <ul className="text-sm">
+        {names.map((n) => <li key={n} data-testid={`storage-${n}`}>{BACKEND_LABEL[n] || n}: <strong>{info.backends[n].status === 'not-configured' && names.some((o) => o !== n && info.backends[o].status !== 'not-configured') ? 'backup storage not configured' : (STATUS_LABEL[info.backends[n].status] || info.backends[n].status)}</strong>{info.backends[n].detail ? ` (${info.backends[n].detail})` : ''}{info.primary === n ? ' - first choice' : ''}</li>)}
+      </ul>
+      <p className="text-xs" data-testid="last-failover">{info.lastFailover ? `Last failover: ${info.lastFailover.from} -> ${info.lastFailover.to || 'none'} (${info.lastFailover.error})` : 'No failover has happened.'}</p>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <label>First choice <select aria-label="First choice" value={info.primary || ''} onChange={(e) => run(async () => { await act('setStorage', { primary: e.target.value }); await load(); })} className="border rounded px-2 py-1" data-testid="storage-primary">
+          <option value="">Automatic (R2 if set up)</option><option value="r2">Cloudflare R2</option><option value="supabase">Supabase Storage</option></select></label>
+        <label><input type="checkbox" checked={info.mirror} onChange={(e) => run(async () => { await act('setStorage', { mirror: e.target.checked }); await load(); })} data-testid="storage-mirror" /> Mirror to both</label>
+        <label>Keep delivered orders' files for <input type="number" min="0" max="365" value={days} onChange={(e) => setDays(e.target.value)} className="border rounded px-2 py-1 w-20" data-testid="retention-days" /> days</label>
+        <Btn onClick={() => run(async () => { await act('setStorage', { retentionDays: Number(days) }); await load(); })}>Save</Btn>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Btn onClick={() => run(async () => { const r = await admin('storageTest', {}); setTestResult(r.status === 200 ? r.body.results : { error: r.body?.error }); })} data-testid="storage-test">Test upload</Btn>
+        <Btn onClick={() => run(async () => { const r = await admin('fileReport', {}); if (r.status === 200) setReport(r.body); })} data-testid="file-report">Deletion report</Btn>
+        <Btn onClick={() => run(async () => { const r = await admin('sweepFiles', { dryRun: true }); if (r.status === 200) setReport({ dry: r.body }); })} data-testid="file-dry-run">Dry run (delete nothing)</Btn>
+        <Btn onClick={() => { if (window.confirm('Delete every print file that is due now? This cannot be undone.')) run(async () => { const r = await admin('sweepFiles', { dryRun: false }); if (r.status === 200) setReport({ ran: r.body }); }); }} data-testid="file-sweep" disabled={busy}>Delete due files now</Btn>
+      </div>
+      {testResult && <p className="text-sm" data-testid="storage-test-result">{testResult.error ? `Test failed: ${testResult.error}` : Object.entries(testResult).map(([n, r]) => `${BACKEND_LABEL[n] || n}: ${r.ok ? 'write, read, signed download, private bucket and delete all passed' : `FAILED - ${['write', 'read', 'signedDownload', 'privateBucket', 'deleted', 'gone'].filter((s) => r[s] !== true).join(', ')}${r.error ? ` (${r.error})` : ''}`}`).join(' | ')}</p>}
+      {report && <p className="text-sm" data-testid="file-report-result">
+        {report.dry ? `Dry run: ${report.dry.due} file(s) are due for deletion; nothing was deleted.` : report.ran ? `Deleted ${report.ran.deleted}, failed ${report.ran.failed}, were due ${report.ran.due}.` : `Files due now: ${report.due}. Deleted so far: ${report.deleted}. Failed: ${report.failed}.`}
+      </p>}
+      <p className="text-xs">Unpaid uploads are deleted after 48 hours, cancelled or refunded orders after 7 days, delivered orders after the number of days above (orders with an open return or exception are never deleted). Deletion runs from the cron job; the order record stays.</p>
     </div>
   );
 }
@@ -102,6 +151,7 @@ function Overview({ data, act }) {
   return (
     <section className="space-y-4" data-testid="overview">
       <VisibilityControl settings={data.settings} act={act} />
+      <StoragePanel act={act} />
       <p>Merchandise is <strong data-testid="global-state">{data.settings.enabled ? 'ON' : 'OFF'}</strong> · {data.orders.length} orders · {paid.length} paid · revenue (all currencies summed by country below) · estimated margin shown per order.</p>
       <table className="w-full text-sm bg-white/70"><thead><tr><th className="text-left p-2">Country</th><th>Paid orders</th><th>Revenue</th></tr></thead>
         <tbody>{Object.entries(byCountry).map(([c, v]) => <tr key={c}><td className="p-2">{c}</td><td className="text-center">{v.n}</td><td className="text-center">{v.rev.toFixed(2)} {v.cur}</td></tr>)}</tbody></table>
@@ -346,14 +396,16 @@ function CatalogueRows({ x, act, data }) {
       <button type="button" className="underline text-sm" onClick={() => setOpen(!open)}>{open ? 'Hide' : 'Show'} variants, SKUs, costs, prices and GST ({rows.length} rows)</button>
       {open && (
         <>
-          <table className="w-full text-xs mt-1"><thead><tr><th className="text-left">Size</th><th className="text-left">Colour</th><th className="text-left">Qikink SKU</th><th>Base cost</th><th>Our price</th><th>GST %</th><th>On</th><th /></tr></thead><tbody>
+          <table className="w-full text-xs mt-1"><thead><tr><th className="text-left">Size</th><th className="text-left">Colour</th><th className="text-left">Qikink SKU</th><th>Base cost</th><th>Our price</th><th>GST %</th><th title="a spec confirmed, b sandbox accepted, c sample approved">Levels a/b/c</th><th>Qikink shipping cost</th><th>On</th><th /></tr></thead><tbody>
             {rows.map(({ size, c }) => {
               const key = keyOf(size, c.id); const vid = variantId(x.id, c.id, size); const v = data.variants?.[vid];
               const first = perColour || c === (x.colors.find((k) => !x.colorsBySize?.[size] || x.colorsBySize[size].includes(k.id)));
               const cost = Number(val('costs', key, baseCost(x.id, c.id, size))); const price = Number(val('prices', key));
               const rate = Number(val('taxByProduct', key, country.taxByProduct?.[x.id] ?? country.taxPercent));
               const tax = price - price / (1 + rate / 100);
-              const low = price > 0 && price - tax <= cost + ship;
+              const sc = shippingCostFor(country, x.id, size); // what Qikink charges us for this product's weight
+              const low = price > 0 && price - tax <= cost + Math.max(ship, sc.amount);
+              const lv = verificationLevels(x, size);
               return (
                 <tr key={vid} className="border-t" data-testid={`variant-row-${vid}`}>
                   <td>{sizeText(size)}</td><td>{c.id}</td>
@@ -361,6 +413,8 @@ function CatalogueRows({ x, act, data }) {
                   <td>{first ? <input aria-label={`${vid} cost`} value={val('costs', key, baseCost(x.id, c.id, size))} onChange={(e) => set('costs', key, e.target.value)} className="border rounded px-1 py-0.5 w-16" /> : <span className="text-gray-500">same</span>}</td>
                   <td>{first ? <input aria-label={`${vid} price`} value={val('prices', key)} onChange={(e) => set('prices', key, e.target.value)} className="border rounded px-1 py-0.5 w-16" data-testid={`price-input-${vid}`} /> : <span className="text-gray-500">same</span>}{first && !price && <span className="text-red-700 ml-1">no price</span>}{first && low && <span className="text-red-700 ml-1" data-testid={`low-${vid}`}>below cost + shipping + tax</span>}</td>
                   <td>{first ? <input aria-label={`${vid} gst`} value={val('taxByProduct', key, '')} placeholder={String(country.taxByProduct?.[x.id] ?? country.taxPercent ?? '')} onChange={(e) => set('taxByProduct', key, e.target.value)} className="border rounded px-1 py-0.5 w-12" /> : <span className="text-gray-500">same</span>}</td>
+                  <td data-testid={`levels-${vid}`} className="text-xs whitespace-nowrap" title="a = spec confirmed by Qikink in writing, b = sandbox order accepted, c = physical sample approved by the owner (needed to sell to Everyone)">{lv.specConfirmed ? 'a' : '-'}{lv.sandboxAccepted ? 'b' : '-'}{lv.sampleApproved ? 'c' : '-'}</td>
+                  <td data-testid={`ship-${vid}`} className={sc.unconfirmed ? 'text-amber-800 text-xs' : 'text-xs'}>{sc.amount}{sc.unconfirmed ? ' (unconfirmed for this weight)' : ''}</td>
                   <td><input type="checkbox" aria-label={`${vid} on`} checked={(v?.enabled ?? c.on) !== false} onChange={(e) => act('setVariant', { productId: x.id, color: c.id, size, enabled: e.target.checked, providerSkus: v?.providerSkus || { qikink: { sku: starterSku(x.id, c.id, size), unverified: true } } }, 'Saved')} /></td>
                 </tr>
               );

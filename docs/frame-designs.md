@@ -56,3 +56,6 @@ Note: the reference tiles for "Sreshan S Nair" (S Re S H N Sn I) are NOT what th
 
 ## Sizes and acrylic (24 November 2026)
 The frame designs now lay out for all nine framed and six acrylic sizes using a composition box fitted inside the artwork area (`compositionBox`, `layoutFrameIn`). Minimum text is 1.5 mm (`MIN_TEXT_MM`); a size that cannot meet it, or the product's minimum DPI, is refused. Framed posters default to a 10 mm inset; acrylic defaults to 0.
+
+## Frame tolerance (UNVERIFIED assumption, 24 November 2026)
+Qikink's product page says "1-inch frame with 0.25-inch tolerance". Our default inset is 10 mm (0.39 in), larger than that tolerance. Whether the real frame hides part of the paper must be settled with a physical sample; the default was NOT changed. A print file also must not have transparent or blank margins (Qikink: "trim unnecessary extra space"): the flat-colour mat border from the inset is artwork and allowed, any non-opaque edge pixel is refused when the file is rendered (`src/merch/trim.js`; the server cannot cheaply decode the PNG).

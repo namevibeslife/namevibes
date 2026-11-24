@@ -79,7 +79,7 @@ export default function MerchCart() {
       const box = document.getElementById('merch-paypal');
       box.innerHTML = '';
       window.paypal.Buttons({ createOrder: () => gatewayOrder.orderId, onApprove: () => done({}), onError: () => setError(t('merch.err.paymentFailed')) }).render('#merch-paypal');
-    } catch { setError(t('merch.err.paymentFailed')); } finally { setBusy(false); }
+    } catch (e) { setError(e?.code === 'storage-unavailable' || e?.code === 'storage-not-configured' ? t('merch.err.storage-unavailable') : t('merch.err.paymentFailed')); } finally { setBusy(false); }
   }
 
   if (cart === null) return <main className="min-h-screen site-background p-4"><p>{t('merch.loading')}</p></main>;

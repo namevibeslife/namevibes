@@ -164,6 +164,15 @@ export function sizeReady(product, size) {
   if (!verified) return { ok: false, reason: 'print-area-unverified', problems: ['unverified'] };
   return { ok: true };
 }
+// Verification levels (per product, optionally per size): (a) spec confirmed by Qikink in writing, (b) sandbox order accepted,
+// (c) physical sample approved by the owner. Admins-only testing needs (a) or (b) (that is what "verified" in the print spec means);
+// selling to Everyone needs (c). The server enforces both.
+export function verificationLevels(product, size) {
+  const v = product?.verification || {}; const per = v.bySize?.[size] || {};
+  const lv = (k) => per[k] ?? v[k];
+  return { specConfirmed: !!lv('specConfirmed'), sandboxAccepted: !!lv('sandboxAccepted'), sampleApproved: !!lv('sampleApproved'), source: per.source || v.source || null };
+}
+export const sampleApproved = (product, size) => verificationLevels(product, size).sampleApproved;
 export const readySizes = (product) => (product?.sizes || []).filter((s) => sizeReady(product, s).ok);
 export function readiness(product) {
   const sizes = product?.sizes || [];

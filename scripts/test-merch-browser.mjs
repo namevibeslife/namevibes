@@ -479,6 +479,14 @@ await step('visibility: Nobody / Admins only / Everyone hides merchandise (menu,
   await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
   assert.equal(await is404('/merch'), false); await page.goto(`${BASE}/dashboard`); assert.equal(await menuHasMerch(), true);
 });
+await step('admin print-file storage panel: backend status, test upload, deletion dry run', async () => {
+  await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin'); await page.goto(`${BASE}/admin/merch`); await page.getByTestId('storage-panel').waitFor();
+  await page.getByTestId('storage-r2').waitFor(); assert.match(await page.getByTestId('storage-r2').innerText(), /OK/);
+  await page.getByTestId('storage-test').click(); await page.getByTestId('storage-test-result').waitFor();
+  assert.match(await page.getByTestId('storage-test-result').innerText(), /signed download, private bucket and delete all passed/);
+  await page.getByTestId('file-dry-run').click(); await page.getByTestId('file-report-result').waitFor();
+  assert.ok((await page.getByTestId('file-report-result').innerText()).includes('nothing was deleted'));
+});
 await step('admin pages have no horizontal page overflow at 390px', async () => {
   await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin'); await page.goto(`${BASE}/admin/merch`); await page.getByTestId('overview').waitFor();
   await page.getByRole('tab', { name: 'Overview' }).click();

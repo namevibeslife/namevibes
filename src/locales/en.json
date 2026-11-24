@@ -1387,7 +1387,9 @@
       "design-source-off": "This kind of design is not available for this product.",
       "design-hidden": "This design is not available right now.",
       "stand-unavailable": "The display stand is not available for this item.",
-      "text-too-small": "At this size the smallest text would print only {{mm}} mm high, too small to read. Choose a larger size or a design with fewer elements."
+      "text-too-small": "At this size the smallest text would print only {{mm}} mm high, too small to read. Choose a larger size or a design with fewer elements.",
+      "storage-unavailable": "We could not save your design just now. You have not been charged. Please try again in a minute.",
+      "storage-not-configured": "We could not save your design just now. You have not been charged. Please try again in a minute."
     },
     "cart": {
       "title": "Your cart",
@@ -1426,7 +1428,8 @@
       "trackLink": "Track shipment",
       "timeline": "Progress",
       "deliveryNote": "Delivery dates are estimates. Personalised items cannot be returned unless faulty.",
-      "reorder": "Order again"
+      "reorder": "Order again",
+      "fileRemoved": "The print file for this order has been removed (it is kept only as long as needed, for privacy)."
     },
     "status": {
       "payment_pending": "Awaiting payment",

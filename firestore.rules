@@ -220,6 +220,7 @@ service cloud.firestore {
     match /merch_webhook_events/{id} { allow read: if isAdmin(); allow write: if false; }
     match /merch_commissions/{id} { allow read: if isAdmin() || isAmbassadorFor(resource.data); allow write: if false; }
     match /merch_audit_logs/{id} { allow read: if isAdmin(); allow write: if false; }
+    match /merch_file_logs/{id} { allow read: if isAdmin(); allow write: if false; }
 
     match /revenueReports/{reportId} {
       allow read, write: if isAdmin();
@@ -238,7 +239,7 @@ service cloud.firestore {
         'ambassadorAccess', 'paymentSettings', 'waitlist',
         'merch_settings', 'merch_countries', 'merch_providers', 'merch_routes', 'merch_products', 'merch_variants',
         'merch_designs', 'merch_carts', 'merch_quotes', 'merch_orders', 'merch_fulfillments',
-        'merch_webhook_events', 'merch_commissions', 'merch_audit_logs'];
+        'merch_webhook_events', 'merch_commissions', 'merch_audit_logs', 'merch_file_logs'];
     }
     match /{collection}/{docId} {
       allow read, write: if isAdmin() && !hasOwnRules(collection);

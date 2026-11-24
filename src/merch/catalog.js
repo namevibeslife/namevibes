@@ -13,6 +13,29 @@
 // bottles carry the Bloodline designs ONLY (the 8 approved logos). `collections` = what the product can carry; `designSources` = what
 // admin has switched on (the server enforces both).
 export { PRINT_DPI } from './layout.js';
+import { FRAME_MM } from './frames.js';
+
+// Qikink support, ticket 136313, 24 Nov 2026 (in writing): posters and mugs use print_type_id 5, framed posters print on the front only,
+// PNG or JPEG at 300 DPI, and the printed size follows the product size and the uploaded file's size (no separate fixed print box).
+// That confirms the specification (verification level a). It does NOT confirm physical placement or the effect of the inset (level c).
+export const QIKINK_TICKET = 'Qikink support, ticket 136313, 24 Nov 2026';
+const mmToIn = (mm) => Math.round((mm / 25.4) * 100) / 100;
+const posterSpec = (sizes) => ({
+  printTypeId: 5, allowedPlacements: ['fr'], minDpi: 150, perSize: true, source: QIKINK_TICKET,
+  bySize: Object.fromEntries(sizes.map((s) => [s, { maxWidthInches: mmToIn(FRAME_MM[s][0]), maxHeightInches: mmToIn(FRAME_MM[s][1]), verified: true }]))
+});
+// Weights Qikink gave for framed posters (grams) and the shipping placeholder (500 g surface, GST included). Heavier parcels are UNCONFIRMED.
+export const WEIGHT_G = { 'poster:A4': 1400, 'poster:A3': 2000 };
+export const SHIPPING_COST_PLACEHOLDER = {
+  slabs: [{ upToGrams: 500, amount: 50, method: 'surface', confirmed: true }, { upToGrams: 100000, amount: 50, method: 'surface', confirmed: false }],
+  note: 'Qikink: 500 g shipment Rs 50 surface, Rs 65 air (GST included). The rate for heavier parcels is not known yet: the second slab is a placeholder.'
+};
+export function shippingCostFor(country, productId, size) {
+  const slabs = (country?.shippingCost?.slabs?.length ? country.shippingCost.slabs : SHIPPING_COST_PLACEHOLDER.slabs).slice().sort((a, b) => a.upToGrams - b.upToGrams);
+  const weight = WEIGHT_G[`${productId}:${size}`] ?? null;
+  const slab = weight == null ? slabs[slabs.length - 1] : slabs.find((s) => s.upToGrams >= weight) || slabs[slabs.length - 1];
+  return { amount: Number(slab?.amount) || 0, weightGrams: weight, unconfirmed: weight == null || slab?.confirmed !== true };
+}
 
 const apparelSizes = ['S', 'M', 'L', 'XL', 'XXL'];
 const apparelColors = [
@@ -60,12 +83,16 @@ const BOTH = ['name_elements', 'blood_group'];
 export const DEFAULT_PRODUCTS = {
   poster: {
     id: 'poster', kind: 'wall-art', category: 'poster', collections: BOTH, designSources: { name_elements: true, blood_group: false }, enabled: false,
-    sizes: FRAMED_SIZES, colors: FRAME_COLORS.map(({ id, hex }) => ({ id, hex, on: true })), colorsBySize: FRAMED_COLOR_IDS, placements: ['full'], defaultInsetMm: 10
+    sizes: FRAMED_SIZES, colors: FRAME_COLORS.map(({ id, hex }) => ({ id, hex, on: true })), colorsBySize: FRAMED_COLOR_IDS, placements: ['full'], defaultInsetMm: 10,
+    printSpec: posterSpec(FRAMED_SIZES), verification: { specConfirmed: true, source: QIKINK_TICKET } // admins-only testing allowed; Everyone needs an approved physical sample
   },
   acrylic: {
     id: 'acrylic', kind: 'acrylic', category: 'poster', collections: BOTH, designSources: { name_elements: true, blood_group: false }, enabled: false,
     sizes: ACRYLIC_SIZES, colors: [{ id: 'white', hex: '#FFFFFF', on: true }], placements: ['full'], defaultInsetMm: 0,
-    standSku: ACRYLIC_STAND.sku // the optional "Add stand" is a SEPARATE Qikink line item (plain product, same quantity)
+    // Qikink says "acrylic poster with stand" is ONE SKU (the stand is a plain accessory, no design file). The SKU code is not confirmed yet, so that
+    // product stays disabled and unverified. The old two-line-item "Add stand" is kept behind this flag (off) until the real SKU is known.
+    standSku: ACRYLIC_STAND.sku, standAsLine: false, standSingleSkuConfirmed: false,
+    printSpec: posterSpec(ACRYLIC_SIZES), verification: { specConfirmed: true, source: QIKINK_TICKET }
   },
   'acrylic-frame': {
     id: 'acrylic-frame', kind: 'acrylic', category: 'poster', collections: BOTH, designSources: { name_elements: true, blood_group: false }, enabled: false,
@@ -75,7 +102,8 @@ export const DEFAULT_PRODUCTS = {
     id: 'mug', kind: 'drinkware', category: 'mug', collections: ['blood_group'], designSources: { blood_group: true }, enabled: false,
     sizes: ['11oz'], colors: MUG_VARIANTS.map(({ id, hex, on }) => ({ id, hex, on })), placements: ['wrap'],
     // CONFIRMED in the Qikink sandbox (24 Nov 2026): print_type_id 5, placement fr, 8.5 x 3.5 in. Placement on a real mug is not proven until a sample is printed.
-    printSpec: { printTypeId: 5, allowedPlacements: ['fr'], maxWidthInches: 8.5, maxHeightInches: 3.5, minDpi: 150, verified: true }
+    printSpec: { printTypeId: 5, allowedPlacements: ['fr'], maxWidthInches: 8.5, maxHeightInches: 3.5, minDpi: 150, verified: true },
+    verification: { specConfirmed: true, sandboxAccepted: true, source: `${QIKINK_TICKET}; sandbox order accepted 24 Nov 2026` }
   },
   ...Object.fromEntries(Object.entries(BOTTLES).map(([id, b]) => [id, {
     id, kind: 'bottle', category: 'bottle', collections: ['blood_group'], designSources: { blood_group: true }, enabled: false,

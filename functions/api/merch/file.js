@@ -1,8 +1,8 @@
-// GET /api/merch/file?o=<orderId>&i=<item>&e=<expiry ms>&s=<signature>
-// Serves one generated print file to the fulfilment provider. The link is HMAC-signed (MERCH_ARTWORK_SECRET)
-// and expires; the file is read from Firebase Storage with the service account. Nothing else is exposed.
-import { accessToken, firestore } from '../../_lib/server.js';
-import { hmacHex, sameString } from '../../_lib/merchCtx.js';
+// GET /api/merch/file?o=<orderId>&i=<item>&k=p|m&e=<expiry ms>&s=<signature>
+// Fallback download link for a stored print file (used only when a backend cannot make its own signed link). The link is
+// HMAC-signed (MERCH_ARTWORK_SECRET) and expires; the file is read from whichever backend holds it. Nothing else is exposed.
+import { firestore } from '../../_lib/server.js';
+import { hmacHex, sameString, buildCtx } from '../../_lib/merchCtx.js';
 
 export async function onRequestGet({ request, env }) {
   const q = new URL(request.url).searchParams;
@@ -15,13 +15,11 @@ export async function onRequestGet({ request, env }) {
     const db = await firestore(env);
     const order = (await db.get(`merch_orders/${o}`))?.data;
     const it = order?.items?.[Number(i)];
-    const art = k === 'm' ? it?.mockup : it?.artwork;
-    if (!art || !String(art.path).startsWith(k === 'm' ? 'merch/mockup/' : 'merch/print/')) return notFound();
-    const account = JSON.parse(env.FIREBASE_SERVICE_ACCOUNT);
-    const token = await accessToken(account, 'https://www.googleapis.com/auth/devstorage.read_only');
-    const bucket = env.FIREBASE_STORAGE_BUCKET || `${account.project_id}.firebasestorage.app`;
-    const res = await fetch(`https://storage.googleapis.com/storage/v1/b/${bucket}/o/${encodeURIComponent(art.path)}?alt=media`, { headers: { Authorization: `Bearer ${token}` } });
-    if (!res.ok) return notFound();
-    return new Response(res.body, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'private, max-age=300' } });
+    const rec = k === 'm' ? it?.mockup : it?.artwork;
+    if (!rec?.key || rec.fileDeletedAt || !String(rec.key).startsWith(k === 'm' ? 'merch/mockup/' : 'merch/print/')) return notFound();
+    const { files } = await buildCtx(env, null);
+    const file = await files.get(rec);
+    if (!file) return notFound();
+    return new Response(file.bytes, { headers: { 'Content-Type': 'image/png', 'Cache-Control': 'private, max-age=300' } });
   } catch { return notFound(); }
 }
