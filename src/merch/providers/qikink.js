@@ -196,7 +196,10 @@ export class QikinkAdapter extends PODProvider {
   }
 
   async fetchToken() {
-    if (!this.clientId || !this.clientSecret) throw Object.assign(new Error('qikink-credentials-missing'), { retryable: false });
+    { // names only, never values
+      const bad = [!this.clientId && 'QIKINK_CLIENT_ID', !this.clientSecret && 'QIKINK_CLIENT_SECRET'].filter(Boolean);
+      if (bad.length) throw Object.assign(new Error(`qikink-credentials-missing: ${bad.join(' and ')} blank`), { retryable: false });
+    }
     await this.throttle();
     let res;
     try {

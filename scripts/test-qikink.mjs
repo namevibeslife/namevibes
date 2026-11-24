@@ -315,5 +315,19 @@ await test('a submitted order is never re-sent (exactly one provider order per p
   assert.equal(e.q.creates, 1); assert.equal(e.q.orders.length, 1);
 });
 
+await test('credentials: missing names are reported (names only); stray spaces, newlines, quotes and hidden characters are trimmed', async () => {
+  const { createProvider } = await import('../src/merch/providers/index.js');
+  const { explainReason } = await import('../src/merch/reasons.js');
+  const doc = { id: 'qikink', adapter: 'qikink' };
+  const submit = async (env) => { try { await createProvider(doc, env).accessToken(); return { ok: true }; } catch (e) { return { ok: false, error: e.message, retryable: e.retryable }; } };
+  let r = await submit({ QIKINK_CLIENT_ID: 'cid', QIKINK_CLIENT_SECRET: '   \n' });
+  assert.equal(r.ok, false); assert.equal(r.error, 'qikink-credentials-missing: QIKINK_CLIENT_SECRET blank'); assert.equal(r.retryable, false);
+  r = await submit({}); assert.equal(r.error, 'qikink-credentials-missing: QIKINK_CLIENT_ID and QIKINK_CLIENT_SECRET blank');
+  assert.match(explainReason(r.error), /sign-in details/);
+  const q = fakeQikink(); const a = createProvider(doc, { QIKINK_CLIENT_ID: ' "cid"\r\n', QIKINK_CLIENT_SECRET: '\nsec \u200b' }, { qikink: { fetch: q.fetch } });
+  assert.equal(a.clientId, 'cid'); assert.equal(a.clientSecret, 'sec');
+  assert.ok(await a.accessToken(), 'the cleaned credentials are accepted by the fake Qikink');
+});
+
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed ? 1 : 0);
