@@ -3,7 +3,9 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createMemoryDb } from '../src/merch/memoryDb.js';
-import { handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset } from '../src/merch/engine.js';
+import { handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset, handleUpload, sweepFiles, fileReport } from '../src/merch/engine.js';
+import { createFileStore } from '../src/merch/storage/stores.js';
+import { makeFakeCloud, fakePng } from './fake-storage.mjs';
 import { BLOOD_GROUPS, bloodGroupSlug, bloodGroupLabel } from '../src/merch/designs.js';
 import { productPreviewSvg } from '../src/merch/render.js';
 import { HEADINGS, layoutFrame, opBounds } from '../src/merch/frames.js';
@@ -533,6 +535,168 @@ await test('visibility: Nobody (default) / Admins only / Everyone, enforced for 
   assert.equal((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).status, 200);
   assert.equal((await handleMerch(anon, 'visibility', {})).status, 200);
   assert.ok((await e.db.list('merch_audit_logs')).filter((l) => l.action === 'admin.setVisibility').length >= 2);
+});
+
+console.log('Print-file storage (engine)');
+const HOUR = 3600 * 1000, DAY = 24 * HOUR;
+function envF(opts = {}) {
+  const e = env(opts); const cloud = makeFakeCloud();
+  e.ctx.now = () => new Date(cloud.clock.t);
+  e.ctx.files = createFileStore({ env: cloud.env, fetch: cloud.fetch, getSettings: async () => (await e.db.get('merch_settings/storage'))?.data || {}, now: () => new Date(cloud.clock.t) });
+  e.ctx.artworkUrl = async (o, i, kind) => e.ctx.files.getSignedUrl(kind === 'mockup' ? i.mockup : i.artwork);
+  return { ...e, cloud };
+}
+const upl = (e, id, kind = 'print', bytes = fakePng(), index = 0, who) => handleUpload(who || e.ctx, { orderId: id, index, kind, bytes });
+async function stored(e, items = [poster()]) { const { id } = await order(e, items, { artwork: false }); assert.equal((await upl(e, id)).status, 200); assert.equal((await upl(e, id, 'mockup')).status, 200); return id; }
+const orderOf = async (e, id) => (await e.db.get(`merch_orders/${id}`)).data;
+const deletes = (cloud) => cloud.state.calls.filter((c) => c.startsWith('DELETE'));
+
+await test('upload: the server stores the file (R2 first), records backend/key/bytes/sha256 on the order, key is under merch/print/<uid>/<order>/', async () => {
+  const e = envF(); const { id } = await order(e, [poster()], { artwork: false });
+  const png = fakePng(); const r = await upl(e, id, 'print', png);
+  assert.equal(r.status, 200); assert.equal(r.body.backend, 'r2'); assert.equal(r.body.width, 2400);
+  const a = (await orderOf(e, id)).items[0].artwork;
+  assert.match(a.key, new RegExp(`^merch/print/u1/${id}/0-[A-Za-z0-9]+\\.png$`)); assert.equal(a.bytes, png.length); assert.match(a.sha256, /^[a-f0-9]{64}$/); assert.equal(a.backend, 'r2'); assert.ok(a.createdAt && a.expiresAt);
+  assert.ok(e.cloud.state.r2.has(a.key));
+  assert.equal((await upl(e, id, 'mockup')).status, 200); assert.match((await orderOf(e, id)).items[0].mockup.key, /^merch\/mockup\/u1\//);
+  assert.equal((await handleMerch(e.ctx, 'artwork', { orderId: id, items: [] })).body.error, 'use-upload');
+});
+await test('upload refusals: not signed in, another buyer order, not a PNG (even as image/png), oversize, too few pixels, locked order, bad kind or index', async () => {
+  const e = envF(); const { id } = await order(e, [poster()], { artwork: false });
+  assert.equal((await upl(e, id, 'print', fakePng(), 0, { ...e.ctx, who: null })).status, 401);
+  assert.equal((await upl(e, id, 'print', fakePng(), 0, { ...e.ctx, who: { uid: 'u2', email: 'u2@x.test', emailVerified: true } })).status, 404);
+  assert.equal((await upl(e, id, 'print', new TextEncoder().encode('<html>hello</html>'.repeat(10)))).body.error, 'not-a-png');
+  assert.equal((await upl(e, id, 'print', fakePng(2400, 3200, 15 * 1024 * 1024 + 1))).body.error, 'file-too-large');
+  assert.equal((await upl(e, id, 'mockup', fakePng(2400, 3200, 5 * 1024 * 1024 + 1))).body.error, 'file-too-large');
+  assert.equal((await upl(e, id, 'print', fakePng(600, 800))).body.error, 'resolution-too-low');
+  assert.equal((await upl(e, id, 'print', fakePng(), 5)).body.error, 'bad-artwork-index');
+  assert.equal((await upl(e, id, 'other')).body.error, 'bad-upload');
+  assert.equal(e.cloud.state.r2.size + e.cloud.state.sb.size, 0, 'nothing was stored for any refused upload');
+  await e.db.patch(`merch_orders/${id}`, { status: 'delivered' });
+  assert.equal((await upl(e, id)).body.error, 'order-locked');
+});
+await test('upload: R2 down -> Supabase; both down -> 503 storage-unavailable and the order is NOT sent to Qikink; replacing a file removes the old copy', async () => {
+  const e = envF(); const sent = []; e.ctx.providerFor = () => ({ submitOrder: async (p) => { sent.push(p); return { ok: true, providerOrderId: 'P' }; } });
+  const { id } = await order(e, [poster()], { artwork: false });
+  e.cloud.state.r2Down = true; assert.equal((await upl(e, id)).body.backend, 'supabase');
+  const first = (await orderOf(e, id)).items[0].artwork.key;
+  e.cloud.state.r2Down = false; assert.equal((await upl(e, id)).status, 200);
+  assert.ok(!e.cloud.state.sb.has(first), 'the replaced file is gone');
+  const { id: id2 } = await order(e, [poster()], { artwork: false });
+  e.cloud.state.r2Down = true; e.cloud.state.sbDown = true;
+  const bad = await upl(e, id2); assert.equal(bad.status, 503); assert.equal(bad.body.error, 'storage-unavailable');
+  assert.ok(!(await orderOf(e, id2)).items[0].artwork);
+  e.cloud.state.r2Down = false; e.cloud.state.sbDown = false;
+  const blocked = await pay(e, id2); assert.equal(blocked.status, 409); assert.equal(blocked.body.error, 'artwork-missing'); // no file stored: the payment is not even confirmed and nothing is submitted
+  assert.equal(sent.filter((p) => p.orderId === id2).length, 0); assert.equal((await orderOf(e, id2)).status, 'payment_pending');
+  const noconf = envF(); noconf.ctx.files = createFileStore({ env: {}, fetch: noconf.cloud.fetch });
+  const { id: id3 } = await order(noconf, [poster()], { artwork: false });
+  assert.equal((await upl(noconf, id3)).body.error, 'storage-not-configured');
+});
+await test('before submitting, the signed link is fetched like the provider would: size, PNG type and hash must match; the provider gets that link', async () => {
+  const e = envF(); const sent = []; e.ctx.providerFor = () => ({ submitOrder: async (p) => { sent.push(p); return { ok: true, providerOrderId: 'P' }; } });
+  const id = await stored(e); await pay(e, id);
+  assert.equal(sent.length, 1);
+  const url = sent[0].items[0].designUrl; assert.match(url, /^https:\/\/acct\.r2\.cloudflarestorage\.com\/prints-r2\/merch\/print\/u1\//);
+  const got = await e.cloud.fetch(url); assert.equal(got.status, 200);
+  assert.equal(Buffer.from(await got.arrayBuffer()).length, (await orderOf(e, id)).items[0].artwork.bytes);
+  assert.match(sent[0].items[0].mockupUrl, /merch\/mockup\//);
+  // tampered file (same size, different bytes) -> never submitted
+  const t = envF(); const sent2 = []; t.ctx.providerFor = () => ({ submitOrder: async (p) => { sent2.push(p); return { ok: true }; } });
+  const tid = await stored(t); const key = (await orderOf(t, tid)).items[0].artwork.key; const f = t.cloud.state.r2.get(key); f.bytes[100] ^= 255;
+  await pay(t, tid); assert.equal(sent2.length, 0); assert.equal((await orderOf(t, tid)).exceptionReason, 'artwork-hash-mismatch');
+  // vanished file
+  const v = envF(); const sent3 = []; v.ctx.providerFor = () => ({ submitOrder: async (p) => { sent3.push(p); return { ok: true }; } });
+  const vid = await stored(v); v.cloud.state.r2.clear(); await pay(v, vid);
+  assert.equal(sent3.length, 0); assert.equal((await orderOf(v, vid)).exceptionReason, 'artwork-unreachable');
+  // primary outage at submission with mirror on: the link comes from the other backend
+  const m = envF(); await m.db.patch('merch_settings/storage', { mirror: true }); const sent4 = []; m.ctx.providerFor = () => ({ submitOrder: async (p) => { sent4.push(p); return { ok: true, providerOrderId: 'P' }; } });
+  const mid = await stored(m); m.cloud.state.r2Down = true; await pay(m, mid);
+  assert.equal(sent4.length, 1); assert.match(sent4[0].items[0].designUrl, /^https:\/\/sb\.test\//);
+});
+
+console.log('Automatic deletion of print files');
+const settle = async (e, id, status, ageMs, extra = {}) => e.db.patch(`merch_orders/${id}`, { status, timeline: [{ state: status, at: new Date(e.cloud.clock.t - ageMs) }], ...extra });
+const present = (e, rec) => e.cloud.state.r2.has(rec.key) || e.cloud.state.sb.has(rec.key);
+await test('schedule: unpaid 48 h, cancelled/refunded 7 days, delivered 30 days after delivery; nothing earlier; the order record, sha256 and a removed timestamp stay', async () => {
+  const e = envF();
+  const cases = [['payment_pending', 47 * HOUR, 49 * HOUR], ['cancelled', 6 * DAY, 7 * DAY + HOUR], ['refunded', 6 * DAY, 8 * DAY], ['delivered', 29 * DAY, 31 * DAY]];
+  for (const [status, early, late] of cases) {
+    const id = await stored(e); const rec = (await orderOf(e, id)).items[0].artwork;
+    const unpaid = status === 'payment_pending';
+    await settle(e, id, status, early, unpaid ? { createdAt: new Date(e.cloud.clock.t - early) } : {});
+    let r = await sweepFiles(e.ctx); assert.equal(r.deleted, 0, `${status} kept at ${early / HOUR} h`); assert.ok(present(e, rec));
+    await settle(e, id, status, late, unpaid ? { createdAt: new Date(e.cloud.clock.t - late) } : {});
+    r = await sweepFiles(e.ctx); assert.equal(r.deleted, 2, `${status} deleted at ${late / HOUR} h (print + mock-up)`); assert.ok(!present(e, rec));
+    const o = await orderOf(e, id); assert.ok(o.items[0].artwork.fileDeletedAt && o.items[0].mockup.fileDeletedAt && o.fileDeletedAt); assert.equal(o.items[0].artwork.sha256, rec.sha256); assert.equal(o.status, status);
+  }
+  assert.ok(deletes(e.cloud).every((c) => /\/merch\/(print|mockup)\//.test(c)), 'only merch/print and merch/mockup are ever deleted');
+  const again = await sweepFiles(e.ctx); assert.equal(again.due, 0); assert.equal(again.deleted, 0); // idempotent
+  assert.equal((await e.db.list('merch_file_logs')).filter((l) => l.ok).length, 8);
+});
+await test('an open return, dispute or exception blocks deletion until it is closed plus the window; orders in progress are never touched', async () => {
+  const e = envF(); const id = await stored(e); const rec = (await orderOf(e, id)).items[0].artwork;
+  await settle(e, id, 'delivered', 100 * DAY, { openCase: true });
+  assert.equal((await sweepFiles(e.ctx)).deleted, 0); assert.ok(present(e, rec));
+  const admin = e.as('admin@x.test');
+  assert.equal((await handleAdmin(admin, { action: 'setOpenCase', data: { orderId: id, open: false } })).status, 200); // closed now
+  assert.equal((await sweepFiles(e.ctx)).deleted, 0, 'closed just now: the window starts at closing'); e.cloud.clock.t += 29 * DAY;
+  assert.equal((await sweepFiles(e.ctx)).deleted, 0); e.cloud.clock.t += 2 * DAY;
+  assert.equal((await sweepFiles(e.ctx)).deleted, 2);
+  for (const status of ['exception', 'held_provider_funds', 'paid', 'submitted', 'in_production', 'shipped']) {
+    const x = await stored(e); await settle(e, x, status, 400 * DAY); assert.equal((await sweepFiles(e.ctx)).deleted, 0, status);
+  }
+});
+await test('admin: retention window 0-365 days (overall and per product), audited; dry run deletes nothing; real deletion only when dryRun is false; customers cannot', async () => {
+  const e = envF(); const admin = e.as('admin@x.test'); const id = await stored(e); const rec = (await orderOf(e, id)).items[0].artwork;
+  await settle(e, id, 'delivered', 11 * DAY);
+  assert.equal((await sweepFiles(e.ctx)).due, 0);
+  assert.equal((await handleAdmin(admin, { action: 'setStorage', data: { retentionDays: 10 } })).status, 200);
+  const dry = await handleAdmin(admin, { action: 'sweepFiles', data: {} }); // default = dry run
+  assert.equal(dry.body.dryRun, true); assert.equal(dry.body.due, 2); assert.equal(dry.body.deleted, 0); assert.ok(present(e, rec));
+  const rep = await handleAdmin(admin, { action: 'fileReport', data: {} }); assert.equal(rep.body.due, 2); assert.equal(rep.body.deleted, 0);
+  const real = await handleAdmin(admin, { action: 'sweepFiles', data: { dryRun: false } }); assert.equal(real.body.deleted, 2); assert.ok(!present(e, rec));
+  assert.equal((await handleAdmin(admin, { action: 'setStorage', data: { retentionDays: 366 } })).status, 400);
+  assert.equal((await handleAdmin(admin, { action: 'setStorage', data: { retentionDays: -1 } })).status, 400);
+  assert.equal((await handleAdmin(admin, { action: 'setStorage', data: { retentionByProduct: { poster: 400 } } })).status, 400);
+  assert.equal((await handleAdmin(admin, { action: 'setStorage', data: { primary: 'dropbox' } })).status, 400);
+  const id2 = await stored(e); await settle(e, id2, 'delivered', 3 * DAY);
+  assert.equal((await handleAdmin(admin, { action: 'setStorage', data: { retentionByProduct: { poster: 2 } } })).status, 200);
+  assert.equal((await sweepFiles(e.ctx)).deleted, 2, 'the per-product window (2 days) applies to the poster');
+  assert.ok((await e.db.list('merch_audit_logs')).filter((l) => l.action === 'admin.setStorage').length >= 2);
+  assert.equal((await handleAdmin(e.ctx, { action: 'sweepFiles', data: { dryRun: false } })).status, 403);
+  assert.equal((await handleAdmin(e.ctx, { action: 'setStorage', data: { retentionDays: 0 } })).status, 403);
+});
+await test('failures are isolated: a failing backend leaves that file in place (logged), the others are deleted, and the next run finishes the job', async () => {
+  const e = envF(); const a = await stored(e); e.cloud.state.r2Down = true; const b = await stored(e); e.cloud.state.r2Down = false; // a on r2, b on supabase
+  const ra = (await orderOf(e, a)).items[0].artwork; const rb = (await orderOf(e, b)).items[0].artwork; assert.equal(ra.backend, 'r2'); assert.equal(rb.backend, 'supabase');
+  await settle(e, a, 'cancelled', 8 * DAY); await settle(e, b, 'cancelled', 8 * DAY);
+  e.cloud.state.sbDown = true;
+  const r1 = await sweepFiles(e.ctx); assert.equal(r1.deleted, 2); assert.equal(r1.failed, 2);
+  assert.ok(!present(e, ra)); assert.ok(e.cloud.state.sb.has(rb.key)); assert.equal((await orderOf(e, b)).items[0].artwork.fileDeletedAt, undefined);
+  assert.equal((await e.db.list('merch_file_logs')).filter((l) => !l.ok).length, 2);
+  const rep = await fileReport(e.ctx); assert.equal(rep.failed, 2); assert.equal(rep.due, 2);
+  e.cloud.state.sbDown = false; const r2 = await sweepFiles(e.ctx); assert.equal(r2.deleted, 2); assert.ok(!e.cloud.state.sb.has(rb.key));
+});
+await test('mirrored copies are deleted from both backends', async () => {
+  const e = envF(); await e.db.patch('merch_settings/storage', { mirror: true });
+  const id = await stored(e); const rec = (await orderOf(e, id)).items[0].artwork; assert.ok(e.cloud.state.r2.has(rec.key) && e.cloud.state.sb.has(rec.key));
+  await settle(e, id, 'cancelled', 8 * DAY); await sweepFiles(e.ctx);
+  assert.ok(!e.cloud.state.r2.has(rec.key) && !e.cloud.state.sb.has(rec.key));
+});
+await test('admin health: each backend ok/failing/not configured, last failover, and a test upload that writes, reads and deletes a tiny file', async () => {
+  const e = envF(); const admin = e.as('admin@x.test');
+  let h = await handleAdmin(admin, { action: 'storageHealth', data: {} });
+  assert.equal(h.body.backends.r2.status, 'ok'); assert.equal(h.body.backends.supabase.status, 'ok');
+  const t = await handleAdmin(admin, { action: 'storageTest', data: {} });
+  assert.deepEqual(t.body.results, { supabase: { ok: true }, r2: { ok: true } }); assert.equal(e.cloud.state.r2.size + e.cloud.state.sb.size, 0, 'the test file is removed again');
+  e.cloud.state.r2Down = true; h = await handleAdmin(admin, { action: 'storageHealth', data: {} }); assert.equal(h.body.backends.r2.status, 'failing');
+  const t2 = await handleAdmin(admin, { action: 'storageTest', data: {} }); assert.equal(t2.body.results.r2.ok, false); assert.equal(t2.body.results.supabase.ok, true);
+  const none = envF(); none.ctx.files = createFileStore({ env: {}, fetch: none.cloud.fetch });
+  h = await handleAdmin(none.as('admin@x.test'), { action: 'storageHealth', data: {} }); assert.equal(h.body.backends.r2.status, 'not-configured'); assert.equal(h.body.backends.supabase.status, 'not-configured');
+  assert.equal((await handleAdmin(e.ctx, { action: 'storageHealth', data: {} })).status, 403);
+  await e.db.patch('merch_settings/global', { visibleTo: 'nobody' }); // the upload route obeys the visibility setting like every customer action
+  assert.equal((await upl(e, 'x')).status, 404);
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

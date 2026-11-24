@@ -4,6 +4,7 @@
 // against the mock database with a simulated payment gateway and a simulated provider that can be told
 // to time out or reject, so the whole customer and admin workflow can be tried offline.
 import { auth, db } from '../firebase';
+import { MockStore, FailoverStore } from './storage/stores.js';
 import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } from 'firebase/firestore';
 
 export const IS_MOCK = import.meta.env.MODE === 'mock';
@@ -44,15 +45,29 @@ const mockDb = {
   }
 };
 
+// dev:mock keeps uploaded files in memory (shared by the browser engine for the whole session); no cloud account is used.
+const mockFiles = new FailoverStore({ stores: { r2: new MockStore('r2'), supabase: new MockStore('supabase') }, getSettings: async () => ({}) });
+async function sendFile(path, blob) {
+  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+  const res = await fetch(path, { method: 'POST', headers: { 'Content-Type': 'image/png', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: blob });
+  return { status: res.status, body: await res.json().catch(() => ({})) };
+}
+/** Upload one print file / mock-up for an order item through the merchandise server (never straight to a storage service). */
+export async function uploadMerchFile({ orderId, index, kind, blob }) {
+  if (!IS_MOCK) return sendFile(`/api/merch/upload?o=${encodeURIComponent(orderId)}&i=${index}&k=${kind}`, blob);
+  const { engine } = await loadMock();
+  return engine.handleUpload(await mockCtx(), { orderId, index, kind, bytes: new Uint8Array(await blob.arrayBuffer()) });
+}
+
 const mockCtx = async () => {
   const { p1, p2 } = await loadMock();
   const user = auth.currentUser;
   return {
-    db: mockDb, env: {}, now: () => new Date(), sandbox: true, paymentsSimulated: true,
+    db: mockDb, env: {}, now: () => new Date(), files: mockFiles, sandbox: true, paymentsSimulated: true,
     who: user ? { uid: user.uid, email: user.email, emailVerified: true } : null,
     id: () => Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 8),
     providerFor: (p) => (p.id === 'mock2' ? p2 : p1),
-    artworkUrl: async (order, item) => `mock://${item.artwork.path}`,
+    artworkUrl: async (order, item, kind) => { const rec = kind === 'mockup' ? item.mockup : item.artwork; return rec?.key ? mockFiles.getSignedUrl(rec) : `mock://${rec?.path}`; },
     gateways: {
       async create(order, choice) { return { orderId: `mock_${order.id}`, client: { gateway: 'mock', realGateway: choice.gateway, orderId: `mock_${order.id}` } }; },
       async verify() { return { transactionId: `mock_tx_${Date.now()}` }; },

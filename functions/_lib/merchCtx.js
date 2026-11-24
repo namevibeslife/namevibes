@@ -5,6 +5,7 @@ import { paypalToken, paypalBase } from '../api/pay/create-order.js';
 import { verifyRazorpay, verifyPayPal } from '../api/pay/verify.js';
 import { createProvider } from '../../src/merch/providers/index.js';
 import { SITE_URL } from '../../src/config/site.js';
+import { createFileStore } from '../../src/merch/storage/stores.js';
 
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 export async function hmacHex(secret, text) {
@@ -102,13 +103,25 @@ export async function signedArtworkUrl(env, order, item, kind = 'print', ttlMs =
 export async function buildCtx(env, request) {
   const db = await firestore(env);
   const who = request ? await signedInUser(request) : null;
+  // Print files live in Supabase Storage and/or Cloudflare R2 (never Firebase Storage). Which one is first is an admin setting
+  // (merch_settings/storage); the secrets only come from env. A backend with missing secrets is simply "not configured".
+  const files = createFileStore({
+    env,
+    getSettings: async () => (await db.get('merch_settings/storage'))?.data || {},
+    onEvent: async (e) => { await db.patch('merch_settings/storageStatus', { lastFailover: { from: e.from, to: e.to, error: String(e.error).slice(0, 120), at: new Date() } }).catch(() => {}); }
+  });
   return {
+    files,
     db, env, who,
     now: () => new Date(),
     id: () => crypto.randomUUID().replace(/-/g, '').slice(0, 20),
     gateways: gatewaysFor(env), sandbox: isSandbox(env), paymentsSimulated: paymentsSimulated(env),
     providerFor: (doc) => createProvider(doc, env),
-    artworkUrl: (order, item, kind) => signedArtworkUrl(env, order, item, kind)
+    // A short-lived public HTTPS link the print provider can fetch without logging in (Supabase signed URL or R2 presigned URL).
+    artworkUrl: (order, item, kind) => {
+      const rec = kind === 'mockup' ? item.mockup : item.artwork;
+      return rec?.key && rec?.backend ? files.getSignedUrl(rec) : signedArtworkUrl(env, order, item, kind);
+    }
   };
 }
 

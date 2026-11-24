@@ -40,6 +40,54 @@ function VisibilityControl({ settings, act }) {
   );
 }
 
+const admin = (action, data) => callMerch('admin', { action, data });
+const BACKEND_LABEL = { r2: 'Cloudflare R2', supabase: 'Supabase Storage' };
+const STATUS_LABEL = { ok: 'OK', failing: 'FAILING', 'not-configured': 'not configured' };
+
+// Where customers' print files are kept (R2 / Supabase with automatic failover) and when they are deleted.
+function StoragePanel({ act }) {
+  const [info, setInfo] = useState(null);
+  const [report, setReport] = useState(null);
+  const [testResult, setTestResult] = useState(null);
+  const [days, setDays] = useState('30');
+  const [busy, setBusy] = useState(false);
+  const load = useCallback(async () => {
+    const r = await admin('storageHealth', {});
+    if (r.status === 200) { setInfo(r.body); setDays(String(r.body.retentionDays)); }
+  }, []);
+  useEffect(() => { load().catch(() => {}); }, [load]);
+  const run = async (fn) => { setBusy(true); try { await fn(); } finally { setBusy(false); } };
+  if (!info) return <div className="p-3 bg-white/70 rounded-lg" data-testid="storage-panel">Print-file storage: loading...</div>;
+  const names = Object.keys(info.backends);
+  return (
+    <div className="p-3 bg-white/70 rounded-lg space-y-2" data-testid="storage-panel">
+      <h2 className="font-semibold">Print-file storage</h2>
+      <ul className="text-sm">
+        {names.map((n) => <li key={n} data-testid={`storage-${n}`}>{BACKEND_LABEL[n] || n}: <strong>{STATUS_LABEL[info.backends[n].status] || info.backends[n].status}</strong>{info.backends[n].detail ? ` (${info.backends[n].detail})` : ''}{info.primary === n ? ' - first choice' : ''}</li>)}
+      </ul>
+      <p className="text-xs" data-testid="last-failover">{info.lastFailover ? `Last failover: ${info.lastFailover.from} -> ${info.lastFailover.to || 'none'} (${info.lastFailover.error})` : 'No failover has happened.'}</p>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <label>First choice <select aria-label="First choice" value={info.primary || ''} onChange={(e) => run(async () => { await act('setStorage', { primary: e.target.value }); await load(); })} className="border rounded px-2 py-1" data-testid="storage-primary">
+          <option value="">Automatic (R2 if set up)</option><option value="r2">Cloudflare R2</option><option value="supabase">Supabase Storage</option></select></label>
+        <label><input type="checkbox" checked={info.mirror} onChange={(e) => run(async () => { await act('setStorage', { mirror: e.target.checked }); await load(); })} data-testid="storage-mirror" /> Mirror to both</label>
+        <label>Keep delivered orders' files for <input type="number" min="0" max="365" value={days} onChange={(e) => setDays(e.target.value)} className="border rounded px-2 py-1 w-20" data-testid="retention-days" /> days</label>
+        <Btn onClick={() => run(async () => { await act('setStorage', { retentionDays: Number(days) }); await load(); })}>Save</Btn>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Btn onClick={() => run(async () => { const r = await admin('storageTest', {}); setTestResult(r.status === 200 ? r.body.results : { error: r.body?.error }); })} data-testid="storage-test">Test upload</Btn>
+        <Btn onClick={() => run(async () => { const r = await admin('fileReport', {}); if (r.status === 200) setReport(r.body); })} data-testid="file-report">Deletion report</Btn>
+        <Btn onClick={() => run(async () => { const r = await admin('sweepFiles', { dryRun: true }); if (r.status === 200) setReport({ dry: r.body }); })} data-testid="file-dry-run">Dry run (delete nothing)</Btn>
+        <Btn onClick={() => { if (window.confirm('Delete every print file that is due now? This cannot be undone.')) run(async () => { const r = await admin('sweepFiles', { dryRun: false }); if (r.status === 200) setReport({ ran: r.body }); }); }} data-testid="file-sweep" disabled={busy}>Delete due files now</Btn>
+      </div>
+      {testResult && <p className="text-sm" data-testid="storage-test-result">{testResult.error ? `Test failed: ${testResult.error}` : Object.entries(testResult).map(([n, r]) => `${BACKEND_LABEL[n] || n}: ${r.ok ? 'write, read and delete worked' : `failed (${r.error})`}`).join(' | ')}</p>}
+      {report && <p className="text-sm" data-testid="file-report-result">
+        {report.dry ? `Dry run: ${report.dry.due} file(s) are due for deletion; nothing was deleted.` : report.ran ? `Deleted ${report.ran.deleted}, failed ${report.ran.failed}, were due ${report.ran.due}.` : `Files due now: ${report.due}. Deleted so far: ${report.deleted}. Failed: ${report.failed}.`}
+      </p>}
+      <p className="text-xs">Unpaid uploads are deleted after 48 hours, cancelled or refunded orders after 7 days, delivered orders after the number of days above (orders with an open return or exception are never deleted). Deletion runs from the cron job; the order record stays.</p>
+    </div>
+  );
+}
+
 export default function MerchAdmin() {
   const { user, loading } = useAuthStore();
   const [isAdmin, setIsAdmin] = useState(null);
@@ -102,6 +150,7 @@ function Overview({ data, act }) {
   return (
     <section className="space-y-4" data-testid="overview">
       <VisibilityControl settings={data.settings} act={act} />
+      <StoragePanel act={act} />
       <p>Merchandise is <strong data-testid="global-state">{data.settings.enabled ? 'ON' : 'OFF'}</strong> · {data.orders.length} orders · {paid.length} paid · revenue (all currencies summed by country below) · estimated margin shown per order.</p>
       <table className="w-full text-sm bg-white/70"><thead><tr><th className="text-left p-2">Country</th><th>Paid orders</th><th>Revenue</th></tr></thead>
         <tbody>{Object.entries(byCountry).map(([c, v]) => <tr key={c}><td className="p-2">{c}</td><td className="text-center">{v.n}</td><td className="text-center">{v.rev.toFixed(2)} {v.cur}</td></tr>)}</tbody></table>

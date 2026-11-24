@@ -19,6 +19,7 @@ function Timeline({ order, t }) {
       {(order.timeline || []).filter((e) => e.state !== 'partial_refund').map((e, i) => (
         <li key={i}>{t(`merch.status.${shown(e.state)}`, { defaultValue: e.state })}<span className="text-xs text-gray-500"> · {when(e.at) ? formatDate(when(e.at)) : ''}</span></li>
       ))}
+      {(order.items || []).some((i) => i.artwork?.fileDeletedAt) && <li className="text-xs text-gray-600" data-testid="file-removed">{t('merch.orders.fileRemoved')}</li>}
     </ol>
   );
 }
