@@ -122,6 +122,14 @@ export async function firestore(env) {
       const res = await fetch(`${base}/${collectionPath}?documentId=${encodeURIComponent(id)}`, { method: 'POST', headers, body: JSON.stringify({ fields }) });
       if (!res.ok) throw new Error(`Firestore create failed (${res.status})`);
     },
+    // Create several NEW documents in as few outgoing calls as possible (one :commit per 100). A document that already exists is left alone.
+    async createMany(items) {
+      for (let i = 0; i < items.length; i += 100) {
+        const writes = items.slice(i, i + 100).map(({ path, data }) => ({ update: { name: `projects/${account.project_id}/databases/(default)/documents/${path}`, fields: Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined).map(([k, v]) => [k, encodeValue(v)])) }, currentDocument: { exists: false } }));
+        const res = await fetch(`${base}:commit`, { method: 'POST', headers, body: JSON.stringify({ writes }) });
+        if (!res.ok) throw new Error(`Firestore batch write failed (${res.status})`);
+      }
+    },
     // Merge fields into a document. `ifUpdateTime` makes the write fail if someone else changed it first.
     async patch(path, data, { ifUpdateTime } = {}) {
       const fields = Object.fromEntries(Object.entries(data).map(([k, v]) => [k, encodeValue(v)]));

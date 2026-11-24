@@ -73,12 +73,16 @@ await test('launch preset: India + Qikink, EVERYTHING disabled, global and India
   const g = (p) => e.db.get(p).then((x) => x?.data);
   assert.equal((await g('merch_settings/global')).enabled, false);
   const india = await g('merch_countries/IN');
-  assert.equal(india.enabled, false); assert.deepEqual(india.prices, {}); assert.equal(india.providerPrimary, 'qikink');
+  assert.equal(india.enabled, true); assert.equal(india.currency, 'INR'); assert.equal(india.taxPercent, 18); assert.equal(india.taxIncluded, true); assert.equal(india.providerPrimary, 'qikink'); assert.equal(india.gatewayOverride, 'auto'); assert.deepEqual(india.shipping, { flat: 50, freeAbove: 999 }); assert.equal(india.marginFloorPercent, 0);
+  assert.deepEqual(india.collections, { name_elements: true, blood_group: true }); assert.ok(india.testSetup);
+  assert.ok(india.prices['poster:A4'] >= 499 && india.prices['poster:A4'] <= 1499 && india.prices['poster:12x18'] <= 1499 && india.prices['acrylic:A4'] >= 799 && india.prices['acrylic:16x24'] <= 2499); assert.equal(india.prices.mug, 299); assert.equal(india.prices['steel-bottle'], 499); assert.equal(india.prices['sipper-bottle'], 599);
+  assert.deepEqual(india.placeholderPrices, india.prices); // every price is marked as a placeholder until an admin changes it
   assert.deepEqual(india.taxByProduct, { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 }); // bottle GST is NOT known: left unset
   assert.equal(india.costs['poster:A4'], 212); assert.equal(india.costs['poster:12x18'], 321); assert.equal(india.costs['acrylic:16x24'], 599); assert.equal(india.costs['acrylic-stand'], 120);
-  assert.equal(india.costs['mug:11oz:white'], 115); assert.equal(india.costs['mug:11oz:black'], 174); assert.equal(india.costs['mug:11oz:enamel-white'], 254); assert.equal(india.costs['steel-bottle:750ml:black'], 213); assert.equal(india.costs['tumbler:20oz:white'], 408);
-  assert.equal((await g('merch_providers/qikink')).active, false); assert.equal((await g('merch_providers/qikink')).liveEnabled, false);
-  for (const id of Object.keys(DEFAULT_PRODUCTS)) assert.equal((await g(`merch_products/${id}`)).enabled, false, id);
+  assert.equal(india.costs.mug, 115); assert.equal(india.costs['steel-bottle'], 213);
+  assert.equal((await g('merch_providers/qikink')).active, true); assert.equal((await g('merch_providers/qikink')).liveEnabled, false); // usable in the sandbox, Live submission OFF
+  for (const id of ['poster', 'acrylic', 'mug']) assert.equal((await g(`merch_products/${id}`)).enabled, true, id); // verified print specs (a/b): sellable to admin testers
+  for (const id of ['acrylic-frame', 'steel-bottle', 'sipper-bottle', 'tumbler', 'tshirt', 'notebook']) assert.equal((await g(`merch_products/${id}`)).enabled, false, id); // no verified print spec: stays hidden
   const variants = await e.db.list('merch_variants');
   assert.equal(variants.length, 26 + 6 + 1 + 15 + 3);
   const sku = (id) => variants.find((v) => v.id === id).providerSkus.qikink.sku;
@@ -92,13 +96,66 @@ await test('launch preset: India + Qikink, EVERYTHING disabled, global and India
   assert.equal(variants.filter((v) => v.productId === 'mug' && v.enabled).length, 1);
   assert.equal(variants.filter((v) => v.productId === 'poster' && v.color !== 'frame-white' && v.color !== 'frame-black').every((v) => ['A4', 'A3'].includes(v.size)), true); // the six frame colours exist for A4/A3 only
   assert.deepEqual(FRAME_COLORS.map((f) => f.code), ['Wh', 'Bk', 'Yl', 'Gn', 'Rb', 'OG']);
-  // idempotent and never overwrites an admin's later change
-  await e.db.patch('merch_countries/IN', { enabled: true, prices: { mug: 1 } });
+  // second run: nothing new, nothing duplicated, nothing overwritten; a value changed after the first run is kept
+  await e.db.patch('merch_countries/IN', { enabled: false, prices: { ...india.prices, 'poster:A4': 777 }, taxPercent: 12 });
+  await e.db.patch('merch_products/mug', { enabled: false });
+  const before = JSON.stringify((await e.db.list('merch_variants')).map((v) => v.id).sort());
   const again = await handleAdmin(a, { action: 'applyLaunchPreset', data: {} });
-  assert.deepEqual(again.body.created, []);
-  assert.equal((await g('merch_countries/IN')).enabled, true);
+  assert.equal(again.body.ok, true); assert.deepEqual(again.body.created, []);
+  assert.equal((await g('merch_countries/IN')).enabled, false); assert.equal((await g('merch_countries/IN')).prices['poster:A4'], 777); assert.equal((await g('merch_countries/IN')).taxPercent, 12);
+  assert.equal((await g('merch_products/mug')).enabled, false);
+  assert.equal(JSON.stringify((await e.db.list('merch_variants')).map((v) => v.id).sort()), before);
+  assert.equal((await e.db.list('merch_providers')).length, 1);
   assert.equal(starterSku('poster', 'frame-black', 'A3'), 'UFPos-Bk-A3 Frame poster');
   assert.ok((await e.db.list('merch_audit_logs')).some((l) => l.action === 'admin.applyLaunchPreset'));
+});
+await test('launch preset for admin testing: first run, global ON only because visibility is Admins only, second run changes nothing, a changed value is kept, a non-admin is refused', async () => {
+  const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'merch_settings/global': { enabled: false, visibleTo: 'admins' } } });
+  const a = e.as('admin@x.test');
+  const g = (p) => e.db.get(p).then((x) => x?.data);
+  assert.equal((await handleAdmin({ ...e.ctx, who: null }, { action: 'applyLaunchPreset', data: {} })).status, 401); // not signed in
+  const user = e.as('u1@x.test'); assert.equal((await handleAdmin(user, { action: 'applyLaunchPreset', data: {} })).status, 403);
+  assert.equal(await g('merch_countries/IN'), undefined); assert.equal((await g('merch_settings/global')).enabled, false); // nothing was written
+  const r = await handleAdmin(a, { action: 'applyLaunchPreset', data: {} });
+  assert.equal(r.body.ok, true); assert.ok(r.body.created.some((x) => /provider qikink/.test(x))); assert.ok(r.body.created.some((x) => /India/.test(x))); assert.ok(r.body.created.some((x) => /Qikink SKU variant/.test(x)));
+  assert.equal((await g('merch_settings/global')).enabled, true); assert.equal((await g('merch_settings/global')).visibleTo, 'admins'); // visibility itself is never changed
+  const p = await g('merch_providers/qikink'); assert.deepEqual([p.adapter, p.active, p.liveEnabled], ['qikink', true, false]);
+  const india = await g('merch_countries/IN'); assert.equal(india.enabled, true); assert.deepEqual(india.taxByProduct.mug, 5); assert.equal(india.taxPercent, 18);
+  // an admin tester can now see and quote the sellable products; the ones without a verified print spec stay hidden
+  const cat = await handleMerch(e.as('admin@x.test'), 'catalogue', { country: 'IN' });
+  assert.equal(cat.status, 200); const ids = cat.body.products.map((x) => x.id);
+  assert.ok(ids.includes('poster') && ids.includes('mug')); assert.ok(!ids.includes('steel-bottle') && !ids.includes('tshirt') && !ids.includes('acrylic-frame'));
+  assert.equal((await handleMerch(e.as('u1@x.test'), 'catalogue', { country: 'IN' })).status, 404); // visible to admins only
+  // second run: nothing created again; values changed after the first run are kept
+  await e.db.patch('merch_countries/IN', { prices: { ...india.prices, mug: 349 }, taxPercent: 12 });
+  const n = (await e.db.list('merch_variants')).length;
+  const r2 = await handleAdmin(a, { action: 'applyLaunchPreset', data: {} });
+  assert.deepEqual([r2.body.ok, r2.body.created.length, r2.body.filled.length], [true, 0, 0]);
+  assert.equal((await g('merch_countries/IN')).prices.mug, 349); assert.equal((await g('merch_countries/IN')).taxPercent, 12);
+  assert.equal((await e.db.list('merch_variants')).length, n); assert.equal((await e.db.list('merch_providers')).length, 1);
+  assert.equal((await e.db.list('merch_audit_logs')).filter((l) => l.action === 'admin.applyLaunchPreset').length, 2);
+});
+await test('launch preset: visibility Nobody or Everyone leaves the global switch alone and says why; a value left blank is filled without touching others; the work is a handful of database calls', async () => {
+  for (const visibleTo of ['nobody', 'everyone']) {
+    const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'merch_settings/global': { enabled: false, visibleTo } } });
+    const r = await handleAdmin(e.as('admin@x.test'), { action: 'applyLaunchPreset', data: {} });
+    assert.equal((await e.db.get('merch_settings/global')).data.enabled, false); assert.ok(r.body.notes.some((x) => /NOT turned on/.test(x)));
+    assert.equal((await e.db.get('merch_settings/global')).data.visibleTo, visibleTo);
+  }
+  // an existing, half-empty India document (what the admin screen saves) is completed on the first run
+  const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'merch_settings/global': { visibleTo: 'admins' }, 'merch_countries/IN': { countryCode: 'IN', enabled: false, currency: 'INR', taxPercent: 0, prices: { 'poster:A4': 555 }, costs: {}, collections: { name_elements: false, blood_group: false }, providerPrimary: '' } } });
+  assert.equal((await handleAdmin(e.as('admin@x.test'), { action: 'applyLaunchPreset', data: {} })).body.ok, true);
+  const india = (await e.db.get('merch_countries/IN')).data;
+  assert.equal(india.enabled, true); assert.equal(india.taxPercent, 18); assert.equal(india.providerPrimary, 'qikink'); assert.equal(india.prices['poster:A4'], 555); assert.ok(india.prices['poster:A3'] > 0);
+  assert.ok(!('poster:A4' in india.placeholderPrices)); // the admin's own price is not marked as a placeholder
+  // a Cloudflare Worker may make only ~50 outgoing calls per request: count them
+  const e2 = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'merch_settings/global': { visibleTo: 'admins' } } });
+  let calls = 0; for (const k of ['get', 'list', 'patch', 'create', 'createMany', 'query']) { const orig = e2.db[k]?.bind(e2.db); if (orig) e2.db[k] = async (...x) => { calls++; return orig(...x); }; }
+  await handleAdmin(e2.as('admin@x.test'), { action: 'applyLaunchPreset', data: {} });
+  assert.ok(calls <= 25, 'database calls: ' + calls);
+  // a failing database is reported on the page instead of failing silently
+  const e3 = env({ seed: { 'admins/admin@x.test': { role: 'super' } } }); const as3 = e3.as('admin@x.test'); const origList = as3.db.list; as3.db.list = async () => { throw new Error('Firestore list failed (503)'); };
+  const bad = await handleAdmin(as3, { action: 'applyLaunchPreset', data: {} }); assert.equal(bad.body.ok, false); assert.match(bad.body.error, /Firestore list failed/); as3.db.list = origList;
 });
 await test('a fresh launch configuration cannot sell anything: switches off, no prices, everything disabled and unverified', async () => {
   const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'users/u1': { email: 'u1@x.test', countryCode: 'IN' } } });

@@ -800,37 +800,125 @@ export async function bulkSwitch(ctx, input) {
   return { applied: summary.filter((c) => !c.noop).length, changes: summary };
 }
 
-// Writes the launch configuration (India, Qikink, poster + mug enabled, everything else disabled) WITHOUT overwriting anything that exists.
-// The global switch and the India switch stay OFF; no prices are set (nothing can be sold until an admin prices it); every Qikink SKU is
-// marked unverified and has no print type, so the products stay blocked until the print spec is filled in.
-export async function applyLaunchPreset(ctx) {
-  const created = [];
-  const putIfAbsent = async (path, data) => { if (!(await ctx.db.get(path))) { await ctx.db.patch(path, { ...data, createdAt: ctx.now() }); created.push(path); } };
-  await putIfAbsent(`${COLL.settings}/global`, { enabled: false, message: '' });
-  await putIfAbsent(`${COLL.providers}/qikink`, { id: 'qikink', name: 'Qikink', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'], products: [] });
-  // Qikink base prices become our cost estimates (editable); NO selling prices are set, so nothing can be sold until the owner prices it.
-  const costs = {}; const taxByProduct = { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 }; // bottles: GST % NOT known, left for the owner
+// "Apply launch configuration": one admin-only call that sets up INDIA FOR ADMIN SANDBOX TESTING. Safe to press twice:
+//  - it creates only what is missing and never overwrites a value an admin changed after the first run;
+//  - on the FIRST run only, a stored default (off / 0 / blank) counts as "not set yet" and is filled in;
+//  - it reads each collection once and writes missing documents in one batch (a Worker may only make ~50 outgoing calls per request);
+//  - it NEVER changes who can see merchandise (visibleTo), never turns Live submission on, and never touches payments or COD.
+// Placeholder test prices are recorded in `placeholderPrices` on the country so the admin screen can flag them until replaced.
+const LAUNCH_SETUP_VERSION = 1;
+const blank = (v) => v === undefined || v === null || v === '';
+const roundUp = (n, step) => Math.ceil(n / step) * step;
+export function placeholderPriceFor(productId, cost) {
+  const c = Number(cost) || 0;
+  if (productId === 'poster') return Math.min(1499, Math.max(499, roundUp(c * 2.6 + 120, 50) - 1));
+  if (productId === 'acrylic') return Math.min(2499, Math.max(799, roundUp(c * 2.2 + 150, 50) - 1));
+  if (productId === 'acrylic-frame') return 599;
+  if (productId === 'acrylic-stand') return 149;
+  if (productId === 'mug') return 299;
+  if (productId === 'steel-bottle') return 499;
+  return 599; // sipper bottle, tumbler
+}
+export function launchDefaults() {
+  const costs = {}; const prices = {};
   for (const p of Object.values(DEFAULT_PRODUCTS)) {
     if (!p.standSku && !p.id.match(/^(poster|acrylic|acrylic-frame|mug|steel-bottle|sipper-bottle|tumbler)$/)) continue;
-    for (const size of p.sizes) for (const c of p.colors) { const cost = baseCost(p.id, c.id, size); if (cost) costs[p.id === 'mug' || p.id.endsWith('bottle') || p.id === 'tumbler' ? `${p.id}:${size}:${c.id}` : `${p.id}:${size}`] = cost; }
-  }
-  costs['acrylic-stand'] = ACRYLIC_STAND.base;
-  await putIfAbsent(`${COLL.countries}/IN`, {
-    countryCode: 'IN', enabled: false, currency: 'INR', taxPercent: 18, taxIncluded: true, taxByProduct,
-    collections: { name_elements: true, blood_group: true }, prices: {}, costs, disabledProducts: {},
-    shipping: { flat: 0, freeAbove: 0 }, shippingCost: SHIPPING_COST_PLACEHOLDER, paymentFeePercent: 0, marginFloorPercent: 0, providerPrimary: 'qikink', providerBackup: null, gatewayOverride: 'auto'
-  });
-  for (const p of Object.values(DEFAULT_PRODUCTS)) await putIfAbsent(`${COLL.products}/${p.id}`, { id: p.id, enabled: false, ...(isFrameKind(p.kind) ? { frameDesigns: { ...DEFAULT_FRAME_DESIGNS } } : {}) });
-  for (const p of Object.values(DEFAULT_PRODUCTS)) {
-    if (!['poster', 'acrylic', 'acrylic-frame', 'mug', 'steel-bottle', 'sipper-bottle', 'tumbler'].includes(p.id)) continue;
-    for (const size of p.sizes) for (const c of colorsFor(p, size, {}).concat(p.colors.filter((x) => x.on === false && !colorsFor(p, size, {}).some((y) => y.id === x.id)))) {
-      const sku = starterSku(p.id, c.id, size); if (!sku) continue;
-      const id = variantId(p.id, c.id, size);
-      await putIfAbsent(`${COLL.variants}/${id}`, { id, productId: p.id, color: c.id, size, enabled: c.on !== false, providerSkus: { qikink: { sku, unverified: true } } });
+    for (const size of p.sizes) for (const c of p.colors) {
+      if (c.on === false) continue; const cost = baseCost(p.id, c.id, size); if (!cost) continue;
+      const key = p.sizes.length > 1 ? `${p.id}:${size}` : p.id; // the same keys the admin table shows (one row per size, or one per product)
+      costs[key] = Math.max(costs[key] || 0, cost); prices[key] = placeholderPriceFor(p.id, costs[key]);
     }
   }
-  await audit(ctx, 'admin.applyLaunchPreset', 'launch', { created: created.length });
-  return { created };
+  costs['acrylic-stand'] = ACRYLIC_STAND.base; prices['acrylic-stand'] = placeholderPriceFor('acrylic-stand');
+  return { costs, prices, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 } }; // bottles: GST % NOT known, left for the owner
+}
+
+export async function applyLaunchPreset(ctx) {
+  const created = []; const skipped = []; const filled = []; const notes = [];
+  try {
+    const get = async (path) => (await ctx.db.get(path))?.data || null;
+    const [globalDoc, providerDoc, indiaDoc, productDocs, variantDocs] = await Promise.all([get(`${COLL.settings}/global`), get(`${COLL.providers}/qikink`), get(`${COLL.countries}/IN`), ctx.db.list(COLL.products), ctx.db.list(COLL.variants)]);
+    const at = ctx.now(); const batch = []; // new documents, written together
+    const add = (path, data, label) => { batch.push({ path, data: { ...data, createdAt: at } }); created.push(label || path); };
+
+    // 1. the Qikink provider: usable in the sandbox, Live submission stays OFF
+    if (!providerDoc) add(`${COLL.providers}/qikink`, { id: 'qikink', name: 'Qikink', adapter: 'qikink', active: true, liveEnabled: false, countries: ['IN'], products: [] }, 'provider qikink (sandbox only, Live submission OFF)');
+    else skipped.push('provider qikink (already exists)');
+
+    // 2 + 3. India: switches, tax, shipping, provider, placeholder prices and cost estimates
+    const d = launchDefaults(); const firstRun = !indiaDoc?.testSetup;
+    const unset = (v) => blank(v) || (firstRun && (v === false || v === 0)); // first run: a stored default counts as "not set yet"
+    const patch = {}; const fillScalar = (field, value) => { if (unset(indiaDoc?.[field])) { patch[field] = value; filled.push(`India ${field}`); } };
+    const fillMap = (field, defaults, { label, track } = {}) => {
+      const cur = { ...(indiaDoc?.[field] || {}) }; let n = 0; const placed = {};
+      for (const [k, v] of Object.entries(defaults)) { if (unset(cur[k])) { cur[k] = v; n++; if (track) placed[k] = v; } }
+      if (n) { patch[field] = cur; filled.push(`India ${label || field}: ${n} value(s)`); }
+      return placed;
+    };
+    if (!indiaDoc) { patch.countryCode = 'IN'; patch.disabledProducts = {}; }
+    fillScalar('enabled', true); fillScalar('currency', 'INR'); fillScalar('taxPercent', 18); fillScalar('providerPrimary', 'qikink');
+    if (blank(indiaDoc?.taxIncluded) || firstRun) { if (indiaDoc?.taxIncluded !== true) { patch.taxIncluded = true; filled.push('India prices include tax'); } }
+    if (blank(indiaDoc?.gatewayOverride)) patch.gatewayOverride = 'auto';
+    if (blank(indiaDoc?.paymentFeePercent)) patch.paymentFeePercent = 0;
+    if (blank(indiaDoc?.marginFloorPercent)) patch.marginFloorPercent = 0;
+    const cols = { ...(indiaDoc?.collections || {}) }; let colN = 0;
+    for (const c of ['name_elements', 'blood_group']) if (unset(cols[c])) { cols[c] = true; colN++; }
+    if (colN) { patch.collections = cols; filled.push('India collections Name Elements + Blood Group ON'); }
+    const ship = { ...(indiaDoc?.shipping || {}) }; let shipN = 0;
+    if (unset(ship.flat)) { ship.flat = 50; shipN++; } if (unset(ship.freeAbove)) { ship.freeAbove = 999; shipN++; }
+    if (shipN) { patch.shipping = ship; filled.push('India shipping Rs 50 flat, free above Rs 999 (placeholder)'); }
+    if (blank(indiaDoc?.shippingCost)) patch.shippingCost = SHIPPING_COST_PLACEHOLDER;
+    fillMap('taxByProduct', d.taxByProduct, { label: 'tax by product' });
+    fillMap('costs', d.costs, { label: 'cost estimates' });
+    const placed = fillMap('prices', d.prices, { label: 'TEST PRICES', track: true });
+    if (Object.keys(placed).length) patch.placeholderPrices = { ...(indiaDoc?.placeholderPrices || {}), ...placed };
+    if (!indiaDoc) { for (const k of Object.keys(patch)) if (patch[k] === undefined) delete patch[k]; }
+    if (!indiaDoc || firstRun) patch.testSetup = { at, by: ctx.who?.email || '', version: LAUNCH_SETUP_VERSION, note: 'TEST PRICES: placeholder sell prices and cost estimates for admin sandbox testing; replace before launch' };
+    if (!indiaDoc) add(`${COLL.countries}/IN`, patch, 'country India (IN)');
+    else if (Object.keys(patch).length) { await ctx.db.patch(`${COLL.countries}/IN`, { ...patch, updatedAt: at }); }
+    else skipped.push('India (nothing missing)');
+
+    // product switches: only products whose print spec is verified (level a or b) are switched on; everything else stays hidden
+    const have = new Map(productDocs.map((p) => [p.id, p])); const productPatches = [];
+    for (const p of Object.values(DEFAULT_PRODUCTS)) {
+      const doc = have.get(p.id); const merged = { ...p, ...(doc || {}) };
+      const levels = verificationLevels(merged); const ok = readiness(merged).ok && (levels.specConfirmed || levels.sandboxAccepted);
+      const frames = isFrameKind(p.kind) ? { frameDesigns: { ...DEFAULT_FRAME_DESIGNS } } : {};
+      if (!doc) add(`${COLL.products}/${p.id}`, { id: p.id, enabled: ok, testSetupAt: at, ...frames }, `product ${p.id}${ok ? ' (ON for admin testing)' : ' (hidden: print spec not verified)'}`);
+      else if (!doc.testSetupAt && ok && doc.enabled !== true) { productPatches.push([p.id, { enabled: true, testSetupAt: at, updatedAt: at }]); filled.push(`product ${p.id} switched ON for admin testing`); }
+      else if (!ok) skipped.push(`product ${p.id} (hidden: print spec not verified)`);
+    }
+    // Qikink SKU variants (starter data, unverified), created only when missing
+    const haveVariant = new Set(variantDocs.map((v) => v.id)); let variantsNew = 0;
+    for (const p of Object.values(DEFAULT_PRODUCTS)) {
+      if (!['poster', 'acrylic', 'acrylic-frame', 'mug', 'steel-bottle', 'sipper-bottle', 'tumbler'].includes(p.id)) continue;
+      for (const size of p.sizes) for (const c of colorsFor(p, size, {}).concat(p.colors.filter((x) => x.on === false && !colorsFor(p, size, {}).some((y) => y.id === x.id)))) {
+        const sku = starterSku(p.id, c.id, size); if (!sku) continue;
+        const id = variantId(p.id, c.id, size); if (haveVariant.has(id)) continue;
+        batch.push({ path: `${COLL.variants}/${id}`, data: { id, productId: p.id, color: c.id, size, enabled: c.on !== false, providerSkus: { qikink: { sku, unverified: true } }, createdAt: at } }); variantsNew++;
+      }
+    }
+    if (variantsNew) created.push(`${variantsNew} Qikink SKU variant(s) (starter data, unverified)`); else skipped.push('Qikink SKU variants (all exist)');
+
+    // 4. the global switch: ON only when merchandise is visible to ADMINS ONLY. This never changes visibleTo.
+    const visibleTo = globalDoc?.visibleTo || 'nobody';
+    if (visibleTo === 'admins') {
+      if (!globalDoc) add(`${COLL.settings}/global`, { enabled: true, message: '', visibleTo: 'admins', testSetupAt: at }, 'global master switch ON (visible to admins only)');
+      else if (!globalDoc.testSetupAt && globalDoc.enabled !== true) { await ctx.db.patch(`${COLL.settings}/global`, { enabled: true, testSetupAt: at, updatedAt: at }); filled.push('global master switch ON (visible to admins only)'); }
+      else skipped.push(globalDoc.enabled === true ? 'global switch (already ON)' : 'global switch (you turned it off after the first run: left as it is)');
+    } else {
+      if (!globalDoc) add(`${COLL.settings}/global`, { enabled: false, message: '' }, 'global settings (switch OFF)');
+      notes.push(`The global switch was NOT turned on: merchandise visibility is "${visibleTo === 'everyone' ? 'Everyone' : 'Nobody'}". Set it to "Admins only" first, then press this button again.`);
+    }
+
+    // write everything that is new in one batch, then the few updates
+    if (batch.length) { if (ctx.db.createMany) await ctx.db.createMany(batch); else for (const w of batch) await ctx.db.patch(w.path, w.data); }
+    for (const [id, p] of productPatches) await ctx.db.patch(`${COLL.products}/${id}`, p);
+    await audit(ctx, 'admin.applyLaunchPreset', 'launch', { created: created.length, filled: filled.length, skipped: skipped.length, firstRun });
+    return { ok: true, created, filled, skipped, notes, firstRun };
+  } catch (e) {
+    return { ok: false, error: String(e?.message || e).slice(0, 200), created, filled, skipped, notes };
+  }
 }
 
 const cfgProductIsWallArt = (cfg, id) => isFrameKind(cfg.products[id]?.kind);
@@ -911,7 +999,7 @@ export async function handleAdmin(ctx, body) {
     return ok({ ok: true });
   }
   if (action === 'bulkSwitch') { const r = await bulkSwitch(ctx, input); return r.error ? fail(400, r.error, { productId: r.productId, reason: r.reason }) : ok(r); }
-  if (action === 'applyLaunchPreset') return ok(await applyLaunchPreset(ctx));
+  if (action === 'applyLaunchPreset') return ok(await applyLaunchPreset(ctx)); // answers { ok, created, filled, skipped, notes } or { ok:false, error }
   if (action === 'addOrderNote') {
     // Complaints, replacements and other notes live on the fulfilment record (admin-only), never on the order the customer can read.
     const type = ['complaint', 'replacement', 'note'].includes(input.type) ? input.type : 'note';

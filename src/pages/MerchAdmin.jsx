@@ -140,7 +140,7 @@ export default function MerchAdmin() {
       <h1 className="text-2xl font-bold mb-3">Merchandise administration</h1>
       <div role="tablist" className="flex flex-wrap gap-2 mb-4">{TABS.map((x) => <button key={x} role="tab" aria-selected={tab === x} onClick={() => setTab(x)} className={`px-3 py-1.5 rounded-lg border ${tab === x ? 'bg-brand-600 text-white' : 'bg-white'}`}>{x}</button>)}</div>
       {note && <p role="status" className="mb-3 text-sm" data-testid="admin-note">{note}</p>}
-      {tab === 'Overview' && <Overview data={data} act={act} />}
+      {tab === 'Overview' && <Overview data={data} act={act} reload={reload} />}
       {tab === 'Global & countries' && <Switches data={data} act={act} />}
       {tab === 'Providers' && <Providers data={data} act={act} />}
       {tab === 'Products' && <Products data={data} act={act} />}
@@ -152,7 +152,19 @@ export default function MerchAdmin() {
 }
 
 // ---- overview ---------------------------------------------------------------------------------------
-function Overview({ data, act }) {
+function Overview({ data, act, reload }) {
+  const [preset, setPreset] = useState(null); // what the last "Apply launch configuration" did, shown on the page (never a key or secret)
+  const [presetBusy, setPresetBusy] = useState(false);
+  async function applyPreset() {
+    if (!window.confirm('Set up India for admin sandbox testing? This creates only what is missing and never overwrites a value you changed. It fills PLACEHOLDER test prices, turns India and the global switch ON (only because merchandise is visible to Admins only), and keeps Qikink on the sandbox with Live OFF.')) return;
+    setPresetBusy(true); setPreset({ running: true });
+    try {
+      const r = await callMerch('admin', { action: 'applyLaunchPreset', data: {} });
+      if (r.status === 200 && r.body?.ok) setPreset(r.body); else setPreset({ ok: false, error: r.body?.error || r.body?.message || `the server answered HTTP ${r.status}`, created: r.body?.created, filled: r.body?.filled, skipped: r.body?.skipped });
+    } catch (e) { setPreset({ ok: false, error: `the request failed (${String(e?.message || e).slice(0, 120)})` }); }
+    setPresetBusy(false);
+    try { await reload(); } catch { /* the result stays on screen */ }
+  }
   const paid = data.orders.filter((o) => o.transactionId && o.status !== 'refunded');
   const sum = (f) => paid.reduce((s, o) => s + f(o), 0);
   const byStatus = STATES.map((s) => [s, data.orders.filter((o) => o.status === s).length]).filter(([, n]) => n);
@@ -170,7 +182,18 @@ function Overview({ data, act }) {
         <tbody>{Object.entries(byCountry).map(([c, v]) => <tr key={c}><td className="p-2">{c}</td><td className="text-center">{v.n}</td><td className="text-center">{v.rev.toFixed(2)} {v.cur}</td></tr>)}</tbody></table>
       <p>Estimated margin on paid orders: {sum((o) => o.totals?.estimatedMargin || 0).toFixed(2)} (mixed currencies; see Orders for each)</p>
       <p>Status: {byStatus.map(([s, n]) => `${s} ${n}`).join(' · ') || 'no orders'}</p>
-      <div className="p-3 rounded-lg bg-white/70"><Btn data-testid="apply-preset" onClick={() => { if (window.confirm('Write the launch configuration (India, Qikink, poster + mug enabled, everything else off, global and India switches OFF, no prices)? Existing settings are not overwritten.')) act('applyLaunchPreset', {}, 'Launch configuration written'); }}>Apply launch configuration</Btn> <span className="text-xs">India, Qikink, framed posters and blood-group mugs; creates only what is missing.</span></div>
+      <div className="p-3 rounded-lg bg-white/70 space-y-2" data-testid="preset-panel">
+        <Btn data-testid="apply-preset" disabled={presetBusy} onClick={applyPreset}>{presetBusy ? 'Working...' : 'Apply launch configuration'}</Btn> <span className="text-xs">Sets up India for admin sandbox testing with placeholder TEST prices; creates only what is missing and never overwrites a value you changed. Safe to press twice.</span>
+        {preset?.running && <p className="text-sm" data-testid="preset-result">Working...</p>}
+        {preset && !preset.running && <div role="status" className={`text-sm p-2 rounded border ${preset.ok ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`} data-testid="preset-result">
+          <p><strong>{preset.ok ? 'Launch configuration applied.' : `Could not finish: ${preset.error}`}</strong>{preset.ok && !preset.created?.length && !preset.filled?.length ? ' Nothing was missing.' : ''}</p>
+          {preset.created?.length > 0 && <div><strong>Created ({preset.created.length}):</strong><ul className="list-disc ml-5">{preset.created.map((x) => <li key={x}>{x}</li>)}</ul></div>}
+          {preset.filled?.length > 0 && <div><strong>Filled in what was empty ({preset.filled.length}):</strong><ul className="list-disc ml-5">{preset.filled.map((x) => <li key={x}>{x}</li>)}</ul></div>}
+          {preset.skipped?.length > 0 && <div><strong>Skipped, left as it was ({preset.skipped.length}):</strong><ul className="list-disc ml-5">{preset.skipped.map((x) => <li key={x}>{x}</li>)}</ul></div>}
+          {(preset.notes || []).map((n) => <p key={n} className="text-amber-800">{n}</p>)}
+          {preset.ok && <p className="text-xs">Prices are PLACEHOLDER test values: replace them under Global & countries before launch. Qikink stays on the sandbox, Live submission is OFF, and cash on delivery does not exist.</p>}
+        </div>}
+      </div>
       <p data-testid="held-count">Orders held for provider funds (Qikink wallet): <strong>{held.length}</strong></p>
       <div className={exceptions.length || stuck.length || held.length ? 'p-3 rounded-lg bg-red-50 border border-red-300' : ''} data-testid="alerts">
         {held.length > 0 && <p>⚠ {held.length} PAID order(s) are held because the Qikink wallet has too little credit. Top up the wallet, then press "Retry after wallet top-up" on each order (Orders tab).</p>}
@@ -195,6 +218,7 @@ function Switches({ data, act }) {
   const products = Object.values(data.products);
   return (
     <section className="space-y-6">
+      {data.countries.some((c) => Object.entries(c.placeholderPrices || {}).some(([k, v]) => Number(c.prices?.[k]) === Number(v))) && <p className="p-3 rounded-lg bg-amber-100 border border-amber-400 text-amber-900 font-semibold" role="alert" data-testid="placeholder-banner">Placeholder test prices: replace before launch</p>}
       <div className="p-3 bg-white/70 rounded-lg">
         <h2 className="font-semibold mb-2">Global master switch</h2>
         <Toggle label="Merchandise enabled (all countries)" checked={data.settings.enabled} onChange={(v) => act('setGlobal', { enabled: v, message })} testid="global-toggle" />
@@ -223,7 +247,7 @@ function Switches({ data, act }) {
             <label className="text-sm">Payment gateway<select value={form.gatewayOverride || 'auto'} onChange={(e) => set('gatewayOverride', e.target.value)} className="block border rounded px-2 py-1 w-full"><option value="auto">Auto</option><option value="razorpay">Razorpay</option><option value="paypal">PayPal</option></select></label>
           </div>
           <table className="w-full text-sm"><thead><tr><th className="text-left">Product / size</th><th>Sell price (tax {form.taxIncluded ? 'incl.' : 'excl.'})</th><th>Provider cost (est.)</th><th>Tax % (blank = country rate)</th><th>Off here</th></tr></thead><tbody>
-            {products.flatMap((p) => ((p.printSpec?.perSize || p.kind === 'wall-art') && p.sizes.length > 1 ? p.sizes.map((sz) => ({ p, key: `${p.id}:${sz}`, label: `${p.id} ${sz}`, first: sz === p.sizes[0] })) : [{ p, key: p.id, label: p.id, first: true }])).map(({ p, key, label, first }) => <tr key={key}><td>{label}</td>
+            {products.flatMap((p) => ((p.printSpec?.perSize || p.kind === 'wall-art') && p.sizes.length > 1 ? p.sizes.map((sz) => ({ p, key: `${p.id}:${sz}`, label: `${p.id} ${sz}`, first: sz === p.sizes[0] })) : [{ p, key: p.id, label: p.id, first: true }])).map(({ p, key, label, first }) => <tr key={key}><td>{label}{Number(form.prices?.[key]) === Number(form.placeholderPrices?.[key]) && form.placeholderPrices?.[key] !== undefined && <span className="ml-1 px-1 rounded bg-amber-200 text-amber-900 text-xs font-bold" data-testid={`testprice-${key}`}>TEST PRICE</span>}</td>
               <td><input aria-label={`${label} price`} value={form.prices?.[key] ?? ''} onChange={(e) => set('prices', { ...form.prices, [key]: e.target.value })} className="border rounded px-2 py-1 w-24" data-testid={`price-${key}`} /></td>
               <td><input aria-label={`${label} cost`} value={form.costs?.[key] ?? ''} onChange={(e) => set('costs', { ...form.costs, [key]: e.target.value })} className="border rounded px-2 py-1 w-24" /></td>
               <td>{first && <input aria-label={`${p.id} tax percent`} value={form.taxByProduct?.[p.id] ?? ''} onChange={(e) => set('taxByProduct', { ...form.taxByProduct, [p.id]: e.target.value })} className="border rounded px-2 py-1 w-20" data-testid={`tax-${p.id}`} />}</td>

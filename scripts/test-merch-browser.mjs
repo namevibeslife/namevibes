@@ -488,6 +488,14 @@ await step('admin print-file storage panel: backend status, test upload, deletio
   await page.getByTestId('file-dry-run').click(); await page.getByTestId('file-report-result').waitFor();
   assert.ok((await page.getByTestId('file-report-result').innerText()).includes('nothing was deleted'));
 });
+await step('"Apply launch configuration" shows what it did on the page, sets up India with TEST PRICES and the banner, and a second press creates nothing', async () => {
+  await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin'); await page.goto(`${BASE}/admin/merch`); await page.getByTestId('overview').waitFor();
+  await page.getByTestId('apply-preset').click(); await page.getByText('Launch configuration applied.').waitFor();
+  const first = await page.getByTestId('preset-result').innerText(); assert.match(first, /Created/); assert.match(first, /provider qikink/); assert.match(first, /TEST PRICES/);
+  await page.getByRole('tab', { name: 'Global & countries' }).click(); await page.getByTestId('placeholder-banner').waitFor();
+  assert.match(await page.getByTestId('placeholder-banner').innerText(), /Placeholder test prices: replace before launch/);
+  await page.getByRole('tab', { name: 'Overview' }).click(); await page.getByTestId('apply-preset').click(); await page.getByText('Nothing was missing.').waitFor();
+});
 await step('admin pages have no horizontal page overflow at 390px', async () => {
   await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin'); await page.goto(`${BASE}/admin/merch`); await page.getByTestId('overview').waitFor();
   await page.getByRole('tab', { name: 'Overview' }).click();

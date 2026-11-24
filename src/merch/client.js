@@ -39,6 +39,7 @@ const mockDb = {
     if ((await getDoc(ref)).exists()) throw new Error('exists');
     await setDoc(ref, data);
   },
+  async createMany(items) { for (const { path, data } of items) { const ref = doc(db, ...path.split('/')); if (!(await getDoc(ref)).exists()) await setDoc(ref, data); } },
   async patch(path, data) {
     const ref = doc(db, ...path.split('/'));
     if ((await getDoc(ref)).exists()) await updateDoc(ref, data); else await setDoc(ref, data);

@@ -19,6 +19,7 @@ export function createMemoryDb(seed = {}) {
       if (store.has(path)) throw new Error('exists');
       put(path, copy(data));
     },
+    async createMany(items) { for (const { path, data } of items) if (!store.has(path)) put(path, copy(data)); },
     async patch(path, data, { ifUpdateTime } = {}) {
       if (ifUpdateTime && times.get(path) !== ifUpdateTime) { const e = new Error('precondition'); e.status = 409; throw e; }
       put(path, { ...(store.get(path) || {}), ...copy(data) });
