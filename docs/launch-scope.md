@@ -76,3 +76,6 @@ Live Qikink behaviour, real payments, placement until a physical sample is print
 - New upload route `/api/merch/upload` (visibility-gated like every customer action). Before a paid order goes to Qikink the signed link is fetched and the PNG type, size and hash are checked.
 - Deletion: unpaid 48 h, cancelled/refunded 7 days, delivered 30 days (admin 0-365, per product), open return/dispute/exception never until closed + window. Runs from `/api/merch/cron` (needs an external scheduler) or the admin "Delete due files now" button; dry run available.
 - Until the owner creates a Supabase and/or R2 bucket and sets the secrets, buyers cannot finish a merchandise order (clear retry message, nobody is charged). That is acceptable while merchandise is admin-only.
+
+## Verification levels (Qikink reply, 24 November 2026)
+(a) spec confirmed by Qikink in writing, (b) sandbox order accepted, (c) physical sample approved by the owner. Admins-only testing needs (a) or (b); `visibleTo = everyone` only sells products/sizes with (c) (server-enforced, reason `sample-not-approved`). Admin action `setVerification` (audited); the variant table shows a/b/c. Defaults: posters and acrylic (a); white mug (a)+(b); nothing has (c). Details in docs/qikink-sku-starter-products.md.

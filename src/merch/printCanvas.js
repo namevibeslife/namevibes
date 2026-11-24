@@ -2,6 +2,7 @@
 //  - the PRINT FILE: a transparent canvas the size of the whole print area (inches x 300 DPI, capped for mobile canvas
 //    limits) with the design drawn at the customer's position and scale;
 //  - the MOCK-UP: the product silhouette with the design composited at the same fractions of the printed area.
+import { readEdges, transparentEdges } from './trim.js';
 import { designGroup } from './render.js';
 import { productMockup } from './render.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
@@ -48,9 +49,12 @@ async function renderFramePrintFile({ design, spec, inset }) {
       const { canvas, metrics, safe } = await renderFrameCanvas({ design, width, height, art });
       const alpha = canvas.getContext('2d').getImageData(Math.floor(width / 2), Math.floor(height / 2), 1, 1).data[3];
       if (alpha !== 255) continue; // blank: over the device canvas limit
+      // Qikink: no transparent or accidental blank margins (the flat-colour mat border is artwork and is opaque)
+      const bad = transparentEdges(readEdges(canvas.getContext('2d'), width, height));
+      if (bad.length) throw Object.assign(new Error('transparent-margin'), { fatal: true, edges: bad });
       const blob = await toBlob(canvas);
       return { blob, width, height, box: { x: 0, y: 0, width, height }, dpi: Math.round(width / Number(spec.maxWidthInches)), metrics, safe, art, artworkInches: art.artworkInches, insetApplied: art.applied };
-    } catch { /* try a smaller canvas */ }
+    } catch (e) { if (e?.fatal) throw e; /* otherwise try a smaller canvas */ }
   }
   throw new Error('print-canvas-unavailable');
 }

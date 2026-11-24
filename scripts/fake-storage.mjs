@@ -1,8 +1,8 @@
 // Fake Supabase Storage and Cloudflare R2 (S3 API) servers for the tests: one fetch() that answers like both, with switches
 // for outages and hangs and a controllable clock for signed-link expiry. No network, no real account.
 export function makeFakeCloud({ clock = { t: Date.now() } } = {}) {
-  const state = { sb: new Map(), r2: new Map(), sbDown: false, r2Down: false, sbHang: false, r2Hang: false, calls: [], tokens: new Map() };
-  const KEY = 'svc-key-secret';
+  const state = { sb: new Map(), r2: new Map(), sbDown: false, sentBearer: false, r2Down: false, sbHang: false, r2Hang: false, calls: [], tokens: new Map() };
+  const KEY = 'sb_secret_svc-key-secret'; // the new-style Supabase key format (not a JWT)
   const hang = (init) => new Promise((_, reject) => init.signal?.addEventListener('abort', () => { const e = new Error('aborted'); e.name = 'AbortError'; reject(e); }));
   const bytesOf = (b) => (b instanceof Uint8Array ? new Uint8Array(b) : new Uint8Array(Buffer.from(String(b || ''))));
   const respond = (status, body, headers = {}) => new Response(body ?? null, { status, headers });
@@ -15,9 +15,10 @@ export function makeFakeCloud({ clock = { t: Date.now() } } = {}) {
       if (state.sbDown) return respond(503, 'down');
       const p = decodeURIComponent(u.pathname.replace('/storage/v1/', ''));
       const signedGet = p.startsWith('object/sign/') && method === 'GET';
-      if (!signedGet && (init.headers?.apikey !== KEY || init.headers?.Authorization !== `Bearer ${KEY}`)) return respond(401, 'unauthorised');
+      if (!signedGet && init.headers?.apikey !== KEY) return respond(401, 'unauthorised');
+      if (!signedGet && init.headers?.Authorization) { state.sentBearer = true; } // recorded so a test can assert it is NOT sent for sb_secret_ keys
       let m;
-      if ((m = /^bucket\/(.+)$/.exec(p))) return respond(m[1] === 'prints' ? 200 : 404, '{}');
+      if ((m = /^bucket\/(.+)$/.exec(p))) return respond(m[1] === 'prints' ? 200 : 404, JSON.stringify({ id: m[1], public: false }));
       if ((m = /^object\/sign\/([^/]+)\/(.+)$/.exec(p))) {
         if (method === 'POST') { const tok = `t${state.tokens.size + 1}`; state.tokens.set(tok, { key: m[2], exp: clock.t + JSON.parse(init.body).expiresIn * 1000 }); return respond(200, JSON.stringify({ signedURL: `/object/sign/${m[1]}/${m[2]}?token=${tok}` })); }
         const t = state.tokens.get(u.searchParams.get('token'));

@@ -26,7 +26,9 @@ export const EDGE_COLORS = { 'elements-gold': '#fbf2da', 'individual-dark': '#02
 // Paper sizes in mm (the frame). Sizes not listed use the print area itself as the frame.
 export const FRAME_MM = {
   A4: [210, 297], A3: [297, 420], '8x8': [203.2, 203.2], '8x10': [203.2, 254], '10x10': [254, 254], '11x14': [279.4, 355.6], '12x12': [304.8, 304.8],
-  '12x16': [304.8, 406.4], '12x18': [304.8, 457.2], '16x16': [406.4, 406.4], '16x24': [406.4, 609.6]
+  '12x16': [304.8, 406.4], '12x18': [304.8, 457.2], '16x16': [406.4, 406.4], '16x24': [406.4, 609.6],
+  // sizes Qikink listed in writing (ticket 136313) that are not sold yet: layouts work, but no SKU is added until it is found on the Qikink SKU list
+  '12x24': [304.8, 609.6], '14x14': [355.6, 355.6], '18x24': [457.2, 609.6]
 };
 
 /**

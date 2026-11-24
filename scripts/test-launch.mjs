@@ -11,7 +11,10 @@ import { productPreviewSvg } from '../src/merch/render.js';
 import { HEADINGS, layoutFrame, opBounds } from '../src/merch/frames.js';
 import { SITE_HOST } from '../src/config/site.js';
 import { buildDesign } from '../src/merch/designs.js';
-import { DEFAULT_PRODUCTS, FRAME_COLORS, starterSku } from '../src/merch/catalog.js';
+import { DEFAULT_PRODUCTS, FRAME_COLORS, starterSku, FRAMED_SIZES, shippingCostFor, SHIPPING_COST_PLACEHOLDER } from '../src/merch/catalog.js';
+import { verificationLevels } from '../src/merch/layout.js';
+import { transparentEdges } from '../src/merch/trim.js';
+import { FRAME_MM } from '../src/merch/frames.js';
 import { computeQuote } from '../src/merch/quoteMath.js';
 import { findCod, isCod } from '../src/merch/cod.js';
 import { MockProviderAdapter } from '../src/merch/providers/mock.js';
@@ -28,8 +31,8 @@ const MUG_SPEC = { printTypeId: 5, allowedPlacements: ['fr'], maxWidthInches: 8,
 const launchSeed = ({ specs = true } = {}) => ({
   'merch_settings/global': { visibleTo: 'everyone', enabled: true },
   'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
-  'merch_products/poster': { id: 'poster', enabled: true, ...(specs ? { printSpec: POSTER_SPEC } : {}) },
-  'merch_products/mug': { id: 'mug', enabled: true, ...(specs ? { printSpec: MUG_SPEC } : {}) },
+  'merch_products/poster': { id: 'poster', enabled: true, verification: { sampleApproved: true }, printSpec: specs ? POSTER_SPEC : null },
+  'merch_products/mug': { id: 'mug', enabled: true, verification: { sampleApproved: true }, ...(specs ? { printSpec: MUG_SPEC } : {}) },
   'merch_products/tshirt': { id: 'tshirt', enabled: false },
   'merch_products/notebook': { id: 'notebook', enabled: false },
   'merch_countries/IN': { countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxByProduct: { poster: 18, mug: 5 }, taxIncluded: true, collections: { name_elements: true, blood_group: true }, prices: { 'poster:A4': 599, 'poster:A3': 899, mug: 399 }, costs: { 'poster:A4': 212, 'poster:A3': 326, mug: 115 }, shipping: { flat: 60 }, paymentFeePercent: 2.5, providerPrimary: 'p', gatewayOverride: 'auto' },
@@ -104,7 +107,7 @@ await test('a fresh launch configuration cannot sell anything: switches off, no 
   assert.equal(cat.body.globalEnabled, false); assert.deepEqual(cat.body.products, []);
   await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'global', enabled: true } });
   await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'country', countryCodes: ['IN'], enabled: true } });
-  assert.equal((await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'products', productIds: ['poster'], enabled: true } })).body.error, 'not-ready');
+  assert.equal((await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'products', productIds: ['tshirt'], enabled: true } })).body.error, 'not-ready');
   assert.deepEqual((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).body.products, []);
 });
 await test('only enabled, ready products with a price are listed; direct API calls for the others are refused; each sells only in its own collection; Bloodline on posters stays off until enabled', async () => {
@@ -465,7 +468,7 @@ await test('designInsetMm: default 10 mm recorded on each frame item; admin can 
   // a customer cannot change it
   assert.equal((await handleMerch(e.ctx, 'admin', { action: 'setProduct', data: { id: 'poster', designInsetMm: 5 } })).status, 403);
   // an exact A4/A3 print area: artwork is 190 x 277 mm and 277 x 400 mm
-  const exact = env({ seed: { ...launchSeed(), 'merch_products/poster': { id: 'poster', enabled: true, printSpec: { ...POSTER_SPEC, bySize: { A4: { maxWidthInches: 210 / 25.4, maxHeightInches: 297 / 25.4, verified: true }, A3: { maxWidthInches: 297 / 25.4, maxHeightInches: 420 / 25.4, verified: true } } } } } });
+  const exact = env({ seed: { ...launchSeed(), 'merch_products/poster': { id: 'poster', enabled: true, verification: { sampleApproved: true }, printSpec: { ...POSTER_SPEC, bySize: { A4: { maxWidthInches: 210 / 25.4, maxHeightInches: 297 / 25.4, verified: true }, A3: { maxWidthInches: 297 / 25.4, maxHeightInches: 420 / 25.4, verified: true } } } } } });
   for (const [size, w, h] of [['A4', 190, 277], ['A3', 277, 400]]) {
     const qq = await handleMerch(exact.ctx, 'quote', { items: [poster({ size })], address: addr });
     const x = (await exact.db.get(`merch_quotes/${qq.body.quoteId}`)).data.items[0];
@@ -482,7 +485,7 @@ await test('every framed size and acrylic size: dimensions exist and the minimum
 });
 await test('Add stand = two Qikink line items (design product + plain stand), separate quote line; refused where the product has no stand', async () => {
   const seed = launchSeed();
-  seed['merch_products/acrylic'] = { id: 'acrylic', enabled: true, printSpec: { printTypeId: 5, allowedPlacements: ['fr'], minDpi: 150, verified: true, perSize: true, bySize: { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69, verified: true } } } };
+  seed['merch_products/acrylic'] = { id: 'acrylic', enabled: true, standAsLine: true, verification: { sampleApproved: true }, printSpec: { printTypeId: 5, allowedPlacements: ['fr'], minDpi: 150, verified: true, perSize: true, bySize: { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69, verified: true } } } };
   const inC = seed['merch_countries/IN'];
   seed['merch_countries/IN'] = { ...inC, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-stand': 18, mug: 5 }, prices: { ...inC.prices, 'acrylic:A4': 499, 'acrylic-stand': 249 }, costs: { ...inC.costs, 'acrylic:A4': 140, 'acrylic-stand': 120 } };
   const e = env({ seed }); const sent = [];
@@ -689,7 +692,7 @@ await test('admin health: each backend ok/failing/not configured, last failover,
   let h = await handleAdmin(admin, { action: 'storageHealth', data: {} });
   assert.equal(h.body.backends.r2.status, 'ok'); assert.equal(h.body.backends.supabase.status, 'ok');
   const t = await handleAdmin(admin, { action: 'storageTest', data: {} });
-  assert.deepEqual(t.body.results, { supabase: { ok: true }, r2: { ok: true } }); assert.equal(e.cloud.state.r2.size + e.cloud.state.sb.size, 0, 'the test file is removed again');
+  for (const n of ['supabase', 'r2']) assert.deepEqual(t.body.results[n], { ok: true, write: true, read: true, signedDownload: true, privateBucket: true, deleted: true, gone: true }); assert.equal(e.cloud.state.r2.size + e.cloud.state.sb.size, 0, 'the test file is removed again');
   e.cloud.state.r2Down = true; h = await handleAdmin(admin, { action: 'storageHealth', data: {} }); assert.equal(h.body.backends.r2.status, 'failing');
   const t2 = await handleAdmin(admin, { action: 'storageTest', data: {} }); assert.equal(t2.body.results.r2.ok, false); assert.equal(t2.body.results.supabase.ok, true);
   const none = envF(); none.ctx.files = createFileStore({ env: {}, fetch: none.cloud.fetch });
@@ -697,6 +700,60 @@ await test('admin health: each backend ok/failing/not configured, last failover,
   assert.equal((await handleAdmin(e.ctx, { action: 'storageHealth', data: {} })).status, 403);
   await e.db.patch('merch_settings/global', { visibleTo: 'nobody' }); // the upload route obeys the visibility setting like every customer action
   assert.equal((await upl(e, 'x')).status, 404);
+});
+
+console.log('Qikink written answers (ticket 136313)');
+await test('verification levels: Admins only needs (a) or (b); Everyone needs (c); the server enforces it and every change is audited', async () => {
+  const seed = launchSeed(); seed['merch_settings/global'] = { visibleTo: 'admins', enabled: true };
+  seed['merch_products/mug'] = { id: 'mug', enabled: true, printSpec: MUG_SPEC }; // no sampleApproved
+  const e = env({ seed }); const admin = e.as('admin@x.test');
+  const q = (c) => handleMerch(c, 'quote', { items: [mug()], address: addr });
+  assert.equal((await q(admin)).status, 200, 'admins-only testing works without an approved sample (levels a/b)');
+  await handleAdmin(admin, { action: 'setVisibility', data: { visibleTo: 'everyone' } });
+  const blocked = await q(e.ctx); assert.equal(blocked.status, 409); assert.equal(blocked.body.reason, 'sample-not-approved');
+  assert.ok(!(await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).body.products.some((p) => p.id === 'mug'), 'unapproved products are not listed for Everyone');
+  assert.equal((await handleAdmin(admin, { action: 'setVerification', data: { productId: 'mug', level: 'bogus', value: true } })).status, 400);
+  assert.equal((await handleAdmin(e.ctx, { action: 'setVerification', data: { productId: 'mug', level: 'sampleApproved', value: true } })).status, 403);
+  assert.equal((await handleAdmin(admin, { action: 'setVerification', data: { productId: 'mug', level: 'sampleApproved', value: true, source: 'owner approved sample 1' } })).status, 200);
+  assert.equal((await q(e.ctx)).status, 200);
+  assert.ok((await e.db.list('merch_audit_logs')).some((l) => l.action === 'admin.setVerification'));
+  assert.deepEqual(verificationLevels(DEFAULT_PRODUCTS.poster, 'A4'), { specConfirmed: true, sandboxAccepted: false, sampleApproved: false, source: DEFAULT_PRODUCTS.poster.verification.source });
+  assert.equal(verificationLevels(DEFAULT_PRODUCTS.mug, '11oz').sandboxAccepted, true);
+});
+await test('print type 5 for framed and acrylic posters carries the Qikink source; the stand as a second line item is OFF by default (single-SKU stand not confirmed)', async () => {
+  for (const id of ['poster', 'acrylic']) { const ps = DEFAULT_PRODUCTS[id].printSpec; assert.equal(ps.printTypeId, 5); assert.deepEqual(ps.allowedPlacements, ['fr']); assert.match(ps.source, /ticket 136313/); assert.ok(Object.values(ps.bySize).every((s) => s.verified === true)); }
+  assert.equal(DEFAULT_PRODUCTS.acrylic.standAsLine, false); assert.equal(DEFAULT_PRODUCTS.acrylic.standSingleSkuConfirmed, false);
+  const seed = launchSeed(); const inC = seed['merch_countries/IN'];
+  seed['merch_products/acrylic'] = { id: 'acrylic', enabled: true, verification: { sampleApproved: true } }; // flag NOT set
+  seed['merch_countries/IN'] = { ...inC, taxByProduct: { ...inC.taxByProduct, acrylic: 18, 'acrylic-stand': 18 }, prices: { ...inC.prices, 'acrylic:A4': 499, 'acrylic-stand': 249 } };
+  const e = env({ seed });
+  const ac = (extra = {}) => ({ productId: 'acrylic', collection: 'name_elements', color: 'white', size: 'A4', qty: 1, design: { name: 'Vibes' }, ...extra });
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [ac()], address: addr })).status, 200);
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [ac({ addStand: true })], address: addr })).body.error, 'stand-unavailable');
+});
+await test('shipping cost slabs: 500 g surface Rs 50 is confirmed; heavier framed posters (A4 ~1.4 kg, A3 ~2 kg) use a placeholder that is flagged unconfirmed', () => {
+  const india = { shippingCost: SHIPPING_COST_PLACEHOLDER };
+  const light = shippingCostFor(india, 'mug', '11oz'); assert.equal(light.unconfirmed, true); // weight unknown -> never presented as final
+  const a4 = shippingCostFor(india, 'poster', 'A4'); assert.deepEqual([a4.weightGrams, a4.amount, a4.unconfirmed], [1400, 50, true]);
+  const a3 = shippingCostFor(india, 'poster', 'A3'); assert.deepEqual([a3.weightGrams, a3.unconfirmed], [2000, true]);
+  const edited = shippingCostFor({ shippingCost: { slabs: [{ upToGrams: 500, amount: 50, confirmed: true }, { upToGrams: 3000, amount: 120, confirmed: true }] } }, 'poster', 'A3');
+  assert.deepEqual([edited.amount, edited.unconfirmed], [120, false]); // once the owner confirms a slab it stops being flagged
+});
+await test('trim rule: a transparent edge is refused, an opaque flat-colour border is accepted', () => {
+  const strip = (alpha, n = 8) => { const d = new Uint8ClampedArray(n * 4); for (let i = 0; i < n; i++) d[i * 4 + 3] = alpha; return d; };
+  assert.deepEqual(transparentEdges({ top: strip(255), bottom: strip(255), left: strip(255), right: strip(255) }), []);
+  const bad = strip(255); bad[3 * 4 + 3] = 0;
+  assert.deepEqual(transparentEdges({ top: strip(255), bottom: bad, left: strip(255), right: strip(0) }), ['bottom', 'right']);
+  assert.deepEqual(transparentEdges({ top: strip(254), bottom: strip(255), left: strip(255), right: strip(255) }), ['top']); // even faint transparency
+});
+await test('new Qikink sizes 12x24, 14x14, 16x24, 18x24: layouts and DPI checks work, but no SKU is added until it is found on the SKU list', () => {
+  for (const [s, w, h] of [['12x24', 304.8, 609.6], ['14x14', 355.6, 355.6], ['16x24', 406.4, 609.6], ['18x24', 457.2, 609.6]]) {
+    assert.deepEqual(FRAME_MM[s], [w, h]);
+    const { design } = buildDesign('name_elements', { frame: 'elements-gold', name: 'Vibes' });
+    const lay = layoutFrame(design, Math.round(w / 25.4 * 150), Math.round(h / 25.4 * 150));
+    assert.ok(lay && Object.keys(lay).length > 0, s + ' lays out');
+  }
+  assert.ok(!FRAMED_SIZES.includes('12x24') && !FRAMED_SIZES.includes('14x14') && !FRAMED_SIZES.includes('18x24'));
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

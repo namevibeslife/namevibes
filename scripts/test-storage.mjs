@@ -40,6 +40,9 @@ await test('Supabase store (fake server): put, get, exists, signed link, delete,
   assert.equal((await s.health()).status, 'ok');
   await s.delete(KEY); assert.equal(await s.exists(KEY), false); await s.delete(KEY); // deleting twice is fine
   await assert.rejects(() => s.put('merch/print/../../etc/passwd.png', png), /bad-key/);
+  assert.equal(cloud.state.sentBearer, false, 'a new-style sb_secret_ key is sent in the apikey header only, never as a Bearer token');
+  assert.equal((await s.health()).detail, 'bucket found (private)');
+  assert.equal((await cloud.fetch(s.publicUrl(KEY))).status === 200, false, 'the unsigned address is refused');
   assert.equal((await new SupabaseStore({ url: cloud.env.SUPABASE_URL, serviceKey: 'wrong', bucket: 'prints', fetch: cloud.fetch }).health()).status, 'failing');
 });
 await test('R2 store (fake S3 server): put, get, exists, presigned link, delete, health', async () => {

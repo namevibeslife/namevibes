@@ -31,7 +31,14 @@ export class SupabaseStore {
     this.timeoutMs = timeoutMs;
   }
   configured() { return !!(this.url && this.serviceKey && this.bucket); }
-  headers(extra = {}) { return { apikey: this.serviceKey, Authorization: `Bearer ${this.serviceKey}`, ...extra }; }
+  // Supabase's new-style keys (sb_secret_...) are NOT JWTs: they go in the apikey header only (the gateway turns them into a short-lived
+  // token for Storage). The legacy service_role key is a JWT (starts with "eyJ") and is also sent as a Bearer token.
+  headers(extra = {}) {
+    const legacyJwt = String(this.serviceKey || '').startsWith('eyJ');
+    return { apikey: this.serviceKey, ...(legacyJwt ? { Authorization: `Bearer ${this.serviceKey}` } : {}), ...extra };
+  }
+  /** The address without any signature: must be refused (the bucket is private). */
+  publicUrl(key) { return `${this.url}/storage/v1/object/public/${this.bucket}/${encodePath(safeKey(key))}`; }
   obj(key, kind = '') { return `${this.url}/storage/v1/object/${kind}${this.bucket}/${encodePath(key)}`; }
   async put(key, bytes, contentType = 'image/png') {
     const r = await timed(this.fetch, this.obj(safeKey(key)), { method: 'POST', headers: this.headers({ 'Content-Type': contentType, 'x-upsert': 'true' }), body: bytes }, this.timeoutMs);
@@ -63,7 +70,8 @@ export class SupabaseStore {
     if (!this.configured()) return { status: 'not-configured' };
     try {
       const r = await timed(this.fetch, `${this.url}/storage/v1/bucket/${encodeURIComponent(this.bucket)}`, { headers: this.headers() }, this.timeoutMs);
-      return r.ok ? { status: 'ok' } : { status: 'failing', detail: `HTTP ${r.status}` };
+      if (r.ok) { const info = await r.json().catch(() => ({})); return { status: 'ok', detail: info.public === true ? 'bucket found but it is PUBLIC: make it private' : 'bucket found (private)' }; }
+      return { status: 'failing', detail: r.status === 404 ? 'bucket not found' : `HTTP ${r.status}` };
     } catch (e) { return { status: 'failing', detail: e.message }; }
   }
 }
@@ -103,6 +111,7 @@ export class R2Store {
     if (!r.ok) throw new Error(`r2-head-${r.status}`);
     return true;
   }
+  publicUrl(key) { return `https://${this.host}${encodePath(this.objPath(safeKey(key)))}`; }
   async getSignedUrl(key, ttlSeconds = 86400) {
     return presignUrl({ method: 'GET', host: this.host, path: this.objPath(safeKey(key)), accessKeyId: this.accessKeyId, secretAccessKey: this.secretAccessKey, expires: ttlSeconds, now: this.now() });
   }
@@ -127,6 +136,7 @@ export class MockStore {
   async put(key, bytes, contentType = 'image/png') { this.up(); safeKey(key); this.files.set(key, { bytes: new Uint8Array(bytes), contentType }); this.puts++; }
   async get(key) { this.up(); return this.files.get(key) || null; }
   async exists(key) { this.up(); return this.files.has(key); }
+  publicUrl(key) { return `mock://${this.name}/${key}`; } // no ?exp= : the mock fetch refuses it, like a private bucket
   async getSignedUrl(key, ttlSeconds = 86400) { this.up(); return `mock://${this.name}/${key}?exp=${this.now() + ttlSeconds * 1000}`; }
   async delete(key) { this.up(); this.files.delete(key); }
   async health() { return this.down ? { status: 'failing', detail: 'down' } : { status: 'ok' }; }

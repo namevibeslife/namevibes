@@ -77,14 +77,16 @@ await test('catalogue defaults: everything starts DISABLED; only the white mug h
   const mug = DEFAULT_PRODUCTS.mug.printSpec;
   assert.deepEqual([mug.printTypeId, mug.allowedPlacements, mug.maxWidthInches, mug.maxHeightInches, mug.verified], [5, ['fr'], 8.5, 3.5, true]);
   assert.equal(readiness(DEFAULT_PRODUCTS.mug).ok, true);
-  for (const id of ['poster', 'acrylic', 'acrylic-frame', 'steel-bottle', 'sipper-bottle', 'tumbler', 'notebook']) { assert.equal(readiness(DEFAULT_PRODUCTS[id]).ok, false, id); assert.equal(readiness(DEFAULT_PRODUCTS[id]).reason, 'print-area-missing', id); }
+  for (const id of ['poster', 'acrylic']) { assert.equal(readiness(DEFAULT_PRODUCTS[id]).ok, true, id); assert.equal(DEFAULT_PRODUCTS[id].printSpec.printTypeId, 5); assert.match(DEFAULT_PRODUCTS[id].printSpec.source, /ticket 136313/); assert.equal(DEFAULT_PRODUCTS[id].verification.specConfirmed, true); assert.ok(!DEFAULT_PRODUCTS[id].verification.sampleApproved); } // print type 5 confirmed in writing; no physical sample approved yet
+  for (const id of ['acrylic-frame', 'steel-bottle', 'sipper-bottle', 'tumbler', 'notebook']) { assert.equal(readiness(DEFAULT_PRODUCTS[id]).ok, false, id); assert.equal(readiness(DEFAULT_PRODUCTS[id]).reason, 'print-area-missing', id); }
   assert.equal(specComplete(DEFAULT_PRODUCTS.tshirt.printSpec), true);
   assert.equal(readiness(DEFAULT_PRODUCTS.tshirt).reason, 'print-area-unverified'); // complete but never confirmed
   const settings = { enabled: true }; const country = { enabled: true, collections: { name_elements: true, blood_group: true }, prices: { mug: 399, poster: 599, 'steel-bottle': 599 } };
   assert.equal(checkAvailability({ settings, country, product: DEFAULT_PRODUCTS.mug, collection: 'blood_group' }).reason, 'product-off');
   assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS.mug, enabled: true }, collection: 'blood_group' }).ok, true);
   assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS.mug, enabled: true }, collection: 'name_elements' }).reason, 'product-collection');
-  assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS.poster, enabled: true }, collection: 'name_elements' }).reason, 'print-area-missing');
+  assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS['acrylic-frame'], enabled: true }, collection: 'name_elements' }).reason, 'print-area-missing');
+  assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS.poster, enabled: true }, collection: 'name_elements' }).ok, true); // spec confirmed in writing: allowed for admins-only testing
   assert.equal(checkAvailability({ settings, country, product: { ...DEFAULT_PRODUCTS.poster, enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11 } } } }, collection: 'name_elements' }).reason, 'print-area-unverified');
 });
 await test('per-size print areas: a framed poster needs a complete area for EVERY size to be complete, but only the verified sizes are sold', () => {
@@ -134,7 +136,7 @@ await test('blood-group masters (1312 px) fail on big prints and pass when small
 console.log('Engine: print areas, resolution, mock-ups, payload to Qikink');
 const baseSeed = () => ({
   'merch_settings/global': { visibleTo: 'everyone', enabled: true },
-  'merch_products/tshirt': { id: 'tshirt', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true } },
+  'merch_products/tshirt': { id: 'tshirt', enabled: true, verification: { sampleApproved: true }, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true } },
   'merch_countries/IN': { countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true, collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, poster: 599 }, costs: { tshirt: 420 }, shipping: { flat: 60 }, providerPrimary: 'p' },
   'merch_providers/p': { id: 'p', adapter: 'mock', active: true, countries: ['IN'] },
   'admins/admin@x.test': { role: 'super' }, 'users/u1': { email: 'u1@x.test', countryCode: 'IN' }, 'paymentSettings/razorpay': {}
@@ -160,21 +162,23 @@ await test('switching a product ON needs a complete AND verified print area (ser
   assert.deepEqual(cat.body.products.map((p) => p.id), ['tshirt']); // poster/acrylic/bottles are disabled and unverified
   const q = await handleMerch(e.ctx, 'quote', { items: [{ ...bloodItem(), productId: 'mug', size: '11oz', color: 'white' }], address: addr });
   assert.equal(q.status, 409); assert.equal(q.body.error, 'merch-product-off'); assert.equal(q.body.reason, 'product-off');
-  const none = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'poster', enabled: true } });
+  const none = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'acrylic-frame', enabled: true } });
   assert.equal(none.status, 400); assert.equal(none.body.error, 'not-ready');
   const unverified = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'poster', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, bySize: { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69 } } } } });
   assert.equal(unverified.status, 400); assert.equal(unverified.body.reason, 'print-area-unverified');
-  const bulk = await handleAdmin(admin.ctx, { action: 'bulkSwitch', data: { scope: 'products', productIds: ['acrylic'], enabled: true } });
+  const bulk = await handleAdmin(admin.ctx, { action: 'bulkSwitch', data: { scope: 'products', productIds: ['steel-bottle'], enabled: true } });
   assert.equal(bulk.status, 400); assert.equal(bulk.body.error, 'not-ready');
   const tooBig = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'mug', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 17, maxHeightInches: 10, minDpi: 150, verified: true } } });
   assert.equal(tooBig.status, 400); assert.equal(tooBig.body.error, 'print-spec-invalid');
   const yes = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'mug', enabled: true } }); // the default mug spec IS verified
+  assert.equal((await handleAdmin(admin.ctx, { action: 'setVerification', data: { productId: 'mug', level: 'sampleApproved', value: true, source: 'test sample' } })).status, 200); // Everyone needs an approved sample
   assert.equal(yes.status, 200);
   const q2 = await handleMerch(admin.ctx, 'quote', { items: [{ ...bloodItem(), productId: 'mug', size: '11oz' }], address: addr });
   assert.equal(q2.status, 200, JSON.stringify(q2.body));
   // one verified poster size
   const one = await handleAdmin(admin.ctx, { action: 'setProduct', data: { id: 'poster', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, bySize: { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69, verified: true }, A3: { maxWidthInches: 11.69, maxHeightInches: 16.54 } } } } });
   assert.equal(one.status, 200, JSON.stringify(one.body));
+  await handleAdmin(admin.ctx, { action: 'setVerification', data: { productId: 'poster', level: 'sampleApproved', value: true } });
   await admin.db.patch('merch_countries/IN', { prices: { tshirt: 799, mug: 399, poster: 599 } });
   const catalogue = await handleMerch(admin.ctx, 'catalogue', { country: 'IN' });
   assert.deepEqual(catalogue.body.products.find((p) => p.id === 'poster').sizes, ['A4']);

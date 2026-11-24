@@ -57,3 +57,11 @@ Recommended first framed posters: A4 and A3 in Black or White (the two best-supp
 
 ## Update 24 November 2026
 Starter SKUs now cover the full catalogue (framed posters x sizes x colours, acrylic sizes, stand `UAcryDiSt-Wh-NA`, frame `UAcryFrmStd-Wh-NA`, 15 mug variants, 3 bottles). All are marked unverified except the white mug; print type IDs stay unset until confirmed with Qikink. See docs/launch-scope.md.
+
+## Qikink's written answers (support ticket 136313, 24 November 2026)
+- Posters and mugs use `print_type_id` 5. Framed posters print on the front only, PNG or JPEG, 300 DPI recommended, "trim unnecessary extra space around the design"; the printed size follows the product size and the uploaded file's size (no separate fixed print box). Our poster and acrylic print specs are therefore complete and marked confirmed (level a) with that source. Physical placement and the effect of the inset are NOT confirmed (level c needs a printed sample).
+- Qikink also lists framed sizes 12x24, 14x14, 16x24 and 18x24. The layouts support them, but no SKU, price, tax or weight was added because the SKU list (Qikink dashboard) was not available to look them up. Add them only once the real SKUs are read from the dashboard (disabled by default).
+- "Acrylic poster with stand" is ONE SKU (the stand is a plain accessory). Qikink did not say which code: that product stays disabled and unverified; the old two-line-item "Add stand" is kept behind the flag `standAsLine` (off) until the SKU is known.
+- Bottle GST: not answered (Qikink asked which bottle). Left unset. Qikink's site prices include 18% GST.
+- Shipping for a 500 g shipment (GST included): surface Rs 50, air Rs 65 (COD Rs 40; COD stays off). Heavier parcels are not known; framed A4 is about 1.4 kg and A3 about 2 kg. Admin has shipping cost slabs per country with the 500 g rate pre-filled and a second placeholder slab marked "unconfirmed for heavier weights"; the margin check in the variant table shows "(unconfirmed for this weight)".
+- Sandbox orders are possible (Qikink suggests apparel for tests); live stays off. Remaining technical details (bottle print area etc.) are with Qikink's team and stay unverified.
