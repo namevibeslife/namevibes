@@ -19,7 +19,7 @@ const test = async (name, fn) => {
 
 // ---- fixtures -------------------------------------------------------------------------------------
 const seed = () => ({
-  'merch_settings/global': { enabled: true, message: '' },
+  'merch_settings/global': { visibleTo: 'everyone', enabled: true, message: '' },
   'merch_countries/IN': {
     countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true,
     collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, notebook: 299, poster: 899 },

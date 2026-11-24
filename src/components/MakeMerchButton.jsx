@@ -2,14 +2,16 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Shirt } from 'lucide-react';
+import { useMerchStatus } from '../merch/useMerchStatus';
 
 // "Frame My Elements": opens the framed-poster designer with the name(s) and the already verified
 // elements from this result, so the customer never has to type them again. The server re-checks them.
 export default function MakeMerchButton({ people }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const status = useMerchStatus();
   const names = (people || []).filter((p) => p?.fullName).slice(0, 4).map((p) => ({ name: p.fullName, relation: p.relation || '', elements: (p.elements || []).map((e) => e.symbol) }));
-  if (names.length === 0) return null;
+  if (names.length === 0 || !status.visible) return null; // no hint of merchandise unless it is visible to this visitor
   return (
     <div className="my-6 text-center">
       <button type="button" data-testid="make-merch" onClick={() => navigate('/merch', { state: { merch: { names, productId: 'poster' } } })}

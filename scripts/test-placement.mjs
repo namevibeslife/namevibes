@@ -133,7 +133,7 @@ await test('blood-group masters (1312 px) fail on big prints and pass when small
 
 console.log('Engine: print areas, resolution, mock-ups, payload to Qikink');
 const baseSeed = () => ({
-  'merch_settings/global': { enabled: true },
+  'merch_settings/global': { visibleTo: 'everyone', enabled: true },
   'merch_products/tshirt': { id: 'tshirt', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true } },
   'merch_countries/IN': { countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true, collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799, mug: 399, poster: 599 }, costs: { tshirt: 420 }, shipping: { flat: 60 }, providerPrimary: 'p' },
   'merch_providers/p': { id: 'p', adapter: 'mock', active: true, countries: ['IN'] },

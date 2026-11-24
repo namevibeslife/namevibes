@@ -38,7 +38,7 @@ export default function MerchCart() {
   const errorText = (body) => (body?.error === 'merch-off' && body.message ? body.message : t(`merch.err.${body?.error}`, { ...body, defaultValue: t('merch.err.generic') }));
   const items = (cart || []).map((l) => ({ productId: l.productId, collection: l.collection, color: l.color, size: l.size, qty: l.qty, design: l.design, layout: l.layout, addStand: l.addStand === true }));
 
-  async function persist(next) { setCart(next); setQuote(null); await saveCart(user.uid, next); }
+  async function persist(next) { setCart(next); setQuote(null); try { await saveCart(user.uid, next); } catch { setError(t('merch.err.generic')); } }
   const setField = (k, v) => { setAddress((a) => ({ ...a, [k]: v })); setQuote(null); }; // an address change invalidates the quote
 
   async function getQuote() {

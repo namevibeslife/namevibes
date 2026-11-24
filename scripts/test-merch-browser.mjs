@@ -30,7 +30,7 @@ await step('"Frame My Elements" on the results screen carries the name and verif
   assert.equal((await page.getByTestId('make-merch').innerText()).trim(), 'Frame My Elements');
   await page.getByTestId('make-merch').click();
   await page.waitForURL('**/merch');
-  assert.equal(await page.getByTestId('product-poster').getAttribute('aria-pressed'), 'true'); // opens the framed poster directly
+  await page.waitForFunction(() => document.querySelector('[data-testid="product-poster"]')?.getAttribute('aria-pressed') === 'true'); // opens the framed poster directly
   assert.equal(await page.getByTestId('merch-name').inputValue(), 'Vibes');
   assert.equal((await page.getByTestId('merch-symbols').innerText()).replace(/.*:\s*/, ''), 'V · I · Be · S');
   await noOverflow('store 390');
@@ -451,7 +451,36 @@ await step('orders: paid order is listed; admin refund marks it refunded', async
   await page.getByTestId('admin-note').getByText('Refunded').waitFor();
   assert.match(await page.locator('[data-testid^="status-"]').first().innerText(), /refunded/);
 });
+await step('visibility: Nobody / Admins only / Everyone hides merchandise (menu, pages, buttons) from non-admins as a normal 404, shows the sandbox banner to admins', async () => {
+  const setMode = async (mode) => {
+    await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin');
+    await page.goto(`${BASE}/admin/merch`);
+    await page.getByTestId('visible-to').waitFor();
+    await page.getByTestId('visible-to').selectOption(mode);
+    await page.waitForFunction((m) => document.querySelector('[data-testid="visible-to"]')?.value === m, mode);
+    await page.waitForTimeout(400);
+  };
+  const menuHasMerch = async () => { await page.waitForTimeout(1200); await page.locator('.site-menu-toggle').click(); await page.locator('#site-navigation-menu').waitFor(); const txt = await page.locator('#site-navigation-menu').innerText(); await page.keyboard.press('Escape'); return /Merchandise|Blood Group/i.test(txt); };
+  const is404 = async (path) => { await page.goto(`${BASE}${path}`); await page.waitForTimeout(1200); return (await page.locator('body').innerText()).includes('404'); };
+  await setMode('nobody');
+  assert.equal(await page.getByTestId('sandbox-banner-admin').count(), 1, 'admin sees the sandbox banner on the admin page');
+  await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
+  for (const p of ['/merch', '/merch/blood-group', '/merch/blood-group/o-positive', '/merch/cart', '/merch/orders', '/merch/returns-policy']) assert.equal(await is404(p), true, p + ' is a 404 for a customer under Nobody');
+  await page.goto(`${BASE}/dashboard`); assert.equal(await menuHasMerch(), false, 'no menu link under Nobody');
+  await setMode('admins');
+  await page.goto(`${BASE}/dashboard`); assert.equal(await menuHasMerch(), true, 'admin sees the menu link');
+  assert.equal(await is404('/merch'), false); // (the mock admin has no customer profile, so the page may redirect to the profile form; it is not a 404)
+  await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
+  assert.equal(await is404('/merch'), true, 'a customer still gets 404 under Admins only');
+  await page.goto(`${BASE}/dashboard`); assert.equal(await menuHasMerch(), false);
+  await page.evaluate(() => localStorage.removeItem('nv_mock_session'));
+  assert.equal(await is404('/merch'), true, 'signed-out gets the 404 page');
+  await setMode('everyone');
+  await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
+  assert.equal(await is404('/merch'), false); await page.goto(`${BASE}/dashboard`); assert.equal(await menuHasMerch(), true);
+});
 await step('admin pages have no horizontal page overflow at 390px', async () => {
+  await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin'); await page.goto(`${BASE}/admin/merch`); await page.getByTestId('overview').waitFor();
   await page.getByRole('tab', { name: 'Overview' }).click();
   await noOverflow('admin overview');
 });

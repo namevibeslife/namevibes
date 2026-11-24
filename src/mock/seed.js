@@ -27,7 +27,7 @@ function merchSeed() {
   const bySize = (sizes) => Object.fromEntries(sizes.map((s) => [s, { maxWidthInches: mm2in(FRAME_MM[s][0]), maxHeightInches: mm2in(FRAME_MM[s][1]), verified: true }]));
   const mock = { allowedPlacements: ['fr'], minDpi: 150, verified: true, mockOnly: true };
   return {
-    'merch_settings/global': { enabled: true, message: '' },
+    'merch_settings/global': { visibleTo: 'everyone', enabled: true, message: '' },
     'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
     'merch_products/poster': { id: 'poster', enabled: true, printSpec: { ...mock, printTypeId: 1, perSize: true, bySize: bySize(FRAMED_SIZES) } },
     'merch_products/acrylic': { id: 'acrylic', enabled: true, printSpec: { ...mock, printTypeId: 5, perSize: true, bySize: bySize(ACRYLIC_SIZES) } },
@@ -57,7 +57,7 @@ export const SEED_DATA = {
   // the enabled products; T-shirts and notebooks are off. Global and India are ON here so the flows can be exercised; the real launch
   // configuration (admin -> Apply launch configuration) starts with the global and India switches OFF and no prices.
   // The printSpec values on poster and mug below are MOCK TEST VALUES (not Qikink data) so the designer can be tried offline.
-  'merch_settings/global': { enabled: true, message: '' },
+  'merch_settings/global': { visibleTo: 'everyone', enabled: true, message: '' },
   'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
   ...merchSeed(),
   'merch_providers/mock': { id: 'mock', name: 'Mock provider', adapter: 'mock', active: true, countries: ['IN', 'US'] },

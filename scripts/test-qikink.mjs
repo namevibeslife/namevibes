@@ -200,7 +200,7 @@ await test('not documented: cancel, webhook and quote are explicit "unsupported"
 console.log('Integration with the engine (fake Qikink)');
 function engineEnv({ env = 'sandbox', q = fakeQikink(), clk = clock() } = {}) {
   const db = createMemoryDb({
-    'merch_settings/global': { enabled: true },
+    'merch_settings/global': { visibleTo: 'everyone', enabled: true },
     'merch_products/tshirt': { id: 'tshirt', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true } },
     'merch_countries/IN': { countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true, collections: { name_elements: true, blood_group: true }, prices: { tshirt: 799 }, costs: { tshirt: 420 }, shipping: { flat: 60 }, providerPrimary: 'qikink' },
     'merch_providers/qikink': { id: 'qikink', adapter: 'qikink', active: true, countries: ['IN'] },

@@ -9,8 +9,8 @@ import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, where } fro
 export const IS_MOCK = import.meta.env.MODE === 'mock';
 
 async function callServer(action, body) {
-  const token = await auth.currentUser.getIdToken();
-  const res = await fetch(`/api/merch/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify(body || {}) });
+  const token = auth.currentUser ? await auth.currentUser.getIdToken() : null; // signed-out visitors may ask "visibility" and get a 404
+  const res = await fetch(`/api/merch/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) }, body: JSON.stringify(body || {}) });
   const data = await res.json().catch(() => ({}));
   return { status: res.status, body: data };
 }
@@ -48,7 +48,7 @@ const mockCtx = async () => {
   const { p1, p2 } = await loadMock();
   const user = auth.currentUser;
   return {
-    db: mockDb, env: {}, now: () => new Date(),
+    db: mockDb, env: {}, now: () => new Date(), sandbox: true, paymentsSimulated: true,
     who: user ? { uid: user.uid, email: user.email, emailVerified: true } : null,
     id: () => Math.random().toString(36).slice(2, 12) + Math.random().toString(36).slice(2, 8),
     providerFor: (p) => (p.id === 'mock2' ? p2 : p1),

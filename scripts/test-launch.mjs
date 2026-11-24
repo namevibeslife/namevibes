@@ -24,7 +24,7 @@ const test = async (name, fn) => { try { await fn(); passed++; console.log(`  ok
 const POSTER_SPEC = { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11, verified: true }, A3: { maxWidthInches: 11.5, maxHeightInches: 16, verified: true } } };
 const MUG_SPEC = { printTypeId: 5, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: true };
 const launchSeed = ({ specs = true } = {}) => ({
-  'merch_settings/global': { enabled: true },
+  'merch_settings/global': { visibleTo: 'everyone', enabled: true },
   'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
   'merch_products/poster': { id: 'poster', enabled: true, ...(specs ? { printSpec: POSTER_SPEC } : {}) },
   'merch_products/mug': { id: 'mug', enabled: true, ...(specs ? { printSpec: MUG_SPEC } : {}) },
@@ -96,6 +96,8 @@ await test('launch preset: India + Qikink, EVERYTHING disabled, global and India
 await test('a fresh launch configuration cannot sell anything: switches off, no prices, everything disabled and unverified', async () => {
   const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'users/u1': { email: 'u1@x.test', countryCode: 'IN' } } });
   await handleAdmin(e.as('admin@x.test'), { action: 'applyLaunchPreset', data: {} });
+  assert.equal((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).status, 404); // visibility defaults to Nobody
+  await handleAdmin(e.as('admin@x.test'), { action: 'setVisibility', data: { visibleTo: 'everyone' } });
   const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
   assert.equal(cat.body.globalEnabled, false); assert.deepEqual(cat.body.products, []);
   await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'global', enabled: true } });
@@ -506,6 +508,31 @@ await test('Blood Group designs: all 8 listed, admin can hide one, a hidden desi
   assert.equal((await handleAdmin(a, { action: 'setBloodDesign', data: { code: 'ZZ', visible: false } })).status, 400);
   assert.ok((await e.db.list('merch_audit_logs')).some((l) => l.action === 'admin.setBloodDesign'));
   assert.equal((await handleMerch(e.ctx, 'verify', { orderId: 'x', proof: { method: 'cod' } })).body.error, 'cod-not-allowed');
+});
+
+
+console.log('Visibility (owner-only testing)');
+await test('visibility: Nobody (default) / Admins only / Everyone, enforced for every merch API; admin actions stay reachable; changes audited', async () => {
+  const seed = launchSeed(); seed['merch_settings/global'] = { enabled: true }; // no visibleTo = Nobody
+  const e = env({ seed }); const admin = e.as('admin@x.test'); const anon = { ...e.ctx, who: null };
+  const other = e.as('someone@x.test');
+  const apis = [['catalogue', { country: 'IN' }], ['quote', { items: [poster()], address: addr }], ['checkout', { quoteId: 'x' }], ['artwork', {}], ['verify', { orderId: 'x', proof: {} }], ['visibility', {}], ['nothing', {}]];
+  const all = async (c) => Promise.all(apis.map(async ([a, b]) => (await handleMerch(c, a, b)).status));
+  for (const c of [e.ctx, anon, other]) assert.deepEqual(await all(c), apis.map(() => 404), 'Nobody: everyone gets 404');
+  assert.equal((await handleMerch(admin, 'catalogue', { country: 'IN' })).status, 404); // even admins see nothing in the shop...
+  const vis = await handleMerch(admin, 'visibility', {}); assert.equal(vis.status, 200); assert.equal(vis.body.visible, false); // ...but can read the setting
+  assert.equal((await handleAdmin(other, { action: 'setVisibility', data: { visibleTo: 'everyone' } })).status, 403);
+  assert.equal((await handleAdmin(admin, { action: 'setVisibility', data: { visibleTo: 'bogus' } })).status, 400);
+  assert.equal((await handleAdmin(admin, { action: 'setVisibility', data: { visibleTo: 'admins' } })).status, 200);
+  assert.equal((await handleMerch(admin, 'catalogue', { country: 'IN' })).status, 200);
+  assert.equal((await handleMerch(admin, 'visibility', {})).body.visible, true);
+  for (const c of [e.ctx, anon, other]) { assert.deepEqual(await all(c), apis.map(() => 404), 'Admins only: non-admins, signed-out and unverified get 404'); }
+  const unverified = { ...admin, who: { ...admin.who, emailVerified: false } };
+  assert.equal((await handleMerch(unverified, 'catalogue', { country: 'IN' })).status, 404);
+  assert.equal((await handleAdmin(admin, { action: 'setVisibility', data: { visibleTo: 'everyone' } })).status, 200);
+  assert.equal((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).status, 200);
+  assert.equal((await handleMerch(anon, 'visibility', {})).status, 200);
+  assert.ok((await e.db.list('merch_audit_logs')).filter((l) => l.action === 'admin.setVisibility').length >= 2);
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

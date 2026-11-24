@@ -8,6 +8,7 @@ import Logo from './Logo';
 import LanguagePicker from './LanguagePicker';
 import { isPlanActive } from '../utils/plan';
 import { useTranslation } from 'react-i18next';
+import { useMerchStatus } from '../merch/useMerchStatus';
 
 const explore = [
   ['nav.home', '/'], ['nav.knowMore', '/learn-more'], ['nav.dashboard', '/dashboard'],
@@ -52,7 +53,9 @@ export default function UserNav() {
   // An approved ambassador with no paid plan only sees links that open for them; the paid tools
   // (and the dashboard that leads to them) stay hidden rather than bouncing to the payment card.
   const planless = user && isAmbassador && !isPlanActive(profile);
-  const exploreLinks = planless ? explore.filter(([, to]) => ['/', '/learn-more'].includes(to) || (to === '/pricing' && profile?.profileComplete)) : explore;
+  const merchStatus = useMerchStatus();
+  const allLinks = merchStatus.visible ? explore : explore.filter(([, to]) => !to.startsWith('/merch'));
+  const exploreLinks = planless ? allLinks.filter(([, to]) => ['/', '/learn-more'].includes(to) || (to === '/pricing' && profile?.profileComplete)) : allLinks;
   const account = user ? [['nav.settings', '/settings'], ['nav.profile', '/profile']] : [['nav.signIn', '/login']];
   // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
   // One link to the ambassador sign-in page; it reads "Ambassador area" for a signed-in ambassador.

@@ -23,6 +23,23 @@ const Toggle = ({ label, checked, onChange, testid }) => (
 );
 const Btn = ({ children, ...p }) => <button type="button" {...p} className={`px-3 py-1.5 rounded-lg bg-brand-600 text-white text-sm disabled:opacity-50 ${p.className || ''}`}>{children}</button>;
 
+// Who can see merchandise at all. Nobody (default) = same 404 as if it did not exist; Admins only = owner testing; Everyone = launched.
+function VisibilityControl({ settings, act }) {
+  const [info, setInfo] = useState(null);
+  useEffect(() => { callMerch('visibility', {}).then((r) => setInfo(r.body)).catch(() => {}); }, [settings.visibleTo]);
+  const mode = settings.visibleTo || 'nobody';
+  return (
+    <div className="p-3 bg-white/70 rounded-lg" data-testid="visibility-control">
+      <h2 className="font-semibold mb-1">Merchandise visible to</h2>
+      <select aria-label="Merchandise visible to" value={mode} onChange={(e) => act('setVisibility', { visibleTo: e.target.value })} className="border rounded px-2 py-1" data-testid="visible-to">
+        <option value="nobody">Nobody (default)</option><option value="admins">Admins only (owner testing)</option><option value="everyone">Everyone</option>
+      </select>
+      <p className="text-xs mt-1">Nobody: the menu link, pages and every merchandise address behave as if the feature does not exist (normal 404). Takes effect at once; no deploy needed.</p>
+      {info?.sandbox && <p className="mt-2 p-2 rounded bg-amber-100 border border-amber-400 text-amber-900 text-sm font-semibold" data-testid="sandbox-banner-admin">SANDBOX: no real order will be printed or shipped. {info.paymentsSimulated ? 'Payments are simulated (nobody is charged).' : 'Checkout is blocked until test payments are switched on (TEST_PAYMENTS).'}</p>}
+    </div>
+  );
+}
+
 export default function MerchAdmin() {
   const { user, loading } = useAuthStore();
   const [isAdmin, setIsAdmin] = useState(null);
@@ -84,6 +101,7 @@ function Overview({ data, act }) {
   paid.forEach((o) => { byCountry[o.countryCode] = byCountry[o.countryCode] || { n: 0, rev: 0, cur: o.currency }; byCountry[o.countryCode].n++; byCountry[o.countryCode].rev += o.amount - (o.refundedAmount || 0); });
   return (
     <section className="space-y-4" data-testid="overview">
+      <VisibilityControl settings={data.settings} act={act} />
       <p>Merchandise is <strong data-testid="global-state">{data.settings.enabled ? 'ON' : 'OFF'}</strong> · {data.orders.length} orders · {paid.length} paid · revenue (all currencies summed by country below) · estimated margin shown per order.</p>
       <table className="w-full text-sm bg-white/70"><thead><tr><th className="text-left p-2">Country</th><th>Paid orders</th><th>Revenue</th></tr></thead>
         <tbody>{Object.entries(byCountry).map(([c, v]) => <tr key={c}><td className="p-2">{c}</td><td className="text-center">{v.n}</td><td className="text-center">{v.rev.toFixed(2)} {v.cur}</td></tr>)}</tbody></table>

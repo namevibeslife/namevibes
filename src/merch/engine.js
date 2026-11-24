@@ -625,6 +625,10 @@ const bool = (v) => v === true;
 const num = (v) => (Number.isFinite(Number(v)) && Number(v) >= 0 ? Number(v) : undefined);
 
 const ADMIN_ACTIONS = {
+  async setVisibility(ctx, b) {
+    if (!VISIBLE_TO.includes(b.visibleTo)) return { error: 'bad-visibility' };
+    return { path: `${COLL.settings}/global`, patch: { visibleTo: b.visibleTo, updatedAt: ctx.now() } };
+  },
   async setGlobal(ctx, b) {
     const patch = { enabled: bool(b.enabled), message: String(b.message || '').slice(0, 300), updatedAt: ctx.now() };
     return { path: `${COLL.settings}/global`, patch };
@@ -867,12 +871,29 @@ export async function handleAdmin(ctx, body) {
 
 // ---- dispatcher -------------------------------------------------------------------------------------
 
+export const VISIBLE_TO = ['nobody', 'admins', 'everyone'];
+export async function merchVisibility(ctx) {
+  const s = (await ctx.db.get(`${COLL.settings}/global`))?.data || {};
+  const mode = VISIBLE_TO.includes(s.visibleTo) ? s.visibleTo : 'nobody';
+  const admin = await requireAdmin(ctx);
+  return { mode, admin, visible: mode === 'everyone' || (mode === 'admins' && admin) };
+}
+
 export async function handleMerch(ctx, action, body) {
   // Cash on Delivery is prohibited everywhere: refuse it here, before any handler, and keep a record.
   const cod = findCod(body);
   if (cod) {
     await audit(ctx, 'alert.cod-rejected', action, { key: cod.key, value: cod.value }).catch(() => {});
     return fail(400, 'cod-not-allowed');
+  }
+  // Who may see merchandise at all (global setting "visibleTo": nobody | admins | everyone, default nobody).
+  // Anyone else gets the same 404 as if the feature did not exist. Admin actions are exempt so the setting can be changed.
+  if (action !== 'admin') {
+    const v = await merchVisibility(ctx);
+    // admins can always ask (to show the sandbox banner and the setting); everyone else gets the 404 below
+    if (action === 'visibility' && v.admin) return ok({ visible: v.visible, admin: true, mode: v.mode, sandbox: ctx.sandbox === true, paymentsSimulated: ctx.paymentsSimulated === true });
+    if (!v.visible) return fail(404, 'not-found');
+    if (action === 'visibility') return ok({ visible: true, admin: false, mode: v.mode, sandbox: ctx.sandbox === true, paymentsSimulated: ctx.paymentsSimulated === true });
   }
   switch (action) {
     case 'catalogue': return handleCatalogue(ctx, body);

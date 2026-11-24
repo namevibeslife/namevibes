@@ -20,7 +20,28 @@ export const sameString = (a, b) => {
 
 const rzAuth = (env) => ({ Authorization: `Basic ${btoa(`${env.RAZORPAY_KEY_ID}:${env.RAZORPAY_KEY_SECRET}`)}`, 'Content-Type': 'application/json' });
 
+// SAFETY: merchandise must never take a real payment while Qikink is on the sandbox (nothing would be printed or shipped).
+//  - Qikink live (QIKINK_ENV=live): the real gateways are used.
+//  - Qikink sandbox (anything else, the default) + TEST_PAYMENTS=true: payments are SIMULATED (no gateway call, no charge).
+//  - Qikink sandbox without TEST_PAYMENTS: merchandise checkout is BLOCKED ("sandbox-payments-blocked").
+export const isSandbox = (env) => env.QIKINK_ENV !== 'live';
+export const paymentsSimulated = (env) => isSandbox(env) && env.TEST_PAYMENTS === 'true';
 export function gatewaysFor(env) {
+  const sandbox = isSandbox(env); const simulated = paymentsSimulated(env);
+  if (sandbox) {
+    return {
+      async create(order, choice) {
+        if (!simulated) return { error: 'sandbox-payments-blocked', status: 409 };
+        return { orderId: `sim_${order.id}`, client: { gateway: 'mock', realGateway: choice.gateway, orderId: `sim_${order.id}` } };
+      },
+      async verify(order) {
+        if (!simulated || !String(order.orderId || '').startsWith('sim_')) return { error: 'sandbox-payments-blocked', status: 409 };
+        return { transactionId: `sim_tx_${order.id}` };
+      },
+      async checkCaptured() { return simulated ? {} : { error: 'sandbox-payments-blocked' }; },
+      async refund() { return simulated ? { ok: true } : { error: 'sandbox-payments-blocked', status: 409 }; }
+    };
+  }
   return {
     async create(order, choice) {
       if (choice.gateway === 'razorpay') {
@@ -85,7 +106,7 @@ export async function buildCtx(env, request) {
     db, env, who,
     now: () => new Date(),
     id: () => crypto.randomUUID().replace(/-/g, '').slice(0, 20),
-    gateways: gatewaysFor(env),
+    gateways: gatewaysFor(env), sandbox: isSandbox(env), paymentsSimulated: paymentsSimulated(env),
     providerFor: (doc) => createProvider(doc, env),
     artworkUrl: (order, item, kind) => signedArtworkUrl(env, order, item, kind)
   };
