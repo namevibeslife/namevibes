@@ -1,4 +1,5 @@
 import PosterDownload from '../components/PosterDownload';
+import MakeMerchButton from '../components/MakeMerchButton';
 import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import React, { useState } from 'react';
 import { Trans } from 'react-i18next';
@@ -133,6 +134,7 @@ export default function FamilyPackage() {
             </div>
 
             <PosterDownload people={results} family />
+            <MakeMerchButton people={results} />
             <FamilyPersonCards people={results} />
 
             {results.length > 1 && (

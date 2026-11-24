@@ -22,7 +22,7 @@ export async function razorpaySignatureValid(secret, orderId, paymentId, signatu
   return same(mac, String(signature || '').toLowerCase());
 }
 
-async function verifyRazorpay(env, order, body) {
+export async function verifyRazorpay(env, order, body) {
   const { razorpay_order_id: orderId, razorpay_payment_id: paymentId, razorpay_signature: signature } = body;
   if (!orderId || !paymentId || !signature || orderId !== order.orderId) return { error: 'Payment could not be verified', status: 400 };
   if (!env.RAZORPAY_KEY_SECRET || !(await razorpaySignatureValid(env.RAZORPAY_KEY_SECRET, orderId, paymentId, signature))) return { error: 'Payment could not be verified', status: 400 };
@@ -44,7 +44,7 @@ async function verifyRazorpay(env, order, body) {
   return { transactionId: paymentId };
 }
 
-async function verifyPayPal(env, order) {
+export async function verifyPayPal(env, order) {
   if (!env.PAYPAL_CLIENT_ID || !env.PAYPAL_CLIENT_SECRET) return { error: 'PayPal is not set up on the server', status: 500 };
   const token = await paypalToken(env);
   const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };

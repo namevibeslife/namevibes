@@ -1,3 +1,6 @@
+import { FRAMED_SIZES, ACRYLIC_SIZES } from '../merch/catalog.js';
+import { FRAME_MM } from '../merch/frames.js';
+
 // Test accounts and starting data for mock mode (`npm run dev:mock`).
 // Everything lives in the browser's localStorage; "Reset mock data" in the mock badge restores this.
 
@@ -15,7 +18,52 @@ export const MOCK_ACCOUNTS = [
 const daysAgo = (n) => new Date(Date.now() - n * 24 * 60 * 60 * 1000);
 const daysAhead = (n) => new Date(Date.now() + n * 24 * 60 * 60 * 1000);
 
+// ---- Merchandise TEST data for mock mode only (never real Qikink data) ----------------------------------------------------------------
+// The shipped catalogue starts with everything DISABLED and every print area unverified. For offline testing this seeds TEST print areas
+// (the nominal paper sizes, marked mockOnly + verified so the designer works), TEST prices and a few enabled products. The real launch
+// configuration (admin -> Apply launch configuration) starts with the global and India switches OFF and no prices.
+const mm2in = (mm) => Math.round((mm / 25.4) * 100) / 100;
+function merchSeed() {
+  const bySize = (sizes) => Object.fromEntries(sizes.map((s) => [s, { maxWidthInches: mm2in(FRAME_MM[s][0]), maxHeightInches: mm2in(FRAME_MM[s][1]), verified: true }]));
+  const mock = { allowedPlacements: ['fr'], minDpi: 150, verified: true, mockOnly: true };
+  return {
+    'merch_settings/global': { visibleTo: 'everyone', enabled: true, message: '' },
+    'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
+    'merch_products/poster': { id: 'poster', enabled: true, printSpec: { ...mock, printTypeId: 1, perSize: true, bySize: bySize(FRAMED_SIZES) } },
+    'merch_products/acrylic': { id: 'acrylic', enabled: true, printSpec: { ...mock, printTypeId: 5, perSize: true, bySize: bySize(ACRYLIC_SIZES) } },
+    'merch_products/mug': { id: 'mug', enabled: true },
+    'merch_products/steel-bottle': { id: 'steel-bottle', enabled: true, printSpec: { ...mock, printTypeId: 5, maxWidthInches: 3, maxHeightInches: 6 } },
+    'merch_products/tshirt': { id: 'tshirt', enabled: false },
+    'merch_products/notebook': { id: 'notebook', enabled: false },
+    'merch_countries/IN': {
+      countryCode: 'IN', enabled: true, currency: 'INR', taxPercent: 18, taxIncluded: true,
+      taxByProduct: { poster: 18, acrylic: 18, 'acrylic-stand': 18, mug: 5, 'steel-bottle': 18 },
+      collections: { name_elements: true, blood_group: true },
+      prices: { 'poster:A4': 599, 'poster:A3': 899, 'poster:8x8': 449, 'poster:8x10': 499, 'poster:10x10': 549, 'poster:11x14': 649, 'poster:12x12': 699, 'poster:12x16': 749, 'poster:12x18': 799,
+        'acrylic:A4': 499, 'acrylic:A3': 749, 'acrylic:8x8': 399, 'acrylic:12x12': 599, 'acrylic:16x16': 899, 'acrylic:16x24': 1199, 'acrylic-stand': 249, mug: 399, 'steel-bottle': 599 },
+      costs: { 'poster:A4': 212, 'poster:A3': 326, mug: 115, 'steel-bottle': 213 }, disabledProducts: {},
+      shipping: { flat: 60, freeAbove: 1500 }, paymentFeePercent: 2.5, providerPrimary: 'mock', providerBackup: 'mock2', gatewayOverride: 'auto'
+    },
+    'merch_countries/US': {
+      countryCode: 'US', enabled: false, currency: 'USD', taxPercent: 0, taxIncluded: false,
+      collections: { name_elements: true, blood_group: true }, prices: { 'poster:A4': 25, 'poster:A3': 35, mug: 15 }, disabledProducts: {}, shipping: { flat: 5, freeAbove: 0 }, providerPrimary: 'mock'
+    }
+  };
+}
+
+
 export const SEED_DATA = {
+  // Merchandise (print-on-demand) TEST configuration for mock mode only. Launch scope: framed posters (A4/A3) and blood-group mugs are
+  // the enabled products; T-shirts and notebooks are off. Global and India are ON here so the flows can be exercised; the real launch
+  // configuration (admin -> Apply launch configuration) starts with the global and India switches OFF and no prices.
+  // The printSpec values on poster and mug below are MOCK TEST VALUES (not Qikink data) so the designer can be tried offline.
+  'merch_settings/global': { visibleTo: 'everyone', enabled: true, message: '' },
+  'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
+  ...merchSeed(),
+  'merch_providers/mock': { id: 'mock', name: 'Mock provider', adapter: 'mock', active: true, countries: ['IN', 'US'] },
+  'merch_providers/mock2': { id: 'mock2', name: 'Mock backup', adapter: 'mock', active: true, countries: ['IN'] },
+  // Inactive Qikink entry (sandbox). Real SKUs/print specs must be filled in admin; the launch preset writes unverified starter SKUs.
+  'merch_providers/qikink': { id: 'qikink', name: 'Qikink (sandbox)', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'] },
   // Country Pricing (admin) - the app shows prices from these records only
   'countrySettings/mock-in': { countryCode: 'IN', countryName: 'India', currency: 'INR', symbol: '₹', price: 399, referralDiscount: 10, taxPercent: 18, isActive: true },
   'countrySettings/mock-us': { countryCode: 'US', countryName: 'United States', currency: 'USD', symbol: '$', price: 25, referralDiscount: 10, taxPercent: 0, isActive: true },

@@ -1,4 +1,5 @@
 import PosterDownload from '../components/PosterDownload';
+import MakeMerchButton from '../components/MakeMerchButton';
 import { FamilyPersonCards, FamilyHarmonyCard } from '../components/FamilyResults';
 import { formatDate } from '../i18n/format';
 import React, { useState, useEffect } from 'react';
@@ -91,6 +92,7 @@ export default function FamilyAnalysisView() {
           </div>
 
           <PosterDownload people={results} family />
+          <MakeMerchButton people={results} />
           <FamilyPersonCards people={results} />
 
           {results.length > 1 && (

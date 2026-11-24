@@ -8,6 +8,7 @@ import Logo from './Logo';
 import LanguagePicker from './LanguagePicker';
 import { isPlanActive } from '../utils/plan';
 import { useTranslation } from 'react-i18next';
+import { useMerchStatus } from '../merch/useMerchStatus';
 
 const explore = [
   ['nav.home', '/'], ['nav.knowMore', '/learn-more'], ['nav.dashboard', '/dashboard'],
@@ -15,6 +16,7 @@ const explore = [
   ['nav.insights', '/element-insights'],
   ['nav.numerology', '/numerology-calculator'],
   ['nav.zodiac', '/zodiac-syllables'], ['nav.hora', '/hora-muhurat'],
+  ['nav.merch', '/merch'], ['nav.bloodGroup', '/merch/blood-group'],
   ['nav.pricing', '/pricing'],
 ];
 
@@ -51,12 +53,14 @@ export default function UserNav() {
   // An approved ambassador with no paid plan only sees links that open for them; the paid tools
   // (and the dashboard that leads to them) stay hidden rather than bouncing to the payment card.
   const planless = user && isAmbassador && !isPlanActive(profile);
-  const exploreLinks = planless ? explore.filter(([, to]) => ['/', '/learn-more'].includes(to) || (to === '/pricing' && profile?.profileComplete)) : explore;
+  const merchStatus = useMerchStatus();
+  const allLinks = merchStatus.visible ? explore : explore.filter(([, to]) => !to.startsWith('/merch'));
+  const exploreLinks = planless ? allLinks.filter(([, to]) => ['/', '/learn-more'].includes(to) || (to === '/pricing' && profile?.profileComplete)) : allLinks;
   const account = user ? [['nav.settings', '/settings'], ['nav.profile', '/profile']] : [['nav.signIn', '/login']];
   // Ambassadors are invite-only, so the only public entry is a login link (no sign-up anywhere).
   // One link to the ambassador sign-in page; it reads "Ambassador area" for a signed-in ambassador.
   const partners = [[isAmbassador ? 'nav.ambassadorArea' : 'nav.ambassadorLogin', '/ambassador']];
-  if (['/admin', '/accounts'].includes(location.pathname)) partners.push(['nav.admin', '/admin'], ['nav.accounts', '/accounts']);
+  if (['/admin', '/accounts', '/admin/merch'].includes(location.pathname)) partners.push(['nav.admin', '/admin'], ['nav.accounts', '/accounts'], ['nav.adminMerch', '/admin/merch']);
   async function signOut() {
     try { await logout(); setOpen(false); navigate('/'); }
     catch { setError(t('errors.signOut')); }

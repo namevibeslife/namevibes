@@ -7,3 +7,7 @@ build/
 ~$*.docx
 scripts/backups/
 .claude/
+
+# local secrets (never commit)
+.env.local
+.dev.vars

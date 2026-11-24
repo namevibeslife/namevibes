@@ -27,6 +27,15 @@ const AmbassadorHome = lazy(() => import('./pages/AmbassadorHome'));
 const AdminPanel = lazy(() => import('./pages/AdminPanel'));
 const ElementInsightsPage = lazy(() => import('./pages/ElementInsightsPage'));
 const AccountsDashboard = lazy(() => import('./pages/AccountsDashboard'));
+import MerchGate from './components/MerchGate';
+const MerchStore = lazy(() => import('./pages/MerchStore'));
+const MerchCart = lazy(() => import('./pages/MerchCart'));
+const MerchOrderList = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderList })));
+const MerchOrderDetail = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderDetail })));
+const MerchAdmin = lazy(() => import('./pages/MerchAdmin'));
+const BloodGroupGrid = lazy(() => import('./pages/BloodGroupShop').then((m) => ({ default: m.BloodGroupGrid })));
+const BloodGroupDetail = lazy(() => import('./pages/BloodGroupShop').then((m) => ({ default: m.BloodGroupDetail })));
+const MerchReturnsPolicy = lazy(() => import('./pages/MerchReturnsPolicy'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 function Spinner() {
@@ -107,6 +116,15 @@ function App() {
           <Route path="/ambassador" element={<AmbassadorHome />} />
           <Route path="/ambassador/register" element={<Navigate to="/ambassador" replace />} />
           <Route path="/ambassador/dashboard" element={<Navigate to="/ambassador?tab=followers" replace />} />
+          {/* Merchandise: any signed-in user with a completed profile; availability is decided by the server */}
+          <Route path="/merch" element={<MerchGate><ProtectedRoute requiresProfile><MerchStore /></ProtectedRoute></MerchGate>} />
+          <Route path="/merch/blood-group" element={<MerchGate><ProtectedRoute requiresProfile><BloodGroupGrid /></ProtectedRoute></MerchGate>} />
+          <Route path="/merch/blood-group/:slug" element={<MerchGate><ProtectedRoute requiresProfile><BloodGroupDetail /></ProtectedRoute></MerchGate>} />
+          <Route path="/merch/cart" element={<MerchGate><ProtectedRoute requiresProfile><MerchCart /></ProtectedRoute></MerchGate>} />
+          <Route path="/merch/orders" element={<MerchGate><ProtectedRoute requiresProfile><MerchOrderList /></ProtectedRoute></MerchGate>} />
+          <Route path="/merch/orders/:id" element={<MerchGate><ProtectedRoute requiresProfile><MerchOrderDetail /></ProtectedRoute></MerchGate>} />
+          <Route path="/merch/returns-policy" element={<MerchGate><MerchReturnsPolicy /></MerchGate>} />
+          <Route path="/admin/merch" element={<ProtectedRoute><MerchAdmin /></ProtectedRoute>} />
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/accounts" element={<AccountsDashboard />} />
           <Route path="*" element={<NotFound />} />
