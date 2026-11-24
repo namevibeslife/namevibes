@@ -22,4 +22,5 @@ export const EXCEPTION_REASONS = {
   'provider-error': 'The provider rejected the order.'
 };
 EXCEPTION_REASONS['qikink-credentials-missing'] = 'The server could not find the Qikink sign-in details (variable names are shown after the code; values are never shown). Check the names in Cloudflare Pages -> Production, then redeploy.';
+EXCEPTION_REASONS['qikink-duplicate-order'] = 'Qikink already has this order under our order number, but its order id could not be looked up. Confirm it in the Qikink dashboard, then use "Mark as submitted" with the Qikink order id. Do not place a new order.';
 export const explainReason = (code) => EXCEPTION_REASONS[code] || EXCEPTION_REASONS[String(code || '').split(':')[0]] || (code ? `The provider answered with "${String(code).slice(0, 60)}".` : '');

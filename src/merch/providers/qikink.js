@@ -284,6 +284,13 @@ export class QikinkAdapter extends PODProvider {
       if (id === undefined || id === null) return { ok: false, error: 'qikink-no-order-id', retryable: true, ambiguous: true };
       return { ok: true, providerOrderId: String(id), orderNumber };
     }
+    // "Duplicate Order": Qikink already has an order under our number (an earlier attempt got through). Never create another:
+    // look it up and treat it as submitted; if the lookup is not possible, say so plainly (an admin confirms it by hand).
+    if (!res.retryable && /duplicate/i.test(String(res.error || ''))) {
+      const found = await this.findByReference(orderNumber).catch(() => ({ ok: false }));
+      if (found.ok && found.order) return { ok: true, providerOrderId: String(found.order.order_id), orderNumber, duplicate: true };
+      return { ok: false, error: 'qikink-duplicate-order', retryable: false, orderNumber };
+    }
     // Qikink is prepaid by wallet credit. The docs do not give the exact error text for an empty wallet, so this pattern is a
     // configurable GUESS (unverified); any other 400 stays a permanent failure.
     if (!res.retryable && this.fundsPattern.test(String(res.error || ''))) return { ok: false, error: res.error, retryable: false, heldFunds: true, orderNumber };

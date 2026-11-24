@@ -558,7 +558,8 @@ function OrderDiagnostics({ order, data, act }) {
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
   const load = useCallback(async () => { const r = await callMerch('admin', { action: 'orderDiagnostics', data: { orderId: order.id } }); if (r.status === 200) setD(r.body); }, [order.id]);
-  useEffect(() => { load().catch(() => {}); }, [load, order.status]);
+  useEffect(() => { load().catch(() => {}); }, [load, order.status, order.exceptionReason]);
+  const [pid, setPid] = useState('');
   if (!d) return <p className="text-xs" data-testid={`diag-${order.id}`}>Checking the order files...</p>;
   const yn = (v) => (v === true ? 'yes' : v === false ? 'NO' : 'unknown');
   const needFile = d.items.some((i) => !i.print.keyPresent || i.print.deleted || i.print.existsInStorage === false);
@@ -578,6 +579,11 @@ function OrderDiagnostics({ order, data, act }) {
       {d.reason ? <p><strong data-testid={`diag-reason-${order.id}`}>{d.reason}</strong>: {d.explanation}</p> : <p>No problem recorded for this order.</p>}
       <ul className="text-xs list-disc ml-5">{d.items.map((i) => <li key={i.index} data-testid={`diag-item-${order.id}-${i.index}`}>Item {i.index + 1} print file: file key present {yn(i.print.keyPresent)}; size {i.print.bytes != null ? `${i.print.bytes} bytes` : 'unknown'}; in storage {yn(i.print.existsInStorage)}{i.print.deleted ? ' (deleted by retention)' : ''}. Mock-up: key present {yn(i.mockup.keyPresent)}, in storage {yn(i.mockup.existsInStorage)}.</li>)}</ul>
       {needFile && ['exception', 'paid', 'fulfillment_pending'].includes(order.status) && <Btn className="mt-1" disabled={busy} onClick={recreate} data-testid={`recreate-${order.id}`}>Re-create print file and retry</Btn>}
+      {d.reason === 'qikink-duplicate-order' && ['exception', 'held_provider_funds', 'fulfillment_pending', 'paid'].includes(order.status) && <div className="mt-1 text-xs">
+        <p>Qikink already has this order; confirm it in the Qikink dashboard.</p>
+        <input aria-label="Qikink order id" value={pid} onChange={(e) => setPid(e.target.value)} placeholder="Qikink order id" className="border rounded px-2 py-1 mr-1" data-testid={`pid-${order.id}`} />
+        <Btn disabled={!pid.trim()} onClick={async () => { await act('markSubmitted', { orderId: order.id, providerOrderId: pid }, 'Marked as submitted'); await load(); }} data-testid={`marksub-${order.id}`}>Mark as submitted</Btn>
+      </div>}
       {msg && <p className="text-xs" role="status">{msg}</p>}
     </div>
   );

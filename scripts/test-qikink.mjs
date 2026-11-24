@@ -6,7 +6,7 @@ import { createMemoryDb } from '../src/merch/memoryDb.js';
 import {
   QikinkAdapter, QIKINK_RATE_LIMIT, QIKINK_STATUS_MAP, mapQikinkStatus, qikinkOrderNumber, isValidOrderNumber, buildOrderPayload, unknownFields, buildShippingAddress
 } from '../src/merch/providers/qikink.js';
-import { handleMerch, retryDue, syncTracking, runFulfilment } from '../src/merch/engine.js';
+import { handleMerch, handleAdmin, retryDue, syncTracking, runFulfilment } from '../src/merch/engine.js';
 
 let passed = 0; let failed = 0;
 const test = async (name, fn) => { try { await fn(); passed++; console.log(`  ok   ${name}`); } catch (e) { failed++; console.log(`  FAIL ${name}\n       ${e.stack.split('\n').slice(0, 4).join('\n       ')}`); } };
@@ -33,6 +33,7 @@ function fakeQikink() {
       if (fail === 'rate') return res({ error: 'Rate limit exceeded. Try again later.' }, 429);
       if (fail === '500-after-store') { store(); return res({ error: 'upstream' }, 500); }
       if (fail === '500') return res({ error: 'upstream' }, 500);
+      if (fail === 'duplicate') { store(); return res({ error: 'Duplicate Order' }, 400); }
       const bad = unknownFields(body);
       if (bad.length) return res({ error: `Unexpected fields: ${bad.join(',')}`, status_code: '400' }, 400);
       if (fail === '400') return res({ error: 'Invalid province', status_code: '400' }, 400);
@@ -327,6 +328,37 @@ await test('credentials: missing names are reported (names only); stray spaces, 
   const q = fakeQikink(); const a = createProvider(doc, { QIKINK_CLIENT_ID: ' "cid"\r\n', QIKINK_CLIENT_SECRET: '\nsec \u200b' }, { qikink: { fetch: q.fetch } });
   assert.equal(a.clientId, 'cid'); assert.equal(a.clientSecret, 'sec');
   assert.ok(await a.accessToken(), 'the cleaned credentials are accepted by the fake Qikink');
+});
+
+await test('"Duplicate Order": looked up by our order number and treated as submitted, no second order', async () => {
+  const e = engineEnv(); e.q.failCreate = ['duplicate'];
+  const id = await pay(e);
+  const o = (await e.db.get(`merch_orders/${id}`)).data;
+  assert.equal(o.status, 'submitted'); assert.ok(o.providerOrderId, 'Qikink order id stored');
+  assert.equal(e.q.orders.length, 1); assert.equal(e.q.creates, 1);
+  assert.equal(o.exceptionReason ?? null, null);
+});
+await test('"Duplicate Order" with no lookup possible: clear reason, admin marks it submitted by hand, nothing is sent; the old reason is replaced', async () => {
+  const e = engineEnv(); e.q.failCreate = ['400']; // an older, different problem first
+  const id = await pay(e);
+  let o = (await e.db.get(`merch_orders/${id}`)).data;
+  assert.equal(o.status, 'exception'); const first = o.exceptionReason; assert.notEqual(first, 'qikink-duplicate-order');
+  e.q.failCreate = ['duplicate']; e.q.listDisabled = true;
+  const admin = { ...e.ctx, who: { uid: 'a', email: 'admin@x.test', emailVerified: true } };
+  await handleAdmin(admin, { action: 'retry', data: { orderId: id } });
+  o = (await e.db.get(`merch_orders/${id}`)).data;
+  assert.equal(o.status, 'exception'); assert.equal(o.exceptionReason, 'qikink-duplicate-order');
+  let d = await handleAdmin(admin, { action: 'orderDiagnostics', data: { orderId: id } });
+  assert.equal(d.body.reason, 'qikink-duplicate-order'); assert.match(d.body.explanation, /Qikink dashboard/);
+  const creates = e.q.creates;
+  assert.equal((await handleAdmin(admin, { action: 'markSubmitted', data: { orderId: id, providerOrderId: 'bad id!' } })).status, 400);
+  assert.equal((await handleAdmin({ ...e.ctx }, { action: 'markSubmitted', data: { orderId: id, providerOrderId: '5001' } })).status, 403, 'non-admin refused');
+  assert.equal((await handleAdmin(admin, { action: 'markSubmitted', data: { orderId: id, providerOrderId: '5001' } })).status, 200);
+  o = (await e.db.get(`merch_orders/${id}`)).data;
+  assert.equal(o.status, 'submitted'); assert.equal(o.providerOrderId, '5001'); assert.equal(o.exceptionReason ?? null, null);
+  assert.equal(e.q.creates, creates, 'nothing was sent to Qikink');
+  d = await handleAdmin(admin, { action: 'orderDiagnostics', data: { orderId: id } });
+  assert.equal(d.body.reason, null);
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

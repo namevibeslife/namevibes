@@ -480,8 +480,8 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
 
   if (res.ok) {
     await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'submitted', providerOrderId: res.providerOrderId, providerOrderNumber: res.orderNumber || null, mockupSources: order.items.map((i) => (i.mockup ? 'mockup' : 'print-fallback')), attempts, submittedAt: ctx.now(), lastError: null });
-    await setState(ctx, orderId, null, 'submitted', { providerOrderId: res.providerOrderId });
-    return { submitted: true, providerOrderId: res.providerOrderId };
+    await setState(ctx, orderId, null, 'submitted', { providerOrderId: res.providerOrderId, exceptionReason: null });
+    return { submitted: true, providerOrderId: res.providerOrderId, ...(res.duplicate ? { alreadyAtProvider: true } : {}) };
   }
   if (res.heldFunds) {
     // Provider wallet is empty: hold the PAID order (no retry loop, no duplicate), alert admin once, wait for the admin's retry after a top-up.
@@ -491,6 +491,7 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
     return { held: true, error: res.error };
   }
   if (res.retryable && attempts < MAX_FULFILMENT_ATTEMPTS) {
+    await ctx.db.patch(`${COLL.orders}/${orderId}`, { exceptionReason: null });
     await ctx.db.patch(`${COLL.fulfillments}/${orderId}`, { status: 'pending', attempts, lastError: res.error, nextRetryAt: new Date(ms(ctx.now()) + backoffMs(attempts)) });
     return { queued: true, attempts, error: res.error };
   }
@@ -981,7 +982,8 @@ export async function handleAdmin(ctx, body) {
   if (action === 'orderDiagnostics') {
     const order = (await ctx.db.get(`${COLL.orders}/${input.orderId}`))?.data; if (!order) return fail(404, 'order-not-found');
     const ff = (await ctx.db.get(`${COLL.fulfillments}/${input.orderId}`))?.data || {};
-    const reason = order.exceptionReason || ff.lastError || null;
+    const done = ['submitted', 'in_production', 'shipped', 'delivered'].includes(order.status);
+    const reason = done ? null : (order.status === 'exception' ? (ff.lastError || order.exceptionReason) : (ff.lastError || order.exceptionReason)) || null; // the NEWEST attempt wins
     return ok({ status: order.status, reason, explanation: explainReason(reason), attempts: ff.attempts || 0, items: await orderFileDiagnostics(ctx, order) });
   }
   if (action === 'fileReport') return ok(await fileReport(ctx));
@@ -1030,6 +1032,18 @@ export async function handleAdmin(ctx, body) {
     return ok({ ok: true });
   }
   if (action === 'refund') { const r = await refundOrder(ctx, input.orderId, input); await audit(ctx, 'admin.refund', input.orderId, { amount: input.amount ?? 'full', reason: input.reason || '', result: r.body?.error || 'ok' }); return r; }
+  if (action === 'markSubmitted') {
+    // Qikink already has the order (Duplicate Order) and its id could not be looked up: the admin confirms it in the Qikink dashboard and records the id here. Nothing is sent to Qikink.
+    const pid = String(input.providerOrderId || '').trim();
+    if (!/^[A-Za-z0-9_-]{1,40}$/.test(pid)) return fail(400, 'bad-provider-order-id');
+    const order = (await ctx.db.get(`${COLL.orders}/${input.orderId}`))?.data; if (!order) return fail(404, 'order-not-found');
+    if (!['exception', 'held_provider_funds', 'fulfillment_pending', 'paid'].includes(order.status)) return fail(409, 'order-not-open');
+    await ctx.db.patch(`${COLL.fulfillments}/${input.orderId}`, { status: 'submitted', providerOrderId: pid, manuallyConfirmed: true, submittedAt: ctx.now(), lastError: null });
+    if (order.status !== 'fulfillment_pending') await setState(ctx, input.orderId, null, 'fulfillment_pending');
+    await setState(ctx, input.orderId, null, 'submitted', { providerOrderId: pid, exceptionReason: null }, { reason: 'confirmed-by-admin' });
+    await audit(ctx, 'admin.markSubmitted', input.orderId, { providerOrderId: pid });
+    return ok({ ok: true });
+  }
   if (action === 'retry') { const r = await runFulfilment(ctx, input.orderId, { force: true }); await audit(ctx, 'admin.retry', input.orderId, r); return ok(r); }
   if (action === 'reroute') {
     const found = await ctx.db.get(`${COLL.orders}/${input.orderId}`);
