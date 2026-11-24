@@ -508,6 +508,43 @@ await step('admin pages have no horizontal page overflow at 390px', async () => 
   await noOverflow('admin overview');
 });
 
+console.log('Language picker (users see it; admin and staff screens do not)');
+await step('picker visible on /, /login and /settings; hidden on /admin and /admin/merch; 320px: one row; the saved language is never changed by admin pages', async () => {
+  const rowOf = () => page.evaluate(() => {
+    const els = ['.site-navigation-logo', '.site-home-link', '.site-menu-toggle'].map((s) => document.querySelector(s)); if (els.some((e) => !e)) return { missing: true };
+    const rs = els.map((e) => e.getBoundingClientRect()); const pk = document.querySelector('.site-navigation-bar .language-picker')?.getBoundingClientRect();
+    const all = pk ? [...rs, pk] : rs;
+    return { picker: !!pk, spread: Math.max(...all.map((r) => r.top)) - Math.min(...all.map((r) => r.top)), right: Math.max(...all.map((r) => r.right)), overflow: document.documentElement.scrollWidth > innerWidth };
+  });
+  for (const w of [320, 390]) {
+    await page.setViewportSize({ width: w, height: 800 });
+    await signIn('mock-individual', 'individual@namevibes.test', 'Indira Individual');
+    await page.evaluate(() => localStorage.setItem('nv_lang', 'hi'));
+    for (const path of ['/', '/settings']) {
+      await page.goto(`${BASE}${path}`); await page.waitForSelector('.site-menu-toggle');
+      assert.ok(await page.locator('.language-picker select').count() >= 1, 'picker on ' + path);
+      const r = await rowOf(); assert.equal(r.picker, true, 'picker in the top bar on ' + path); assert.ok(r.spread < 20, 'one row at ' + w + ' on ' + path); assert.ok(r.right <= w, 'fits at ' + w); assert.equal(r.overflow, false);
+      assert.equal(await page.evaluate(() => document.documentElement.lang), 'hi', 'the saved language is used');
+    }
+    await page.evaluate(() => { localStorage.removeItem('nv_mock_session'); }); await page.goto(`${BASE}/login`); await page.waitForSelector('.site-menu-toggle');
+    assert.ok(await page.locator('.language-picker select').count() >= 2, 'sign-in page has its own picker besides the top bar');
+    await page.locator('.site-menu-toggle').click(); assert.ok(await page.locator('.site-navigation-language select').count() === 1, 'picker in the Menu');
+    await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin');
+    for (const path of ['/admin', '/admin/merch', '/accounts']) {
+      await page.goto(`${BASE}${path}`); await page.waitForSelector('.site-menu-toggle');
+      assert.equal(await page.locator('.language-picker').count(), 0, 'no picker on ' + path);
+      const r = await rowOf(); assert.equal(r.picker, false); assert.ok(r.spread < 20, 'Home and Menu on one row on ' + path); assert.ok(r.right <= w); assert.equal(r.overflow, false, 'no overflow on ' + path + ' at ' + w);
+      await page.locator('.site-menu-toggle').click(); assert.equal(await page.locator('.site-navigation-language').count(), 0, 'no picker in the Menu on ' + path); await page.locator('.site-menu-toggle').click();
+      assert.equal(await page.evaluate(() => document.documentElement.lang), 'en', 'staff screens are in English');
+      assert.equal(await page.evaluate(() => localStorage.getItem('nv_lang')), 'hi', 'the saved language is untouched');
+    }
+    await page.goto(`${BASE}/settings`); await page.waitForSelector('.site-menu-toggle');
+    assert.equal(await page.evaluate(() => document.documentElement.lang), 'hi', 'the user language comes back after an admin page');
+  }
+  await page.setViewportSize({ width: 390, height: 900 });
+  await page.evaluate(() => localStorage.setItem('nv_lang', 'en'));
+});
+
 console.log(`\n${passed} passed`);
 console.log('Console/page errors:', errors.length ? errors : 'none');
 await browser.close();
