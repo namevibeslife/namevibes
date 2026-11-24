@@ -25,7 +25,9 @@ import { findCod, isCod } from './cod.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
 import { resolveGateway, GATEWAY_OVERRIDES } from '../data/gatewayCurrencies.js';
 import { uploadFile, checkFileReachable, sweepFiles, fileReport, storageDiagnostics } from './fileOps.js';
-import { sha256Bytes } from './storage/stores.js';
+import { sha256Bytes, redact } from './storage/stores.js';
+// The real reason a storage call failed (error name + message), with any secret removed. Never contains a key.
+const whyFailed = (e, store) => redact(`${e.message}${e.causeName ? ` - ${e.causeName}: ${e.causeMessage}` : ''}`, [store.serviceKey, store.secretAccessKey, store.accessKeyId]).slice(0, 200);
 
 const ok = (body = {}) => ({ status: 200, body });
 const fail = (status, code, extra = {}) => ({ status, body: { error: code, ...extra } });
@@ -868,8 +870,8 @@ export async function handleAdmin(ctx, body) {
         steps.signedDownload = dl.status === 200 && !!dl.bytes && dl.bytes.length === png.length && /image\/png/i.test(dl.contentType);
         const open = await ctx.files.fetchUrl(store.publicUrl(key)).catch(() => ({ status: 0 }));
         steps.privateBucket = open.status !== 200; // the plain address without a signature must be refused
-      } catch (e) { steps.error = String(e.message).slice(0, 80); }
-      try { await store.delete(key); steps.deleted = true; steps.gone = (await store.exists(key)) === false; } catch (e) { steps.deleted = false; steps.error = steps.error || String(e.message).slice(0, 80); }
+      } catch (e) { steps.error = whyFailed(e, store); }
+      try { await store.delete(key); steps.deleted = true; steps.gone = (await store.exists(key)) === false; } catch (e) { steps.deleted = false; steps.error = steps.error || whyFailed(e, store); }
       results[name] = { ok: steps.write === true && steps.read === true && steps.signedDownload === true && steps.privateBucket === true && steps.deleted === true && steps.gone === true, ...steps };
     }
     await audit(ctx, 'admin.storageTest', 'storage', { results });

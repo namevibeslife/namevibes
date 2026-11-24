@@ -126,6 +126,29 @@ await test('Supabase health tells the HTTP status and a short reason: wrong key,
   const offline = await mk({ fetch: async () => { throw new TypeError('fetch failed'); } }).health(); assert.equal(offline.reason, 'network error'); assert.equal(offline.httpStatus, undefined);
   assert.equal((await mk({ url: '', serviceKey: '' }).health()).status, 'not-configured');
 });
+await test('a key pasted with a line break, space, quotes or a hidden character inside still works (these used to fail before the request was sent: "Invalid header value")', async () => {
+  const { cloud } = fresh(); const good = cloud.env.SUPABASE_SERVICE_ROLE_KEY;
+  for (const messy of [good.slice(0, 12) + '\n' + good.slice(12), '"' + good + '"', good + '\r\n', ' ' + good, good.slice(0, 12) + '\u200B' + good.slice(12)]) {
+    const s = new SupabaseStore({ url: cloud.env.SUPABASE_URL + '\n', serviceKey: messy, bucket: ' prints\n', fetch: cloud.fetch });
+    assert.equal((await s.health()).status, 'ok');
+  }
+});
+await test('if Storage insists on an Authorization header for the new-style key, the store retries once with the key as Bearer and remembers it', async () => {
+  const { cloud } = fresh(); cloud.state.needBearer = true;
+  const s = new SupabaseStore({ url: cloud.env.SUPABASE_URL, serviceKey: cloud.env.SUPABASE_SERVICE_ROLE_KEY, bucket: 'prints', fetch: cloud.fetch });
+  assert.equal((await s.health()).status, 'ok'); assert.equal(s.bearer, true);
+  await s.put(KEY, png); assert.equal(await s.exists(KEY), true); await s.delete(KEY);
+  const calls = cloud.state.calls.length; await s.health(); assert.equal(cloud.state.calls.length - calls, 1, 'no second attempt once the mode is known');
+});
+await test('a failing request shows the real cause (error name and message, host and path) and never the key', async () => {
+  const { cloud } = fresh(); const key = cloud.env.SUPABASE_SERVICE_ROLE_KEY;
+  const boom = new SupabaseStore({ url: cloud.env.SUPABASE_URL, serviceKey: key, bucket: 'prints', fetch: async () => { const e = new TypeError('Invalid header value ' + key); throw e; } });
+  const h = await boom.health(); const dump = JSON.stringify(h);
+  assert.equal(h.status, 'failing'); assert.equal(h.errorName, 'TypeError'); assert.match(h.detail, /TypeError: Invalid header value/); assert.equal(h.called, 'GET sb.test/storage/v1/bucket/prints');
+  assert.ok(!dump.includes(key), 'the key is redacted'); assert.match(dump, /\[hidden\]/);
+  const said = await new SupabaseStore({ url: cloud.env.SUPABASE_URL, serviceKey: 'sb_secret_wrongwrongwrong', bucket: 'prints', fetch: async () => new Response(JSON.stringify({ message: 'Invalid Compact JWS' }), { status: 400 }) }).health();
+  assert.match(said.detail, /400 rejected/); assert.match(said.detail, /Supabase said: "Invalid Compact JWS"/);
+});
 await test('diagnostics: names only (present/missing), the kind of key but never a value or length; typo names are listed', () => {
   const env = { SUPABASE_URL: 'https://abc.supabase.co', SUPABASE_BUCKET: 'my-private-bucket', SUPABASE_SERVICE_ROLE_KEY: 'sb_publishable_TOPSECRETVALUE', SUPABASE_KEY: 'x', MERCH_CRON_SECRET: ' padded ' };
   const d = storageDiagnostics(env); const dump = JSON.stringify(d);

@@ -11,13 +11,23 @@ const hexOf = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padSta
 export const sha256Bytes = async (bytes) => hexOf(await crypto.subtle.digest('SHA-256', bytes));
 // Only files under merch/print/ and merch/mockup/ can ever be written, read or deleted through this layer.
 export const validKey = (k) => /^merch\/(print|mockup)\/[A-Za-z0-9_-]{1,64}\/[A-Za-z0-9_-]{1,64}\/[A-Za-z0-9_.-]{1,80}\.png$/.test(String(k));
+// Text that may be shown to an admin: any secret that happens to appear in it is replaced.
+export const redact = (text, secrets = []) => secrets.filter((s) => typeof s === 'string' && s.length >= 6).reduce((t, s) => t.split(s).join('[hidden]'), String(text || ''));
+// Settings pasted into a dashboard often carry a line break, a space, a quote or an invisible character. None of these can be part of
+// a key, bucket name or address, and one of them inside an HTTP header makes the request fail before it is sent
+// ("TypeError: Invalid header value"), so everything outside plain visible ASCII is removed, together with surrounding quotes.
+export const cleanSetting = (v) => (typeof v === 'string' ? v.replace(/[^\x21-\x7e]/g, '').replace(/^["']+|["']+$/g, '') : v);
 const safeKey = (key) => { if (!validKey(key)) throw new Error('bad-key'); return key; };
 
 async function timed(fetchFn, url, init, ms) {
   const ctl = new AbortController();
   const timer = setTimeout(() => ctl.abort(), ms);
   try { return await fetchFn(url, { ...init, signal: ctl.signal }); }
-  catch (e) { throw new Error(e?.name === 'AbortError' ? 'timeout' : 'network'); }
+  catch (e) {
+    const err = new Error(e?.name === 'AbortError' ? 'timeout' : 'network');
+    err.causeName = String(e?.name || 'Error').slice(0, 60); err.causeMessage = String(e?.message || '').slice(0, 300); // the real reason (redacted before it is shown)
+    throw err;
+  }
   finally { clearTimeout(timer); }
 }
 
@@ -25,59 +35,74 @@ export class SupabaseStore {
   constructor({ url, serviceKey, bucket, fetch: f, timeoutMs = PUT_TIMEOUT_MS } = {}) {
     this.name = 'supabase';
     // only the site address matters: a pasted "https://x.supabase.co/rest/v1/" must still work
-    let base = String(url || '').trim();
+    let base = cleanSetting(String(url || ''));
     try { base = new URL(base).origin; } catch { /* leave as typed: health() will say it is not an https address */ }
     this.url = base.replace(/\/+$/, '');
-    this.serviceKey = serviceKey;
-    this.bucket = bucket;
+    this.serviceKey = cleanSetting(serviceKey);
+    this.bucket = cleanSetting(bucket);
     this.fetch = f || ((...a) => globalThis.fetch(...a));
     this.timeoutMs = timeoutMs;
   }
   configured() { return !!(this.url && this.serviceKey && this.bucket); }
   // Supabase's new-style keys (sb_secret_...) are NOT JWTs: they go in the apikey header only (the gateway turns them into a short-lived
   // token for Storage). The legacy service_role key is a JWT (starts with "eyJ") and is also sent as a Bearer token.
+  // The key goes in the apikey header only. If Storage answers that an Authorization header is required, ask once more with the key
+  // also as a Bearer token and remember that for this instance (so it works whichever way Supabase wants the new-style key).
+  async call(url, init, ms) {
+    let r = await timed(this.fetch, url, init, ms);
+    if (!this.bearer && (r.status === 400 || r.status === 401) && !String(this.serviceKey).startsWith('eyJ')) {
+      const said = await r.clone().json().then((j) => String(j.message || j.error || '')).catch(() => '');
+      if (/authorization/i.test(said)) { this.bearer = true; r = await timed(this.fetch, url, { ...init, headers: { ...init.headers, Authorization: `Bearer ${this.serviceKey}` } }, ms); }
+    }
+    return r;
+  }
   headers(extra = {}) {
     const legacyJwt = String(this.serviceKey || '').startsWith('eyJ');
-    return { apikey: this.serviceKey, ...(legacyJwt ? { Authorization: `Bearer ${this.serviceKey}` } : {}), ...extra };
+    return { apikey: this.serviceKey, ...(legacyJwt || this.bearer ? { Authorization: `Bearer ${this.serviceKey}` } : {}), ...extra };
   }
   /** The address without any signature: must be refused (the bucket is private). */
   publicUrl(key) { return `${this.url}/storage/v1/object/public/${this.bucket}/${encodePath(safeKey(key))}`; }
   obj(key, kind = '') { return `${this.url}/storage/v1/object/${kind}${this.bucket}/${encodePath(key)}`; }
   async put(key, bytes, contentType = 'image/png') {
-    const r = await timed(this.fetch, this.obj(safeKey(key)), { method: 'POST', headers: this.headers({ 'Content-Type': contentType, 'x-upsert': 'true' }), body: bytes }, this.timeoutMs);
+    const r = await this.call(this.obj(safeKey(key)), { method: 'POST', headers: this.headers({ 'Content-Type': contentType, 'x-upsert': 'true' }), body: bytes }, this.timeoutMs);
     if (!r.ok) throw new Error(`supabase-put-${r.status}`);
   }
   async get(key) {
-    const r = await timed(this.fetch, this.obj(safeKey(key), 'authenticated/'), { headers: this.headers() }, this.timeoutMs * 3);
+    const r = await this.call(this.obj(safeKey(key), 'authenticated/'), { headers: this.headers() }, this.timeoutMs * 3);
     if (r.status === 404 || r.status === 400) return null;
     if (!r.ok) throw new Error(`supabase-get-${r.status}`);
     return { bytes: new Uint8Array(await r.arrayBuffer()), contentType: r.headers.get('content-type') || 'image/png' };
   }
   async exists(key) {
-    const r = await timed(this.fetch, this.obj(safeKey(key), 'authenticated/'), { method: 'HEAD', headers: this.headers() }, this.timeoutMs);
+    const r = await this.call(this.obj(safeKey(key), 'authenticated/'), { method: 'HEAD', headers: this.headers() }, this.timeoutMs);
     if (r.status === 404 || r.status === 400) return false;
     if (!r.ok) throw new Error(`supabase-head-${r.status}`);
     return true;
   }
   async getSignedUrl(key, ttlSeconds = 86400) {
-    const r = await timed(this.fetch, this.obj(safeKey(key), 'sign/'), { method: 'POST', headers: this.headers({ 'Content-Type': 'application/json' }), body: JSON.stringify({ expiresIn: ttlSeconds }) }, this.timeoutMs);
+    const r = await this.call(this.obj(safeKey(key), 'sign/'), { method: 'POST', headers: this.headers({ 'Content-Type': 'application/json' }), body: JSON.stringify({ expiresIn: ttlSeconds }) }, this.timeoutMs);
     if (!r.ok) throw new Error(`supabase-sign-${r.status}`);
     const { signedURL } = await r.json();
     return signedURL.startsWith('http') ? signedURL : `${this.url}/storage/v1${signedURL}`;
   }
   async delete(key) {
-    const r = await timed(this.fetch, this.obj(safeKey(key)), { method: 'DELETE', headers: this.headers() }, this.timeoutMs);
+    const r = await this.call(this.obj(safeKey(key)), { method: 'DELETE', headers: this.headers() }, this.timeoutMs);
     if (!r.ok && r.status !== 404) throw new Error(`supabase-delete-${r.status}`);
   }
   async health() {
     if (!this.configured()) return { status: 'not-configured' };
     if (!/^https:\/\/[^/]+$/.test(this.url)) return { status: 'failing', detail: 'SUPABASE_URL is not an https address (expected https://<project>.supabase.co)', reason: 'bad url' };
+    const called = `GET ${this.url.replace(/^https:\/\//, '')}/storage/v1/bucket/${encodeURIComponent(this.bucket)}`; // host and path only: never a key
     try {
-      const r = await timed(this.fetch, `${this.url}/storage/v1/bucket/${encodeURIComponent(this.bucket)}`, { headers: this.headers() }, this.timeoutMs);
+      const r = await this.call(`${this.url}/storage/v1/bucket/${encodeURIComponent(this.bucket)}`, { headers: this.headers() }, this.timeoutMs);
       if (r.ok) { const info = await r.json().catch(() => ({})); return { status: 'ok', httpStatus: r.status, detail: info.public === true ? 'bucket found but it is PUBLIC: make it private' : 'bucket found (private)' }; }
-      const reason = r.status === 401 || r.status === 403 ? 'invalid key, or a key type that may not read Storage (use the secret key)' : r.status === 404 || r.status === 400 ? 'bucket not found (check the SUPABASE_BUCKET name)' : `unexpected answer`;
-      return { status: 'failing', httpStatus: r.status, reason, detail: `${r.status} ${reason}` };
-    } catch (e) { return { status: 'failing', reason: e.message === 'timeout' ? 'timeout' : 'network error', detail: e.message === 'timeout' ? 'timeout (no answer within 8 s)' : 'network error (check SUPABASE_URL)' }; }
+      const said = await r.json().then((j) => redact(String(j.message || j.error || ''), [this.serviceKey]).slice(0, 120)).catch(() => '');
+      const reason = r.status === 401 || r.status === 403 ? 'invalid key, or a key type that may not read Storage (use the secret key)' : r.status === 404 ? 'bucket not found (check the SUPABASE_BUCKET name)' : r.status === 400 ? 'rejected (invalid key or bucket name)' : 'unexpected answer';
+      return { status: 'failing', httpStatus: r.status, reason, detail: `${r.status} ${reason}${said ? ` - Supabase said: "${said}"` : ''}`, called, said };
+    } catch (e) {
+      const real = e.causeName ? `${e.causeName}: ${redact(e.causeMessage, [this.serviceKey])}` : redact(e.message, [this.serviceKey]);
+      return { status: 'failing', reason: e.message === 'timeout' ? 'timeout' : 'network error', detail: `${e.message === 'timeout' ? 'timeout (no answer within 8 s)' : 'the request did not complete'} - ${real}`, called, errorName: e.causeName, errorMessage: redact(e.causeMessage, [this.serviceKey]) };
+    }
   }
 }
 
@@ -131,7 +156,10 @@ export class R2Store {
       if (r.ok) return { status: 'ok', httpStatus: r.status, detail: 'bucket found' };
       const reason = r.status === 403 || r.status === 401 ? 'invalid access key or token not allowed on this bucket' : r.status === 404 ? 'bucket not found' : 'unexpected answer';
       return { status: 'failing', httpStatus: r.status, reason, detail: `${r.status} ${reason}` };
-    } catch (e) { return { status: 'failing', reason: e.message, detail: e.message === 'timeout' ? 'timeout' : 'network error' }; }
+    } catch (e) {
+      const real = e.causeName ? `${e.causeName}: ${redact(e.causeMessage, [this.secretAccessKey, this.accessKeyId])}` : e.message;
+      return { status: 'failing', reason: e.message, detail: `${e.message === 'timeout' ? 'timeout' : 'the request did not complete'} - ${real}`, called: `HEAD ${this.host}/${this.bucket}`, errorName: e.causeName };
+    }
   }
 }
 

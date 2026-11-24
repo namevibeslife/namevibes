@@ -152,6 +152,9 @@ export function storageDiagnostics(env = {}) {
   const notes = [];
   if (has('SUPABASE_URL') && !/^https:\/\/[^/\s]+/.test(env.SUPABASE_URL.trim())) notes.push('SUPABASE_URL is present but does not start with https://');
   for (const n of STORAGE_ENV_NAMES) if (has(n) && env[n] !== env[n].trim()) notes.push(`${n} has a space or line break at the start or end: save it again without it`);
+  for (const n of ['SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_URL', 'SUPABASE_BUCKET']) { // stray spaces, line breaks or hidden characters inside the value
+    if (has(n) && !/^[\x21-\x7e]+$/.test(env[n].trim())) notes.push(`${n} contains a space, line break or hidden character inside the value (the server now ignores these, but re-paste it cleanly)`);
+  }
   if (has('SUPABASE_SERVICE_ROLE_KEY')) { // the kind of key only, never the key
     const k = env.SUPABASE_SERVICE_ROLE_KEY.trim();
     const kind = k.startsWith('sb_secret_') ? 'new-style secret key (correct)' : k.startsWith('sb_publishable_') ? 'PUBLISHABLE key (wrong: use the secret key)' : k.startsWith('eyJ') ? 'legacy JWT key' : 'unrecognised format';

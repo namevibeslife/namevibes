@@ -1,7 +1,7 @@
 // Fake Supabase Storage and Cloudflare R2 (S3 API) servers for the tests: one fetch() that answers like both, with switches
 // for outages and hangs and a controllable clock for signed-link expiry. No network, no real account.
 export function makeFakeCloud({ clock = { t: Date.now() } } = {}) {
-  const state = { sb: new Map(), r2: new Map(), sbDown: false, sentBearer: false, r2Down: false, sbHang: false, r2Hang: false, calls: [], tokens: new Map() };
+  const state = { sb: new Map(), r2: new Map(), sbDown: false, sentBearer: false, needBearer: false, r2Down: false, sbHang: false, r2Hang: false, calls: [], tokens: new Map() };
   const KEY = 'sb_secret_svc-key-secret'; // the new-style Supabase key format (not a JWT)
   const hang = (init) => new Promise((_, reject) => init.signal?.addEventListener('abort', () => { const e = new Error('aborted'); e.name = 'AbortError'; reject(e); }));
   const bytesOf = (b) => (b instanceof Uint8Array ? new Uint8Array(b) : new Uint8Array(Buffer.from(String(b || ''))));
@@ -16,6 +16,7 @@ export function makeFakeCloud({ clock = { t: Date.now() } } = {}) {
       const p = decodeURIComponent(u.pathname.replace('/storage/v1/', ''));
       const signedGet = p.startsWith('object/sign/') && method === 'GET';
       if (!signedGet && init.headers?.apikey !== KEY) return respond(401, 'unauthorised');
+      if (!signedGet && state.needBearer && !init.headers?.Authorization) return respond(400, JSON.stringify({ message: "headers must have required property 'authorization'" }));
       if (!signedGet && init.headers?.Authorization) { state.sentBearer = true; } // recorded so a test can assert it is NOT sent for sb_secret_ keys
       let m;
       if ((m = /^bucket\/(.+)$/.exec(p))) return respond(m[1] === 'prints' ? 200 : 404, JSON.stringify({ id: m[1], public: false }));

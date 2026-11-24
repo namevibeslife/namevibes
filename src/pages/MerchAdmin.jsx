@@ -64,7 +64,7 @@ function StoragePanel({ act }) {
     <div className="p-3 bg-white/70 rounded-lg space-y-2" data-testid="storage-panel">
       <h2 className="font-semibold">Print-file storage</h2>
       <ul className="text-sm">
-        {names.map((n) => <li key={n} data-testid={`storage-${n}`} title="HTTP status and reason shown when the storage answered">{BACKEND_LABEL[n] || n}: <strong>{info.backends[n].status === 'not-configured' && names.some((o) => o !== n && info.backends[o].status !== 'not-configured') ? 'backup storage not configured' : (STATUS_LABEL[info.backends[n].status] || info.backends[n].status)}</strong>{info.backends[n].detail ? ` (${info.backends[n].detail})` : ''}{info.primary === n ? ' - first choice' : ''}</li>)}
+        {names.map((n) => <li key={n} data-testid={`storage-${n}`} title="HTTP status and reason shown when the storage answered">{BACKEND_LABEL[n] || n}: <strong>{info.backends[n].status === 'not-configured' && names.some((o) => o !== n && info.backends[o].status !== 'not-configured') ? 'backup storage not configured' : (STATUS_LABEL[info.backends[n].status] || info.backends[n].status)}</strong>{info.backends[n].detail ? ` (${info.backends[n].detail})` : ''}{info.backends[n].called ? <span className="block text-xs font-mono" data-testid={`called-${n}`}>called: {info.backends[n].called}</span> : null}{info.primary === n ? ' - first choice' : ''}</li>)}
       </ul>
       <p className="text-xs" data-testid="last-failover">{info.lastFailover ? `Last failover: ${info.lastFailover.from} -> ${info.lastFailover.to || 'none'} (${info.lastFailover.error})` : 'No failover has happened.'}</p>
       <div className="flex flex-wrap items-center gap-2 text-sm">
