@@ -483,7 +483,8 @@ await step('admin print-file storage panel: backend status, test upload, deletio
   await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin'); await page.goto(`${BASE}/admin/merch`); await page.getByTestId('storage-panel').waitFor();
   await page.getByTestId('storage-r2').waitFor(); assert.match(await page.getByTestId('storage-r2').innerText(), /OK/);
   await page.getByTestId('storage-test').click(); await page.getByTestId('storage-test-result').waitFor();
-  assert.match(await page.getByTestId('storage-test-result').innerText(), /signed download, private bucket and delete all passed/);
+  await page.getByText('ALL PASSED').first().waitFor(); assert.match(await page.getByTestId('storage-test-result').innerText(), /ALL PASSED/);
+  assert.equal(await page.getByTestId('var-SUPABASE_URL').count(), 1); // the settings list (names only) is on the page
   await page.getByTestId('file-dry-run').click(); await page.getByTestId('file-report-result').waitFor();
   assert.ok((await page.getByTestId('file-report-result').innerText()).includes('nothing was deleted'));
 });

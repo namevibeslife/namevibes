@@ -24,7 +24,7 @@ import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
 import { findCod, isCod } from './cod.js';
 import { BLOOD_ASSETS } from './bloodAssets.js';
 import { resolveGateway, GATEWAY_OVERRIDES } from '../data/gatewayCurrencies.js';
-import { uploadFile, checkFileReachable, sweepFiles, fileReport } from './fileOps.js';
+import { uploadFile, checkFileReachable, sweepFiles, fileReport, storageDiagnostics } from './fileOps.js';
 import { sha256Bytes } from './storage/stores.js';
 
 const ok = (body = {}) => ({ status: 200, body });
@@ -850,7 +850,7 @@ export async function handleAdmin(ctx, body) {
   if (action === 'storageHealth') {
     const settings = (await ctx.db.get(`${COLL.settings}/storage`))?.data || {};
     const status = (await ctx.db.get(`${COLL.settings}/storageStatus`))?.data || {};
-    return ok({ backends: ctx.files ? await ctx.files.health() : {}, primary: settings.primary || null, mirror: settings.mirror === true, ttlHours: settings.ttlHours || 24, retentionDays: settings.retentionDays ?? 30, retentionByProduct: settings.retentionByProduct || {}, lastFailover: status.lastFailover || null, configured: ctx.files ? ctx.files.names() : [] });
+    return ok({ backends: ctx.files ? await ctx.files.health() : {}, primary: settings.primary || null, mirror: settings.mirror === true, diagnostics: storageDiagnostics(ctx.env || {}), ttlHours: settings.ttlHours || 24, retentionDays: settings.retentionDays ?? 30, retentionByProduct: settings.retentionByProduct || {}, lastFailover: status.lastFailover || null, configured: ctx.files ? ctx.files.names() : [] });
   }
   if (action === 'storageTest') {
     if (!ctx.files) return fail(503, 'storage-not-configured');
