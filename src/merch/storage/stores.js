@@ -24,7 +24,10 @@ async function timed(fetchFn, url, init, ms) {
 export class SupabaseStore {
   constructor({ url, serviceKey, bucket, fetch: f, timeoutMs = PUT_TIMEOUT_MS } = {}) {
     this.name = 'supabase';
-    this.url = String(url || '').replace(/\/+$/, '');
+    // only the site address matters: a pasted "https://x.supabase.co/rest/v1/" must still work
+    let base = String(url || '').trim();
+    try { base = new URL(base).origin; } catch { /* leave as typed: health() will say it is not an https address */ }
+    this.url = base.replace(/\/+$/, '');
     this.serviceKey = serviceKey;
     this.bucket = bucket;
     this.fetch = f || ((...a) => globalThis.fetch(...a));
@@ -68,11 +71,13 @@ export class SupabaseStore {
   }
   async health() {
     if (!this.configured()) return { status: 'not-configured' };
+    if (!/^https:\/\/[^/]+$/.test(this.url)) return { status: 'failing', detail: 'SUPABASE_URL is not an https address (expected https://<project>.supabase.co)', reason: 'bad url' };
     try {
       const r = await timed(this.fetch, `${this.url}/storage/v1/bucket/${encodeURIComponent(this.bucket)}`, { headers: this.headers() }, this.timeoutMs);
-      if (r.ok) { const info = await r.json().catch(() => ({})); return { status: 'ok', detail: info.public === true ? 'bucket found but it is PUBLIC: make it private' : 'bucket found (private)' }; }
-      return { status: 'failing', detail: r.status === 404 ? 'bucket not found' : `HTTP ${r.status}` };
-    } catch (e) { return { status: 'failing', detail: e.message }; }
+      if (r.ok) { const info = await r.json().catch(() => ({})); return { status: 'ok', httpStatus: r.status, detail: info.public === true ? 'bucket found but it is PUBLIC: make it private' : 'bucket found (private)' }; }
+      const reason = r.status === 401 || r.status === 403 ? 'invalid key, or a key type that may not read Storage (use the secret key)' : r.status === 404 || r.status === 400 ? 'bucket not found (check the SUPABASE_BUCKET name)' : `unexpected answer`;
+      return { status: 'failing', httpStatus: r.status, reason, detail: `${r.status} ${reason}` };
+    } catch (e) { return { status: 'failing', reason: e.message === 'timeout' ? 'timeout' : 'network error', detail: e.message === 'timeout' ? 'timeout (no answer within 8 s)' : 'network error (check SUPABASE_URL)' }; }
   }
 }
 
@@ -123,8 +128,10 @@ export class R2Store {
     if (!this.configured()) return { status: 'not-configured' };
     try {
       const r = await this.request('HEAD', `/${this.bucket}`);
-      return r.ok ? { status: 'ok' } : { status: 'failing', detail: `HTTP ${r.status}` };
-    } catch (e) { return { status: 'failing', detail: e.message }; }
+      if (r.ok) return { status: 'ok', httpStatus: r.status, detail: 'bucket found' };
+      const reason = r.status === 403 || r.status === 401 ? 'invalid access key or token not allowed on this bucket' : r.status === 404 ? 'bucket not found' : 'unexpected answer';
+      return { status: 'failing', httpStatus: r.status, reason, detail: `${r.status} ${reason}` };
+    } catch (e) { return { status: 'failing', reason: e.message, detail: e.message === 'timeout' ? 'timeout' : 'network error' }; }
   }
 }
 

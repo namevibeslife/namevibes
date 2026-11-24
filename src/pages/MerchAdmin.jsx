@@ -57,14 +57,14 @@ function StoragePanel({ act }) {
     if (r.status === 200) { setInfo(r.body); setDays(String(r.body.retentionDays)); }
   }, []);
   useEffect(() => { load().catch(() => {}); }, [load]);
-  const run = async (fn) => { setBusy(true); try { await fn(); } finally { setBusy(false); } };
+  const run = async (fn) => { setBusy(true); try { await fn(); } catch { setTestResult({ error: 'the request failed (see the browser console)' }); } finally { setBusy(false); } };
   if (!info) return <div className="p-3 bg-white/70 rounded-lg" data-testid="storage-panel">Print-file storage: loading...</div>;
   const names = Object.keys(info.backends);
   return (
     <div className="p-3 bg-white/70 rounded-lg space-y-2" data-testid="storage-panel">
       <h2 className="font-semibold">Print-file storage</h2>
       <ul className="text-sm">
-        {names.map((n) => <li key={n} data-testid={`storage-${n}`}>{BACKEND_LABEL[n] || n}: <strong>{info.backends[n].status === 'not-configured' && names.some((o) => o !== n && info.backends[o].status !== 'not-configured') ? 'backup storage not configured' : (STATUS_LABEL[info.backends[n].status] || info.backends[n].status)}</strong>{info.backends[n].detail ? ` (${info.backends[n].detail})` : ''}{info.primary === n ? ' - first choice' : ''}</li>)}
+        {names.map((n) => <li key={n} data-testid={`storage-${n}`} title="HTTP status and reason shown when the storage answered">{BACKEND_LABEL[n] || n}: <strong>{info.backends[n].status === 'not-configured' && names.some((o) => o !== n && info.backends[o].status !== 'not-configured') ? 'backup storage not configured' : (STATUS_LABEL[info.backends[n].status] || info.backends[n].status)}</strong>{info.backends[n].detail ? ` (${info.backends[n].detail})` : ''}{info.primary === n ? ' - first choice' : ''}</li>)}
       </ul>
       <p className="text-xs" data-testid="last-failover">{info.lastFailover ? `Last failover: ${info.lastFailover.from} -> ${info.lastFailover.to || 'none'} (${info.lastFailover.error})` : 'No failover has happened.'}</p>
       <div className="flex flex-wrap items-center gap-2 text-sm">
@@ -75,12 +75,25 @@ function StoragePanel({ act }) {
         <Btn onClick={() => run(async () => { await act('setStorage', { retentionDays: Number(days) }); await load(); })}>Save</Btn>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Btn onClick={() => run(async () => { const r = await admin('storageTest', {}); setTestResult(r.status === 200 ? r.body.results : { error: r.body?.error }); })} data-testid="storage-test">Test upload</Btn>
+        <Btn onClick={() => run(async () => { setTestResult({ running: true }); const r = await admin('storageTest', {}); setTestResult(r.status === 200 ? r.body.results : { error: r.body?.error || `HTTP ${r.status}` }); await load(); })} data-testid="storage-test" disabled={busy}>Test upload</Btn>
         <Btn onClick={() => run(async () => { const r = await admin('fileReport', {}); if (r.status === 200) setReport(r.body); })} data-testid="file-report">Deletion report</Btn>
         <Btn onClick={() => run(async () => { const r = await admin('sweepFiles', { dryRun: true }); if (r.status === 200) setReport({ dry: r.body }); })} data-testid="file-dry-run">Dry run (delete nothing)</Btn>
         <Btn onClick={() => { if (window.confirm('Delete every print file that is due now? This cannot be undone.')) run(async () => { const r = await admin('sweepFiles', { dryRun: false }); if (r.status === 200) setReport({ ran: r.body }); }); }} data-testid="file-sweep" disabled={busy}>Delete due files now</Btn>
       </div>
-      {testResult && <p className="text-sm" data-testid="storage-test-result">{testResult.error ? `Test failed: ${testResult.error}` : Object.entries(testResult).map(([n, r]) => `${BACKEND_LABEL[n] || n}: ${r.ok ? 'write, read, signed download, private bucket and delete all passed' : `FAILED - ${['write', 'read', 'signedDownload', 'privateBucket', 'deleted', 'gone'].filter((s) => r[s] !== true).join(', ')}${r.error ? ` (${r.error})` : ''}`}`).join(' | ')}</p>}
+      <details className="text-xs" open={names.every((n) => info.backends[n].status !== 'ok')} data-testid="storage-diagnostics"><summary className="cursor-pointer">Settings the server can see (names only, no values)</summary>
+        <ul>{Object.entries(info.diagnostics?.vars || {}).map(([n, v]) => <li key={n} data-testid={`var-${n}`}>{n}: <strong className={v === 'present' ? '' : 'text-red-700'}>{v}</strong></li>)}</ul>
+        {(info.diagnostics?.notes || []).map((n) => <p key={n} className="text-amber-800">{n}</p>)}
+        {info.diagnostics?.seenNames?.length > 0 && <p>Other similarly named settings seen (check for typos): {info.diagnostics.seenNames.join(', ')}</p>}
+        <p>If a name shows "missing" here, it is not in the environment this site was deployed with: add it under Production (not only Preview), then redeploy.</p>
+      </details>
+      {testResult?.running && <p className="text-sm" data-testid="storage-test-result">Testing... (write, read, signed download, private check, delete)</p>}
+      {testResult && !testResult.running && testResult.error && <p className="text-sm text-red-700" data-testid="storage-test-result">Test could not run: {testResult.error}</p>}
+      {testResult && !testResult.running && !testResult.error && Object.keys(testResult).length === 0 && <p className="text-sm text-red-700" data-testid="storage-test-result">Nothing to test: no storage backend is configured (see the settings list above).</p>}
+      {testResult && !testResult.running && !testResult.error && Object.keys(testResult).length > 0 && <div className="text-sm" data-testid="storage-test-result">
+        {Object.entries(testResult).map(([n, r]) => <div key={n}><strong>{BACKEND_LABEL[n] || n}: {r.ok ? 'ALL PASSED' : 'FAILED'}</strong>
+          <ul className="ml-4">{[['write', 'Write a tiny PNG'], ['read', 'Read it back'], ['signedDownload', 'Download through a signed link'], ['privateBucket', 'Plain address without signature is refused (private bucket)'], ['deleted', 'Delete it'], ['gone', 'Confirm it is gone']].map(([k, label]) => <li key={k}>{r[k] === true ? 'PASS' : r[k] === false ? 'FAIL' : 'not reached'} - {label}</li>)}</ul>
+          {r.error && <p className="text-red-700">Reason: {r.error}</p>}</div>)}
+      </div>}
       {report && <p className="text-sm" data-testid="file-report-result">
         {report.dry ? `Dry run: ${report.dry.due} file(s) are due for deletion; nothing was deleted.` : report.ran ? `Deleted ${report.ran.deleted}, failed ${report.ran.failed}, were due ${report.ran.due}.` : `Files due now: ${report.due}. Deleted so far: ${report.deleted}. Failed: ${report.failed}.`}
       </p>}

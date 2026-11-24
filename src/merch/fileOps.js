@@ -144,6 +144,24 @@ export async function sweepFiles(ctx, { dryRun = false } = {}) {
   return out;
 }
 
+// ---- safe diagnostics: which settings the running server can see (NAMES only, never values, never lengths) ----------------------
+export const STORAGE_ENV_NAMES = ['SUPABASE_URL', 'SUPABASE_BUCKET', 'SUPABASE_SERVICE_ROLE_KEY', 'R2_ACCOUNT_ID', 'R2_BUCKET', 'R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'MERCH_CRON_SECRET'];
+export function storageDiagnostics(env = {}) {
+  const has = (n) => typeof env[n] === 'string' && env[n].trim().length > 0;
+  const vars = Object.fromEntries(STORAGE_ENV_NAMES.map((n) => [n, has(n) ? 'present' : 'missing']));
+  const notes = [];
+  if (has('SUPABASE_URL') && !/^https:\/\/[^/\s]+/.test(env.SUPABASE_URL.trim())) notes.push('SUPABASE_URL is present but does not start with https://');
+  for (const n of STORAGE_ENV_NAMES) if (has(n) && env[n] !== env[n].trim()) notes.push(`${n} has a space or line break at the start or end: save it again without it`);
+  if (has('SUPABASE_SERVICE_ROLE_KEY')) { // the kind of key only, never the key
+    const k = env.SUPABASE_SERVICE_ROLE_KEY.trim();
+    const kind = k.startsWith('sb_secret_') ? 'new-style secret key (correct)' : k.startsWith('sb_publishable_') ? 'PUBLISHABLE key (wrong: use the secret key)' : k.startsWith('eyJ') ? 'legacy JWT key' : 'unrecognised format';
+    notes.push(`SUPABASE_SERVICE_ROLE_KEY looks like a ${kind}`);
+  }
+  // names that look related but are not one of the exact names above (typos like SUPABASE_KEY): names only
+  const seenNames = Object.keys(env).filter((k) => /supabase|r2_|service_role|storage|cron/i.test(k) && !STORAGE_ENV_NAMES.includes(k)).slice(0, 20);
+  return { vars, notes, seenNames };
+}
+
 /** Counts for the admin report: files due now (dry run), deleted and failed deletions from the log. */
 export async function fileReport(ctx) {
   const dry = await sweepFiles(ctx, { dryRun: true });

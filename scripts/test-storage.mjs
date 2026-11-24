@@ -5,6 +5,7 @@ import { presignUrl } from '../src/merch/storage/sigv4.js';
 import { SupabaseStore, R2Store, MockStore, FailoverStore, createFileStore, validKey } from '../src/merch/storage/stores.js';
 import { readPng } from '../src/merch/storage/png.js';
 import { makeFakeCloud, fakePng } from './fake-storage.mjs';
+import { storageDiagnostics } from '../src/merch/fileOps.js';
 
 let passed = 0, failed = 0;
 const test = async (name, fn) => { try { await fn(); passed++; console.log('  ok  ', name); } catch (e) { failed++; console.log('  FAIL', name, '\n      ', e.message); } };
@@ -113,6 +114,27 @@ await test('delete reports a failing backend (mirrored copy left behind) instead
   const { cloud, store } = fresh({ mirror: true }); const rec = await store.put(KEY, png);
   cloud.state.sbDown = true; const del = await store.delete(rec);
   assert.equal(del.ok, false); assert.equal(del.results.find((r) => r.backend === 'r2').ok, true); assert.equal(del.results.find((r) => r.backend === 'supabase').ok, false);
+});
+await test('Supabase health tells the HTTP status and a short reason: wrong key, wrong bucket, bad address, outage, no network', async () => {
+  const { cloud } = fresh(); const mk = (o = {}) => new SupabaseStore({ url: cloud.env.SUPABASE_URL, serviceKey: cloud.env.SUPABASE_SERVICE_ROLE_KEY, bucket: 'prints', fetch: cloud.fetch, ...o });
+  const ok = await mk().health(); assert.deepEqual([ok.status, ok.httpStatus, ok.detail], ['ok', 200, 'bucket found (private)']);
+  const badKey = await mk({ serviceKey: 'sb_publishable_x' }).health(); assert.deepEqual([badKey.status, badKey.httpStatus], ['failing', 401]); assert.match(badKey.reason, /invalid key/);
+  const noBucket = await mk({ bucket: 'nope' }).health(); assert.deepEqual([noBucket.httpStatus], [404]); assert.match(noBucket.reason, /bucket not found/);
+  assert.equal((await mk({ url: 'http://insecure.example' }).health()).reason, 'bad url');
+  assert.equal((await mk({ url: 'https://sb.test/rest/v1/' }).health()).status, 'ok'); // a pasted address with a path still works
+  cloud.state.sbDown = true; const down = await mk().health(); assert.equal(down.httpStatus, 503); cloud.state.sbDown = false;
+  const offline = await mk({ fetch: async () => { throw new TypeError('fetch failed'); } }).health(); assert.equal(offline.reason, 'network error'); assert.equal(offline.httpStatus, undefined);
+  assert.equal((await mk({ url: '', serviceKey: '' }).health()).status, 'not-configured');
+});
+await test('diagnostics: names only (present/missing), the kind of key but never a value or length; typo names are listed', () => {
+  const env = { SUPABASE_URL: 'https://abc.supabase.co', SUPABASE_BUCKET: 'my-private-bucket', SUPABASE_SERVICE_ROLE_KEY: 'sb_publishable_TOPSECRETVALUE', SUPABASE_KEY: 'x', MERCH_CRON_SECRET: ' padded ' };
+  const d = storageDiagnostics(env); const dump = JSON.stringify(d);
+  assert.equal(d.vars.SUPABASE_URL, 'present'); assert.equal(d.vars.R2_BUCKET, 'missing'); assert.equal(d.vars.SUPABASE_SERVICE_ROLE_KEY, 'present');
+  for (const secret of ['TOPSECRETVALUE', 'my-private-bucket', 'abc.supabase.co', 'padded']) assert.ok(!dump.includes(secret), 'no value leaks: ' + secret);
+  assert.ok(d.notes.some((n) => /PUBLISHABLE key \(wrong/.test(n))); assert.ok(d.notes.some((n) => /MERCH_CRON_SECRET has a space/.test(n)));
+  assert.deepEqual(d.seenNames, ['SUPABASE_KEY']);
+  assert.equal(storageDiagnostics({}).vars.SUPABASE_URL, 'missing'); assert.deepEqual(storageDiagnostics({ SUPABASE_URL: '   ' }).vars.SUPABASE_URL, 'missing');
+  assert.ok(storageDiagnostics({ SUPABASE_SERVICE_ROLE_KEY: 'sb_secret_abc' }).notes.some((n) => /new-style secret key \(correct\)/.test(n)));
 });
 await test('MockStore (dev:mock) behaves like a store', async () => {
   const m = new MockStore('x'); await m.put(KEY, png); assert.equal(await m.exists(KEY), true); await m.delete(KEY); assert.equal(await m.exists(KEY), false);
