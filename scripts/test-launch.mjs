@@ -3,7 +3,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync, readdirSync } from 'node:fs';
 import { createMemoryDb } from '../src/merch/memoryDb.js';
-import { handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset, handleUpload, sweepFiles, fileReport } from '../src/merch/engine.js';
+import { priceFromCost, launchDefaults, handleMerch, handleAdmin, handlePaymentWebhook, runFulfilment, retryDue, applyLaunchPreset, handleUpload, sweepFiles, fileReport } from '../src/merch/engine.js';
 import { createFileStore } from '../src/merch/storage/stores.js';
 import { runCron } from '../src/merch/cronRun.js';
 import { secretMatches } from '../functions/api/merch/cron.js';
@@ -75,10 +75,12 @@ await test('launch preset: India + Qikink, EVERYTHING disabled, global and India
   const india = await g('merch_countries/IN');
   assert.equal(india.enabled, true); assert.equal(india.currency, 'INR'); assert.equal(india.taxPercent, 18); assert.equal(india.taxIncluded, true); assert.equal(india.providerPrimary, 'qikink'); assert.equal(india.gatewayOverride, 'auto'); assert.deepEqual(india.shipping, { flat: 50, freeAbove: 999 }); assert.equal(india.marginFloorPercent, 0);
   assert.deepEqual(india.collections, { name_elements: true, blood_group: true }); assert.ok(india.testSetup);
-  assert.ok(india.prices['poster:A4'] >= 499 && india.prices['poster:A4'] <= 1499 && india.prices['poster:12x18'] <= 1499 && india.prices['acrylic:A4'] >= 799 && india.prices['acrylic:16x24'] <= 2499); assert.equal(india.prices.mug, 299); assert.equal(india.prices['steel-bottle'], 499); assert.equal(india.prices['sipper-bottle'], 599);
+  assert.equal(india.prices['poster:A4'], 1003); assert.equal(india.prices['poster:A3'], 1534); assert.equal(india.prices['acrylic:16x24'], 2832); assert.equal(india.prices.mug, 483); assert.equal(india.prices['steel-bottle'], 1003);
+  assert.equal(india.priceNotes['poster:A4'], 'cost 212, x4 = 850, GST 18% -> 1003'); assert.match(india.priceNotes['steel-bottle'], /GST unconfirmed/); assert.equal(india.prices.tshirt, undefined); assert.equal(india.disabledProducts.tshirt, true); assert.equal(india.disabledProducts.notebook, true); assert.equal(india.disabledProducts.poster, undefined);
+  assert.ok(r.body.notes.some((x) => /tshirt: needs Qikink price/.test(x)) && r.body.notes.some((x) => /12x24/.test(x)));
   assert.deepEqual(india.placeholderPrices, india.prices); // every price is marked as a placeholder until an admin changes it
-  assert.deepEqual(india.taxByProduct, { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 }); // bottle GST is NOT known: left unset
-  assert.equal(india.costs['poster:A4'], 212); assert.equal(india.costs['poster:12x18'], 321); assert.equal(india.costs['acrylic:16x24'], 599); assert.equal(india.costs['acrylic-stand'], 120);
+  assert.deepEqual(india.taxByProduct, { poster: 18, acrylic: 18, 'acrylic-frame': 18, mug: 5 }); // bottle GST is NOT known: left unset
+  assert.equal(india.costs['poster:A4'], 212); assert.equal(india.costs['poster:12x18'], 321); assert.equal(india.costs['acrylic:16x24'], 599);
   assert.equal(india.costs.mug, 115); assert.equal(india.costs['steel-bottle'], 213);
   assert.equal((await g('merch_providers/qikink')).active, true); assert.equal((await g('merch_providers/qikink')).liveEnabled, false); // usable in the sandbox, Live submission OFF
   for (const id of ['poster', 'acrylic', 'mug']) assert.equal((await g(`merch_products/${id}`)).enabled, true, id); // verified print specs (a/b): sellable to admin testers
@@ -108,6 +110,20 @@ await test('launch preset: India + Qikink, EVERYTHING disabled, global and India
   assert.equal((await e.db.list('merch_providers')).length, 1);
   assert.equal(starterSku('poster', 'frame-black', 'A3'), 'UFPos-Bk-A3 Frame poster');
   assert.ok((await e.db.list('merch_audit_logs')).some((l) => l.action === 'admin.applyLaunchPreset'));
+});
+await test('price formula: 4 x Qikink cost rounded to Rs 10, GST on top, rounded to the rupee; mug 5%; unknown GST marked; unknown cost gets no price', () => {
+  const eq = (id, cost, pretax, gst, price) => { const r = priceFromCost(id, cost); assert.deepEqual([r.pretax, r.gst, r.price], [pretax, gst, price], id + ' ' + cost); };
+  eq('poster', 250, 1000, 18, 1180); assert.equal(priceFromCost('poster', 250).note, 'cost 250, x4 = 1000, GST 18% -> 1180');
+  eq('poster', 212, 850, 18, 1003); // 848 rounds to 850; 850 x 1.18 = 1003
+  eq('poster', 173, 690, 18, 814); // 692 -> 690; 814.2 -> 814
+  eq('poster', 188, 750, 18, 885); // 752 -> 750 (rounds down); 885
+  eq('mug', 115, 460, 5, 483); // 5% GST, 483
+  eq('acrylic', 599, 2400, 18, 2832);
+  eq('acrylic', 126, 500, 18, 590); // 504 -> 500; exactly .5 handling not needed
+  const b = priceFromCost('steel-bottle', 213); assert.deepEqual([b.gst, b.gstConfirmed, b.price], [18, false, 1003]); assert.match(b.note, /GST unconfirmed/);
+  for (const bad of [0, undefined, null, NaN, -5, '']) assert.equal(priceFromCost('poster', bad), null);
+  const d = launchDefaults(); assert.equal(d.prices.tshirt, undefined); assert.equal(d.prices['acrylic-stand'], undefined);
+  for (const [k, v] of Object.entries(d.prices)) assert.equal(v, priceFromCost(k.split(':')[0], d.costs[k]).price, k);
 });
 await test('launch preset for admin testing: first run, global ON only because visibility is Admins only, second run changes nothing, a changed value is kept, a non-admin is refused', async () => {
   const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'merch_settings/global': { enabled: false, visibleTo: 'admins' } } });

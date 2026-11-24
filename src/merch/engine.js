@@ -809,28 +809,32 @@ export async function bulkSwitch(ctx, input) {
 const LAUNCH_SETUP_VERSION = 1;
 const blank = (v) => v === undefined || v === null || v === '';
 const roundUp = (n, step) => Math.ceil(n / step) * step;
-export function placeholderPriceFor(productId, cost) {
-  const c = Number(cost) || 0;
-  if (productId === 'poster') return Math.min(1499, Math.max(499, roundUp(c * 2.6 + 120, 50) - 1));
-  if (productId === 'acrylic') return Math.min(2499, Math.max(799, roundUp(c * 2.2 + 150, 50) - 1));
-  if (productId === 'acrylic-frame') return 599;
-  if (productId === 'acrylic-stand') return 149;
-  if (productId === 'mug') return 299;
-  if (productId === 'steel-bottle') return 499;
-  return 599; // sipper bottle, tumbler
+// The owner's starting formula (to be reviewed before launch): pre-tax = 4 x Qikink cost rounded to the nearest Rs 10, then India GST on top,
+// final price (tax included) rounded to the whole rupee. GST: 18% posters / framed posters / acrylic, 5% mugs; anything else uses the country
+// default 18% and is marked "GST unconfirmed". A product or size with no known Qikink cost gets NO price.
+export const PRICE_MULTIPLIER = 4;
+const GST_CONFIRMED = { poster: 18, acrylic: 18, 'acrylic-frame': 18, 'acrylic-stand': 18, mug: 5 };
+export function priceFromCost(productId, cost) {
+  const c = Number(cost); if (!(c > 0)) return null;
+  const pretax = Math.round((c * PRICE_MULTIPLIER) / 10) * 10;
+  const confirmed = GST_CONFIRMED[productId] !== undefined; const gst = confirmed ? GST_CONFIRMED[productId] : 18;
+  const price = Math.round(pretax * (1 + gst / 100));
+  return { cost: c, pretax, gst, gstConfirmed: confirmed, price, note: `cost ${c}, x${PRICE_MULTIPLIER} = ${pretax}, GST ${gst}% -> ${price}${confirmed ? '' : ' (GST unconfirmed)'}` };
 }
 export function launchDefaults() {
-  const costs = {}; const prices = {};
+  const costs = {}; const prices = {}; const notes = {}; const table = []; const needsPrice = [];
   for (const p of Object.values(DEFAULT_PRODUCTS)) {
-    if (!p.standSku && !p.id.match(/^(poster|acrylic|acrylic-frame|mug|steel-bottle|sipper-bottle|tumbler)$/)) continue;
-    for (const size of p.sizes) for (const c of p.colors) {
-      if (c.on === false) continue; const cost = baseCost(p.id, c.id, size); if (!cost) continue;
-      const key = p.sizes.length > 1 ? `${p.id}:${size}` : p.id; // the same keys the admin table shows (one row per size, or one per product)
-      costs[key] = Math.max(costs[key] || 0, cost); prices[key] = placeholderPriceFor(p.id, costs[key]);
+    if (!p.standSku && !p.id.match(/^(poster|acrylic|acrylic-frame|mug|steel-bottle|sipper-bottle|tumbler)$/)) { needsPrice.push(`${p.id}: needs Qikink price`); continue; }
+    for (const size of p.sizes) {
+      let cost = 0; for (const c of p.colors) if (c.on !== false) cost = Math.max(cost, baseCost(p.id, c.id, size) || 0);
+      const key = p.sizes.length > 1 ? `${p.id}:${size}` : p.id; // the same keys the admin table shows
+      const r = priceFromCost(p.id, cost);
+      if (!r) { needsPrice.push(`${key}: needs Qikink price`); continue; }
+      costs[key] = cost; prices[key] = r.price; notes[key] = r.note; table.push({ product: p.id, size, ...r });
     }
   }
-  costs['acrylic-stand'] = ACRYLIC_STAND.base; prices['acrylic-stand'] = placeholderPriceFor('acrylic-stand');
-  return { costs, prices, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 } }; // bottles: GST % NOT known, left for the owner
+  needsPrice.push('acrylic poster with stand (single SKU): needs Qikink price', 'framed sizes 12x24, 14x14, 16x24, 18x24: needs Qikink price (no SKU yet)');
+  return { costs, prices, notes, table, needsPrice, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-frame': 18, mug: 5 } }; // bottles: GST % NOT known, left for the owner
 }
 
 export async function applyLaunchPreset(ctx) {
@@ -870,8 +874,15 @@ export async function applyLaunchPreset(ctx) {
     if (blank(indiaDoc?.shippingCost)) patch.shippingCost = SHIPPING_COST_PLACEHOLDER;
     fillMap('taxByProduct', d.taxByProduct, { label: 'tax by product' });
     fillMap('costs', d.costs, { label: 'cost estimates' });
-    const placed = fillMap('prices', d.prices, { label: 'TEST PRICES', track: true });
-    if (Object.keys(placed).length) patch.placeholderPrices = { ...(indiaDoc?.placeholderPrices || {}), ...placed };
+    const placed = fillMap('prices', d.prices, { label: 'placeholder prices (4 x cost + GST)', track: true });
+    if (Object.keys(placed).length) {
+      patch.placeholderPrices = { ...(indiaDoc?.placeholderPrices || {}), ...placed };
+      patch.priceNotes = { ...(indiaDoc?.priceNotes || {}), ...Object.fromEntries(Object.keys(placed).map((k) => [k, d.notes[k]])) };
+    }
+    const off = { ...(indiaDoc?.disabledProducts || {}) }; let offN = 0;
+    for (const p of Object.values(DEFAULT_PRODUCTS)) if (!Object.keys(d.prices).some((k) => k === p.id || k.startsWith(p.id + ':')) && off[p.id] === undefined) { off[p.id] = true; offN++; }
+    if (offN) { patch.disabledProducts = off; filled.push(`India: ${offN} product(s) with no known Qikink cost left OFF`); }
+    for (const n of d.needsPrice) notes.push(n);
     if (!indiaDoc) { for (const k of Object.keys(patch)) if (patch[k] === undefined) delete patch[k]; }
     if (!indiaDoc || firstRun) patch.testSetup = { at, by: ctx.who?.email || '', version: LAUNCH_SETUP_VERSION, note: 'TEST PRICES: placeholder sell prices and cost estimates for admin sandbox testing; replace before launch' };
     if (!indiaDoc) add(`${COLL.countries}/IN`, patch, 'country India (IN)');
