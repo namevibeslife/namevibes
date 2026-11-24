@@ -14,6 +14,7 @@ import { auth } from '../firebase';
 import { GoogleButton, AppleButton } from '../components/AuthButtons';
 import Logo from '../components/Logo';
 import LanguagePicker from '../components/LanguagePicker';
+import { LANGUAGE_PICKER_ENABLED } from '../config/site';
 import { useTranslation } from 'react-i18next';
 
 const QUIET_CODES = ['auth/popup-closed-by-user', 'auth/cancelled-popup-request'];
@@ -132,7 +133,7 @@ export default function LoginPage() {
           <p className="text-gray-600">{t('auth.tagline')}</p>
         </div>
 
-        <div className="flex justify-center mb-4"><LanguagePicker prominent /></div>
+        {LANGUAGE_PICKER_ENABLED && <div className="flex justify-center mb-4"><LanguagePicker prominent /></div>}
         <h2 className="text-xl font-semibold text-gray-800 text-center mb-5">{title}</h2>
 
         {mode !== 'reset' && (

@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import Logo from './Logo';
 import LanguagePicker from './LanguagePicker';
+import { LANGUAGE_PICKER_ENABLED } from '../config/site';
 import { isPlanActive } from '../utils/plan';
 import { useTranslation } from 'react-i18next';
 import { useMerchStatus } from '../merch/useMerchStatus';
@@ -80,7 +81,7 @@ export default function UserNav() {
           <h2>{t(title)}</h2>
           <div className="site-navigation-links">{links.map(([label, to]) => <NavLink key={to} to={to} end onClick={() => setOpen(false)}>{t(label)}</NavLink>)}</div>
         </section>)}
-        <div className="site-navigation-language"><LanguagePicker /></div>
+        {LANGUAGE_PICKER_ENABLED && <div className="site-navigation-language"><LanguagePicker /></div>}
         {user && <button type="button" onClick={signOut} className="site-signout">{t('nav.signOut')}</button>}
         {error && <p role="alert">{error}</p>}
       </nav>}

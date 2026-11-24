@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import LanguagePicker from '../components/LanguagePicker';
+import { LANGUAGE_PICKER_ENABLED } from '../config/site';
 import { Trash2, AlertTriangle, LogOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -75,10 +76,10 @@ export default function Settings() {
           <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('settings.title')}</h2>
           
           <div className="space-y-4">
-            <div className="border-b border-gray-200 pb-4">
+            {LANGUAGE_PICKER_ENABLED && <div className="border-b border-gray-200 pb-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">{t('nav.language')}</h3>
               <LanguagePicker />
-            </div>
+            </div>}
             <div className="border-b border-gray-200 pb-4">
               <p className="text-sm text-gray-600 mb-1">{t('settings.email')}</p>
               <p className="text-lg font-semibold text-gray-800">{auth.currentUser?.email}</p>

@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { LANGUAGE_PICKER_ENABLED } from '../config/site';
 import { useAuthStore } from '../store/authStore';
 import { isSupported, savedLanguage, setLanguage } from '../i18n';
 import { saveLanguageToProfile } from '../i18n/profileLanguage';
@@ -9,7 +10,7 @@ export default function LanguageSync() {
   const profile = useAuthStore(s => s.profile);
   const uid = useAuthStore(s => s.user?.uid);
   useEffect(() => {
-    if (!uid || !profile) return;
+    if (!LANGUAGE_PICKER_ENABLED || !uid || !profile) return; // picker off: the site stays English, the profile is left alone
     const local = savedLanguage();
     if (!local && isSupported(profile.language)) setLanguage(profile.language);
     else if (local && profile.language !== local) saveLanguageToProfile(local);

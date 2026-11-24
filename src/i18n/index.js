@@ -1,6 +1,7 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import en from '../locales/en.json';
+import { LANGUAGE_PICKER_ENABLED } from '../config/site';
 import { ensureScriptFont, scriptFontFamily } from './fonts';
 
 // Adding a language = adding src/locales/<code>.json (+ src/locales/content/<code>.json).
@@ -48,6 +49,7 @@ function browserLanguage() {
 // saved choice -> (profile language, applied after sign-in) -> detected country (India shows
 // English, with the picker prominent) -> browser language -> English
 async function pickInitialLanguage() {
+  if (!LANGUAGE_PICKER_ENABLED) return { code: DEFAULT_LANGUAGE, chosen: false }; // picker off: English only, saved/detected choices ignored (not deleted)
   const saved = savedLanguage();
   if (saved) return { code: saved, chosen: true };
   let country = null;
@@ -78,6 +80,7 @@ function applyDocument(code) {
 export const languageInfo = (code = i18n.language) => LANGUAGES.find(l => l.code === code) || LANGUAGES[0];
 
 export async function setLanguage(code, { persist = true } = {}) {
+  if (!LANGUAGE_PICKER_ENABLED) { code = DEFAULT_LANGUAGE; persist = false; }
   const lang = await loadLanguage(code);
   const script = languageInfo(lang).script;
   await ensureScriptFont(script, languageInfo(lang).name);
@@ -109,6 +112,6 @@ export async function initI18n() {
 }
 
 // "IN" visitors without a saved choice get a prominent picker
-export const hasChosenLanguage = () => Boolean(savedLanguage());
+export const hasChosenLanguage = () => (LANGUAGE_PICKER_ENABLED ? Boolean(savedLanguage()) : true);
 
 export default i18n;

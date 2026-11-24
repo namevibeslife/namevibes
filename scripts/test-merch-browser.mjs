@@ -41,8 +41,14 @@ await step('changing the language keeps the element symbols unchanged', async ()
   await page.getByTestId('merch-name').fill('Vibes');
   const txt = await page.getByTestId('merch-symbols').innerText();
   assert.match(txt, /V · I · Be · S/);
-  assert.ok(!/Your elements/.test(txt), 'label should be translated');
-  assert.notEqual((await page.getByTestId('product-poster').innerText()).split('\n')[0], 'Framed poster (A4 / A3)', 'product name is translated');
+  const pickerOn = await page.evaluate(async () => (await import('/src/config/site.js')).LANGUAGE_PICKER_ENABLED);
+  if (pickerOn) {
+    assert.ok(!/Your elements/.test(txt), 'label should be translated');
+    assert.notEqual((await page.getByTestId('product-poster').innerText()).split('\n')[0], 'Framed poster (A4 / A3)', 'product name is translated');
+  } else {
+    assert.ok(/Your elements/.test(txt), 'picker is switched off: the site stays English even with a saved language');
+    assert.equal(await page.evaluate(() => document.documentElement.lang), 'en');
+  }
   const heads = await page.evaluate(async () => { const D = await import('/src/merch/designs.js'); const F = await import('/src/merch/framePaint.js'); const r = await F.renderFrameCanvas({ design: D.buildDesign('name_elements', { frame: 'elements-gold', name: 'Vibes' }).design, width: 600, height: 848 }); return r.metrics.map((m) => m.text); });
   assert.ok(heads.includes('THE CHEMISTRY OF YOUR NAME') && heads.includes('ELEMENTS IN YOUR NAME'), 'poster headings stay exactly as specified in a translated UI');
   await page.evaluate(() => localStorage.setItem('nv_lang', 'en'));
