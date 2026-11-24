@@ -59,3 +59,8 @@ If a service's secrets are missing it simply shows "not configured"; nothing cra
 
 ## Not tested against the real services
 Real Supabase and real R2 (only fakes), the signed links being accepted by Qikink's servers, and bucket lifecycle rules.
+
+## Update 24 November 2026 (evening)
+- **Supabase key format:** the new-style secret key (`sb_secret_...`) is not a JWT, so it is sent in the `apikey` header only; a legacy JWT service_role key is also sent as a Bearer token. This is covered by a fake-server test; it has NOT been run against the real Supabase from here (the key exists only in Cloudflare). The admin "Test upload" button does the real check: it writes a 1x1 PNG, reads it back, downloads it through a signed link, confirms the plain unsigned address is refused (private bucket), deletes it and confirms it is gone, and reports each step pass/fail without showing any key or link.
+- R2 is optional: with its variables missing it is skipped cleanly (no mirroring, no failover) and the admin panel says "backup storage not configured".
+- **Daily deletion:** `.github/workflows/merch-cron.yml` calls `/api/merch/cron` once a day (03:17 UTC) and can be run by hand from the GitHub Actions tab. Secret name in BOTH places: `MERCH_CRON_SECRET` - GitHub: repository -> Settings -> Secrets and variables -> Actions -> New repository secret; Cloudflare: Pages project -> Settings -> Variables and Secrets (Production) -> add a secret with the same name and the same value.
