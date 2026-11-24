@@ -358,7 +358,8 @@
     "menu": "Menu",
     "signOut": "Sign Out",
     "merch": "Merchandise",
-    "adminMerch": "Merchandise admin"
+    "adminMerch": "Merchandise admin",
+    "bloodGroup": "Blood Group"
   },
   "dashboard": {
     "welcome": "👋 Welcome, {{name}}!",
@@ -1323,7 +1324,12 @@
       "tshirt": "T-shirt",
       "mug": "Blood Group Mug (11 oz)",
       "notebook": "Notebook",
-      "poster": "Framed poster (A4 / A3)"
+      "poster": "Framed poster",
+      "acrylic": "Acrylic poster",
+      "acrylic-frame": "Acrylic photo frame with stand",
+      "steel-bottle": "Steel water bottle (750 ml)",
+      "sipper-bottle": "Sipper bottle (750 ml)",
+      "tumbler": "Tumbler (20 oz)"
     },
     "color": {
       "white": "White",
@@ -1338,7 +1344,20 @@
       "frame-yellow": "Yellow frame",
       "frame-green": "Bottle green frame",
       "frame-royal-blue": "Royal blue frame",
-      "frame-olive": "Olive green frame"
+      "frame-olive": "Olive green frame",
+      "colour-green": "Green inside",
+      "colour-skyblue": "Sky blue inside",
+      "colour-orange": "Orange inside",
+      "colour-black": "Black inside",
+      "colour-darkblue": "Dark blue inside",
+      "colour-red": "Red inside",
+      "colour-yellow": "Yellow inside",
+      "colour-lightpink": "Light pink inside",
+      "magic-black": "Magic mug, Black",
+      "magic-red": "Magic mug, Red",
+      "magic-green": "Magic mug, Green",
+      "magic-royalblue": "Magic mug, Royal blue",
+      "enamel-white": "Enamel mug, White"
     },
     "err": {
       "generic": "Something went wrong. Please try again.",
@@ -1364,7 +1383,11 @@
       "frame-design-off": "This poster design is not available right now.",
       "frame-design-unavailable": "This design is only for framed posters.",
       "people-required": "Enter at least one name.",
-      "too-many-people": "A family poster holds at most 4 members."
+      "too-many-people": "A family poster holds at most 4 members.",
+      "design-source-off": "This kind of design is not available for this product.",
+      "design-hidden": "This design is not available right now.",
+      "stand-unavailable": "The display stand is not available for this item.",
+      "text-too-small": "At this size the smallest text would print only {{mm}} mm high, too small to read. Choose a larger size or a design with fewer elements."
     },
     "cart": {
       "title": "Your cart",
@@ -1440,6 +1463,18 @@
     "familyName": "Family name (optional)",
     "memberName": "Member {{n}} name",
     "memberRelation": "Relation (optional)",
-    "addMember": "Add a family member"
+    "addMember": "Add a family member",
+    "blood": {
+      "title": "Blood Group designs",
+      "intro": "Choose a design, then the product you want it on.",
+      "designLabel": "Blood group {{group}}",
+      "choose": "Choose a product",
+      "pick": "Choose",
+      "from": "From {{price}}",
+      "none": "No products carry this design yet.",
+      "notAvailable": "This design is not available right now."
+    },
+    "addStand": "Add display stand (+{{price}})",
+    "stand": "display stand"
   }
 }

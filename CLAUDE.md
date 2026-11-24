@@ -369,3 +369,10 @@ The user explicitly authorized pushing to GitHub and deploying the existing prod
 - `Claude outputs/`, `vibes templates/`, and `artifacts/` contain local reference/verification assets. Do not add them indiscriminately to a deployment commit.
 - An untracked `push-to-github.bat` appeared during this session. It was inspected but not run or modified. It copies broad folder contents and deletes a temporary checkout; prefer pushing this Git checkout directly.
 - Never print or commit credentials, `.env` files, or tokens. Do not reset or overwrite unrelated local changes when completing deployment.
+
+## Full merchandise catalogue - 24 November 2026 (branch `merch`, NOT pushed or deployed; see docs/launch-scope.md)
+
+- Everything starts DISABLED. A product can only be switched on (single or bulk, server-enforced, reason `not-ready`) when its printSpec (print type, placement, per-size print area) is complete AND `verified`. Only the white 11 oz mug is verified (sandbox-confirmed). Catalogue in `src/merch/catalog.js`: 9 framed sizes, 6 acrylic sizes + separate-line "Add stand", acrylic frame AF22, mugs (white on; other styles admin-enableable), steel/sipper bottles, tumbler. Bottle GST unknown: unset, so bottles cannot be quoted.
+- Design sources (`designSources`, server-checked in `checkAvailability`): mugs/bottles Bloodline only; posters Elements, Bloodline off until admin enables. Admin shows/hides each of 8 blood designs (`setBloodDesign`, `merch_settings/bloodDesigns.hidden`); `/merch` blood group shop page (`BloodGroupShop.jsx`). Per-variant prices/costs/tax via keys `product`, `product:size`, `product:size:color`. Admin variant table warns when price <= cost + shipping + tax.
+- Stand add-on = second Qikink line item (`print_type_id 1`, no design). Layouts fit any aspect ratio, min text 1.5 mm, DPI refusal.
+- Tests: test:merch 34+35, test:qikink 24, test:placement 14, test:launch 29, browser 20 steps, payments/commission/i18n/build pass. Not tested against real Qikink: posters, acrylic, stand, frame, bottles (print types/areas unknown).

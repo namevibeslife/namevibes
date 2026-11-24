@@ -11,11 +11,11 @@
 //   ctx.now() / ctx.id()
 // Every handler returns { status, body } and never throws for expected failures.
 import { COLL, STATES, TRANSITIONS, PAID_STATES, QUOTE_TTL_MS, MAX_QTY_PER_ITEM, MAX_ITEMS_PER_ORDER, MAX_FULFILMENT_ATTEMPTS, COLLECTION_IDS, NAME_ALGORITHM_VERSION } from './constants.js';
-import { buildDesign, bloodGroupSlug, applyTemplate } from './designs.js';
-import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS, starterSku } from './catalog.js';
+import { buildDesign, bloodGroupSlug, applyTemplate, BLOOD_GROUPS } from './designs.js';
+import { mergeProducts, findVariantOptions, variantId, DEFAULT_PRODUCTS, starterSku, baseCost, colorsFor, isFrameKind, ACRYLIC_STAND } from './catalog.js';
 import { checkAvailability, routeProvider, validateAddress, normaliseAddress } from './availability.js';
-import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS, DEFAULT_INSET_MM, MAX_INSET_MM, artworkInches } from './frames.js';
-import { FULL_LAYOUT, normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
+import { FRAME_IDS, DEFAULT_FRAME, DEFAULT_FRAME_DESIGNS, DEFAULT_INSET_MM, MAX_INSET_MM, artworkInches, minTextMm, MIN_TEXT_MM } from './frames.js';
+import { FULL_LAYOUT, normaliseLayout, defaultLayoutFor, effectiveSpec, specProblems, specComplete, sizeReady, readySizes, readiness, designDpi, resolutionStatus, maxScaleForDpi } from './layout.js';
 import { computeQuote, lookupBySize, taxRateFor } from './quoteMath.js';
 import { computeOrderCommission, reversalAmount } from './commission.js';
 import { PROVIDER_STATUS_TO_STATE } from './providers/base.js';
@@ -31,13 +31,15 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 // ---- config loading -------------------------------------------------------------------------------
 
 export async function loadConfig(db) {
-  const [settings, countries, providers, products, routes] = await Promise.all([
-    db.get(`${COLL.settings}/global`), db.list(COLL.countries), db.list(COLL.providers), db.list(COLL.products), db.list(COLL.routes)
+  const bloodDesigns = (await db.get(`${COLL.settings}/bloodDesigns`))?.data || {};
+  const [settings, countries, providers, products, routes, variants] = await Promise.all([
+    db.get(`${COLL.settings}/global`), db.list(COLL.countries), db.list(COLL.providers), db.list(COLL.products), db.list(COLL.routes), db.list(COLL.variants)
   ]);
   return {
     settings: settings?.data || { enabled: false },
     countries: countries.map((c) => ({ ...c, countryCode: c.countryCode })),
-    providers, routes,
+    providers, routes, bloodDesigns,
+    variants: Object.fromEntries(variants.filter((v) => v?.id).map((v) => [v.id, v])),
     products: mergeProducts(products)
   };
 }
@@ -69,16 +71,39 @@ export async function handleCatalogue(ctx, body) {
   for (const col of COLLECTION_IDS) out.collections[col] = country.collections?.[col] === true;
   out.products = Object.values(cfg.products)
     .filter((p) => COLLECTION_IDS.some((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok))
-    .map((p) => ({
-      id: p.id, kind: p.kind, sizes: p.sizes, colors: p.colors, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true, designInsetMm: p.kind === 'wall-art' ? (Number.isFinite(Number(p.designInsetMm)) ? Number(p.designInsetMm) : DEFAULT_INSET_MM) : undefined, frames: p.kind === 'wall-art' ? { ...DEFAULT_FRAME_DESIGNS, ...(p.frameDesigns || {}) } : undefined, price: country.prices[p.id], prices: Object.fromEntries(p.sizes.map((sz) => [sz, lookupBySize(country.prices, p.id, sz)]).filter(([, v]) => v > 0)),
-      collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
-    }));
+    .map((p) => {
+      // only sizes with a verified print area, and within them only the colours that are switched on and priced
+      const colorsBySize = {}; const variantPrices = {}; const prices = {};
+      for (const sz of readySizes(p)) {
+        const cols = colorsFor(p, sz, cfg.variants).filter((c) => lookupBySize(country.prices, p.id, sz, c.id) > 0);
+        if (!cols.length) continue;
+        colorsBySize[sz] = cols.map(({ id, hex }) => ({ id, hex }));
+        for (const c of cols) variantPrices[`${sz}|${c.id}`] = lookupBySize(country.prices, p.id, sz, c.id);
+        prices[sz] = variantPrices[`${sz}|${cols[0].id}`];
+      }
+      const sizes = Object.keys(colorsBySize);
+      const stand = p.standSku ? lookupBySize(country.prices, `${p.id}-stand`, undefined) : undefined;
+      return {
+        id: p.id, kind: p.kind, category: p.category, sizes, colors: p.colors, colorsBySize, placements: p.placements, printSpec: p.printSpec, dpiOverride: p.dpiOverride === true,
+        designInsetMm: isFrameKind(p.kind) ? insetFor(p) : undefined, frames: isFrameKind(p.kind) ? { ...DEFAULT_FRAME_DESIGNS, ...(p.frameDesigns || {}) } : undefined,
+        price: prices[sizes[0]], prices, variantPrices, standPrice: stand > 0 ? stand : undefined,
+        collections: p.collections.filter((col) => out.collections[col] && checkAvailability({ settings: cfg.settings, country, product: p, collection: col }).ok)
+      };
+    })
+    .filter((p) => p.sizes.length > 0);
+  // Bloodline designs: a design is shown only if admin has not hidden it AND at least one available product carries it
+  const bloodProducts = out.products.filter((p) => p.collections.includes('blood_group')).map((p) => p.id);
+  out.bloodDesigns = BLOOD_GROUPS.map((code) => ({ code, slug: bloodGroupSlug(code), visible: cfg.bloodDesigns.hidden?.[code] !== true && bloodProducts.length > 0, products: bloodProducts }))
+    .filter((d) => d.visible).map(({ code, slug, products }) => ({ code, slug, products }));
   return ok(out);
 }
 
 // ---- quote ------------------------------------------------------------------------------------------
 
-const ERRORS_BLOCKED = { 'global-off': 'merch-off', 'country-off': 'merch-country-off', 'collection-off': 'merch-collection-off', 'product-off': 'merch-product-off', 'product-collection': 'merch-product-off', 'no-pricing': 'merch-product-off', 'print-area-missing': 'merch-product-off' };
+// The inset default is per product (framed posters 10 mm, acrylic 0); admin can change it.
+const insetFor = (p) => (Number.isFinite(Number(p.designInsetMm)) ? Number(p.designInsetMm) : Number.isFinite(Number(p.defaultInsetMm)) ? Number(p.defaultInsetMm) : DEFAULT_INSET_MM);
+
+const ERRORS_BLOCKED = { 'design-source-off': 'design-source-off', 'print-area-unverified': 'merch-product-off', 'global-off': 'merch-off', 'country-off': 'merch-country-off', 'collection-off': 'merch-collection-off', 'product-off': 'merch-product-off', 'product-collection': 'merch-product-off', 'no-pricing': 'merch-product-off', 'print-area-missing': 'merch-product-off' };
 
 // Validates every line, routes one provider for the whole order, recomputes the price. Used by quote AND
 // re-run at checkout and before fulfilment, so the answer is never taken from the browser.
@@ -107,16 +132,22 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     if (!opts.colorOk || !opts.sizeOk) return fail(400, 'bad-variant');
     // Framed posters use a "frame design" (Elements Gold by default). Which ones are on is a per-product admin option.
     let input = raw.design || {};
-    if (!skipDesign && product.kind === 'wall-art' && collection === 'name_elements') input = { frame: DEFAULT_FRAME, ...input };
+    if (!skipDesign && isFrameKind(product.kind) && collection === 'name_elements') input = { frame: DEFAULT_FRAME, ...input };
     if (!skipDesign && input.frame) {
-      if (product.kind !== 'wall-art') return fail(400, 'frame-design-unavailable');
+      if (!isFrameKind(product.kind)) return fail(400, 'frame-design-unavailable');
       if (FRAME_IDS.includes(input.frame) && !(product.frameDesigns?.[input.frame] ?? DEFAULT_FRAME_DESIGNS[input.frame])) return fail(409, 'frame-design-off', { frame: input.frame });
     }
     const built = skipDesign ? { design: raw.design } : buildDesign(collection, input);
     if (built.error) return fail(400, built.error);
+    if (collection === 'blood_group' && cfg.bloodDesigns.hidden?.[built.design.bloodGroup] === true) return fail(409, 'design-hidden');
     const design = skipDesign ? built.design : applyTemplate(built.design, product);
 
-    const vdoc = (await ctx.db.get(`${COLL.variants}/${variantId(product.id, raw.color, raw.size)}`))?.data;
+    const vdoc = cfg.variants[variantId(product.id, raw.color, raw.size)];
+    const colorOn = product.colors.find((c) => c.id === raw.color)?.on;
+    if ((vdoc?.enabled ?? colorOn) === false) return fail(409, 'merch-product-off', { reason: 'variant-off' });
+    const ready = sizeReady(product, raw.size);
+    if (!ready.ok) return fail(409, 'merch-product-off', { reason: ready.reason, problems: ready.problems });
+    if (product.taxUnverified && lookupBySize(country.taxByProduct, product.id, raw.size, raw.color) === undefined) return fail(409, 'merch-product-off', { reason: 'tax-not-set' });
     const route = cfg.routes.find((r) => r.countryCode === country.countryCode && r.productId === product.id);
     const routed = routeProvider({ providers: cfg.providers, country, product, variantMap: vdoc, route, exclude: providerId ? [] : [] });
     if (!routed.provider) return fail(409, 'no-provider', { rejected: routed.rejected });
@@ -137,21 +168,38 @@ export async function priceItems(ctx, cfg, rawItems, address, { skipDesign = fal
     if (status === 'blocked' && product.dpiOverride !== true) {
       return fail(409, 'resolution-too-low', { dpi: res.dpi, minDpi: Number(spec.minDpi), maxScale: +maxScaleForDpi({ design: design, spec, minDpi: Number(spec.minDpi) }).toFixed(2) });
     }
-    const unitPrice = lookupBySize(country.prices, product.id, raw.size);
+    const unitPrice = lookupBySize(country.prices, product.id, raw.size, raw.color);
     if (!(unitPrice > 0)) return fail(409, 'merch-product-off', { reason: 'no-pricing' });
     // Frame designs are printed inset from the frame on every side (product setting, default 10 mm). The print file stays the full print area;
     // we record the artwork size, the inset and which rule applied (the stricter of the print area and the frame minus the inset).
-    const insetMm = design.template === 'frame' ? (Number.isFinite(Number(product.designInsetMm)) ? Number(product.designInsetMm) : DEFAULT_INSET_MM) : null;
+    const insetMm = design.template === 'frame' ? insetFor(product) : null;
     const artwork = insetMm === null ? null : artworkInches({ areaInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) }, size: raw.size, insetMm });
+    // Optional "Add stand" (acrylic): a SEPARATE Qikink line item (the stand SKU, same quantity), priced as its own quote line.
+    let stand = null;
+    if (raw.addStand === true) {
+      const standPrice = product.standSku ? lookupBySize(country.prices, `${product.id}-stand`) : undefined;
+      if (!product.standSku || !(standPrice > 0)) return fail(409, 'stand-unavailable');
+      stand = { standSku: product.standSku, standPrice, standCost: lookupBySize(country.costs, `${product.id}-stand`) ?? 0, standTaxPercent: taxRateFor(country, `${product.id}-stand`, undefined, undefined) };
+      if (country.taxByProduct?.[`${product.id}-stand`] === undefined) stand.standTaxPercent = taxRateFor(country, product.id, raw.size, raw.color);
+    }
+    // the smallest printed text must stay readable on every size and ratio (the design is laid out inside the area, never scaled down after)
+    if (artwork) { const fit = minTextMm(design, artwork.artworkInches); if (!fit.ok && product.minTextOverride !== true) return fail(409, 'text-too-small', { size: raw.size, minMm: +fit.mm.toFixed(2), needMm: MIN_TEXT_MM, where: fit.where }); }
     items.push({
+      ...(stand ? { addStand: true, ...stand } : {}),
       productId: product.id, collection, color: raw.color, size: raw.size, qty, design: design, layout,
       canvasInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) },
       ...(artwork ? { designInsetMm: insetMm, artworkInches: artwork.artworkInches, insetApplied: artwork.applied } : {}),
       placementSku: spec.allowedPlacements[0], printTypeId: Number(spec.printTypeId), minDpi: Number(spec.minDpi), dpi: res.dpi, resolution: status,
-      providerSku: mapping, unitPrice, unitCost: lookupBySize(country.costs, product.id, raw.size) ?? 0, taxPercent: taxRateFor(country, product.id)
+      providerSku: mapping, unitPrice, unitCost: lookupBySize(country.costs, product.id, raw.size, raw.color) ?? 0, taxPercent: taxRateFor(country, product.id, raw.size, raw.color)
     });
   }
-  const quote = computeQuote({ lines: items.map((i) => ({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice, unitCost: i.unitCost, taxPercent: i.taxPercent })), country });
+  const lines = [];
+  for (const i of items) {
+    i.lineIndex = lines.length;
+    lines.push({ productId: i.productId, qty: i.qty, unitPrice: i.unitPrice, unitCost: i.unitCost, taxPercent: i.taxPercent });
+    if (i.addStand) { i.standLineIndex = lines.length; lines.push({ productId: `${i.productId}-stand`, qty: i.qty, unitPrice: i.standPrice, unitCost: i.standCost, taxPercent: i.standTaxPercent }); }
+  }
+  const quote = computeQuote({ lines, country });
   // Costs and shipping are admin-configured (no provider quote API), and a sale below the configured margin floor is refused.
   quote.source = 'configured';
   const floor = Number(country.marginFloorPercent);
@@ -293,8 +341,9 @@ async function createCommission(ctx, order) {
   if (!order.referral?.ambassadorEmail) return;
   const policy = (await ctx.db.get(`${COLL.settings}/commission`))?.data;
   const lines = order.items.map((i) => {
-    const line = order.totals.lines[i.index];
-    const share = order.totals.items > 0 ? line.lineTotal / order.totals.items : 0;
+    const line = order.totals.lines[i.lineIndex ?? i.index];
+    const standTotal = i.standLineIndex !== undefined ? order.totals.lines[i.standLineIndex].lineTotal : 0;
+    const share = order.totals.items > 0 ? (line.lineTotal + standTotal) / order.totals.items : 0;
     const margin = order.totals.estimatedMargin * share;
     return { productId: i.productId, collection: i.collection, qty: i.qty, lineMargin: margin };
   });
@@ -397,13 +446,13 @@ export async function runFulfilment(ctx, orderId, { force = false } = {}) {
   const products = mergeProducts(await ctx.db.list(COLL.products));
   const payload = {
     idempotencyKey: ff.idempotencyKey, orderId, attempt: attempts, paymentMethod: 'prepaid', address: order.address, email: order.email, currency: order.currency, totalValue: order.amount,
-    items: await Promise.all(order.items.map(async (i) => ({
+    items: (await Promise.all(order.items.map(async (i) => [{
       index: i.index, productId: i.productId, color: i.color, size: i.size, qty: i.qty, unitPrice: i.unitPrice, providerSku: i.providerSku, placement: 'default',
       layout: i.layout, canvasInches: i.canvasInches, placementSku: i.placementSku, printTypeId: i.printTypeId,
       designUrl: await ctx.artworkUrl(order, i, 'print'), designSha256: i.artwork.sha256,
       // a real mock-up when the browser made one; otherwise the print file (recorded below as the fallback)
       mockupUrl: i.mockup ? await ctx.artworkUrl(order, i, 'mockup') : null
-    })))
+    }, ...(i.addStand ? [{ index: `${i.index}s`, productId: `${i.productId}-stand`, qty: i.qty, unitPrice: i.standPrice, printTypeId: 1, providerSku: { sku: i.standSku, printTypeId: 1, plain: true } }] : [])]))).flat()
   };
   let res;
   try { res = await adapter.submitOrder(payload); } catch (e) { res = { ok: false, error: 'exception', retryable: true }; }
@@ -608,12 +657,15 @@ const ADMIN_ACTIONS = {
   },
   async setProduct(ctx, b) {
     if (!/^[a-z0-9_-]{2,30}$/.test(String(b.id || ''))) return { error: 'bad-product-id' };
-    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections', 'frameDesigns', 'designInsetMm']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
+    const patch = { id: b.id, ...pick(b, ['kind', 'sizes', 'colors', 'placements', 'printSpec', 'collections', 'frameDesigns', 'designInsetMm', 'designSources']), dpiOverride: b.dpiOverride === true, enabled: b.enabled !== false, updatedAt: ctx.now() };
     if (b.designInsetMm !== undefined && b.designInsetMm !== null && b.designInsetMm !== '' && !(Number(b.designInsetMm) >= 0 && Number(b.designInsetMm) <= MAX_INSET_MM)) return { error: 'bad-inset' };
     if (patch.designInsetMm !== undefined) patch.designInsetMm = patch.designInsetMm === '' || patch.designInsetMm === null ? DEFAULT_INSET_MM : Number(patch.designInsetMm);
-    // The switch may be ON with the spec still missing: availability.js keeps such a product blocked ("enabled but blocked").
-    // A spec that IS given must be valid, though (documented DTG/DTF limits, known print type, placement codes).
-    if (b.printSpec && specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes).length) return { error: 'print-spec-invalid', problems: specProblems(b.printSpec, b.sizes || DEFAULT_PRODUCTS[b.id]?.sizes) };
+    // A spec that is given must be valid (documented DTG/DTF limits, known print type, placement codes).
+    // Switching a product ON needs a complete AND verified print spec (confirmed from Qikink); nothing unverified is ever enabled.
+    // a per-size spec may be filled in size by size: only the sizes given are checked here (readiness decides what is sellable)
+    const given = b.printSpec?.perSize ? Object.keys(b.printSpec.bySize || {}) : undefined;
+    if (b.printSpec && specProblems(b.printSpec, given).length) return { error: 'print-spec-invalid', problems: specProblems(b.printSpec, given) };
+    if (patch.enabled) { const cur = (await loadConfig(ctx.db)).products[b.id] || {}; const r = readiness({ ...cur, ...pick(b, ['printSpec', 'sizes']) }); if (!r.ok) return { error: 'not-ready', reason: r.reason, problems: r.problems }; }
     return { path: `${COLL.products}/${b.id}`, patch };
   },
   async setRoute(ctx, b) {
@@ -650,6 +702,8 @@ export async function bulkSwitch(ctx, input) {
     if (!ids.length) return { error: 'nothing-selected' };
     for (const id of ids) {
       if (!cfg.products[id]) return { error: 'unknown-product' };
+      // nothing unverified is ever switched on
+      if (enabled) { const r = readiness(cfg.products[id]); if (!r.ok) return { error: 'not-ready', productId: id, reason: r.reason }; }
       if (input.countryCode) {
         const cc = String(input.countryCode).toUpperCase();
         const c = countryDocs[cc];
@@ -697,24 +751,32 @@ export async function applyLaunchPreset(ctx) {
   const putIfAbsent = async (path, data) => { if (!(await ctx.db.get(path))) { await ctx.db.patch(path, { ...data, createdAt: ctx.now() }); created.push(path); } };
   await putIfAbsent(`${COLL.settings}/global`, { enabled: false, message: '' });
   await putIfAbsent(`${COLL.providers}/qikink`, { id: 'qikink', name: 'Qikink', adapter: 'qikink', active: false, liveEnabled: false, countries: ['IN'], products: [] });
+  // Qikink base prices become our cost estimates (editable); NO selling prices are set, so nothing can be sold until the owner prices it.
+  const costs = {}; const taxByProduct = { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 }; // bottles: GST % NOT known, left for the owner
+  for (const p of Object.values(DEFAULT_PRODUCTS)) {
+    if (!p.standSku && !p.id.match(/^(poster|acrylic|acrylic-frame|mug|steel-bottle|sipper-bottle|tumbler)$/)) continue;
+    for (const size of p.sizes) for (const c of p.colors) { const cost = baseCost(p.id, c.id, size); if (cost) costs[p.id === 'mug' || p.id.endsWith('bottle') || p.id === 'tumbler' ? `${p.id}:${size}:${c.id}` : `${p.id}:${size}`] = cost; }
+  }
+  costs['acrylic-stand'] = ACRYLIC_STAND.base;
   await putIfAbsent(`${COLL.countries}/IN`, {
-    countryCode: 'IN', enabled: false, currency: 'INR', taxPercent: 18, taxIncluded: true, taxByProduct: { poster: 18, mug: 5 },
-    collections: { name_elements: true, blood_group: true }, prices: {}, costs: {}, disabledProducts: { tshirt: true, notebook: true },
+    countryCode: 'IN', enabled: false, currency: 'INR', taxPercent: 18, taxIncluded: true, taxByProduct,
+    collections: { name_elements: true, blood_group: true }, prices: {}, costs, disabledProducts: {},
     shipping: { flat: 0, freeAbove: 0 }, paymentFeePercent: 0, marginFloorPercent: 0, providerPrimary: 'qikink', providerBackup: null, gatewayOverride: 'auto'
   });
-  for (const [id, on] of [['poster', true], ['mug', true], ['tshirt', false], ['notebook', false]]) await putIfAbsent(`${COLL.products}/${id}`, { id, enabled: on, ...(id === 'poster' ? { frameDesigns: { ...DEFAULT_FRAME_DESIGNS } } : {}) });
-  for (const p of ['poster', 'mug']) {
-    const prod = DEFAULT_PRODUCTS[p];
-    for (const c of prod.colors) for (const size of prod.sizes) {
-      const id = variantId(p, c.id, size);
-      await putIfAbsent(`${COLL.variants}/${id}`, { id, productId: p, color: c.id, size, enabled: true, providerSkus: { qikink: { sku: starterSku(p, c.id, size), unverified: true } } });
+  for (const p of Object.values(DEFAULT_PRODUCTS)) await putIfAbsent(`${COLL.products}/${p.id}`, { id: p.id, enabled: false, ...(isFrameKind(p.kind) ? { frameDesigns: { ...DEFAULT_FRAME_DESIGNS } } : {}) });
+  for (const p of Object.values(DEFAULT_PRODUCTS)) {
+    if (!['poster', 'acrylic', 'acrylic-frame', 'mug', 'steel-bottle', 'sipper-bottle', 'tumbler'].includes(p.id)) continue;
+    for (const size of p.sizes) for (const c of colorsFor(p, size, {}).concat(p.colors.filter((x) => x.on === false && !colorsFor(p, size, {}).some((y) => y.id === x.id)))) {
+      const sku = starterSku(p.id, c.id, size); if (!sku) continue;
+      const id = variantId(p.id, c.id, size);
+      await putIfAbsent(`${COLL.variants}/${id}`, { id, productId: p.id, color: c.id, size, enabled: c.on !== false, providerSkus: { qikink: { sku, unverified: true } } });
     }
   }
-  await audit(ctx, 'admin.applyLaunchPreset', 'launch', { created });
+  await audit(ctx, 'admin.applyLaunchPreset', 'launch', { created: created.length });
   return { created };
 }
 
-const cfgProductIsWallArt = (cfg, id) => cfg.products[id]?.kind === 'wall-art';
+const cfgProductIsWallArt = (cfg, id) => isFrameKind(cfg.products[id]?.kind);
 
 export async function handleAdmin(ctx, body) {
   if (!ctx.who) return fail(401, 'not-signed-in');
@@ -724,7 +786,7 @@ export async function handleAdmin(ctx, body) {
 
   if (ADMIN_ACTIONS[action]) {
     const r = await ADMIN_ACTIONS[action](ctx, input);
-    if (r.error) return fail(400, r.error);
+    if (r.error) return fail(400, r.error, { reason: r.reason, problems: r.problems });
     const before = (await ctx.db.get(r.path))?.data || null;
     await ctx.db.patch(r.path, r.patch);
     await audit(ctx, `admin.${action}`, r.path, { before, after: clone(r.patch) });
@@ -740,7 +802,23 @@ export async function handleAdmin(ctx, body) {
     await audit(ctx, 'admin.setFrameDesign', input.productId, { before, after });
     return ok({ ok: true });
   }
-  if (action === 'bulkSwitch') { const r = await bulkSwitch(ctx, input); return r.error ? fail(400, r.error) : ok(r); }
+  if (action === 'setDesignSource') {
+    const cfg = await loadConfig(ctx.db); const p = cfg.products[input.productId];
+    if (!p || !COLLECTION_IDS.includes(input.source) || typeof input.enabled !== 'boolean' || !(p.collections || []).includes(input.source)) return fail(400, 'bad-design-source');
+    const before = { ...(p.designSources || {}) }; const after = { ...before, [input.source]: input.enabled };
+    await ctx.db.patch(`${COLL.products}/${p.id}`, { id: p.id, designSources: after, updatedAt: ctx.now() });
+    await audit(ctx, 'admin.setDesignSource', p.id, { before, after });
+    return ok({ ok: true });
+  }
+  if (action === 'setBloodDesign') {
+    if (!BLOOD_GROUPS.includes(input.code) || typeof input.visible !== 'boolean') return fail(400, 'bad-blood-design');
+    const cur = (await ctx.db.get(`${COLL.settings}/bloodDesigns`))?.data || {};
+    const before = { ...(cur.hidden || {}) }; const after = { ...before, [input.code]: !input.visible };
+    await ctx.db.patch(`${COLL.settings}/bloodDesigns`, { hidden: after, updatedAt: ctx.now() });
+    await audit(ctx, 'admin.setBloodDesign', input.code, { before: before[input.code] !== true, after: input.visible });
+    return ok({ ok: true });
+  }
+  if (action === 'bulkSwitch') { const r = await bulkSwitch(ctx, input); return r.error ? fail(400, r.error, { productId: r.productId, reason: r.reason }) : ok(r); }
   if (action === 'applyLaunchPreset') return ok(await applyLaunchPreset(ctx));
   if (action === 'addOrderNote') {
     // Complaints, replacements and other notes live on the fulfilment record (admin-only), never on the order the customer can read.

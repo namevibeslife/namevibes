@@ -1,7 +1,7 @@
 // Canvas painter for the framed-poster designs (browser only). It executes the operations produced by frames.js, so the
 // on-screen preview and the print file are the same drawing at different sizes. Backgrounds are painted in code (not from the
 // 1000 px reference images), so they stay sharp at 300 DPI on A4 and A3.
-import { layoutFrame, HEADINGS, EDGE_COLORS } from './frames.js';
+import { layoutFrameIn, HEADINGS, EDGE_COLORS } from './frames.js';
 import { drawGemTile, loadGemTexture } from '../utils/posterArtwork.js';
 import { textColorFor } from '../utils/elements.js';
 import { ensureScriptFont } from '../i18n/fonts.js';
@@ -161,15 +161,16 @@ export async function paintOps(ctx, layout) {
 export async function renderFrameCanvas({ design, width, height, art }) {
   // art = { x, y, w, h }: where the artwork sits inside the canvas (the rest is the flat border). Default: the whole canvas.
   const a = art || { x: 0, y: 0, w: width, h: height };
-  const layout = layoutFrame(design, a.w, a.h); // laid out inside the smaller area, not scaled down afterwards
+  const layout = layoutFrameIn(design, a.w, a.h); // laid out inside the smaller area (and for any aspect ratio), not scaled down afterwards
   await ensureFontsFor(layout.ops.filter((o) => o.type === 'text').map((o) => o.text));
   const canvas = document.createElement('canvas');
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = EDGE_COLORS[design.frame] || '#ffffff'; ctx.fillRect(0, 0, width, height);
   ctx.save(); ctx.translate(a.x, a.y); ctx.beginPath(); ctx.rect(0, 0, a.w, a.h); ctx.clip();
-  paintBackground(ctx, a.w, a.h, layout.bg);
-  const metrics = (await paintOps(ctx, layout)).map((m) => ({ ...m, x: m.x + a.x, y: m.y + a.y }));
+  paintBackground(ctx, a.w, a.h, layout.bg); // the background runs across the whole artwork
+  ctx.translate(layout.box.x, layout.box.y); // the composition is centred inside it
+  const metrics = (await paintOps(ctx, layout)).map((m) => ({ ...m, x: m.x + a.x + layout.box.x, y: m.y + a.y + layout.box.y }));
   ctx.restore();
   return { canvas, layout, metrics, art: a, safe: { x: a.x + layout.safe.x, y: a.y + layout.safe.y, w: layout.safe.w, h: layout.safe.h } };
 }

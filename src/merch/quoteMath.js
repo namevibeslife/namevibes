@@ -6,14 +6,15 @@ const toMinor = (amount, exp) => Math.round(Number(amount) * 10 ** exp);
 const toMajor = (minor, exp) => minor / 10 ** exp;
 
 // Admin-set price/cost for a product and size: a `product:size` entry wins over the plain `product` entry.
-export const lookupBySize = (table, productId, size) => {
-  const v = table?.[`${productId}:${size}`] ?? table?.[productId];
+// Most specific wins: "mug:11oz:black" (size + colour) > "poster:A4" (size) > "poster" (product).
+export const lookupBySize = (table, productId, size, color) => {
+  const v = (color !== undefined ? table?.[`${productId}:${size}:${color}`] : undefined) ?? table?.[`${productId}:${size}`] ?? table?.[productId];
   return v === undefined || v === null || v === '' ? undefined : Number(v);
 };
 // Tax rate for a product: the admin's per-product rate (e.g. posters 18, mugs 5) or else the country rate.
-export const taxRateFor = (country, productId) => {
-  const r = country.taxByProduct?.[productId];
-  return Math.max(0, Number(r !== undefined && r !== null && r !== '' ? r : country.taxPercent) || 0);
+export const taxRateFor = (country, productId, size, color) => {
+  const r = lookupBySize(country.taxByProduct, productId, size, color);
+  return Math.max(0, Number(r !== undefined ? r : country.taxPercent) || 0);
 };
 
 /**

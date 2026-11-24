@@ -2,7 +2,7 @@
 // Firestore documents, used by the server for every quote, checkout and fulfilment, and by the
 // browser only to hide options (never as the authority).
 
-import { specComplete } from './layout.js';
+import { readiness } from './layout.js';
 
 // Master switch -> country -> collection -> product. Eligibility comes from the SHIPPING destination.
 export function checkAvailability({ settings, country, product, collection }) {
@@ -12,8 +12,11 @@ export function checkAvailability({ settings, country, product, collection }) {
   if (!product || product.enabled === false) return { ok: false, reason: 'product-off' };
   if (!(product.collections || []).includes(collection)) return { ok: false, reason: 'product-collection' };
   if (country.disabledProducts && country.disabledProducts[product.id] === true) return { ok: false, reason: 'product-off' };
-  // A product cannot be sold until its print area, print type and placement are known (never guessed).
-  if (!specComplete(product.printSpec, product.sizes)) return { ok: false, reason: 'print-area-missing' };
+  // The admin must have switched this design source on for the product (mugs and bottles: Bloodline only; posters: Elements, Bloodline off until enabled).
+  if (product.designSources && product.designSources[collection] !== true) return { ok: false, reason: 'design-source-off' };
+  // A product cannot be sold until at least one size has a complete AND verified print area, print type and placement (never guessed).
+  const ready = readiness(product);
+  if (!ready.ok) return { ok: false, reason: ready.reason };
   // A price may be set for the product or for individual sizes ("poster:A4")
   const priced = Object.entries(country.prices || {}).some(([k, v]) => (k === product.id || k.startsWith(`${product.id}:`)) && Number(v) > 0);
   if (!priced) return { ok: false, reason: 'no-pricing' };

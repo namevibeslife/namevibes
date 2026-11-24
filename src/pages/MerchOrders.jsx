@@ -6,6 +6,7 @@ import { db } from '../firebase';
 import { useAuthStore } from '../store/authStore';
 import { loadCart, saveCart, newLineId } from '../merch/cart';
 import { bloodGroupLabel } from '../merch/designs';
+import { sizeLabel } from '../merch/labels';
 import { formatMoney, formatDate } from '../i18n/format';
 
 const when = (v) => (v && typeof v.toDate === 'function' ? v.toDate() : v ? new Date(v) : null);
@@ -56,7 +57,7 @@ export function MerchOrderDetail() {
 
   async function reorder() {
     const cart = await loadCart(user.uid);
-    const lines = order.items.map((i) => ({ id: newLineId(), collection: i.collection, productId: i.productId, color: i.color, size: i.size, qty: i.qty, layout: i.layout,
+    const lines = order.items.map((i) => ({ id: newLineId(), collection: i.collection, productId: i.productId, color: i.color, size: i.size, qty: i.qty, layout: i.layout, addStand: i.addStand === true,
       design: i.collection === 'blood_group' ? { bloodGroup: i.design.bloodGroup, confirmed: true }
         : i.design.template === 'frame' ? (i.design.frame === 'family-dark' ? { frame: i.design.frame, familyName: i.design.familyName, people: i.design.people.map((p) => ({ name: p.name, relation: p.relation, elements: p.elements.map((e) => e.symbol) })) } : { frame: i.design.frame, name: i.design.name, elements: i.design.elements.map((e) => e.symbol) })
           : { name: i.design.name, elements: i.design.elements.map((e) => e.symbol) } }));
@@ -71,7 +72,7 @@ export function MerchOrderDetail() {
       <p><Link to="/merch/orders" className="underline text-brand-700">{t('merch.orders.title')}</Link></p>
       <h1 className="text-2xl font-bold text-gray-800 my-3" data-testid="order-status">{t('merch.orders.order', { id: order.id.slice(0, 8) })} · {t(`merch.status.${shown(order.status)}`)}</h1>
       <ul className="mb-4 space-y-1">{order.items.map((i) => (
-        <li key={i.index}>{t(`merch.product.${i.productId}`, { defaultValue: i.productId })} · {i.size} × {i.qty} · {i.collection === 'blood_group' ? bloodGroupLabel(i.design.bloodGroup) : i.design.people && i.design.frame === 'family-dark' ? i.design.people.map((p) => p.name).join(', ') : `${i.design.name} (${i.design.elements.map((e) => e.symbol).join(' ')})`}</li>))}</ul>
+        <li key={i.index}>{t(`merch.product.${i.productId}`, { defaultValue: i.productId })} · {sizeLabel(i.size) || i.size} × {i.qty}{i.addStand ? ` + ${t('merch.stand')}` : ''} · {i.collection === 'blood_group' ? bloodGroupLabel(i.design.bloodGroup) : i.design.people && i.design.frame === 'family-dark' ? i.design.people.map((p) => p.name).join(', ') : `${i.design.name} (${i.design.elements.map((e) => e.symbol).join(' ')})`}</li>))}</ul>
       <p className="mb-4">{t('merch.cart.total')}: <strong>{formatMoney(order.amount, order.currency)}</strong>{order.refundedAmount > 0 && <span> · {t('merch.orders.refunded', { amount: formatMoney(order.refundedAmount, order.currency) })}</span>}</p>
       {order.tracking && <p className="mb-4" data-testid="tracking">{t('merch.orders.tracking')}: {order.tracking.carrier} {order.tracking.number} {order.tracking.url && <a className="underline" href={order.tracking.url} target="_blank" rel="noopener noreferrer">{t('merch.orders.trackLink')}</a>}</p>}
       <h2 className="text-lg font-semibold mb-2">{t('merch.orders.timeline')}</h2>

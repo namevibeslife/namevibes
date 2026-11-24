@@ -151,3 +151,23 @@ export function defaultLayoutFor(design, spec) {
   const cap = Math.floor(maxScaleForDpi({ design, spec, minDpi: Number(spec.minDpi) || DEFAULT_MIN_DPI }) * 100) / 100;
   return { scale: Math.max(MIN_SCALE, Math.min(DEFAULT_LAYOUT.scale, cap)), x: 0.5, y: 0.5 };
 }
+
+// ---- readiness: what may be sold ------------------------------------------------------------------------------------------------
+// A size is ready when its print spec is complete AND verified (confirmed from Qikink). Nothing unverified can be switched on or sold.
+export function sizeReady(product, size) {
+  const ps = product?.printSpec;
+  const flat = effectiveSpec(ps, null, size);
+  const problems = specProblems(flat);
+  const verified = ps?.perSize ? ps.bySize?.[size]?.verified === true : ps?.verified === true;
+  if (!ps) return { ok: false, reason: 'print-area-missing', problems: ['missing'] };
+  if (problems.length) return { ok: false, reason: 'print-area-missing', problems };
+  if (!verified) return { ok: false, reason: 'print-area-unverified', problems: ['unverified'] };
+  return { ok: true };
+}
+export const readySizes = (product) => (product?.sizes || []).filter((s) => sizeReady(product, s).ok);
+export function readiness(product) {
+  const sizes = product?.sizes || [];
+  const ok = readySizes(product).length > 0;
+  const first = sizes.map((s) => sizeReady(product, s)).find((r) => !r.ok);
+  return ok ? { ok: true } : { ok: false, reason: first?.reason || 'print-area-missing', problems: first?.problems || ['missing'] };
+}

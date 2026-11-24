@@ -31,9 +31,9 @@ const seed = () => ({
     collections: { name_elements: true, blood_group: true }, prices: { tshirt: 25 }, shipping: { flat: 5 }, providerPrimary: 'mock'
   },
   // the T-shirt is DISABLED by default (launch scope); these generic engine tests switch it on
-  'merch_products/tshirt': { id: 'tshirt', enabled: true },
+  'merch_products/tshirt': { id: 'tshirt', enabled: true, printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true } },
   // mug has a complete print spec in this fixture (the shipped default leaves it unset, which blocks it)
-  'merch_products/mug': { id: 'mug', printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: false } },
+  'merch_products/mug': { id: 'mug', enabled: true, printSpec: { printTypeId: 5, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: true } },
   'merch_providers/mock': { id: 'mock', adapter: 'mock', active: true, countries: ['IN', 'US'] },
   'merch_providers/mock2': { id: 'mock2', adapter: 'mock', active: true, countries: ['IN'] },
   'admins/admin@x.test': { role: 'super' },
@@ -118,7 +118,7 @@ const cfgFromSeed = async () => {
 };
 await test('switches cascade global -> country -> collection -> product', async () => {
   const c = await cfgFromSeed();
-  const product = { id: 'tshirt', enabled: true, collections: ['name_elements', 'blood_group'], printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150 } };
+  const product = { id: 'tshirt', enabled: true, collections: ['name_elements', 'blood_group'], sizes: ['M'], printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true } };
   assert.equal(checkAvailability({ settings: c.settings, country: c.india, product, collection: 'name_elements' }).ok, true);
   assert.equal(checkAvailability({ settings: { enabled: false }, country: c.india, product, collection: 'name_elements' }).reason, 'global-off');
   assert.equal(checkAvailability({ settings: c.settings, country: c.us, product, collection: 'name_elements' }).reason, 'country-off');

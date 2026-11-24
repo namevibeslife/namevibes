@@ -54,3 +54,6 @@ Recommended first framed posters: A4 and A3 in Black or White (the two best-supp
 2. Print-area size in inches and allowed `placement_sku` per product (DTG max is 16 x 20 in, DTF 18 x 20 in per the API docs; mugs, notebooks, posters need Qikink's print-area guide).
 3. Whether a whole-order shipping charge, COD/prepaid rules or add-on prices apply (not in the table).
 4. Prices above are Qikink's cost, not our selling price; add shipping, payment fees, GST handling and margin when you set India prices.
+
+## Update 24 November 2026
+Starter SKUs now cover the full catalogue (framed posters x sizes x colours, acrylic sizes, stand `UAcryDiSt-Wh-NA`, frame `UAcryFrmStd-Wh-NA`, 15 mug variants, 3 bottles). All are marked unverified except the white mug; print type IDs stay unset until confirmed with Qikink. See docs/launch-scope.md.

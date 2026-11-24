@@ -6,7 +6,9 @@ import { useAuthStore } from '../store/authStore';
 import { callMerch, mockControls, IS_MOCK } from '../merch/client';
 import { DEFAULT_PRODUCTS, mergeProducts } from '../merch/catalog';
 import { COLLECTION_IDS, STATES } from '../merch/constants';
-import { specProblems } from '../merch/layout';
+import { specProblems, readiness, readySizes } from '../merch/layout';
+import { baseCost, starterSku, variantId } from '../merch/catalog';
+import { BLOOD_GROUPS, bloodGroupSlug } from '../merch/designs';
 import { FRAME_IDS, DEFAULT_FRAME_DESIGNS } from '../merch/frames';
 import { ALL_COUNTRIES, getCountry } from '../data/countries';
 
@@ -34,11 +36,11 @@ export default function MerchAdmin() {
   }, [user]);
 
   const reload = useCallback(async () => {
-    const [settings, countries, providers, products, orders, commissions, audit, policy] = await Promise.all([
+    const [settings, countries, providers, products, orders, commissions, audit, policy, variants, blood] = await Promise.all([
       getDoc(doc(db, 'merch_settings', 'global')), read('merch_countries'), read('merch_providers'), read('merch_products'), read('merch_orders'),
-      read('merch_commissions'), read('merch_audit_logs'), getDoc(doc(db, 'merch_settings', 'commission'))
+      read('merch_commissions'), read('merch_audit_logs'), getDoc(doc(db, 'merch_settings', 'commission')), read('merch_variants'), getDoc(doc(db, 'merch_settings', 'bloodDesigns'))
     ]);
-    setData({ settings: settings.exists() ? settings.data() : { enabled: false, message: '' }, countries, providers, products: mergeProducts(products), orders, commissions, audit, policy: policy.exists() ? policy.data() : {} });
+    setData({ settings: settings.exists() ? settings.data() : { enabled: false, message: '' }, countries, providers, products: mergeProducts(products), orders, commissions, audit, policy: policy.exists() ? policy.data() : {}, variants: Object.fromEntries(variants.map((v) => [v.id, v])), bloodDesigns: blood.exists() ? blood.data() : {} });
   }, []);
   useEffect(() => { if (isAdmin) reload().catch(() => setNote('Could not load merchandise data')); }, [isAdmin, reload]);
 
@@ -219,12 +221,12 @@ function ProductManagement({ data, act }) {
       </div>
       <table className="w-full text-sm" data-testid="pm-table"><thead><tr><th /><th className="text-left">Product</th><th>Status</th><th>Everywhere</th>{countries.map((c) => <th key={c.countryCode}>{c.countryCode}</th>)}</tr></thead>
         <tbody>{products.map((p) => {
-          const problems = specProblems(p.printSpec, p.sizes);
+          const ready = readiness(p); const problems = ready.ok ? [] : [ready.reason];
           return (
             <tr key={p.id} className="border-t" data-testid={`pm-row-${p.id}`}>
               <td><input type="checkbox" aria-label={`Select ${p.id}`} checked={!!sel[p.id]} onChange={(e) => setSel({ ...sel, [p.id]: e.target.checked })} /></td>
               <td>{p.id}<span className="block text-xs text-gray-500">{p.collections.join(', ')}</span></td>
-              <td className="text-center">{p.enabled === false ? <Pill ok={false}>OFF</Pill> : problems.length ? <span className="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-900" data-testid={`blocked-${p.id}`}>ENABLED BUT BLOCKED: print spec missing</span> : <Pill ok>ON</Pill>}</td>
+              <td className="text-center">{p.enabled === false ? <Pill ok={false}>OFF</Pill> : problems.length ? <span className="px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-900" data-testid={`blocked-${p.id}`}>ENABLED BUT BLOCKED: print area missing or not verified</span> : <Pill ok>ON</Pill>}</td>
               <td className="text-center"><button type="button" className="underline" data-testid={`switch-${p.id}`} onClick={() => change({ scope: 'products', productIds: [p.id], enabled: p.enabled === false })}>{p.enabled === false ? 'Turn on' : 'Turn off'}</button></td>
               {countries.map((c) => <td key={c.countryCode} className="text-center"><button type="button" className="underline" data-testid={`switch-${p.id}-${c.countryCode}`} onClick={() => change({ scope: 'products', productIds: [p.id], countryCode: c.countryCode, enabled: !on(p, c.countryCode) })}>{on(p, c.countryCode) ? 'ON' : 'OFF'}</button></td>)}
             </tr>
@@ -244,40 +246,124 @@ function ProductManagement({ data, act }) {
   );
 }
 
-function ProductCard({ x, act }) {
+const sizeText = (s) => (s === 'NA' ? 'one size' : s);
+const SOURCE_LABEL = { name_elements: 'Elements designs (the buyer\'s own name)', blood_group: 'Bloodline designs (the 8 approved logos)' };
+
+function ProductCard({ x, act, data }) {
   const sp = x.printSpec || {};
-  const [f, setF] = useState({ printTypeId: sp.printTypeId ?? '', allowedPlacements: (sp.allowedPlacements || []).join(','), maxWidthInches: sp.maxWidthInches ?? '', maxHeightInches: sp.maxHeightInches ?? '', minDpi: sp.minDpi ?? 150, dpiOverride: x.dpiOverride === true });
-  const problems = specProblems(x.printSpec, x.sizes);
-  const [inset, setInset] = useState(String(x.designInsetMm ?? 10));
-  const spec = () => ({ printTypeId: Number(f.printTypeId), allowedPlacements: f.allowedPlacements.split(',').map((p) => p.trim()).filter(Boolean), maxWidthInches: Number(f.maxWidthInches), maxHeightInches: Number(f.maxHeightInches), minDpi: Number(f.minDpi), verified: false });
+  const manySizes = (x.sizes || []).length > 1;
+  const [perSize, setPerSize] = useState(sp.perSize === true || (!x.printSpec && manySizes && (x.kind === 'wall-art' || x.kind === 'acrylic')));
+  const [f, setF] = useState({ printTypeId: sp.printTypeId ?? '', allowedPlacements: (sp.allowedPlacements || []).join(','), maxWidthInches: sp.maxWidthInches ?? '', maxHeightInches: sp.maxHeightInches ?? '', minDpi: sp.minDpi ?? 150, dpiOverride: x.dpiOverride === true, verified: sp.verified === true });
+  const [sizes, setSizes] = useState(() => Object.fromEntries((x.sizes || []).map((s) => [s, { w: sp.bySize?.[s]?.maxWidthInches ?? '', h: sp.bySize?.[s]?.maxHeightInches ?? '', v: sp.bySize?.[s]?.verified === true }])));
+  const ready = readiness(x);
+  const [inset, setInset] = useState(String(x.designInsetMm ?? x.defaultInsetMm ?? 10));
+  const spec = () => {
+    const base = { printTypeId: Number(f.printTypeId), allowedPlacements: f.allowedPlacements.split(',').map((p) => p.trim()).filter(Boolean), minDpi: Number(f.minDpi) };
+    return perSize
+      ? { ...base, perSize: true, bySize: Object.fromEntries(Object.entries(sizes).filter(([, v]) => v.w !== '' && v.h !== '').map(([s, v]) => [s, { maxWidthInches: Number(v.w), maxHeightInches: Number(v.h), verified: v.v === true }])) }
+      : { ...base, maxWidthInches: Number(f.maxWidthInches), maxHeightInches: Number(f.maxHeightInches), verified: f.verified };
+  };
+  const frameKind = x.kind === 'wall-art' || x.kind === 'acrylic';
   return (
     <div className="p-3 bg-white/70 rounded-lg" data-testid={`product-card-${x.id}`}>
-      <strong>{x.id}</strong> · {x.kind} · sizes {x.sizes.join(', ')} · colours {x.colors.map((c) => c.id).join(', ')}
-      {problems.length > 0 && <p className="text-sm text-red-700" data-testid={`blocked-${x.id}`}>BLOCKED: print area / print type / placement not set ({problems.join(', ')}). It cannot be sold until you fill these in from Qikink's guide.</p>}
-      {x.printSpec && x.printSpec.verified !== true && problems.length === 0 && <p className="text-xs text-amber-800">Print spec is UNVERIFIED: confirm with a physical sample.</p>}
-      <div className="grid sm:grid-cols-6 gap-2 mt-2 text-sm">
+      <strong>{x.id}</strong> · {x.kind} · sizes {(x.sizes || []).map(sizeText).join(', ')} · colours {(x.colors || []).filter((c) => c.on !== false).map((c) => c.id).join(', ')}{x.taxUnverified ? ' · GST % NOT KNOWN: set it before selling' : ''}
+      {!ready.ok && <p className="text-sm text-red-700" data-testid={`blocked-${x.id}`}>BLOCKED: {ready.reason === 'print-area-unverified' ? 'the print area is filled in but not marked "verified with Qikink"' : 'print type / placement / print area not filled in'}. It cannot be switched on until a size has a complete AND verified print spec.</p>}
+      {ready.ok && <p className="text-xs text-green-800">Ready: {readySizes(x).map(sizeText).join(', ')} {readySizes(x).length < (x.sizes || []).length ? '(the other sizes are still blocked)' : ''}</p>}
+      <div className="mt-2 text-sm">{(x.collections || []).map((c) => <Toggle key={c} label={SOURCE_LABEL[c]} checked={x.designSources?.[c] === true} onChange={(v) => act('setDesignSource', { productId: x.id, source: c, enabled: v }, 'Saved')} testid={`source-${x.id}-${c}`} />)}</div>
+      <div className="grid sm:grid-cols-5 gap-2 mt-2 text-sm">
         <input aria-label={`${x.id} print_type_id`} placeholder="print_type_id" value={f.printTypeId} onChange={(e) => setF({ ...f, printTypeId: e.target.value })} className="border rounded px-2 py-1" />
         <input aria-label={`${x.id} placements`} placeholder="placements e.g. fr" value={f.allowedPlacements} onChange={(e) => setF({ ...f, allowedPlacements: e.target.value })} className="border rounded px-2 py-1" />
-        <input aria-label={`${x.id} max width in`} placeholder="max width in" value={f.maxWidthInches} onChange={(e) => setF({ ...f, maxWidthInches: e.target.value })} className="border rounded px-2 py-1" />
-        <input aria-label={`${x.id} max height in`} placeholder="max height in" value={f.maxHeightInches} onChange={(e) => setF({ ...f, maxHeightInches: e.target.value })} className="border rounded px-2 py-1" />
         <input aria-label={`${x.id} min dpi`} placeholder="min DPI" value={f.minDpi} onChange={(e) => setF({ ...f, minDpi: e.target.value })} className="border rounded px-2 py-1" />
         <Toggle label="Allow below min DPI" checked={f.dpiOverride} onChange={(v) => setF({ ...f, dpiOverride: v })} />
+        {manySizes && <Toggle label="Different print area per size" checked={perSize} onChange={setPerSize} testid={`persize-${x.id}`} />}
       </div>
-      {x.kind === 'wall-art' && (
-        <div className="mt-2 p-2 rounded bg-white/70" data-testid={`inset-${x.id}`}>
-          <label className="text-sm">Artwork inset from the frame, mm (all four sides, 0 to 30; default 10)
-            <input aria-label={`${x.id} design inset mm`} value={inset} onChange={(e) => setInset(e.target.value)} className="ml-2 border rounded px-2 py-1 w-20" data-testid={`inset-input-${x.id}`} /></label>
-          <Btn className="ml-2" data-testid={`save-inset-${x.id}`} onClick={() => act('setProduct', { ...x, designInsetMm: inset === '' ? 10 : Number(inset) }, 'Saved')}>Save inset</Btn>
-          <span className="text-xs ml-2">A4 is printed 190 x 277 mm and A3 277 x 400 mm at 10 mm. The border is a flat colour.</span>
+      {perSize ? (
+        <table className="w-full text-sm mt-2" data-testid={`spec-table-${x.id}`}><thead><tr><th className="text-left">Size</th><th>Print width in</th><th>Print height in</th><th>Verified with Qikink</th></tr></thead><tbody>
+          {(x.sizes || []).map((s) => <tr key={s}><td>{sizeText(s)}</td>
+            <td><input aria-label={`${x.id} ${s} width`} value={sizes[s].w} onChange={(e) => setSizes({ ...sizes, [s]: { ...sizes[s], w: e.target.value } })} className="border rounded px-2 py-1 w-24" /></td>
+            <td><input aria-label={`${x.id} ${s} height`} value={sizes[s].h} onChange={(e) => setSizes({ ...sizes, [s]: { ...sizes[s], h: e.target.value } })} className="border rounded px-2 py-1 w-24" /></td>
+            <td className="text-center"><input type="checkbox" aria-label={`${x.id} ${s} verified`} checked={sizes[s].v} onChange={(e) => setSizes({ ...sizes, [s]: { ...sizes[s], v: e.target.checked } })} /></td></tr>)}
+        </tbody></table>
+      ) : (
+        <div className="grid sm:grid-cols-3 gap-2 mt-2 text-sm">
+          <input aria-label={`${x.id} max width in`} placeholder="print width in" value={f.maxWidthInches} onChange={(e) => setF({ ...f, maxWidthInches: e.target.value })} className="border rounded px-2 py-1" />
+          <input aria-label={`${x.id} max height in`} placeholder="print height in" value={f.maxHeightInches} onChange={(e) => setF({ ...f, maxHeightInches: e.target.value })} className="border rounded px-2 py-1" />
+          <Toggle label="Verified with Qikink" checked={f.verified} onChange={(v) => setF({ ...f, verified: v })} testid={`verified-${x.id}`} />
         </div>
       )}
-      {x.kind === 'wall-art' && (
+      {frameKind && (
+        <div className="mt-2 p-2 rounded bg-white/70" data-testid={`inset-${x.id}`}>
+          <label className="text-sm">Artwork inset from the edge, mm (all four sides, 0 to 30; framed default 10, acrylic default 0)
+            <input aria-label={`${x.id} design inset mm`} value={inset} onChange={(e) => setInset(e.target.value)} className="ml-2 border rounded px-2 py-1 w-20" data-testid={`inset-input-${x.id}`} /></label>
+          <Btn className="ml-2" data-testid={`save-inset-${x.id}`} onClick={() => act('setProduct', { ...x, designInsetMm: inset === '' ? 10 : Number(inset) }, 'Saved')}>Save inset</Btn>
+        </div>
+      )}
+      {frameKind && (
         <div className="mt-2 p-2 rounded bg-white/70" data-testid={`frames-${x.id}`}>
           <strong className="text-sm">Frame designs customers can choose</strong> <span className="text-xs">(launch: Elements Gold only; the two dark designs stay off until you activate them)</span>
           <div>{FRAME_IDS.map((fid) => <Toggle key={fid} label={fid === 'elements-gold' ? 'Elements Gold' : fid === 'individual-dark' ? 'Individual Dark' : 'Family Dark'} checked={{ ...DEFAULT_FRAME_DESIGNS, ...(x.frameDesigns || {}) }[fid]} onChange={(v) => act('setFrameDesign', { productId: x.id, frame: fid, enabled: v }, 'Saved')} testid={`frame-toggle-${fid}`} />)}</div>
         </div>
       )}
       <Btn className="mt-2" data-testid={`save-spec-${x.id}`} onClick={() => act('setProduct', { ...x, printSpec: spec(), dpiOverride: f.dpiOverride })}>Save print spec</Btn>
+      <CatalogueRows x={x} act={act} data={data} />
+    </div>
+  );
+}
+
+// One row per size / colour variant: Qikink SKU, base cost, our selling price, GST %, switch. A product can be switched on only after its print area is verified (above).
+function CatalogueRows({ x, act, data }) {
+  const country = data.countries[0];
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState({});
+  if (!country) return <p className="text-xs mt-2">Create a country (Global & countries tab) to price this product.</p>;
+  const perColour = x.kind === 'drinkware' || x.kind === 'bottle';
+  const keyOf = (size, color) => (perColour ? `${x.id}:${size}:${color}` : `${x.id}:${size}`);
+  const rows = [];
+  for (const size of x.sizes || []) for (const c of (x.colorsBySize?.[size] ? x.colors.filter((k) => x.colorsBySize[size].includes(k.id)) : x.colors || [])) rows.push({ size, c });
+  const val = (table, key, fallback) => draft[table]?.[key] ?? country[table]?.[key] ?? fallback ?? '';
+  const set = (table, key, v) => setDraft({ ...draft, [table]: { ...(draft[table] || {}), [key]: v } });
+  const ship = Number(country.shipping?.flat) || 0;
+  return (
+    <div className="mt-2" data-testid={`catalogue-${x.id}`}>
+      <button type="button" className="underline text-sm" onClick={() => setOpen(!open)}>{open ? 'Hide' : 'Show'} variants, SKUs, costs, prices and GST ({rows.length} rows)</button>
+      {open && (
+        <>
+          <table className="w-full text-xs mt-1"><thead><tr><th className="text-left">Size</th><th className="text-left">Colour</th><th className="text-left">Qikink SKU</th><th>Base cost</th><th>Our price</th><th>GST %</th><th>On</th><th /></tr></thead><tbody>
+            {rows.map(({ size, c }) => {
+              const key = keyOf(size, c.id); const vid = variantId(x.id, c.id, size); const v = data.variants?.[vid];
+              const first = perColour || c === (x.colors.find((k) => !x.colorsBySize?.[size] || x.colorsBySize[size].includes(k.id)));
+              const cost = Number(val('costs', key, baseCost(x.id, c.id, size))); const price = Number(val('prices', key));
+              const rate = Number(val('taxByProduct', key, country.taxByProduct?.[x.id] ?? country.taxPercent));
+              const tax = price - price / (1 + rate / 100);
+              const low = price > 0 && price - tax <= cost + ship;
+              return (
+                <tr key={vid} className="border-t" data-testid={`variant-row-${vid}`}>
+                  <td>{sizeText(size)}</td><td>{c.id}</td>
+                  <td>{v?.providerSkus?.qikink?.sku || starterSku(x.id, c.id, size) || '-'}{v?.providerSkus?.qikink?.unverified !== false ? ' (unverified)' : ''}</td>
+                  <td>{first ? <input aria-label={`${vid} cost`} value={val('costs', key, baseCost(x.id, c.id, size))} onChange={(e) => set('costs', key, e.target.value)} className="border rounded px-1 py-0.5 w-16" /> : <span className="text-gray-500">same</span>}</td>
+                  <td>{first ? <input aria-label={`${vid} price`} value={val('prices', key)} onChange={(e) => set('prices', key, e.target.value)} className="border rounded px-1 py-0.5 w-16" data-testid={`price-input-${vid}`} /> : <span className="text-gray-500">same</span>}{first && !price && <span className="text-red-700 ml-1">no price</span>}{first && low && <span className="text-red-700 ml-1" data-testid={`low-${vid}`}>below cost + shipping + tax</span>}</td>
+                  <td>{first ? <input aria-label={`${vid} gst`} value={val('taxByProduct', key, '')} placeholder={String(country.taxByProduct?.[x.id] ?? country.taxPercent ?? '')} onChange={(e) => set('taxByProduct', key, e.target.value)} className="border rounded px-1 py-0.5 w-12" /> : <span className="text-gray-500">same</span>}</td>
+                  <td><input type="checkbox" aria-label={`${vid} on`} checked={(v?.enabled ?? c.on) !== false} onChange={(e) => act('setVariant', { productId: x.id, color: c.id, size, enabled: e.target.checked, providerSkus: v?.providerSkus || { qikink: { sku: starterSku(x.id, c.id, size), unverified: true } } }, 'Saved')} /></td>
+                </tr>
+              );
+            })}
+          </tbody></table>
+          {x.standSku && <p className="text-xs mt-1">Add-stand price (separate Qikink line, SKU {x.standSku}, base ₹120): <input aria-label={`${x.id} stand price`} value={val('prices', `${x.id}-stand`)} onChange={(e) => set('prices', `${x.id}-stand`, e.target.value)} className="border rounded px-1 py-0.5 w-16" data-testid={`stand-price-${x.id}`} /></p>}
+          <Btn className="mt-1" data-testid={`save-prices-${x.id}`} onClick={async () => { await act('setCountry', { ...country, prices: { ...country.prices, ...(draft.prices || {}) }, costs: { ...country.costs, ...(draft.costs || {}) }, taxByProduct: { ...country.taxByProduct, ...(draft.taxByProduct || {}) } }, 'Saved'); setDraft({}); }}>Save prices, costs and GST ({country.countryCode})</Btn>
+          <span className="text-xs ml-2">Shipping charged: {ship}. Confirm GST with your accountant. Base costs are Qikink's list prices.</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+function BloodDesigns({ data, act }) {
+  const hidden = data.bloodDesigns?.hidden || {};
+  return (
+    <div className="p-3 bg-white/70 rounded-lg" data-testid="blood-designs-admin">
+      <h2 className="font-semibold mb-1">Bloodline designs shown on the site</h2>
+      <p className="text-xs mb-1">A design appears in the customer's Blood Group section only if it is shown here AND at least one enabled product carries it.</p>
+      {BLOOD_GROUPS.map((g) => <Toggle key={g} label={g} checked={hidden[g] !== true} onChange={(v) => act('setBloodDesign', { code: g, visible: v }, 'Saved')} testid={`blood-design-${bloodGroupSlug(g)}`} />)}
     </div>
   );
 }
@@ -288,7 +374,8 @@ function Products({ data, act }) {
   return (
     <section className="space-y-4">
       <ProductManagement data={data} act={act} />
-      {Object.values(data.products).map((x) => <ProductCard key={x.id} x={x} act={act} />)}
+      <BloodDesigns data={data} act={act} />
+      {Object.values(data.products).map((x) => <ProductCard key={x.id} x={x} act={act} data={data} />)}
       <div className="p-3 bg-white/70 rounded-lg">
         <h2 className="font-semibold mb-2">Provider SKU mapping (per exact variant)</h2>
         <div className="grid sm:grid-cols-5 gap-2">

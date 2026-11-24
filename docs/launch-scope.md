@@ -51,3 +51,13 @@ Supported variants, fulfilment charges and quotes: there is no catalogue, rate o
 ## Unverified
 
 Live Qikink behaviour, real payments, placement until a physical sample is printed, the exact wallet error text, all print specs for posters and mugs, SKU/print-type pairs, GST treatment.
+
+## Full catalogue (24 November 2026) - supersedes "two launch products enabled"
+
+- EVERYTHING now starts DISABLED (global switch, India, every product, Qikink). Nothing unverified can be switched on: the server refuses (`not-ready`, single and bulk) any product whose print type, placement or print area is missing or not marked verified. Only the white 11 oz mug is verified by default (print type 5, placement `fr`, 8.5 x 3.5 in, confirmed in the Qikink sandbox).
+- Catalogue: framed posters (9 sizes, base Rs 173-326; A4/A3 in six frame colours), acrylic posters (6 sizes, base Rs 140-599) with an optional "Add stand" (Rs 120 base, sent to Qikink as a SEPARATE plain line item), acrylic photo frame AF22 (Rs 164), mugs 11 oz (white on at launch; black, colour, magic, enamel are admin-enableable), bottles (steel 750 ml Rs 213, sipper 750 ml Rs 216, tumbler 20 oz Rs 408).
+- Design sources are enforced on the server: mugs and bottles carry Bloodline (blood group) art only; posters carry Name Elements (Bloodline on posters exists but is OFF until an admin turns it on). Admin can show/hide each of the 8 Bloodline designs; the Blood Group shop lists a design only if it is visible AND an enabled product carries it.
+- Elements posters are visible to the buyer only after generating from a name (the "Sample" images stay as examples).
+- Admin variant table: SKU, base cost, price, shipping, GST, enable, design source, inset, print area, verified. A warning shows when price <= cost + shipping + tax. All changes are audited.
+- Layout: every aspect ratio is fitted inside the artwork box; a minimum text size (1.5 mm) and the DPI check refuse a size rather than shrink silently. Bloodline art is about 1300 px, so large posters are refused for blur.
+- Still unknown / blocked: print type, placement and print area for posters, acrylic, stand, frame AF22 and bottles; GST for bottles (left unset, so they cannot be quoted); real Qikink behaviour for the stand pairing.

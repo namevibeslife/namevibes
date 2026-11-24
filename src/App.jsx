@@ -32,6 +32,8 @@ const MerchCart = lazy(() => import('./pages/MerchCart'));
 const MerchOrderList = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderList })));
 const MerchOrderDetail = lazy(() => import('./pages/MerchOrders').then((m) => ({ default: m.MerchOrderDetail })));
 const MerchAdmin = lazy(() => import('./pages/MerchAdmin'));
+const BloodGroupGrid = lazy(() => import('./pages/BloodGroupShop').then((m) => ({ default: m.BloodGroupGrid })));
+const BloodGroupDetail = lazy(() => import('./pages/BloodGroupShop').then((m) => ({ default: m.BloodGroupDetail })));
 const MerchReturnsPolicy = lazy(() => import('./pages/MerchReturnsPolicy'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
@@ -115,6 +117,8 @@ function App() {
           <Route path="/ambassador/dashboard" element={<Navigate to="/ambassador?tab=followers" replace />} />
           {/* Merchandise: any signed-in user with a completed profile; availability is decided by the server */}
           <Route path="/merch" element={<ProtectedRoute requiresProfile><MerchStore /></ProtectedRoute>} />
+          <Route path="/merch/blood-group" element={<ProtectedRoute requiresProfile><BloodGroupGrid /></ProtectedRoute>} />
+          <Route path="/merch/blood-group/:slug" element={<ProtectedRoute requiresProfile><BloodGroupDetail /></ProtectedRoute>} />
           <Route path="/merch/cart" element={<ProtectedRoute requiresProfile><MerchCart /></ProtectedRoute>} />
           <Route path="/merch/orders" element={<ProtectedRoute requiresProfile><MerchOrderList /></ProtectedRoute>} />
           <Route path="/merch/orders/:id" element={<ProtectedRoute requiresProfile><MerchOrderDetail /></ProtectedRoute>} />

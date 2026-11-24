@@ -8,6 +8,7 @@ import { callMerch, IS_MOCK } from '../merch/client';
 import { loadCart, saveCart } from '../merch/cart';
 import { attachArtwork } from '../merch/artworkUpload';
 import { mergeProducts } from '../merch/catalog';
+import { sizeLabel } from '../merch/labels';
 import { bloodGroupLabel } from '../merch/designs';
 import { ALL_COUNTRIES } from '../data/countries';
 import { formatMoney } from '../i18n/format';
@@ -35,7 +36,7 @@ export default function MerchCart() {
 
   useEffect(() => { if (user) loadCart(user.uid).then(setCart); }, [user]);
   const errorText = (body) => (body?.error === 'merch-off' && body.message ? body.message : t(`merch.err.${body?.error}`, { ...body, defaultValue: t('merch.err.generic') }));
-  const items = (cart || []).map((l) => ({ productId: l.productId, collection: l.collection, color: l.color, size: l.size, qty: l.qty, design: l.design, layout: l.layout }));
+  const items = (cart || []).map((l) => ({ productId: l.productId, collection: l.collection, color: l.color, size: l.size, qty: l.qty, design: l.design, layout: l.layout, addStand: l.addStand === true }));
 
   async function persist(next) { setCart(next); setQuote(null); await saveCart(user.uid, next); }
   const setField = (k, v) => { setAddress((a) => ({ ...a, [k]: v })); setQuote(null); }; // an address change invalidates the quote
@@ -93,7 +94,7 @@ export default function MerchCart() {
             <ul className="space-y-2 mb-6" data-testid="cart-lines">
               {cart.map((l) => (
                 <li key={l.id} className="flex items-center justify-between gap-3 bg-white/70 rounded-lg p-3">
-                  <span>{t(`merch.product.${l.productId}`, { defaultValue: l.productId })} · {t(`merch.color.${l.color}`, { defaultValue: l.color })} · {l.size} × {l.qty}
+                  <span>{t(`merch.product.${l.productId}`, { defaultValue: l.productId })} · {t(`merch.color.${l.color}`, { defaultValue: l.color })} · {sizeLabel(l.size) || l.size} × {l.qty}{l.addStand ? ` + ${t('merch.stand')}` : ''}
                     <span className="block text-sm text-gray-600">{l.collection === 'blood_group' ? bloodGroupLabel(l.design.bloodGroup) : l.design.people ? l.design.people.map((p) => p.name).join(', ') : `${l.design.name} (${(l.design.elements || []).join(' ')})`}</span></span>
                   <button className="text-sm underline" onClick={() => persist(cart.filter((x) => x.id !== l.id))}>{t('merch.cart.remove')}</button>
                 </li>

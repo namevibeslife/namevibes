@@ -53,3 +53,6 @@ Note: the reference tiles for "Sreshan S Nair" (S Re S H N Sn I) are NOT what th
 - Qikink's real print area for A4 / A3 (the designs scale to whatever it is) and whether it wants a bleed.
 - Family titles: the buyer types the family name (e.g. "Nair Family"); nothing is derived from the names.
 - Element meanings are English only (the app's translated meanings could be used for non-English posters).
+
+## Sizes and acrylic (24 November 2026)
+The frame designs now lay out for all nine framed and six acrylic sizes using a composition box fitted inside the artwork area (`compositionBox`, `layoutFrameIn`). Minimum text is 1.5 mm (`MIN_TEXT_MM`); a size that cannot meet it, or the product's minimum DPI, is refused. Framed posters default to a 10 mm inset; acrylic defaults to 0.

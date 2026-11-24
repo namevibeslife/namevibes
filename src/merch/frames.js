@@ -24,7 +24,10 @@ export const DEFAULT_INSET_MM = 10;
 export const MAX_INSET_MM = 30;
 export const EDGE_COLORS = { 'elements-gold': '#fbf2da', 'individual-dark': '#020204', 'family-dark': '#020204' };
 // Paper sizes in mm (the frame). Sizes not listed use the print area itself as the frame.
-export const FRAME_MM = { A4: [210, 297], A3: [297, 420] };
+export const FRAME_MM = {
+  A4: [210, 297], A3: [297, 420], '8x8': [203.2, 203.2], '8x10': [203.2, 254], '10x10': [254, 254], '11x14': [279.4, 355.6], '12x12': [304.8, 304.8],
+  '12x16': [304.8, 406.4], '12x18': [304.8, 457.2], '16x16': [406.4, 406.4], '16x24': [406.4, 609.6]
+};
 
 /**
  * Where the artwork sits inside the print file, in inches. areaInches = the print area (the full file); the frame is the paper size;
@@ -402,6 +405,37 @@ function layoutFamily(data, W, H) {
  * Operations for one frame design on a canvas of W x H (any size; sizes scale with W). The safe area keeps content away from
  * the edge and the border; the tests check every operation stays inside it.
  */
+// ---- any aspect ratio ------------------------------------------------------------------------------------------------------------
+// The designs are composed on an A-series sheet (1 : 1.414). For another ratio (square, 4:5, 3:4, 2:3) the composition is laid out
+// at the largest A-ratio size that fits INSIDE the artwork area, centred, and the background art runs across the whole area. Nothing is
+// stretched. A square sheet therefore gets a smaller composition, so the smallest text must still be big enough (minTextMm).
+export const A_RATIO = 297 / 210;
+export const MIN_TEXT_MM = 1.5; // smallest printed font size we accept (about 4.3 pt: the tile category labels)
+export function compositionBox(aw, ah) {
+  if (ah / aw >= A_RATIO) { const h = aw * A_RATIO; return { x: 0, y: (ah - h) / 2, w: aw, h }; }
+  const w = ah / A_RATIO; return { x: (aw - w) / 2, y: 0, w, h: ah };
+}
+
+/** Operations for a design inside an artwork area of aw x ah px: { ops (in composition coordinates), box, W, H, safe (artwork coordinates), bg } */
+export function layoutFrameIn(design, aw, ah) {
+  const box = compositionBox(aw, ah);
+  const l = layoutFrame(design, box.w, box.h);
+  return { ...l, box, art: { w: aw, h: ah }, safe: { x: box.x + l.safe.x, y: box.y + l.safe.y, w: l.safe.w, h: l.safe.h } };
+}
+
+// The smallest font size (mm) anywhere on the artwork when printed at the given size (tile labels included).
+export function minTextMm(design, artworkIn, dpi = 300) {
+  const aw = Math.round(artworkIn.width * dpi); const ah = Math.round(artworkIn.height * dpi);
+  const l = layoutFrameIn(design, aw, ah);
+  let min = Infinity; let where = '';
+  const note = (px, what) => { if (px < min) { min = px; where = what; } };
+  for (const o of l.ops) {
+    if (o.type === 'text') { const est = estWidth(o.text, o.size, { caps: o.caps, spacing: o.spacing || 0, serif: o.serif }); note(o.maxWidth && est > o.maxWidth ? o.size * (o.maxWidth / est) : o.size, o.text); }
+    else if (o.type === 'tile') { note(o.w * 0.15, 'tile name'); if (o.showCategory) note(o.w * 0.115, 'tile category'); }
+  }
+  return { mm: (min / dpi) * 25.4, where, ok: (min / dpi) * 25.4 >= MIN_TEXT_MM - 1e-9 };
+}
+
 export function layoutFrame(design, W, H) {
   const data = frameData(design);
   const out = data.frame === 'family-dark' ? layoutFamily(data, W, H) : data.frame === 'individual-dark' ? layoutIndividual(data, W, H) : layoutGold(data, W, H);

@@ -15,7 +15,7 @@ const explore = [
   ['nav.insights', '/element-insights'],
   ['nav.numerology', '/numerology-calculator'],
   ['nav.zodiac', '/zodiac-syllables'], ['nav.hora', '/hora-muhurat'],
-  ['nav.merch', '/merch'],
+  ['nav.merch', '/merch'], ['nav.bloodGroup', '/merch/blood-group'],
   ['nav.pricing', '/pricing'],
 ];
 

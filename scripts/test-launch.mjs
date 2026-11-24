@@ -21,8 +21,8 @@ let passed = 0; let failed = 0;
 const test = async (name, fn) => { try { await fn(); passed++; console.log(`  ok   ${name}`); } catch (e) { failed++; console.log(`  FAIL ${name}\n       ${e.stack.split('\n').slice(0, 4).join('\n       ')}`); } };
 
 // ---- fixtures: the launch configuration with TEST print specs (not Qikink data) -----------------------------------
-const POSTER_SPEC = { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11 }, A3: { maxWidthInches: 11.5, maxHeightInches: 16 } } };
-const MUG_SPEC = { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150 };
+const POSTER_SPEC = { printTypeId: 1, allowedPlacements: ['fr'], minDpi: 150, perSize: true, bySize: { A4: { maxWidthInches: 8, maxHeightInches: 11, verified: true }, A3: { maxWidthInches: 11.5, maxHeightInches: 16, verified: true } } };
+const MUG_SPEC = { printTypeId: 5, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: true };
 const launchSeed = ({ specs = true } = {}) => ({
   'merch_settings/global': { enabled: true },
   'merch_settings/commission': { enabled: true, type: 'percent_margin', value: 20, cap: 0, holdDays: 14, overrides: {} },
@@ -58,7 +58,7 @@ async function order(e, items, { artwork = true } = {}) {
 const pay = async (e, id) => handleMerch(e.ctx, 'verify', { orderId: id, proof: {} });
 
 console.log('Launch configuration and visibility');
-await test('launch preset: India + Qikink, poster and mug ON, T-shirt and notebook OFF, global and India switches OFF, no prices, SKUs unverified; idempotent', async () => {
+await test('launch preset: India + Qikink, EVERYTHING disabled, global and India switches OFF, no selling prices, Qikink base costs, unverified SKUs for every variant; idempotent', async () => {
   const e = env({ seed: { 'admins/admin@x.test': { role: 'super' } } });
   const a = e.as('admin@x.test');
   const r = await handleAdmin(a, { action: 'applyLaunchPreset', data: {} });
@@ -66,17 +66,24 @@ await test('launch preset: India + Qikink, poster and mug ON, T-shirt and notebo
   const g = (p) => e.db.get(p).then((x) => x?.data);
   assert.equal((await g('merch_settings/global')).enabled, false);
   const india = await g('merch_countries/IN');
-  assert.equal(india.enabled, false); assert.deepEqual(india.prices, {}); assert.equal(india.providerPrimary, 'qikink'); assert.deepEqual(india.taxByProduct, { poster: 18, mug: 5 });
+  assert.equal(india.enabled, false); assert.deepEqual(india.prices, {}); assert.equal(india.providerPrimary, 'qikink');
+  assert.deepEqual(india.taxByProduct, { poster: 18, acrylic: 18, 'acrylic-stand': 18, 'acrylic-frame': 18, mug: 5 }); // bottle GST is NOT known: left unset
+  assert.equal(india.costs['poster:A4'], 212); assert.equal(india.costs['poster:12x18'], 321); assert.equal(india.costs['acrylic:16x24'], 599); assert.equal(india.costs['acrylic-stand'], 120);
+  assert.equal(india.costs['mug:11oz:white'], 115); assert.equal(india.costs['mug:11oz:black'], 174); assert.equal(india.costs['mug:11oz:enamel-white'], 254); assert.equal(india.costs['steel-bottle:750ml:black'], 213); assert.equal(india.costs['tumbler:20oz:white'], 408);
   assert.equal((await g('merch_providers/qikink')).active, false); assert.equal((await g('merch_providers/qikink')).liveEnabled, false);
-  assert.deepEqual([['poster', true], ['mug', true], ['tshirt', false], ['notebook', false]].map(([id]) => id), ['poster', 'mug', 'tshirt', 'notebook']);
-  for (const [id, on] of [['poster', true], ['mug', true], ['tshirt', false], ['notebook', false]]) assert.equal((await g(`merch_products/${id}`)).enabled, on);
+  for (const id of Object.keys(DEFAULT_PRODUCTS)) assert.equal((await g(`merch_products/${id}`)).enabled, false, id);
   const variants = await e.db.list('merch_variants');
-  assert.equal(variants.length, 12 + 2);
-  assert.equal(variants.find((v) => v.id === 'poster_frame-white_A4').providerSkus.qikink.sku, 'UFPos-Wh-A4 Frame poster');
-  assert.equal(variants.find((v) => v.id === 'poster_frame-olive_A3').providerSkus.qikink.sku, 'UFPos-OG-A3 Frame poster');
-  assert.equal(variants.find((v) => v.id === 'mug_white_11oz').providerSkus.qikink.sku, 'UWCM-Wh-11 OZ');
-  assert.equal(variants.find((v) => v.id === 'mug_black_11oz').providerSkus.qikink.sku, 'UBCM-Bk-11 OZ');
+  assert.equal(variants.length, 26 + 6 + 1 + 15 + 3);
+  const sku = (id) => variants.find((v) => v.id === id).providerSkus.qikink.sku;
+  assert.equal(sku('poster_frame-white_A4'), 'UFPos-Wh-A4 Frame poster'); assert.equal(sku('poster_frame-olive_A3'), 'UFPos-OG-A3 Frame poster'); assert.equal(sku('poster_frame-black_12x18'), 'UFPos-Bk-12x18Fpos'); assert.equal(sku('poster_frame-white_8x8'), 'UFPos-Wh-8x8FPoster');
+  assert.equal(sku('acrylic_white_A4'), 'UAcryPos-Wh-A4 poster'); assert.equal(sku('acrylic_white_16x24'), 'UAcryPos-Wh-16x24Inches'); assert.equal(sku('acrylic_white_8x8'), 'UAcryPos-Wh-8x8inches');
+  assert.equal(sku('acrylic-frame_white_NA'), 'UAcryFrmStd-Wh-NA');
+  assert.equal(sku('mug_white_11oz'), 'UWCM-Wh-11 OZ'); assert.equal(sku('mug_black_11oz'), 'UBCM-Bk-11 OZ'); assert.equal(sku('mug_enamel-white_11oz'), 'UWECM-Wh-11oz'); assert.equal(sku('mug_magic-royalblue_11oz'), 'UMCM-Wh-11ozRoyalBlue');
+  assert.equal(sku('steel-bottle_black_750ml'), 'UWtrbtl-Bk-750ml'); assert.equal(sku('sipper-bottle_white_750ml'), 'USSBl-Wh-750ml'); assert.equal(sku('tumbler_white_20oz'), 'UTumb-Wh-20oz');
   assert.ok(variants.every((v) => v.providerSkus.qikink.unverified === true && v.providerSkus.qikink.printTypeId === undefined));
+  assert.equal(variants.find((v) => v.id === 'mug_white_11oz').enabled, true); // only the white mug is on by default; the other mug styles are admin-enableable
+  assert.equal(variants.filter((v) => v.productId === 'mug' && v.enabled).length, 1);
+  assert.equal(variants.filter((v) => v.productId === 'poster' && v.color !== 'frame-white' && v.color !== 'frame-black').every((v) => ['A4', 'A3'].includes(v.size)), true); // the six frame colours exist for A4/A3 only
   assert.deepEqual(FRAME_COLORS.map((f) => f.code), ['Wh', 'Bk', 'Yl', 'Gn', 'Rb', 'OG']);
   // idempotent and never overwrites an admin's later change
   await e.db.patch('merch_countries/IN', { enabled: true, prices: { mug: 1 } });
@@ -86,36 +93,40 @@ await test('launch preset: India + Qikink, poster and mug ON, T-shirt and notebo
   assert.equal(starterSku('poster', 'frame-black', 'A3'), 'UFPos-Bk-A3 Frame poster');
   assert.ok((await e.db.list('merch_audit_logs')).some((l) => l.action === 'admin.applyLaunchPreset'));
 });
-await test('a fresh launch configuration cannot sell anything: switches off, no prices, specs missing ("enabled but blocked")', async () => {
+await test('a fresh launch configuration cannot sell anything: switches off, no prices, everything disabled and unverified', async () => {
   const e = env({ seed: { 'admins/admin@x.test': { role: 'super' }, 'users/u1': { email: 'u1@x.test', countryCode: 'IN' } } });
   await handleAdmin(e.as('admin@x.test'), { action: 'applyLaunchPreset', data: {} });
   const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
   assert.equal(cat.body.globalEnabled, false); assert.deepEqual(cat.body.products, []);
   await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'global', enabled: true } });
   await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'country', countryCodes: ['IN'], enabled: true } });
-  const cat2 = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
-  assert.deepEqual(cat2.body.products, []); // posters and mugs are ON but have no price and no print spec
+  assert.equal((await handleAdmin(e.as('admin@x.test'), { action: 'bulkSwitch', data: { scope: 'products', productIds: ['poster'], enabled: true } })).body.error, 'not-ready');
+  assert.deepEqual((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).body.products, []);
 });
-await test('only the two launch products are listed; T-shirt/notebook cannot be ordered even by direct API; each sells only in its own collection', async () => {
+await test('only enabled, ready products with a price are listed; direct API calls for the others are refused; each sells only in its own collection; Bloodline on posters stays off until enabled', async () => {
   const e = env();
   const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
   assert.deepEqual(cat.body.products.map((p) => p.id).sort(), ['mug', 'poster']);
-  assert.deepEqual(cat.body.products.find((p) => p.id === 'poster').collections, ['name_elements']);
+  assert.deepEqual(cat.body.products.find((p) => p.id === 'poster').collections, ['name_elements']); // bloodline posters exist but their design source is off
   assert.deepEqual(cat.body.products.find((p) => p.id === 'mug').collections, ['blood_group']);
   assert.deepEqual(cat.body.products.find((p) => p.id === 'poster').prices, { A4: 599, A3: 899 });
-  for (const productId of ['tshirt', 'notebook']) {
-    const r = await handleMerch(e.ctx, 'quote', { items: [{ productId, collection: 'name_elements', color: productId === 'tshirt' ? 'white' : 'ivory', size: productId === 'tshirt' ? 'M' : 'A5', qty: 1, design: { name: 'Vibes' } }], address: addr });
-    assert.equal(r.status, 409); assert.equal(r.body.error, 'merch-product-off');
+  for (const productId of ['tshirt', 'notebook', 'acrylic', 'steel-bottle']) {
+    const r = await handleMerch(e.ctx, 'quote', { items: [{ productId, collection: 'name_elements', color: 'white', size: 'M', qty: 1, design: { name: 'Vibes' } }], address: addr });
+    assert.equal(r.status === 400 || r.status === 409, true, productId); assert.notEqual(r.status, 200);
   }
-  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ collection: 'blood_group', design: { bloodGroup: 'O+', confirmed: true } })], address: addr })).body.error, 'merch-product-off');
-  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug('O+', { collection: 'name_elements', design: { name: 'Vibes' } })], address: addr })).body.error, 'merch-product-off');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ collection: 'blood_group', design: { bloodGroup: 'O+', confirmed: true } })], address: addr })).body.error, 'design-source-off');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug('O+', { collection: 'name_elements', design: { name: 'Vibes' } })], address: addr })).body.error, 'merch-product-off'); // the mug cannot carry Elements at all
+  const a = e.as('admin@x.test');
+  assert.equal((await handleAdmin(a, { action: 'setDesignSource', data: { productId: 'poster', source: 'blood_group', enabled: true } })).status, 200);
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ collection: 'blood_group', design: { bloodGroup: 'O+', confirmed: true } })], address: addr })).status, 200);
+  assert.equal((await handleAdmin(a, { action: 'setDesignSource', data: { productId: 'mug', source: 'name_elements', enabled: true } })).status, 400); // a mug cannot be given Elements
 });
-await test('posters and mugs with NO print spec are enabled but blocked: hidden and unquotable', async () => {
+await test('a poster with no print spec is blocked (hidden and unquotable); the mug is ready by default because its spec is confirmed', async () => {
   const e = env({ seed: launchSeed({ specs: false }) });
-  assert.deepEqual((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).body.products, []);
+  assert.deepEqual((await handleMerch(e.ctx, 'catalogue', { country: 'IN' })).body.products.map((p) => p.id), ['mug']);
   const q = await handleMerch(e.ctx, 'quote', { items: [poster()], address: addr });
   assert.equal(q.body.reason, 'print-area-missing');
-  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug()], address: addr })).body.reason, 'print-area-missing');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug()], address: addr })).status, 200);
 });
 
 console.log('Framed poster artwork text');
@@ -320,13 +331,16 @@ await test('bulk switch previews (dryRun writes nothing), applies, audits before
   await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'products', productIds: ['poster'], countryCode: 'IN', enabled: true } });
   assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster()], address: addr })).status, 200);
 });
-await test('select all + activate/deactivate selected; collection, country and whole-module switches; bad input is refused', async () => {
+await test('select all + activate/deactivate selected; only READY products can be switched on; collection, country and whole-module switches; bad input is refused', async () => {
   const e = env(); const a = e.as('admin@x.test');
-  const all = ['poster', 'mug', 'tshirt', 'notebook'];
-  await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'products', productIds: all, enabled: false } });
-  assert.deepEqual(await names(e, all), [false, false, false, false]);
-  await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'products', productIds: all, enabled: true } });
-  assert.deepEqual(await names(e, all), [true, true, true, true]);
+  const ready = ['poster', 'mug'];
+  await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'products', productIds: ready, enabled: false } });
+  assert.deepEqual(await names(e, ready), [false, false]);
+  await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'products', productIds: ready, enabled: true } });
+  assert.deepEqual(await names(e, ready), [true, true]);
+  const all = await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'products', productIds: ['poster', 'mug', 'tshirt', 'notebook'], enabled: true } });
+  assert.equal(all.status, 400); assert.equal(all.body.error, 'not-ready'); assert.equal(all.body.productId, 'tshirt'); // select-all cannot enable unverified products
+  assert.deepEqual(await names(e, ['tshirt', 'notebook']), [false, false]);
   await handleAdmin(a, { action: 'bulkSwitch', data: { scope: 'collection', collection: 'blood_group', countryCodes: 'all', enabled: false } });
   assert.equal((await e.db.get('merch_countries/IN')).data.collections.blood_group, false); assert.equal((await e.db.get('merch_countries/US')).data.collections.blood_group, false);
   assert.equal((await e.db.get('merch_countries/IN')).data.collections.name_elements, true);
@@ -447,12 +461,51 @@ await test('designInsetMm: default 10 mm recorded on each frame item; admin can 
   // a customer cannot change it
   assert.equal((await handleMerch(e.ctx, 'admin', { action: 'setProduct', data: { id: 'poster', designInsetMm: 5 } })).status, 403);
   // an exact A4/A3 print area: artwork is 190 x 277 mm and 277 x 400 mm
-  const exact = env({ seed: { ...launchSeed(), 'merch_products/poster': { id: 'poster', enabled: true, printSpec: { ...POSTER_SPEC, bySize: { A4: { maxWidthInches: 210 / 25.4, maxHeightInches: 297 / 25.4 }, A3: { maxWidthInches: 297 / 25.4, maxHeightInches: 420 / 25.4 } } } } } });
+  const exact = env({ seed: { ...launchSeed(), 'merch_products/poster': { id: 'poster', enabled: true, printSpec: { ...POSTER_SPEC, bySize: { A4: { maxWidthInches: 210 / 25.4, maxHeightInches: 297 / 25.4, verified: true }, A3: { maxWidthInches: 297 / 25.4, maxHeightInches: 420 / 25.4, verified: true } } } } } });
   for (const [size, w, h] of [['A4', 190, 277], ['A3', 277, 400]]) {
     const qq = await handleMerch(exact.ctx, 'quote', { items: [poster({ size })], address: addr });
     const x = (await exact.db.get(`merch_quotes/${qq.body.quoteId}`)).data.items[0];
     assert.ok(Math.abs(x.artworkInches.width * 25.4 - w) < 1e-6 && Math.abs(x.artworkInches.height * 25.4 - h) < 1e-6, size);
   }
+});
+
+console.log('Full catalogue');
+await test('every framed size and acrylic size: dimensions exist and the minimum text size is computed (never silently shrunk)', async () => {
+  const { FRAMED_SIZES, ACRYLIC_SIZES } = await import('../src/merch/catalog.js');
+  const { FRAME_MM, MIN_TEXT_MM } = await import('../src/merch/frames.js');
+  for (const s of [...FRAMED_SIZES, ...ACRYLIC_SIZES]) assert.ok(FRAME_MM[s], `size ${s} has dimensions`);
+  assert.equal(MIN_TEXT_MM, 1.5);
+});
+await test('Add stand = two Qikink line items (design product + plain stand), separate quote line; refused where the product has no stand', async () => {
+  const seed = launchSeed();
+  seed['merch_products/acrylic'] = { id: 'acrylic', enabled: true, printSpec: { printTypeId: 5, allowedPlacements: ['fr'], minDpi: 150, verified: true, perSize: true, bySize: { A4: { maxWidthInches: 8.27, maxHeightInches: 11.69, verified: true } } } };
+  const inC = seed['merch_countries/IN'];
+  seed['merch_countries/IN'] = { ...inC, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-stand': 18, mug: 5 }, prices: { ...inC.prices, 'acrylic:A4': 499, 'acrylic-stand': 249 }, costs: { ...inC.costs, 'acrylic:A4': 140, 'acrylic-stand': 120 } };
+  const e = env({ seed }); const sent = [];
+  e.ctx.providerFor = () => ({ submitOrder: async (p) => { sent.push(p); return { ok: true, providerOrderId: 'P1' }; } });
+  const ac = (extra = {}) => ({ productId: 'acrylic', collection: 'name_elements', color: 'white', size: 'A4', qty: 1, design: { name: 'Vibes' }, ...extra });
+  const plain = await handleMerch(e.ctx, 'quote', { items: [ac()], address: addr });
+  const withStand = await handleMerch(e.ctx, 'quote', { items: [ac({ addStand: true })], address: addr });
+  assert.equal(plain.status, 200, JSON.stringify(plain.body)); assert.equal(withStand.status, 200, JSON.stringify(withStand.body));
+  assert.ok(withStand.body.quote.total > plain.body.quote.total);
+  const { id } = await order(e, [ac({ addStand: true })]);
+  await pay(e, id);
+  assert.equal(sent.length, 1); assert.equal(sent[0].items.length, 2);
+  assert.equal(sent[0].items[0].productId, 'acrylic'); assert.equal(sent[0].items[1].productId, 'acrylic-stand'); assert.equal(sent[0].items[1].printTypeId, 1);
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [poster({ addStand: true })], address: addr })).body.error, 'stand-unavailable');
+});
+await test('Blood Group designs: all 8 listed, admin can hide one, a hidden design cannot be quoted, COD still rejected', async () => {
+  const e = env(); const a = e.as('admin@x.test');
+  const cat = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
+  assert.equal(cat.body.bloodDesigns.length, 8);
+  assert.equal((await handleAdmin(a, { action: 'setBloodDesign', data: { code: 'AB-', visible: false } })).status, 200);
+  const cat2 = await handleMerch(e.ctx, 'catalogue', { country: 'IN' });
+  assert.equal(cat2.body.bloodDesigns.length, 7); assert.ok(!cat2.body.bloodDesigns.some((d) => d.code === 'AB-'));
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug('AB-')], address: addr })).body.error, 'design-hidden');
+  assert.equal((await handleMerch(e.ctx, 'quote', { items: [mug('O+')], address: addr })).status, 200);
+  assert.equal((await handleAdmin(a, { action: 'setBloodDesign', data: { code: 'ZZ', visible: false } })).status, 400);
+  assert.ok((await e.db.list('merch_audit_logs')).some((l) => l.action === 'admin.setBloodDesign'));
+  assert.equal((await handleMerch(e.ctx, 'verify', { orderId: 'x', proof: { method: 'cod' } })).body.error, 'cod-not-allowed');
 });
 
 console.log(`\n${passed} passed, ${failed} failed`);

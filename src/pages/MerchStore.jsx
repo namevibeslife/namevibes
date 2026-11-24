@@ -6,7 +6,9 @@ import { useAuthStore } from '../store/authStore';
 import { callMerch } from '../merch/client';
 import { loadCart, saveCart, newLineId } from '../merch/cart';
 import { buildDesign, applyTemplate, BLOOD_GROUPS, bloodGroupLabel } from '../merch/designs';
-import { FRAME_IDS, DEFAULT_FRAME, FRAME_MAX_MEMBERS } from '../merch/frames';
+import { FRAME_IDS, DEFAULT_FRAME, FRAME_MAX_MEMBERS, artworkInches, minTextMm, DEFAULT_INSET_MM } from '../merch/frames';
+import { isFrameKind } from '../merch/catalog';
+import { sizeLabel } from '../merch/labels';
 import ProductPreview from '../merch/ProductPreview';
 import { ALL_COUNTRIES } from '../data/countries';
 import { effectiveSpec, defaultLayoutFor, normaliseLayout, placementBox, designAspect, designDpi, resolutionStatus, maxScaleForDpi } from '../merch/layout';
@@ -24,14 +26,15 @@ export default function MerchStore() {
   const [country, setCountry] = useState(String(profile?.countryCode || 'IN').toUpperCase());
   const [catalogue, setCatalogue] = useState(null);
   const [loadError, setLoadError] = useState(false);
-  const [collection, setCollection] = useState('name_elements');
+  const [collection, setCollection] = useState(incoming?.collection || 'name_elements');
   const [productId, setProductId] = useState(incoming?.productId || ''); // "Frame My Elements" opens the framed poster directly
   const [name, setName] = useState(incoming?.names?.[0]?.name || profile?.fullName || '');
   const [frame, setFrame] = useState(DEFAULT_FRAME);
   // family design: members come from the family result (name + relation the buyer entered), editable, up to FRAME_MAX_MEMBERS
   const [members, setMembers] = useState(() => (incoming?.names?.length ? incoming.names.slice(0, FRAME_MAX_MEMBERS) : [{ name: profile?.fullName || '', relation: '' }]).map((n) => ({ name: n.name || '', relation: n.relation || '' })));
   const [familyName, setFamilyName] = useState('');
-  const [bloodGroup, setBloodGroup] = useState('');
+  const [bloodGroup, setBloodGroup] = useState(incoming?.bloodGroup || ''); // from a Blood Group page
+  const [addStand, setAddStand] = useState(false);
   const [confirmed, setConfirmed] = useState(false);
   const [color, setColor] = useState('');
   const [size, setSize] = useState('');
@@ -54,9 +57,12 @@ export default function MerchStore() {
     if (!products.find((p) => p.id === productId)) setProductId(first?.id || '');
   }, [products, productId]);
   const product = products.find((p) => p.id === productId);
-  useEffect(() => { if (product) { setColor(product.colors[0]?.id || ''); setSize(product.sizes[0] || ''); setLayout(null); } }, [productId, collection]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (product) { const s0 = product.sizes[0] || ''; setSize(s0); setColor((product.colorsBySize?.[s0] || product.colors)[0]?.id || ''); setLayout(null); setAddStand(false); } }, [productId, collection]); // eslint-disable-line react-hooks/exhaustive-deps
+  // the colours that exist for the chosen size (e.g. framed posters beyond A4/A3 come in white and black only)
+  const colorOptions = product ? (product.colorsBySize?.[size] || product.colors) : [];
+  useEffect(() => { if (product && colorOptions.length && !colorOptions.some((c) => c.id === color)) setColor(colorOptions[0].id); }, [size]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const isPoster = product?.kind === 'wall-art';
+  const isPoster = isFrameKind(product?.kind);
   const frames = isPoster ? FRAME_IDS.filter((f) => product.frames?.[f]) : [];
   const activeFrame = frames.includes(frame) ? frame : frames[0];
   useEffect(() => { if (isPoster && activeFrame && activeFrame !== frame) setFrame(activeFrame); }, [isPoster, activeFrame, frame]);
@@ -66,7 +72,8 @@ export default function MerchStore() {
     : buildDesign('blood_group', { bloodGroup, confirmed: true }); // preview only; the confirmation is required to add
   // the server builds the same design again from the names; the preview and the print file use exactly this definition
   const built = baseBuilt.design ? { ...baseBuilt, design: applyTemplate(baseBuilt.design, product) } : baseBuilt;
-  const colorHex = product?.colors.find((c) => c.id === color)?.hex || '#FFFFFF';
+  const colorHex = (colorOptions.find((c) => c.id === color) || product?.colors?.find((c) => c.id === color))?.hex || '#FFFFFF';
+  const unitPrice = product ? (product.variantPrices?.[`${size}|${color}`] ?? product.prices?.[size] ?? product.price) : undefined;
   const isFrameDesign = built.design?.template === 'frame';
   const symbols = built.design?.elements?.map((e) => e.symbol).join(' · ');
   // print area, position bounds and resolution (the server re-checks all of it)
@@ -81,6 +88,10 @@ export default function MerchStore() {
   const resStatus = res ? resolutionStatus(res.dpi, { minDpi: Number(spec.minDpi) }) : 'ok';
   const blocked = resStatus === 'blocked' && !product?.dpiOverride;
   const maxScale = res && built.design ? maxScaleForDpi({ design: built.design, spec, minDpi: Number(spec.minDpi) }) : 1;
+  // framed/acrylic posters: the smallest printed text must stay readable at this size (the server checks the same thing)
+  const insetMm = product?.designInsetMm ?? DEFAULT_INSET_MM;
+  const textFit = isFrameDesign && spec ? minTextMm(built.design, artworkInches({ areaInches: { width: Number(spec.maxWidthInches), height: Number(spec.maxHeightInches) }, size, insetMm }).artworkInches) : null;
+  const textBlocked = !!textFit && !textFit.ok;
   const errorText = (code) => t(`merch.err.${code}`, { defaultValue: t('merch.err.generic') });
 
   async function add() {
@@ -93,8 +104,9 @@ export default function MerchStore() {
       : { name: built.design.name, elements: built.design.elements.map((e) => e.symbol) };
     const unitPrice = product.prices?.[size] ?? product.price;
     if (!(unitPrice > 0)) { setMsg(errorText('merch-product-off')); return; }
+    if (textBlocked) { setMsg(t('merch.err.text-too-small', { mm: textFit.mm.toFixed(1) })); return; }
     if (blocked) { setMsg(t('merch.err.resolution-too-low', { dpi: res?.dpi, minDpi: spec?.minDpi })); return; }
-    const next = [...cart, { id: newLineId(), collection, productId, color, size, qty: Number(qty), design, layout: lay }];
+    const next = [...cart, { id: newLineId(), collection, productId, color, size, qty: Number(qty), design, layout: lay, ...(addStand && product.standPrice ? { addStand: true } : {}) }];
     try { await saveCart(user.uid, next); setCart(next); setMsg(t('merch.added')); } catch { setMsg(t('merch.err.generic')); }
   }
 
@@ -130,7 +142,7 @@ export default function MerchStore() {
                 {products.map((p) => (
                   <button key={p.id} onClick={() => setProductId(p.id)} aria-pressed={productId === p.id} data-testid={`product-${p.id}`}
                     className={`px-3 py-2 rounded-lg border ${productId === p.id ? 'border-brand-600 ring-2 ring-brand-600' : ''} bg-white`}>
-                    {t(`merch.product.${p.id}`, { defaultValue: p.id })}<span className="block text-xs text-gray-500">{formatMoney(Math.min(...Object.values(p.prices || {}).concat(p.price > 0 ? [p.price] : [Infinity])), catalogue.currency)}</span>
+                    {t(`merch.product.${p.id}`, { defaultValue: p.id })}<span className="block text-xs text-gray-500">{formatMoney(Math.min(...Object.values(p.variantPrices || p.prices || {})), catalogue.currency)}</span>
                   </button>
                 ))}
               </div>
@@ -184,14 +196,16 @@ export default function MerchStore() {
               {product && (
                 <div className="grid grid-cols-3 gap-3 mb-4">
                   <label className="text-sm font-medium text-gray-700">{t('merch.colour')}
-                    <select value={color} onChange={(e) => setColor(e.target.value)} className="mt-1 block w-full border rounded-lg px-2 py-2">{product.colors.map((c) => <option key={c.id} value={c.id}>{t(`merch.color.${c.id}`, { defaultValue: c.id })}</option>)}</select></label>
+                    <select value={color} onChange={(e) => setColor(e.target.value)} className="mt-1 block w-full border rounded-lg px-2 py-2">{colorOptions.map((c) => <option key={c.id} value={c.id}>{t(`merch.color.${c.id}`, { defaultValue: c.id })}</option>)}</select></label>
                   <label className="text-sm font-medium text-gray-700">{t('merch.size')}
-                    <select value={size} onChange={(e) => setSize(e.target.value)} className="mt-1 block w-full border rounded-lg px-2 py-2">{product.sizes.map((s) => <option key={s} value={s}>{s}</option>)}</select></label>
+                    <select value={size} onChange={(e) => setSize(e.target.value)} className="mt-1 block w-full border rounded-lg px-2 py-2">{product.sizes.map((s) => <option key={s} value={s}>{sizeLabel(s) || s}</option>)}</select></label>
                   <label className="text-sm font-medium text-gray-700">{t('merch.qty')}
                     <input type="number" min="1" max="10" value={qty} onChange={(e) => setQty(Math.max(1, Math.min(10, Number(e.target.value) || 1)))} className="mt-1 block w-full border rounded-lg px-2 py-2" /></label>
                 </div>
               )}
-              {product && <p className="mb-3 text-lg font-semibold" data-testid="unit-price">{formatMoney(product.prices?.[size] ?? product.price, catalogue.currency)}</p>}
+              {product && <p className="mb-3 text-lg font-semibold" data-testid="unit-price">{formatMoney(unitPrice, catalogue.currency)}</p>}
+              {product?.standPrice > 0 && <label className="flex items-center gap-2 mb-3 text-sm"><input type="checkbox" checked={addStand} onChange={(e) => setAddStand(e.target.checked)} data-testid="add-stand" />{t('merch.addStand', { price: formatMoney(product.standPrice, catalogue.currency) })}</label>}
+              {textBlocked && <p role="alert" className="text-xs text-red-700 mb-2" data-testid="text-too-small">{t('merch.err.text-too-small', { mm: textFit.mm.toFixed(1) })}</p>}
               {product && built.design && spec && !isFrameDesign && (
                 <fieldset className="mb-4" data-testid="layout-controls">
                   <legend className="block text-sm font-medium text-gray-700">{t('merch.layoutTitle')}</legend>
@@ -204,7 +218,7 @@ export default function MerchStore() {
                   {resStatus === 'blocked' && <p role="alert" className="text-xs text-red-700" data-testid="dpi-blocked">{t('merch.err.resolution-too-low', { dpi: res.dpi, minDpi: spec.minDpi })} {t('merch.dpiMaxSize', { percent: Math.floor(maxScale * 100) })} <button type="button" className="underline" onClick={() => setLayout({ ...lay, scale: Math.max(0.2, Math.floor(maxScale * 100) / 100) })}>{t('merch.dpiFix')}</button></p>}
                 </fieldset>
               )}
-              <button onClick={add} disabled={blocked || !product || (collection === 'name_elements' ? !!built.error : !bloodGroup)} className="px-5 py-2 rounded-lg bg-brand-600 text-white disabled:opacity-50" data-testid="add-to-cart">{t('merch.addToCart')}</button>
+              <button onClick={add} disabled={blocked || textBlocked || !product || (collection === 'name_elements' ? !!built.error : !bloodGroup)} className="px-5 py-2 rounded-lg bg-brand-600 text-white disabled:opacity-50" data-testid="add-to-cart">{t('merch.addToCart')}</button>
               {msg && <p role="status" className="mt-2 text-sm text-gray-700" data-testid="merch-msg">{msg} {msg === t('merch.added') && <button className="underline" onClick={() => navigate('/merch/cart')}>{t('merch.viewCart')}</button>}</p>}
             </section>
             <section aria-label={t('merch.preview')} className="bg-white/60 rounded-xl p-4">
@@ -219,7 +233,7 @@ export default function MerchStore() {
             </section>
           </div>
         )}
-        <p className="mt-6"><Link to="/merch/orders" className="underline text-brand-700">{t('merch.orders.title')}</Link></p>
+        <p className="mt-6"><Link to="/merch/blood-group" className="underline text-brand-700 mr-4" data-testid="blood-shop-link">{t('merch.blood.title')}</Link><Link to="/merch/orders" className="underline text-brand-700">{t('merch.orders.title')}</Link></p>
       </div>
     </main>
   );

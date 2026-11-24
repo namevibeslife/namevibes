@@ -75,7 +75,12 @@ const MOCKUPS = {
   stationery: { w: 400, h: 440, box: { x: 125, y: 90, width: 150, height: 210 },
     shape: (c) => `<rect x="100" y="50" width="200" height="320" rx="8" fill="${c}" stroke="#9CA3AF" stroke-width="2"/><rect x="100" y="50" width="22" height="320" rx="6" fill="#00000022"/>` },
   'wall-art': { w: 400, h: 440, box: { x: 120, y: 90, width: 160, height: 250 },
-    shape: (c) => `<rect x="90" y="50" width="220" height="330" fill="${c}" stroke="#6B7280" stroke-width="2"/><rect x="110" y="70" width="180" height="290" fill="#FFFFFF"/>` }
+    shape: (c) => `<rect x="90" y="50" width="220" height="330" fill="${c}" stroke="#6B7280" stroke-width="2"/><rect x="110" y="70" width="180" height="290" fill="#FFFFFF"/>` },
+  // acrylic: a clear sheet, no frame, with a small display stand
+  acrylic: { w: 400, h: 440, box: { x: 110, y: 60, width: 180, height: 270 },
+    shape: () => `<rect x="100" y="50" width="200" height="290" rx="4" fill="#EAF4F8" fill-opacity="0.7" stroke="#9CC4D4" stroke-width="3"/><path d="M170 340 h60 l10 30 h-80 z" fill="#C9D6DC" stroke="#9CA3AF" stroke-width="1.5"/>` },
+  bottle: { w: 400, h: 440, box: { x: 165, y: 150, width: 70, height: 150 },
+    shape: (c) => `<rect x="170" y="40" width="60" height="40" rx="8" fill="#6B7280"/><rect x="150" y="75" width="100" height="320" rx="30" fill="${c}" stroke="#9CA3AF" stroke-width="2"/>` }
 };
 
 /**
@@ -89,7 +94,7 @@ export function productMockup(product, colorHex, design, { layout, spec } = {}) 
   const local = placementBox({ width: areaRect.width, height: areaRect.height }, layout, designAspect(design, areaRect));
   const designBox = { x: areaRect.x + local.x, y: areaRect.y + local.y, width: local.width, height: local.height };
   // wall art is white inside the frame, so its ink is always dark; other products follow their colour
-  const ink = product.kind === 'wall-art' ? '#1F2937' : inkFor(colorHex);
+  const ink = product.kind === 'wall-art' || product.kind === 'acrylic' ? '#1F2937' : inkFor(colorHex); // posters and acrylic are printed on a light sheet
   return { w: m.w, h: m.h, areaRect, designBox, ink, shapeSvg: m.shape(colorHex) };
 }
 

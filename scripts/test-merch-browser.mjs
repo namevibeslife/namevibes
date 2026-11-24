@@ -238,7 +238,7 @@ await step('admin enables the dark frame designs; customers then see the design 
 });
 await step('designer (blood-group mug): a design too large for its resolution is blocked with a message, and "use that size" fixes it', async () => {
   // the mock mug print area is small and never blocks; make it large for this check, then put it back
-  await page.evaluate(async () => { const { doc, updateDoc } = await import('/src/mock/firestore.js'); const { db } = await import('/src/firebase.js'); await updateDoc(doc(db, 'merch_products', 'mug'), { printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: false, mockOnly: true } }); });
+  await page.evaluate(async () => { const { doc, updateDoc } = await import('/src/mock/firestore.js'); const { db } = await import('/src/firebase.js'); await updateDoc(doc(db, 'merch_products', 'mug'), { printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 12, maxHeightInches: 16, minDpi: 150, verified: true, mockOnly: true } }); });
   await page.reload();
   await page.getByTestId('tab-blood_group').click();
   assert.equal(await page.getByTestId('product-mug').count(), 1);
@@ -250,7 +250,7 @@ await step('designer (blood-group mug): a design too large for its resolution is
   await page.getByTestId('dpi-blocked').getByRole('button').click();
   assert.equal(await page.getByTestId('dpi-blocked').count(), 0);
   assert.equal(await page.getByTestId('add-to-cart').isDisabled(), false);
-  await page.evaluate(async () => { const { doc, updateDoc } = await import('/src/mock/firestore.js'); const { db } = await import('/src/firebase.js'); await updateDoc(doc(db, 'merch_products', 'mug'), { printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: false, mockOnly: true } }); });
+  await page.evaluate(async () => { const { doc, updateDoc } = await import('/src/mock/firestore.js'); const { db } = await import('/src/firebase.js'); await updateDoc(doc(db, 'merch_products', 'mug'), { printSpec: { printTypeId: 1, allowedPlacements: ['fr'], maxWidthInches: 8, maxHeightInches: 3.5, minDpi: 150, verified: true, mockOnly: true } }); });
   await page.reload();
   await page.getByTestId('tab-name_elements').click();
 });
@@ -427,13 +427,12 @@ await step('admin Product Management: single and bulk switches with a confirmati
   await signIn('mock-admin', 'admin@namevibes.test', 'Super Admin');
   await page.goto(`${BASE}/admin/merch`);
   await page.getByRole('tab', { name: 'Products' }).click();
-  await page.getByTestId('select-all').check();
+  await page.getByLabel('Select poster').check(); await page.getByLabel('Select mug').check(); // select-all would include unverified products, which the server refuses
   await page.getByTestId('activate-selected').click();
   await statusIs('poster', 'ON');
-  await page.getByTestId('select-all').uncheck();
-  await page.getByTestId('switch-tshirt').click(); // turn T-shirt ON then OFF again to prove the single switch
-  await statusIs('tshirt', 'ON');
-  await page.getByTestId('switch-tshirt').click();
+  await page.getByTestId('select-all').check(); await page.getByTestId('select-all').uncheck();
+  await page.getByTestId('switch-tshirt').click(); // the T-shirt has no verified print area: the server refuses, it stays OFF
+  await page.waitForTimeout(800);
   await statusIs('tshirt', 'OFF');
   await page.getByTestId('switch-poster-IN').click();
   await page.waitForFunction(() => document.querySelector('[data-testid="switch-poster-IN"]')?.textContent === 'OFF');
@@ -441,7 +440,7 @@ await step('admin Product Management: single and bulk switches with a confirmati
   await page.waitForFunction(() => document.querySelector('[data-testid="switch-poster-IN"]')?.textContent === 'ON');
   await page.getByRole('tab', { name: 'Audit' }).click();
   const audit = await page.getByTestId('audit').innerText();
-  assert.ok((audit.match(/admin\.bulkSwitch/g) || []).length >= 5, 'every change is audited');
+  assert.ok((audit.match(/admin\.bulkSwitch/g) || []).length >= 3, 'every change is audited');
 });
 await step('orders: paid order is listed; admin refund marks it refunded', async () => {
   await page.getByRole('tab', { name: 'Orders' }).click();
