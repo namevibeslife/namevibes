@@ -77,10 +77,10 @@ await test('launch preset: India + Qikink, EVERYTHING disabled, global and India
   assert.equal(india.enabled, true); assert.equal(india.currency, 'INR'); assert.equal(india.taxPercent, 18); assert.equal(india.taxIncluded, true); assert.equal(india.providerPrimary, 'qikink'); assert.equal(india.gatewayOverride, 'auto'); assert.deepEqual(india.shipping, { flat: 50, freeAbove: 999 }); assert.equal(india.marginFloorPercent, 0);
   assert.deepEqual(india.collections, { name_elements: true, blood_group: true }); assert.ok(india.testSetup);
   assert.equal(india.prices['poster:A4'], 1003); assert.equal(india.prices['poster:A3'], 1534); assert.equal(india.prices['acrylic:16x24'], 2832); assert.equal(india.prices.mug, 483); assert.equal(india.prices['steel-bottle'], 1003);
-  assert.equal(india.priceNotes['poster:A4'], 'cost 212, x4 = 850, GST 18% -> 1003'); assert.match(india.priceNotes['steel-bottle'], /GST unconfirmed/); assert.equal(india.prices.tshirt, undefined); assert.equal(india.disabledProducts.tshirt, true); assert.equal(india.disabledProducts.notebook, true); assert.equal(india.disabledProducts.poster, undefined);
+  assert.equal(india.priceNotes['poster:A4'], 'cost 212, x4 = 850, GST 18% -> 1003'); assert.equal(india.priceNotes['steel-bottle'], 'cost 213, x4 = 850, GST 18% -> 1003'); assert.ok(!/unconfirmed/.test(india.priceNotes['steel-bottle'])); assert.equal(india.prices.tshirt, undefined); assert.equal(india.disabledProducts.tshirt, true); assert.equal(india.disabledProducts.notebook, true); assert.equal(india.disabledProducts.poster, undefined);
   assert.ok(r.body.notes.some((x) => /tshirt: needs Qikink price/.test(x)) && r.body.notes.some((x) => /12x24/.test(x)));
   assert.deepEqual(india.placeholderPrices, india.prices); // every price is marked as a placeholder until an admin changes it
-  assert.deepEqual(india.taxByProduct, { poster: 18, acrylic: 18, 'acrylic-frame': 18, mug: 5 }); // bottle GST is NOT known: left unset
+  assert.deepEqual(india.taxByProduct, { poster: 18, acrylic: 18, 'acrylic-frame': 18, mug: 5, 'steel-bottle': 18, 'sipper-bottle': 18, tumbler: 18 }); // bottle GST 18% confirmed by Qikink
   assert.equal(india.costs['poster:A4'], 212); assert.equal(india.costs['poster:12x18'], 321); assert.equal(india.costs['acrylic:16x24'], 599);
   assert.equal(india.costs.mug, 115); assert.equal(india.costs['steel-bottle'], 213);
   assert.equal((await g('merch_providers/qikink')).active, true); assert.equal((await g('merch_providers/qikink')).liveEnabled, false); // usable in the sandbox, Live submission OFF
@@ -121,7 +121,8 @@ await test('price formula: 4 x Qikink cost rounded to Rs 10, GST on top, rounded
   eq('mug', 115, 460, 5, 483); // 5% GST, 483
   eq('acrylic', 599, 2400, 18, 2832);
   eq('acrylic', 126, 500, 18, 590); // 504 -> 500; exactly .5 handling not needed
-  const b = priceFromCost('steel-bottle', 213); assert.deepEqual([b.gst, b.gstConfirmed, b.price], [18, false, 1003]); assert.match(b.note, /GST unconfirmed/);
+  const b = priceFromCost('steel-bottle', 213); assert.deepEqual([b.gst, b.gstConfirmed, b.price], [18, true, 1003]); assert.ok(!/unconfirmed/.test(b.note));
+  for (const id of ['sipper-bottle', 'tumbler']) assert.equal(priceFromCost(id, 300).gstConfirmed, true, id);
   for (const bad of [0, undefined, null, NaN, -5, '']) assert.equal(priceFromCost('poster', bad), null);
   const d = launchDefaults(); assert.equal(d.prices.tshirt, undefined); assert.equal(d.prices['acrylic-stand'], undefined);
   for (const [k, v] of Object.entries(d.prices)) assert.equal(v, priceFromCost(k.split(':')[0], d.costs[k]).price, k);
@@ -892,13 +893,35 @@ await test('print type 5 for framed and acrylic posters carries the Qikink sourc
   assert.equal((await handleMerch(e.ctx, 'quote', { items: [ac()], address: addr })).status, 200);
   assert.equal((await handleMerch(e.ctx, 'quote', { items: [ac({ addStand: true })], address: addr })).body.error, 'stand-unavailable');
 });
-await test('shipping cost slabs: 500 g surface Rs 50 is confirmed; heavier framed posters (A4 ~1.4 kg, A3 ~2 kg) use a placeholder that is flagged unconfirmed', () => {
-  const india = { shippingCost: SHIPPING_COST_PLACEHOLDER };
-  const light = shippingCostFor(india, 'mug', '11oz'); assert.equal(light.unconfirmed, true); // weight unknown -> never presented as final
-  const a4 = shippingCostFor(india, 'poster', 'A4'); assert.deepEqual([a4.weightGrams, a4.amount, a4.unconfirmed], [1400, 50, true]);
-  const a3 = shippingCostFor(india, 'poster', 'A3'); assert.deepEqual([a3.weightGrams, a3.unconfirmed], [2000, true]);
+await test('shipping cost: Rs 50 per 500 g including GST (1.5 kg = 150, 2 kg = 200), an estimate; the old two-slab placeholder is ignored; unknown weight is flagged', () => {
+  for (const india of [{}, { shippingCost: SHIPPING_COST_PLACEHOLDER }, { shippingCost: { slabs: [{ upToGrams: 500, amount: 50, confirmed: true }, { upToGrams: 100000, amount: 50, confirmed: false }] } }]) {
+    const a4 = shippingCostFor(india, 'poster', 'A4'); assert.deepEqual([a4.weightGrams, a4.amount, a4.unconfirmed, a4.estimate], [1400, 150, false, true]);
+    const a3 = shippingCostFor(india, 'poster', 'A3'); assert.deepEqual([a3.weightGrams, a3.amount], [2000, 200]);
+    const mug = shippingCostFor(india, 'mug', '11oz'); assert.equal(mug.unconfirmed, true); assert.equal(mug.amount, 50); // weight unknown: one 500 g step, flagged
+  }
+  assert.equal(SHIPPING_COST_PLACEHOLDER.slabs.find((s) => s.upToGrams === 1500).amount, 150);
   const edited = shippingCostFor({ shippingCost: { slabs: [{ upToGrams: 500, amount: 50, confirmed: true }, { upToGrams: 3000, amount: 120, confirmed: true }] } }, 'poster', 'A3');
-  assert.deepEqual([edited.amount, edited.unconfirmed], [120, false]); // once the owner confirms a slab it stops being flagged
+  assert.deepEqual([edited.amount, edited.unconfirmed], [120, false]); // an admin-edited table still wins
+});
+await test('Qikink answers (ticket 136313): bottles 18% GST, acrylic frame with stand = one SKU and no price, bottle print areas at 300 DPI, steel area warning', async () => {
+  const { DEFAULT_PRODUCTS, baseCost, starterSku } = await import('../src/merch/catalog.js');
+  const { readiness, verificationLevels } = await import('../src/merch/layout.js');
+  const dims = { 'steel-bottle': [2, 4, 'side only'], 'sipper-bottle': [8.7, 6.9, 'wrap'], tumbler: [9.5, 8, 'wrap'] };
+  for (const [id, [w, h, where]] of Object.entries(dims)) {
+    const p = DEFAULT_PRODUCTS[id];
+    assert.deepEqual([p.printSpec.maxWidthInches, p.printSpec.maxHeightInches, p.printSpec.minDpi, p.printSpec.areaWhere], [w, h, 300, where], id);
+    assert.equal(p.taxUnverified, undefined, id + ' GST is confirmed now');
+    assert.equal(readiness(p).ok, false, id + ' stays blocked until Qikink gives print_type_id and placement (never guessed)');
+    assert.equal(p.printSpec.verified, false);
+    assert.equal(p.enabled, false);
+    assert.equal(priceFromCost(id, 200).gst, 18);
+  }
+  assert.ok(DEFAULT_PRODUCTS['steel-bottle'].printAreaWarning); assert.equal(DEFAULT_PRODUCTS['sipper-bottle'].printAreaWarning, null);
+  const d = launchDefaults(); for (const id of Object.keys(dims)) assert.equal(d.taxByProduct[id], 18);
+  const fr = DEFAULT_PRODUCTS['acrylic-frame'];
+  assert.equal(fr.sku, 'UAcryFrmStd-Wh-NA'); assert.equal(starterSku('acrylic-frame', 'white', 'NA'), 'UAcryFrmStd-Wh-NA'); assert.equal(fr.withStand, true);
+  assert.equal(baseCost('acrylic-frame', 'white', 'NA'), undefined); assert.equal(d.prices['acrylic-frame'], undefined); assert.equal(d.costs['acrylic-frame'], undefined);
+  assert.ok(d.needsPrice.some((x) => /acrylic-frame/.test(x)), 'listed as needing the Qikink cost');
 });
 await test('trim rule: a transparent edge is refused, an opaque flat-colour border is accepted', () => {
   const strip = (alpha, n = 8) => { const d = new Uint8ClampedArray(n * 4); for (let i = 0; i < n; i++) d[i * 4 + 3] = alpha; return d; };

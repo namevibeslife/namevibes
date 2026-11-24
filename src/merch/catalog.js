@@ -4,7 +4,7 @@
 //
 // EVERYTHING STARTS DISABLED. A product can only be switched on when its print spec is complete AND verified (print_type_id,
 // placement and print area from Qikink); only the white 11 oz mug is confirmed so far (sandbox: print type 5, placement fr,
-// 8.5 x 3.5 in). Tax % for the bottles was not in the data we have and must be set by the owner (taxUnverified).
+// 8.5 x 3.5 in). Bottle GST is 18% (Qikink, ticket 136313; included in their prices).
 //
 // printSpec = { printTypeId, allowedPlacements[], minDpi, verified, and either maxWidthInches + maxHeightInches or
 // perSize: true with bySize: { A4: { maxWidthInches, maxHeightInches, verified }, ... } } (see layout.js).
@@ -26,15 +26,22 @@ const posterSpec = (sizes) => ({
 });
 // Weights Qikink gave for framed posters (grams) and the shipping placeholder (500 g surface, GST included). Heavier parcels are UNCONFIRMED.
 export const WEIGHT_G = { 'poster:A4': 1400, 'poster:A3': 2000 };
+// Qikink (ticket 136313): surface shipping is Rs 50 per 500 g INCLUDING GST (1.5 kg = Rs 150, 2 kg = Rs 200). The final charge can differ with the
+// actual or volumetric weight, so every figure is an ESTIMATE; it is only "unconfirmed" when a product's weight is not known at all.
+export const SHIPPING_PER_500G = 50;
 export const SHIPPING_COST_PLACEHOLDER = {
-  slabs: [{ upToGrams: 500, amount: 50, method: 'surface', confirmed: true }, { upToGrams: 100000, amount: 50, method: 'surface', confirmed: false }],
-  note: 'Qikink: 500 g shipment Rs 50 surface, Rs 65 air (GST included). The rate for heavier parcels is not known yet: the second slab is a placeholder.'
+  slabs: Array.from({ length: 20 }, (_, i) => ({ upToGrams: (i + 1) * 500, amount: (i + 1) * SHIPPING_PER_500G, method: 'surface', confirmed: true })),
+  rule: 'per-500g-v2',
+  note: 'Qikink surface shipping: Rs 50 per 500 g including GST (1.5 kg = Rs 150, 2 kg = Rs 200). The final charge can vary with actual or volumetric weight.'
 };
+// An India document saved by the first launch setup holds the OLD two-slab placeholder (500 g = Rs 50, everything heavier "unconfirmed"): ignore it.
+const isOldShippingPlaceholder = (sc) => Array.isArray(sc?.slabs) && sc.slabs.length <= 2 && sc.slabs.some((s) => s.confirmed === false) && sc.rule !== 'per-500g-v2';
 export function shippingCostFor(country, productId, size) {
-  const slabs = (country?.shippingCost?.slabs?.length ? country.shippingCost.slabs : SHIPPING_COST_PLACEHOLDER.slabs).slice().sort((a, b) => a.upToGrams - b.upToGrams);
+  const own = country?.shippingCost;
+  const slabs = (own?.slabs?.length && !isOldShippingPlaceholder(own) ? own.slabs : SHIPPING_COST_PLACEHOLDER.slabs).slice().sort((a, b) => a.upToGrams - b.upToGrams);
   const weight = WEIGHT_G[`${productId}:${size}`] ?? null;
-  const slab = weight == null ? slabs[slabs.length - 1] : slabs.find((s) => s.upToGrams >= weight) || slabs[slabs.length - 1];
-  return { amount: Number(slab?.amount) || 0, weightGrams: weight, unconfirmed: weight == null || slab?.confirmed !== true };
+  const slab = weight == null ? slabs[0] : slabs.find((s) => s.upToGrams >= weight) || slabs[slabs.length - 1];
+  return { amount: Number(slab?.amount) || 0, weightGrams: weight, unconfirmed: weight == null || slab?.confirmed !== true, estimate: true };
 }
 
 const apparelSizes = ['S', 'M', 'L', 'XL', 'XXL'];
@@ -74,10 +81,14 @@ export const MUG_VARIANTS = [
 
 // ---- bottles -----------------------------------------------------------------------------------------------------------------
 export const BOTTLES = {
-  'steel-bottle': { sku: 'UWtrbtl-Bk-750ml', base: 213, size: '750ml', color: { id: 'black', hex: '#111111' } },
-  'sipper-bottle': { sku: 'USSBl-Wh-750ml', base: 216, size: '750ml', color: { id: 'white', hex: '#FFFFFF' } },
-  tumbler: { sku: 'UTumb-Wh-20oz', base: 408, size: '20oz', color: { id: 'white', hex: '#FFFFFF' } }
+  'steel-bottle': { sku: 'UWtrbtl-Bk-750ml', base: 213, size: '750ml', color: { id: 'black', hex: '#111111' }, area: { w: 2, h: 4, where: 'side only' }, warning: 'Small print area (2 x 4 in, one side only): simple designs only.' },
+  'sipper-bottle': { sku: 'USSBl-Wh-750ml', base: 216, size: '750ml', color: { id: 'white', hex: '#FFFFFF' }, area: { w: 8.7, h: 6.9, where: 'wrap' } },
+  tumbler: { sku: 'UTumb-Wh-20oz', base: 408, size: '20oz', color: { id: 'white', hex: '#FFFFFF' }, area: { w: 9.5, h: 8, where: 'wrap' } }
 };
+// Qikink print areas for the bottles (PNG/JPEG, 300 DPI, trim extra space). Qikink has not yet given the print_type_id or placement code, so the
+// spec stays incomplete (and the product blocked) until an admin fills them in; the size and DPI below are already used by the designer and print file.
+export const BOTTLE_GST = 18;
+const bottleSpec = (b) => ({ maxWidthInches: b.area.w, maxHeightInches: b.area.h, minDpi: 300, verified: false, areaWhere: b.area.where, source: QIKINK_TICKET });
 
 const BOTH = ['name_elements', 'blood_group'];
 export const DEFAULT_PRODUCTS = {
@@ -96,7 +107,8 @@ export const DEFAULT_PRODUCTS = {
   },
   'acrylic-frame': {
     id: 'acrylic-frame', kind: 'acrylic', category: 'poster', collections: BOTH, designSources: { name_elements: true, blood_group: false }, enabled: false,
-    sizes: ['NA'], colors: [{ id: 'white', hex: '#FFFFFF', on: true }], placements: ['full'], defaultInsetMm: 0 // Acrylic Photo Frame with Stand (AF22), a separate product
+    sizes: ['NA'], colors: [{ id: 'white', hex: '#FFFFFF', on: true }], placements: ['full'], defaultInsetMm: 0, // Acrylic photo frame WITH stand, ONE Qikink SKU (the stand is part of it)
+    sku: 'UAcryFrmStd-Wh-NA', withStand: true, skuSource: QIKINK_TICKET // no price until the owner supplies Qikink's cost
   },
   mug: {
     id: 'mug', kind: 'drinkware', category: 'mug', collections: ['blood_group'], designSources: { blood_group: true }, enabled: false,
@@ -107,7 +119,7 @@ export const DEFAULT_PRODUCTS = {
   },
   ...Object.fromEntries(Object.entries(BOTTLES).map(([id, b]) => [id, {
     id, kind: 'bottle', category: 'bottle', collections: ['blood_group'], designSources: { blood_group: true }, enabled: false,
-    sizes: [b.size], colors: [{ ...b.color, on: true }], placements: ['wrap'], taxUnverified: true // wrap print area and GST % are NOT known yet
+    sizes: [b.size], colors: [{ ...b.color, on: true }], placements: ['wrap'], printSpec: bottleSpec(b), printAreaWarning: b.warning || null
   }])),
   tshirt: {
     id: 'tshirt', kind: 'apparel', category: 'apparel', collections: BOTH, designSources: { name_elements: true, blood_group: true }, enabled: false,
@@ -135,7 +147,7 @@ export function starterSku(productId, color, size) {
 export function baseCost(productId, color, size) {
   if (productId === 'poster') return FRAMED_BASE[size];
   if (productId === 'acrylic') return ACRYLIC_BASE[size];
-  if (productId === 'acrylic-frame') return 164;
+  if (productId === 'acrylic-frame') return undefined; // Qikink's cost not supplied yet: never price it from a guess
   if (productId === 'mug') return MUG_VARIANTS.find((m) => m.id === color)?.base;
   return BOTTLES[productId]?.base;
 }

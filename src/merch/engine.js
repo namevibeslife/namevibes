@@ -816,7 +816,7 @@ const roundUp = (n, step) => Math.ceil(n / step) * step;
 // final price (tax included) rounded to the whole rupee. GST: 18% posters / framed posters / acrylic, 5% mugs; anything else uses the country
 // default 18% and is marked "GST unconfirmed". A product or size with no known Qikink cost gets NO price.
 export const PRICE_MULTIPLIER = 4;
-const GST_CONFIRMED = { poster: 18, acrylic: 18, 'acrylic-frame': 18, 'acrylic-stand': 18, mug: 5 };
+const GST_CONFIRMED = { poster: 18, acrylic: 18, 'acrylic-frame': 18, 'acrylic-stand': 18, mug: 5, 'steel-bottle': 18, 'sipper-bottle': 18, tumbler: 18 }; // bottles: Qikink ticket 136313
 export function priceFromCost(productId, cost) {
   const c = Number(cost); if (!(c > 0)) return null;
   const pretax = Math.round((c * PRICE_MULTIPLIER) / 10) * 10;
@@ -837,7 +837,7 @@ export function launchDefaults() {
     }
   }
   needsPrice.push('acrylic poster with stand (single SKU): needs Qikink price', 'framed sizes 12x24, 14x14, 16x24, 18x24: needs Qikink price (no SKU yet)');
-  return { costs, prices, notes, table, needsPrice, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-frame': 18, mug: 5 } }; // bottles: GST % NOT known, left for the owner
+  return { costs, prices, notes, table, needsPrice, taxByProduct: { poster: 18, acrylic: 18, 'acrylic-frame': 18, mug: 5, 'steel-bottle': 18, 'sipper-bottle': 18, tumbler: 18 } };
 }
 
 export async function applyLaunchPreset(ctx) {

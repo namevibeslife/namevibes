@@ -32,7 +32,7 @@ function merchSeed() {
     'merch_products/poster': { id: 'poster', enabled: true, verification: { sampleApproved: true }, printSpec: { ...mock, printTypeId: 1, perSize: true, bySize: bySize(FRAMED_SIZES) } },
     'merch_products/acrylic': { id: 'acrylic', enabled: true, verification: { sampleApproved: true }, printSpec: { ...mock, printTypeId: 5, perSize: true, bySize: bySize(ACRYLIC_SIZES) } },
     'merch_products/mug': { id: 'mug', enabled: true, verification: { sampleApproved: true } },
-    'merch_products/steel-bottle': { id: 'steel-bottle', enabled: true, verification: { sampleApproved: true }, printSpec: { ...mock, printTypeId: 5, maxWidthInches: 3, maxHeightInches: 6 } },
+    'merch_products/steel-bottle': { id: 'steel-bottle', enabled: true, verification: { sampleApproved: true }, printSpec: { ...mock, printTypeId: 5, maxWidthInches: 2, maxHeightInches: 4 } },
     'merch_products/tshirt': { id: 'tshirt', enabled: false },
     'merch_products/notebook': { id: 'notebook', enabled: false },
     'merch_countries/IN': {
